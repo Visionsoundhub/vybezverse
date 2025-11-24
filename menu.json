@@ -1,0 +1,12 @@
+{
+  "links": [
+    { "text": "Home", "url": "index.html" },
+    { "text": "Releases", "url": "releases.html" },
+    { "text": "Beats", "url": "beats.html" },
+    { "text": "Podcasts", "url": "podcasts.html" },
+    { "text": "Store", "url": "store.html" },
+    { "text": "Gallery", "url": "gallery.html" },
+    { "text": "Bio", "url": "bio.html" },
+    { "text": "Press", "url": "press.html" }
+  ]
+}
