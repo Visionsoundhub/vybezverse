@@ -40,15 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // ==========================================
-    // 2. HOME PAGE: LATEST RELEASE
+    // 2. HOME PAGE: LATEST RELEASE & BANNER
     // ==========================================
     const latestContainer = document.getElementById('latest-release-container');
     if (latestContainer) {
         fetch('releases.json').then(r => r.json()).then(data => {
             if(data.tracks && data.tracks.length > 0) {
-                const track = data.tracks[0]; // Παίρνουμε το πρώτο (πιο πρόσφατο)
-                
-                // Έλεγχος για Free Download Link
+                const track = data.tracks[0];
                 const downloadBtn = track.downloadUrl ? 
                     `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px; font-size:0.8rem;"><i class="fas fa-download"></i> FREE</a>` : '';
 
@@ -64,6 +62,25 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- HOME BANNER & TITLES (CMS) ---
+    const bannerContainer = document.getElementById('home-banner-container');
+    const bannerImg = document.getElementById('home-banner-img');
+    const heroTitle = document.getElementById('home-hero-title');
+    const heroSubtitle = document.getElementById('home-hero-subtitle');
+
+    if (heroTitle) { // Check if we are on home page
+        fetch('home.json').then(r => r.json()).then(data => {
+            if (data.heroImage && bannerContainer) {
+                bannerImg.src = data.heroImage;
+                bannerContainer.style.display = 'block';
+            }
+            if (data.heroTitle) heroTitle.textContent = data.heroTitle;
+            if (data.heroSubtitle) heroSubtitle.textContent = data.heroSubtitle;
+        }).catch(() => {
+            console.log('No home settings yet.');
+        });
+    }
+
     // ==========================================
     // 3. PRESS PAGE (CMS COMPATIBLE)
     // ==========================================
@@ -71,14 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (pressContainer) {
         fetch('press.json').then(r => r.json()).then(data => {
             pressContainer.innerHTML = '';
-            
-            // ΣΗΜΑΝΤΙΚΟ: Ελέγχουμε αν είναι λίστα ή αντικείμενο από το CMS
             let articles = [];
-            if (Array.isArray(data)) {
-                articles = data;
-            } else if (data.articles) {
-                articles = data.articles;
-            }
+            if (Array.isArray(data)) { articles = data; } 
+            else if (data.articles) { articles = data.articles; }
 
             if (articles.length === 0) {
                 pressContainer.innerHTML = '<p style="text-align:center; width:100%;">No press items yet.</p>';
@@ -99,13 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
             });
         }).catch(err => {
-            console.error(err);
             pressContainer.innerHTML = '<p style="text-align:center; width:100%;">No press items found.</p>';
         });
     }
 
     // ==========================================
-    // 4. STORE PAGE: BUNDLE MODAL (GREEK)
+    // 4. STORE PAGE: BUNDLE MODAL
     // ==========================================
     const bundleBtn = document.getElementById('open-bundle-modal');
     const bundleModal = document.getElementById('bundle-modal');
@@ -142,33 +153,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let allBeats = [];
 
     if (beatContainer) {
-        // Load Beats (CMS check included)
         fetch('beats.json').then(r => r.json()).then(data => {
-            // Check structure (CMS vs Manual)
             if (Array.isArray(data)) { allBeats = data; } 
             else if (data.beatslist) { allBeats = data.beatslist; }
-            
             renderBeats(allBeats);
         });
 
-        // Filters Logic
         filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 filterBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 const category = btn.getAttribute('data-category');
-                
                 if (category === 'all') {
                     renderBeats(allBeats);
                 } else {
-                    // Case insensitive check
                     const filtered = allBeats.filter(b => b.category && b.category.toLowerCase() === category.toLowerCase());
                     renderBeats(filtered);
                 }
             });
         });
 
-        // Vibe Search Modal
         const vibeBtn = document.getElementById('vibe-search-btn');
         const vibeModal = document.getElementById('vibe-modal');
         const vibeClose = document.getElementById('vibe-modal-close');
@@ -177,10 +181,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (vibeBtn && vibeModal) {
             vibeBtn.addEventListener('click', () => {
                 vibeModal.classList.add('visible');
-                // Load Vibes only once
                 if (bubblesContainer.innerHTML === '') {
                     fetch('vibes.json').then(r => r.json()).then(data => {
-                        // CMS Check
                         let vibes = [];
                         if(Array.isArray(data)) vibes = data;
                         else if(data.vibes) vibes = data.vibes;
@@ -190,21 +192,15 @@ document.addEventListener('DOMContentLoaded', () => {
                             b.className = 'btn';
                             b.style.cssText = "background:#222; border:1px solid #444; margin:5px; font-size:0.85rem;";
                             b.textContent = vibe.name;
-                            
-                            // Hover
                             b.onmouseover = () => { b.style.borderColor = "#8a2be2"; b.style.color = "#fff"; };
                             b.onmouseout = () => { b.style.borderColor = "#444"; b.style.color = "#ccc"; };
-                            
-                            // Click to filter
                             b.onclick = () => {
                                 vibeModal.classList.remove('visible');
                                 const filtered = allBeats.filter(beat => {
-                                    // Check tags array
                                     if(!beat.tags) return false;
                                     return beat.tags.some(t => vibe.tags.includes(t));
                                 });
                                 renderBeats(filtered);
-                                // Reset filters visual
                                 filterBtns.forEach(b => b.classList.remove('active'));
                             };
                             bubblesContainer.appendChild(b);
@@ -255,7 +251,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (releasesList) {
         fetch('releases.json').then(r => r.json()).then(data => {
             releasesList.innerHTML = '';
-            // CMS Check
             let tracks = [];
             if(Array.isArray(data)) tracks = data;
             else if(data.tracks) tracks = data.tracks;
