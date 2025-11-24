@@ -12,23 +12,32 @@
     
     <nav class="main-navigation">
         <a href="index.html" class="nav-logo"></a>
-        
         <div class="hamburger">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
         </div>
-
         <div class="nav-links"></div>
     </nav>
 
-    <div class="hero-section"><h1 class="hero-title">PRESS & MEDIA</h1><p class="hero-subtitle">NEWS . ARTICLES . TV</p></div>
-
-    <div class="glass-container" style="background:transparent; border:none; box-shadow:none;">
-        <div class="press-grid" id="press-container"><div style="text-align:center; width:100%; color:#666;">Loading...</div></div>
+    <main id="swup" class="transition-fade">
+        <div class="hero-section"><h1 class="hero-title">PRESS & MEDIA</h1><p class="hero-subtitle">NEWS . ARTICLES . TV</p></div>
+    
+        <div class="glass-container" style="background:transparent; border:none; box-shadow:none;">
+            <div class="press-grid" id="press-container"><div style="text-align:center; width:100%; color:#666;">Loading...</div></div>
+        </div>
+    </main>
+    <div id="sticky-player">
+        <div class="player-inner">
+            <button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button>
+            <div style="flex-grow:1;">
+                <div id="player-track-title" style="font-weight:700;">SELECT A BEAT</div>
+                <div style="background:#333; height:4px; width:100%;"><div id="player-progress" style="width:0%; height:100%;"></div></div>
+            </div>
+        </div>
     </div>
 
     <div id="dynamic-footer"></div>
+
+    <script src="https://unpkg.com/swup@4"></script>
     <script src="scripts.js"></script>
 </body>
 </html>
