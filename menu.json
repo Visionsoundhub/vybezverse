@@ -1,12 +1,44 @@
 {
   "links": [
-    { "text": "Home", "url": "index.html" },
-    { "text": "Releases", "url": "releases.html" },
-    { "text": "Beats", "url": "beats.html" },
-    { "text": "Podcasts", "url": "podcasts.html" },
-    { "text": "Store", "url": "store.html" },
-    { "text": "Gallery", "url": "gallery.html" },
-    { "text": "Bio", "url": "bio.html" },
-    { "text": "Press", "url": "press.html" }
+    {
+      "text": "Home",
+      "url": "index.html",
+      "newTab": false
+    },
+    {
+      "text": "Κυκλοφορίες",
+      "url": "releases.html",
+      "newTab": false
+    },
+    {
+      "text": "Beats",
+      "url": "beats.html",
+      "newTab": false
+    },
+    {
+      "text": "Podcasts",
+      "url": "podcasts.html",
+      "newTab": false
+    },
+    {
+      "text": "Store",
+      "url": "store.html",
+      "newTab": false
+    },
+    {
+      "text": "Gallery",
+      "url": "gallery.html",
+      "newTab": false
+    },
+    {
+      "text": "Bio",
+      "url": "bio.html",
+      "newTab": false
+    },
+    {
+      "text": "Press",
+      "url": "press.html",
+      "newTab": false
+    }
   ]
 }
