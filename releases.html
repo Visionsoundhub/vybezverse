@@ -3,7 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Releases | VYBEZONE</title>
+    <title>Μουσικές Κυκλοφορίες | Black Vybez</title>
+
+    <meta name="description" content="Άκουσε και αγόρασε όλες τις επίσημες κυκλοφορίες του Black Vybez.">
+    
+    <meta property="og:title" content="Μουσικές Κυκλοφορίες | Black Vybez" />
+    <meta property="og:type" content="music.musician" />
+    <meta property="og:url" content="[ΠΡΕΠΕΙ ΝΑ ΤΟ ΑΛΛΑΞΕΙΣ: ΒΑΣΙΚΟ URL ΤΟΥ SITE]/releases.html" />
+    <meta property="og:image" content="[ΠΡΕΠΕΙ ΝΑ ΤΟ ΑΛΛΑΞΕΙΣ: LINK ΓΙΑ ΤΗΝ ΕΙΚΟΝΑ ΚΟΙΝΟΠΟΙΗΣΗΣ (1200x630px)]" />
+    <meta property="og:site_name" content="VYBEZONE" />
+    <meta property="og:description" content="Ολοκληρωμένος κατάλογος μουσικής του Black Vybez. Stream, download & bundles." />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -12,9 +23,13 @@
     
     <nav class="main-navigation">
         <a href="index.html" class="nav-logo"></a>
+        
         <div class="hamburger">
-            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
         </div>
+
         <div class="nav-links"></div>
     </nav>
 
@@ -29,25 +44,6 @@
             </div>
             <div id="releases-list">Loading Tracks...</div>
         </div>
-        
-        <div class="modal-overlay" id="why-buy-modal">
-            <div class="modal-box" style="text-align:left;">
-                <button class="modal-close-btn" id="close-why-buy">&times;</button>
-                <h2 style="text-align:center; color:#fff; margin-bottom:1.5rem; border-bottom:1px solid #333; padding-bottom:10px;">
-                    ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΕΙΣ;
-                </h2>
-                <div style="color:#ccc; font-size:0.95rem; line-height:1.6;">
-                    <p style="margin-bottom:1rem;">
-                        <i class="fas fa-heart" style="color:#8a2be2;"></i> <strong>ΣΤΗΡΙΞΕ ΤΟΝ ΚΑΛΛΙΤΕΧΝΗ</strong><br>
-                        Οι πλατφόρμες streaming πληρώνουν ελάχιστα. Η αγορά ενός τραγουδιού ισοδυναμεί με χιλιάδες streams.
-                    </p>
-                    <p style="margin-bottom:1rem;">
-                        <i class="fas fa-box-open" style="color:#8a2be2;"></i> <strong>ΤΙ ΠΑΙΡΝΕΙΣ;</strong><br>
-                        WAV, Εναλλακτικές Εκδόσεις, Ringtones, Artwork, Στίχους.
-                    </p>
-                </div>
-            </div>
-        </div>
     </main>
     <div id="sticky-player">
         <div class="player-inner">
@@ -60,6 +56,29 @@
     </div>
 
     <div id="dynamic-footer"></div>
+    
+    <div class="modal-overlay" id="why-buy-modal">
+        <div class="modal-box" style="text-align:left;">
+            <button class="modal-close-btn" id="close-why-buy">&times;</button>
+            <h2 style="text-align:center; color:#fff; margin-bottom:1.5rem; border-bottom:1px solid #333; padding-bottom:10px;">
+                ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΕΙΣ;
+            </h2>
+            <div style="color:#ccc; font-size:0.95rem; line-height:1.6;">
+                <p style="margin-bottom:1rem;">
+                    <i class="fas fa-heart" style="color:#8a2be2;"></i> <strong>ΣΤΗΡΙΞΕ ΤΟΝ ΚΑΛΛΙΤΕΧΝΗ</strong><br>
+                    Οι πλατφόρμες streaming πληρώνουν ελάχιστα. Η αγορά ενός τραγουδιού ισοδυναμεί με χιλιάδες streams.
+                </p>
+                <p style="margin-bottom:1rem;">
+                    <i class="fas fa-gem" style="color:#8a2be2;"></i> <strong>ΑΝΩΤΕΡΗ ΠΟΙΟΤΗΤΑ</strong><br>
+                    Απόκτησε το κομμάτι σε Master Quality (WAV/FLAC) για την καλύτερη ακουστική εμπειρία.
+                </p>
+                <p style="margin-bottom:1rem;">
+                    <i class="fas fa-box" style="color:#8a2be2;"></i> <strong>ΠΛΗΡΕΣ BUNDLE</strong><br>
+                    Στο bundle περιλαμβάνονται bonus υλικό, εναλλακτικές εκδόσεις (Sped up, Slowed) και collectors' items.
+                </p>
+            </div>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/swup@4"></script>
     <script src="scripts.js"></script>
