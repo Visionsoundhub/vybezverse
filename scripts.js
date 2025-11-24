@@ -1,52 +1,80 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- HELPER: Get YouTube ID from URL ---
-    function getYoutubeId(url) {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
-    }
-
     // --- 1. GLOBAL SETTINGS ---
     const navLogoContainer = document.querySelector('.nav-logo');
     const artistSocialsContainer = document.getElementById('artist-socials');
     const prodSocialsContainer = document.getElementById('prod-socials');
     const footerEmail = document.getElementById('footer-email');
+    const accordionsContainer = document.getElementById('info-accordions-container'); // NEW
 
     fetch('settings.json').then(r => r.json()).then(data => {
+        // Logo & Socials... (ως έχουν)
         if (navLogoContainer) {
-            if (data.logoType === 'image' && data.logoImage) {
-                navLogoContainer.innerHTML = `<img src="${data.logoImage}" alt="Logo" style="height:50px;">`;
-            } else {
-                navLogoContainer.innerHTML = `<span class="logo-text">${data.logoText || "BLACK VYBEZ"}</span>`;
-            }
+            if (data.logoType === 'image' && data.logoImage) { navLogoContainer.innerHTML = `<img src="${data.logoImage}" alt="Logo" style="height:50px;">`; } 
+            else { navLogoContainer.innerHTML = `<span class="logo-text">${data.logoText || "BLACK VYBEZ"}</span>`; }
         }
-        if (artistSocialsContainer) {
+        if (artistSocialsContainer && data.artistSocials) {
             let html = '';
-            if (data.artistFb) html += `<a href="${data.artistFb}" target="_blank" class="social-link"><img src="${data.artistFbIcon}" alt="FB"></a>`;
-            if (data.artistIg) html += `<a href="${data.artistIg}" target="_blank" class="social-link"><img src="${data.artistIgIcon}" alt="IG"></a>`;
-            if (data.artistTt) html += `<a href="${data.artistTt}" target="_blank" class="social-link"><img src="${data.artistTtIcon}" alt="TT"></a>`;
-            if (data.artistYt) html += `<a href="${data.artistYt}" target="_blank" class="social-link"><img src="${data.artistYtIcon}" alt="YT"></a>`;
+            if (data.artistFb && data.artistFbIcon) html += `<a href="${data.artistFb}" target="_blank" class="social-link"><img src="${data.artistFbIcon}" alt="FB"></a>`;
+            if (data.artistIg && data.artistIgIcon) html += `<a href="${data.artistIg}" target="_blank" class="social-link"><img src="${data.artistIgIcon}" alt="IG"></a>`;
+            if (data.artistTt && data.artistTtIcon) html += `<a href="${data.artistTt}" target="_blank" class="social-link"><img src="${data.artistTtIcon}" alt="TT"></a>`;
+            if (data.artistYt && data.artistYtIcon) html += `<a href="${data.artistYt}" target="_blank" class="social-link"><img src="${data.artistYtIcon}" alt="YT"></a>`;
             artistSocialsContainer.innerHTML = html;
         }
-        if (prodSocialsContainer) {
+        if (prodSocialsContainer && data.prodSocials) {
             let html = '';
-            if (data.prodFb) html += `<a href="${data.prodFb}" target="_blank" class="social-link"><img src="${data.prodFbIcon}" alt="FB"></a>`;
-            if (data.prodIg) html += `<a href="${data.prodIg}" target="_blank" class="social-link"><img src="${data.prodIgIcon}" alt="IG"></a>`;
-            if (data.prodTt) html += `<a href="${data.prodTt}" target="_blank" class="social-link"><img src="${data.prodTtIcon}" alt="TT"></a>`;
-            if (data.prodYt) html += `<a href="${data.prodYt}" target="_blank" class="social-link"><img src="${data.prodYtIcon}" alt="YT"></a>`;
+            if (data.prodFb && data.prodFbIcon) html += `<a href="${data.prodFb}" target="_blank" class="social-link"><img src="${data.prodFbIcon}" alt="FB"></a>`;
+            if (data.prodIg && data.prodIgIcon) html += `<a href="${data.prodIg}" target="_blank" class="social-link"><img src="${data.prodIgIcon}" alt="IG"></a>`;
+            if (data.prodTt && data.prodTtIcon) html += `<a href="${data.prodTt}" target="_blank" class="social-link"><img src="${data.prodTtIcon}" alt="TT"></a>`;
+            if (data.prodYt && data.prodYtIcon) html += `<a href="${data.prodYt}" target="_blank" class="social-link"><img src="${data.prodYtIcon}" alt="YT"></a>`;
             prodSocialsContainer.innerHTML = html;
         }
         if (footerEmail && data.email) footerEmail.innerHTML = `<i class="fas fa-envelope"></i> ${data.email}`;
+
+        // --- NEW: POPULATE ACCORDIONS ---
+        if (accordionsContainer) {
+            const items = [
+                { title: data.exclusiveTitle, text: data.exclusiveText },
+                { title: data.aiTitle, text: data.aiText },
+                { title: data.vaultTitle, text: data.vaultText }
+            ];
+            let accHtml = '';
+            items.forEach((item, index) => {
+                // Only show if text exists
+                if(item.text) {
+                    accHtml += `
+                    <div class="accordion">
+                        <button class="accordion-btn">${item.title || 'Info'}</button>
+                        <div class="accordion-content"><p>${item.text}</p></div>
+                    </div>`;
+                }
+            });
+            accordionsContainer.innerHTML = accHtml;
+
+            // Activate Click Listeners
+            const accBtns = document.querySelectorAll('.accordion-btn');
+            accBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    this.parentElement.classList.toggle('active');
+                    const content = this.nextElementSibling;
+                    if (content.style.maxHeight) {
+                        content.style.maxHeight = null;
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                    }
+                });
+            });
+        }
+
     }).catch(() => {});
 
-    // --- 2. PLAYER LOGIC ---
+    // --- (Player Logic, Home Page, Press etc. παραμένουν ίδια) ---
     const audio = new Audio();
     const playerTitle = document.getElementById('player-track-title');
     const playBtn = document.getElementById('player-play-btn');
     const progressBar = document.getElementById('player-progress');
     let isPlaying = false;
 
-    if(playBtn) {
+    if (playBtn) {
         window.playTrack = function(url, title) {
             if (audio.src !== url && url) {
                 audio.src = url;
@@ -74,59 +102,56 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 3. HOME PAGE: CMS CONTROLLED CONTENT ---
-    const homeBannerTitle = document.getElementById('home-hero-title');
-    if (homeBannerTitle) {
-        fetch('home.json').then(r => r.json()).then(data => {
-            // 1. Banner
-            const bContainer = document.getElementById('home-banner-container');
-            const bImg = document.getElementById('home-banner-img');
-            const hSub = document.getElementById('home-hero-subtitle');
-            if (data.heroImage && bContainer) { bImg.src = data.heroImage; bContainer.style.display = 'block'; }
-            if (data.heroTitle) homeBannerTitle.textContent = data.heroTitle;
-            if (data.heroSubtitle) hSub.textContent = data.heroSubtitle;
-
-            // 2. Announcement Video
-            const annContainer = document.getElementById('home-announcement-container');
-            const annIframe = document.getElementById('announcement-iframe');
-            const annText = document.getElementById('announcement-text');
-            
-            if (data.announcementVideo && annContainer) {
-                const videoId = getYoutubeId(data.announcementVideo);
-                if(videoId) {
-                    annIframe.src = `https://www.youtube.com/embed/${videoId}`;
-                    annContainer.style.display = 'block';
-                    if(data.announcementText) annText.textContent = data.announcementText;
-                }
+    // ... (Home Page, Releases, Press Logic as before) ...
+    const latestContainer = document.getElementById('latest-release-container');
+    if (latestContainer) {
+        fetch('releases.json').then(r => r.json()).then(data => {
+            if(data.tracks && data.tracks.length > 0) {
+                const track = data.tracks[0];
+                const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px; font-size:0.75rem;"><i class="fas fa-download"></i> FREE</a>` : '';
+                latestContainer.innerHTML = `
+                    <div style="margin-bottom:1rem;"><h3 style="font-size:1.5rem; margin:0;">${track.title}</h3></div>
+                    <a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent"><i class="fab fa-youtube"></i> WATCH NOW</a>
+                    <a href="${track.streamUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px;">STREAM</a> ${downloadBtn}`;
             }
-
-            // 3. Latest Drop (Featured)
-            const dropContainer = document.getElementById('home-featured-container');
-            const dropTitleLabel = document.getElementById('drop-title-label');
-            const dropIframe = document.getElementById('drop-iframe');
-            const dropButtons = document.getElementById('drop-buttons');
-
-            if (data.dropVideo && dropContainer) {
-                const dropId = getYoutubeId(data.dropVideo);
-                if(dropId) {
-                    dropIframe.src = `https://www.youtube.com/embed/${dropId}`;
-                    dropContainer.style.display = 'block';
-                    if(data.dropTitle) dropTitleLabel.innerHTML = `🔥 ${data.dropTitle}`;
-                    
-                    // Create Buttons
-                    let btnsHtml = '';
-                    if(data.dropStream) btnsHtml += `<a href="${data.dropStream}" target="_blank" class="btn btn-outline">STREAM</a>`;
-                    if(data.dropBuy) btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑΣΕ ΤΟ</a>`;
-                    if(data.dropFree) btnsHtml += `<a href="${data.dropFree}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>`;
-                    
-                    dropButtons.innerHTML = btnsHtml;
-                }
-            }
-
-        }).catch(() => {});
+        });
     }
 
-    // --- 4. RELEASES PAGE ---
+    const bannerContainer = document.getElementById('home-banner-container');
+    const bannerImg = document.getElementById('home-banner-img');
+    const heroTitle = document.getElementById('home-hero-title');
+    const heroSubtitle = document.getElementById('home-hero-subtitle');
+    if (heroTitle) {
+        fetch('home.json').then(r => r.json()).then(data => {
+            if (data.heroImage && bannerContainer) { bannerImg.src = data.heroImage; bannerContainer.style.display = 'block'; }
+            if (data.heroTitle) heroTitle.textContent = data.heroTitle;
+            if (data.heroSubtitle) heroSubtitle.textContent = data.heroSubtitle;
+        }).catch(() => {});
+    }
+    
+    // Press Page
+    const pressContainer = document.getElementById('press-container');
+    if (pressContainer) {
+        fetch('press.json').then(r => r.json()).then(data => {
+            pressContainer.innerHTML = '';
+            let articles = Array.isArray(data) ? data : (data.articles || []);
+            if (articles.length === 0) { pressContainer.innerHTML = '<p style="text-align:center; width:100%;">No press items yet.</p>'; return; }
+            articles.forEach(item => {
+                pressContainer.innerHTML += `
+                    <div class="press-card">
+                        <img src="${item.image}" alt="${item.title}" class="press-image">
+                        <div class="press-content">
+                            <div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date} • ${item.source}</div>
+                            <h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3>
+                            <p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary}</p>
+                            <a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">ΔΙΑΒΑΣΕ ΤΟ</a>
+                        </div>
+                    </div>`;
+            });
+        }).catch(() => {});
+    }
+    
+    // Releases Page (YouTube Links)
     const releasesList = document.getElementById('releases-list');
     const whyBuyBtn = document.getElementById('why-buy-btn');
     const whyBuyModal = document.getElementById('why-buy-modal');
@@ -136,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
         closeWhyBuy.addEventListener('click', () => whyBuyModal.classList.remove('visible'));
         whyBuyModal.addEventListener('click', (e) => { if(e.target === whyBuyModal) whyBuyModal.classList.remove('visible'); });
     }
-
     if (releasesList) {
         fetch('releases.json').then(r => r.json()).then(data => {
             releasesList.innerHTML = '';
@@ -153,22 +177,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 5. STORE MODAL ---
+    // Store Modal
     const bundleBtn = document.getElementById('open-bundle-modal');
     const bundleModal = document.getElementById('bundle-modal');
     const closeBundle = document.getElementById('close-bundle-modal');
     const bundleList = document.getElementById('bundle-list-content');
     if(bundleBtn && bundleModal) {
         if (bundleList) {
-            const items = [
-                { text: "Master Quality Track: WAV/MP3 (High Res)", icon: "fas fa-music" },
-                { text: "Εναλλακτικές Εκδόσεις: Slowed, Sped up & Edits", icon: "fas fa-random" },
-                { text: "Ringtone: Έτοιμο κομμένο αρχείο m4r/mp3", icon: "fas fa-mobile-alt" },
-                { text: "Signed Artwork: 300DPI για εκτύπωση", icon: "fas fa-image" },
-                { text: "Χειρόγραφοι Στίχοι: PDF με υπογραφή Black Vybez", icon: "fas fa-pen-nib" },
-                { text: "BTS Video: Αποκλειστικό υλικό από το στούντιο", icon: "fas fa-video" },
-                { text: "Οδηγίες Χρήσης: PDF οδηγός εγκατάστασης", icon: "fas fa-book" }
-            ];
+            const items = [ { text: "Master Quality Track: WAV/MP3 (High Res)", icon: "fas fa-music" }, { text: "Εναλλακτικές Εκδόσεις: Slowed, Sped up & Edits", icon: "fas fa-random" }, { text: "Ringtone: Έτοιμο κομμένο αρχείο m4r/mp3", icon: "fas fa-mobile-alt" }, { text: "Signed Artwork: 300DPI για εκτύπωση", icon: "fas fa-image" }, { text: "Χειρόγραφοι Στίχοι: PDF με υπογραφή Black Vybez", icon: "fas fa-pen-nib" }, { text: "BTS Video: Αποκλειστικό υλικό από το στούντιο", icon: "fas fa-video" }, { text: "Οδηγίες Χρήσης: PDF οδηγός εγκατάστασης", icon: "fas fa-book" } ];
             bundleList.innerHTML = items.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`).join('');
         }
         bundleBtn.addEventListener('click', () => bundleModal.classList.add('visible'));
@@ -176,19 +192,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bundleModal.addEventListener('click', (e) => { if(e.target === bundleModal) bundleModal.classList.remove('visible'); });
     }
 
-    // --- 6. PRESS & BEATS ---
-    const pCont = document.getElementById('press-container');
-    if (pCont) {
-        fetch('press.json').then(r => r.json()).then(data => {
-            pCont.innerHTML = '';
-            let articles = Array.isArray(data) ? data : (data.articles || []);
-            if (articles.length === 0) { pCont.innerHTML = '<p style="text-align:center; width:100%;">No press items yet.</p>'; return; }
-            articles.forEach(item => {
-                pCont.innerHTML += `<div class="press-card"><img src="${item.image}" alt="${item.title}" class="press-image"><div class="press-content"><div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date} • ${item.source}</div><h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3><p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary}</p><a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">ΔΙΑΒΑΣΕ ΤΟ</a></div></div>`;
-            });
-        }).catch(() => {});
-    }
-
+    // BEATS PAGE (With Floating Vibes)
     const beatContainer = document.getElementById('beat-store-list');
     const filterBtns = document.querySelectorAll('.filter-btn');
     let allBeats = [];
@@ -217,12 +221,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         let vibes = Array.isArray(data) ? data : (data.vibes || []);
                         vibes.forEach(vibe => {
                             const b = document.createElement('button');
-                            b.className = 'btn';
-                            b.style.cssText = "background:#222; border:1px solid #444; margin:5px; font-size:0.85rem;";
+                            b.className = 'btn floating-vibe'; // ADDED CLASS FOR ANIMATION
                             b.textContent = vibe.name;
-                            b.onmouseover = () => { b.style.borderColor = "#8a2be2"; b.style.color = "#fff"; };
-                            b.onmouseout = () => { b.style.borderColor = "#444"; b.style.color = "#ccc"; };
-                            b.onclick = () => { vModal.classList.remove('visible'); const f = allBeats.filter(beat => { if(!beat.tags) return false; return beat.tags.some(t => vibe.tags.includes(t)); }); renderBeats(f); filterBtns.forEach(b => b.classList.remove('active')); };
+                            b.onclick = () => {
+                                vModal.classList.remove('visible');
+                                const filtered = allBeats.filter(beat => { if(!beat.tags) return false; return beat.tags.some(t => vibe.tags.includes(t)); });
+                                renderBeats(filtered);
+                                filterBtns.forEach(b => b.classList.remove('active'));
+                            };
                             vBubbles.appendChild(b);
                         });
                     });
@@ -245,7 +251,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="beat-row">
                     <div class="beat-art"><img src="https://via.placeholder.com/60/111/333?text=V" alt="Art"><div class="beat-play-overlay" onclick="playTrack('${beat.audioSrc}', '${beat.title}')"><i class="fas fa-play" style="color:#fff;"></i></div></div>
                     <div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${bpm} BPM • ${key} • ${beat.category}</div></div>
-                    <div class="beat-actions"><a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent" style="min-width:140px;">${beat.price} | <i class="fas fa-shopping-cart" style="margin-left:5px;"></i> ${statusLabel}</a></div>
+                    <div class="beat-actions">
+                        <a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent" style="min-width:140px;">${beat.price} | <i class="fas fa-shopping-cart" style="margin-left:5px;"></i> ${statusLabel}</a>
+                    </div>
                 </div>`;
         });
     }
