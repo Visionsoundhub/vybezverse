@@ -162,29 +162,36 @@ document.addEventListener('DOMContentLoaded', () => {
     const bImg = document.getElementById('home-banner-img');
     const hSub = document.getElementById('home-hero-subtitle');
     
-    if (document.querySelector('.hero-section')) { // General check to run Home logic
+    if (document.querySelector('.hero-section')) { 
         fetch('home.json').then(r => r.json()).then(data => {
+            // Hero
             if (data.heroImage && bContainer) { bImg.src = data.heroImage; bContainer.style.display = 'block'; }
             if (data.heroTitle && document.getElementById('home-hero-title')) document.getElementById('home-hero-title').textContent = data.heroTitle;
             if (data.heroSubtitle && hSub) hSub.textContent = data.heroSubtitle;
             
+            // Announcement Section (Checks 'showAnnouncement' toggle)
             const annContainer = document.getElementById('home-announcement-container');
             const annIframe = document.getElementById('announcement-iframe');
             const annText = document.getElementById('announcement-text');
-            if (data.announcementVideo && annContainer) { 
+            
+            if (data.showAnnouncement && data.announcementVideo && annContainer) { 
                 const videoId = getYoutubeId(data.announcementVideo); 
                 if(videoId) { 
                     annIframe.src = `https://www.youtube.com/embed/${videoId}`; 
                     annContainer.style.display = 'block'; 
                     if(data.announcementText) annText.textContent = data.announcementText; 
                 } 
+            } else if (annContainer) {
+                annContainer.style.display = 'none'; // Ensure hidden if toggle is off
             }
             
+            // Latest Drop Section (Checks 'showDrop' toggle)
             const dropContainer = document.getElementById('home-featured-container');
             const dropTitleLabel = document.getElementById('drop-title-label');
             const dropIframe = document.getElementById('drop-iframe');
             const dropButtons = document.getElementById('drop-buttons');
-            if (data.dropVideo && dropContainer) { 
+            
+            if (data.showDrop && data.dropVideo && dropContainer) { 
                 const dropId = getYoutubeId(data.dropVideo); 
                 if(dropId) { 
                     dropIframe.src = `https://www.youtube.com/embed/${dropId}`; 
@@ -196,6 +203,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(data.dropFree) btnsHtml += `<a href="${data.dropFree}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>`; 
                     dropButtons.innerHTML = btnsHtml; 
                 } 
+            } else if (dropContainer) {
+                dropContainer.style.display = 'none'; // Ensure hidden if toggle is off
             }
         }).catch(() => {});
     }
