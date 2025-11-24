@@ -32,89 +32,101 @@ document.addEventListener('DOMContentLoaded', () => {
         if (footerEmail && data.email) footerEmail.innerHTML = `<i class="fas fa-envelope"></i> ${data.email}`;
     }).catch(() => {});
 
-    // --- 2. PLAYER LOGIC (ONLY FOR BEATS NOW) ---
+    // --- 2. PLAYER LOGIC (ONLY WORKS IF PLAYER EXISTS) ---
     const audio = new Audio();
     const playerTitle = document.getElementById('player-track-title');
     const playBtn = document.getElementById('player-play-btn');
     const progressBar = document.getElementById('player-progress');
     let isPlaying = false;
 
-    window.playTrack = function(url, title) {
-        if (audio.src !== url && url) {
-            audio.src = url;
-            if(playerTitle) playerTitle.textContent = title;
-            audio.play();
-            isPlaying = true;
-        } else {
-            togglePlay();
+    if (playBtn) { // Έλεγχος: Υπάρχει ο player στη σελίδα;
+        window.playTrack = function(url, title) {
+            if (audio.src !== url && url) {
+                audio.src = url;
+                if(playerTitle) playerTitle.textContent = title;
+                audio.play();
+                isPlaying = true;
+            } else {
+                togglePlay();
+            }
+            updatePlayerUI();
+        };
+
+        function togglePlay() {
+            if (audio.paused) { audio.play(); isPlaying = true; } 
+            else { audio.pause(); isPlaying = false; }
+            updatePlayerUI();
         }
-        updatePlayerUI();
-    };
 
-    function togglePlay() {
-        if (audio.paused) { audio.play(); isPlaying = true; } 
-        else { audio.pause(); isPlaying = false; }
-        updatePlayerUI();
-    }
-
-    function updatePlayerUI() {
-        if(playBtn) playBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
-    }
-
-    if(playBtn) playBtn.addEventListener('click', togglePlay);
-    audio.addEventListener('timeupdate', () => {
-        if(progressBar) {
-            const percent = (audio.currentTime / audio.duration) * 100;
-            progressBar.style.width = percent + '%';
+        function updatePlayerUI() {
+            playBtn.innerHTML = isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
         }
-    });
 
-    // --- 3. RELEASES PAGE (YOUTUBE LINKS) ---
-    const releasesList = document.getElementById('releases-list');
-    
-    // Modal Logic
-    const whyBuyBtn = document.getElementById('why-buy-btn');
-    const whyBuyModal = document.getElementById('why-buy-modal');
-    const closeWhyBuy = document.getElementById('close-why-buy');
-    if(whyBuyBtn && whyBuyModal) {
-        whyBuyBtn.addEventListener('click', () => whyBuyModal.classList.add('visible'));
-        closeWhyBuy.addEventListener('click', () => whyBuyModal.classList.remove('visible'));
-        whyBuyModal.addEventListener('click', (e) => { if(e.target === whyBuyModal) whyBuyModal.classList.remove('visible'); });
-    }
-
-    if (releasesList) {
-        fetch('releases.json').then(r => r.json()).then(data => {
-            releasesList.innerHTML = '';
-            let tracks = Array.isArray(data) ? data : (data.tracks || []);
-            tracks.forEach(track => {
-                const downloadBtn = track.downloadUrl ? 
-                    `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : '';
-
-                // ΑΛΛΑΓΗ: Το Play Button τώρα είναι Link για YouTube
-                releasesList.innerHTML += `
-                <div class="beat-row">
-                    <div class="beat-art">
-                        <img src="${track.cover || 'https://via.placeholder.com/100'}" alt="Art">
-                        <a href="${track.youtubeUrl}" target="_blank" class="beat-play-overlay">
-                            <i class="fab fa-youtube" style="color:#fff; font-size:1.5rem;"></i>
-                        </a>
-                    </div>
-                    <div class="beat-info"><h4>${track.title}</h4><div class="beat-meta">Available Now</div></div>
-                    
-                    <div class="beat-actions">
-                        <a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent play-round">
-                            <i class="fab fa-youtube"></i>
-                        </a>
-                        <a href="${track.streamUrl}" target="_blank" class="btn btn-outline">STREAM</a>
-                        <a href="${track.bundleUrl}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2; font-weight:800;">ΑΓΟΡΑΣΕ ΤΟ</a>
-                        ${downloadBtn}
-                    </div>
-                </div>`;
-            });
+        playBtn.addEventListener('click', togglePlay);
+        
+        audio.addEventListener('timeupdate', () => {
+            if(progressBar) {
+                const percent = (audio.currentTime / audio.duration) * 100;
+                progressBar.style.width = percent + '%';
+            }
         });
     }
 
-    // --- 4. STORE MODAL ---
+    // --- 3. HOME PAGE: LATEST RELEASE (YOUTUBE LINK) ---
+    const latestContainer = document.getElementById('latest-release-container');
+    if (latestContainer) {
+        fetch('releases.json').then(r => r.json()).then(data => {
+            if(data.tracks && data.tracks.length > 0) {
+                const track = data.tracks[0];
+                const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px; font-size:0.75rem;"><i class="fas fa-download"></i> FREE</a>` : '';
+                
+                // ΑΛΛΑΓΗ: Κουμπί YouTube αντί για Play
+                latestContainer.innerHTML = `
+                    <div style="margin-bottom:1rem;"><h3 style="font-size:1.5rem; margin:0;">${track.title}</h3></div>
+                    <a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent">
+                        <i class="fab fa-youtube"></i> WATCH VIDEO
+                    </a>
+                    <a href="${track.streamUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px;">STREAM</a> ${downloadBtn}`;
+            }
+        });
+    }
+
+    // Home Banner
+    const bannerContainer = document.getElementById('home-banner-container');
+    const bannerImg = document.getElementById('home-banner-img');
+    const heroTitle = document.getElementById('home-hero-title');
+    const heroSubtitle = document.getElementById('home-hero-subtitle');
+    if (heroTitle) {
+        fetch('home.json').then(r => r.json()).then(data => {
+            if (data.heroImage && bannerContainer) { bannerImg.src = data.heroImage; bannerContainer.style.display = 'block'; }
+            if (data.heroTitle) heroTitle.textContent = data.heroTitle;
+            if (data.heroSubtitle) heroSubtitle.textContent = data.heroSubtitle;
+        }).catch(() => {});
+    }
+
+    // --- 4. PRESS PAGE ---
+    const pressContainer = document.getElementById('press-container');
+    if (pressContainer) {
+        fetch('press.json').then(r => r.json()).then(data => {
+            pressContainer.innerHTML = '';
+            let articles = Array.isArray(data) ? data : (data.articles || []);
+            if (articles.length === 0) { pressContainer.innerHTML = '<p style="text-align:center; width:100%;">No press items yet.</p>'; return; }
+            articles.forEach(item => {
+                pressContainer.innerHTML += `
+                    <div class="press-card">
+                        <img src="${item.image}" alt="${item.title}" class="press-image">
+                        <div class="press-content">
+                            <div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date} • ${item.source}</div>
+                            <h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3>
+                            <p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary}</p>
+                            <a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">ΔΙΑΒΑΣΕ ΤΟ</a>
+                        </div>
+                    </div>`;
+            });
+        }).catch(() => {});
+    }
+
+    // --- 5. STORE MODAL ---
     const bundleBtn = document.getElementById('open-bundle-modal');
     const bundleModal = document.getElementById('bundle-modal');
     const closeBundle = document.getElementById('close-bundle-modal');
@@ -137,57 +149,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bundleModal.addEventListener('click', (e) => { if(e.target === bundleModal) bundleModal.classList.remove('visible'); });
     }
 
-    // --- 5. HOME PAGE (Latest Drop -> YouTube) ---
-    const homeBannerTitle = document.getElementById('home-hero-title');
-    if (homeBannerTitle) {
-        fetch('releases.json').then(r => r.json()).then(data => {
-            if(data.tracks && data.tracks.length > 0) {
-                const track = data.tracks[0];
-                const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px; font-size:0.75rem;"><i class="fas fa-download"></i> FREE</a>` : '';
-                const cont = document.getElementById('latest-release-container');
-                if(cont) {
-                    cont.innerHTML = `
-                    <div style="margin-bottom:1rem;"><h3 style="font-size:1.5rem; margin:0;">${track.title}</h3></div>
-                    <a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent">
-                        <i class="fab fa-youtube"></i> WATCH NOW
-                    </a>
-                    <a href="${track.streamUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px;">STREAM</a> ${downloadBtn}`;
-                }
-            }
-        });
-        const bContainer = document.getElementById('home-banner-container');
-        const bImg = document.getElementById('home-banner-img');
-        const hSub = document.getElementById('home-hero-subtitle');
-        fetch('home.json').then(r => r.json()).then(data => {
-            if (data.heroImage && bContainer) { bImg.src = data.heroImage; bContainer.style.display = 'block'; }
-            if (data.heroTitle) homeBannerTitle.textContent = data.heroTitle;
-            if (data.heroSubtitle) hSub.textContent = data.heroSubtitle;
-        }).catch(() => {});
-    }
-
-    // --- 6. PRESS PAGE ---
-    const pCont = document.getElementById('press-container');
-    if (pCont) {
-        fetch('press.json').then(r => r.json()).then(data => {
-            pCont.innerHTML = '';
-            let articles = Array.isArray(data) ? data : (data.articles || []);
-            if (articles.length === 0) { pCont.innerHTML = '<p style="text-align:center; width:100%;">No press items yet.</p>'; return; }
-            articles.forEach(item => {
-                pCont.innerHTML += `
-                    <div class="press-card">
-                        <img src="${item.image}" alt="${item.title}" class="press-image">
-                        <div class="press-content">
-                            <div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date} • ${item.source}</div>
-                            <h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3>
-                            <p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary}</p>
-                            <a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">ΔΙΑΒΑΣΕ ΤΟ</a>
-                        </div>
-                    </div>`;
-            });
-        }).catch(() => {});
-    }
-
-    // --- 7. BEAT STORE (MP3 Player Works Here) ---
+    // --- 6. BEAT STORE (PLAYER ACTIVE HERE) ---
     const beatContainer = document.getElementById('beat-store-list');
     const filterBtns = document.querySelectorAll('.filter-btn');
     let allBeats = [];
@@ -200,8 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
             btn.addEventListener('click', () => {
                 filterBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                const cat = btn.getAttribute('data-category');
-                renderBeats(cat === 'all' ? allBeats : allBeats.filter(b => b.category && b.category.toLowerCase() === cat.toLowerCase()));
+                const category = btn.getAttribute('data-category');
+                renderBeats(category === 'all' ? allBeats : allBeats.filter(b => b.category && b.category.toLowerCase() === category.toLowerCase()));
             });
         });
         const vibeBtn = document.getElementById('vibe-search-btn');
@@ -253,6 +215,51 @@ document.addEventListener('DOMContentLoaded', () => {
                         <a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent" style="min-width:140px;">${beat.price} | <i class="fas fa-shopping-cart" style="margin-left:5px;"></i> ${statusLabel}</a>
                     </div>
                 </div>`;
+        });
+    }
+
+    // --- 7. RELEASES PAGE (YOUTUBE LINKS ONLY) ---
+    const releasesList = document.getElementById('releases-list');
+    
+    // Why Buy Modal Logic
+    const whyBuyBtn = document.getElementById('why-buy-btn');
+    const whyBuyModal = document.getElementById('why-buy-modal');
+    const closeWhyBuy = document.getElementById('close-why-buy');
+    if(whyBuyBtn && whyBuyModal) {
+        whyBuyBtn.addEventListener('click', () => whyBuyModal.classList.add('visible'));
+        closeWhyBuy.addEventListener('click', () => whyBuyModal.classList.remove('visible'));
+        whyBuyModal.addEventListener('click', (e) => { if(e.target === whyBuyModal) whyBuyModal.classList.remove('visible'); });
+    }
+
+    if (releasesList) {
+        fetch('releases.json').then(r => r.json()).then(data => {
+            releasesList.innerHTML = '';
+            let tracks = Array.isArray(data) ? data : (data.tracks || []);
+            tracks.forEach(track => {
+                const downloadBtn = track.downloadUrl ? 
+                    `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : '';
+
+                // ΑΛΛΑΓΗ: Κουμπί YouTube αντί για PlayTrack
+                releasesList.innerHTML += `
+                <div class="beat-row">
+                    <div class="beat-art">
+                        <img src="${track.cover || 'https://via.placeholder.com/100'}" alt="Art">
+                        <a href="${track.youtubeUrl}" target="_blank" class="beat-play-overlay">
+                            <i class="fab fa-youtube" style="color:#fff; font-size:1.5rem;"></i>
+                        </a>
+                    </div>
+                    <div class="beat-info"><h4>${track.title}</h4><div class="beat-meta">Available Now</div></div>
+                    
+                    <div class="beat-actions">
+                        <a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent play-round">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                        <a href="${track.streamUrl}" target="_blank" class="btn btn-outline">STREAM</a>
+                        <a href="${track.bundleUrl}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2; font-weight:800;">ΑΓΟΡΑΣΕ ΤΟ</a>
+                        ${downloadBtn}
+                    </div>
+                </div>`;
+            });
         });
     }
 });
