@@ -1,57 +1,50 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // ==========================================
-    // 1. GLOBAL SETTINGS (LOGO & FOOTER)
-    // ==========================================
+    // 1. GLOBAL SETTINGS
     const navLogoContainer = document.querySelector('.nav-logo');
     const artistSocialsContainer = document.getElementById('artist-socials');
     const prodSocialsContainer = document.getElementById('prod-socials');
     const footerEmail = document.getElementById('footer-email');
 
-    // Load Global Settings
     fetch('settings.json').then(r => r.json()).then(data => {
-        // --- A. LOGO LOGIC ---
+        // A. LOGO
         if (navLogoContainer) {
             if (data.logoType === 'image' && data.logoImage) {
-                // Show Image Logo
                 navLogoContainer.innerHTML = `<img src="${data.logoImage}" alt="Logo" style="height:50px;">`;
             } else {
-                // Show Text Logo (Default)
                 const text = data.logoText || "BLACK VYBEZ";
                 navLogoContainer.innerHTML = `<span class="logo-text">${text}</span>`;
             }
         }
 
-        // --- B. FOOTER SOCIALS (ARTIST) ---
-        if (artistSocialsContainer && data.artistSocials) {
+        // B. FOOTER ICONS (ARTIST) - CUSTOM IMAGES
+        if (artistSocialsContainer) {
             let html = '';
-            if (data.artistSocials.fb) html += `<a href="${data.artistSocials.fb}" target="_blank" class="social-link"><i class="fab fa-facebook-f"></i></a>`;
-            if (data.artistSocials.ig) html += `<a href="${data.artistSocials.ig}" target="_blank" class="social-link"><i class="fab fa-instagram"></i></a>`;
-            if (data.artistSocials.tt) html += `<a href="${data.artistSocials.tt}" target="_blank" class="social-link"><i class="fab fa-tiktok"></i></a>`;
-            if (data.artistSocials.yt) html += `<a href="${data.artistSocials.yt}" target="_blank" class="social-link"><i class="fab fa-youtube"></i></a>`;
+            if (data.artistFb && data.artistFbIcon) html += `<a href="${data.artistFb}" target="_blank" class="social-link"><img src="${data.artistFbIcon}" alt="FB"></a>`;
+            if (data.artistIg && data.artistIgIcon) html += `<a href="${data.artistIg}" target="_blank" class="social-link"><img src="${data.artistIgIcon}" alt="IG"></a>`;
+            if (data.artistTt && data.artistTtIcon) html += `<a href="${data.artistTt}" target="_blank" class="social-link"><img src="${data.artistTtIcon}" alt="TT"></a>`;
+            if (data.artistYt && data.artistYtIcon) html += `<a href="${data.artistYt}" target="_blank" class="social-link"><img src="${data.artistYtIcon}" alt="YT"></a>`;
             artistSocialsContainer.innerHTML = html;
         }
 
-        // --- C. FOOTER SOCIALS (PRODUCER) ---
-        if (prodSocialsContainer && data.prodSocials) {
+        // C. FOOTER ICONS (PRODUCER) - CUSTOM IMAGES
+        if (prodSocialsContainer) {
             let html = '';
-            if (data.prodSocials.fb) html += `<a href="${data.prodSocials.fb}" target="_blank" class="social-link"><i class="fab fa-facebook-f"></i></a>`;
-            if (data.prodSocials.ig) html += `<a href="${data.prodSocials.ig}" target="_blank" class="social-link"><i class="fab fa-instagram"></i></a>`;
-            if (data.prodSocials.tt) html += `<a href="${data.prodSocials.tt}" target="_blank" class="social-link"><i class="fab fa-tiktok"></i></a>`;
-            if (data.prodSocials.yt) html += `<a href="${data.prodSocials.yt}" target="_blank" class="social-link"><i class="fab fa-youtube"></i></a>`;
+            if (data.prodFb && data.prodFbIcon) html += `<a href="${data.prodFb}" target="_blank" class="social-link"><img src="${data.prodFbIcon}" alt="FB"></a>`;
+            if (data.prodIg && data.prodIgIcon) html += `<a href="${data.prodIg}" target="_blank" class="social-link"><img src="${data.prodIgIcon}" alt="IG"></a>`;
+            if (data.prodTt && data.prodTtIcon) html += `<a href="${data.prodTt}" target="_blank" class="social-link"><img src="${data.prodTtIcon}" alt="TT"></a>`;
+            if (data.prodYt && data.prodYtIcon) html += `<a href="${data.prodYt}" target="_blank" class="social-link"><img src="${data.prodYtIcon}" alt="YT"></a>`;
             prodSocialsContainer.innerHTML = html;
         }
 
-        // --- D. EMAIL ---
+        // D. EMAIL
         if (footerEmail && data.email) {
             footerEmail.innerHTML = `<i class="fas fa-envelope"></i> ${data.email}`;
         }
 
     }).catch(() => console.log('Settings not loaded yet.'));
 
-
-    // ==========================================
-    // 2. PLAYER LOGIC (EXISTING)
-    // ==========================================
+    // (Rest of scripts.js - Player, Page Loaders, etc. παραμένουν ως έχουν)
+    // ... Κράτα τον υπόλοιπο κώδικα από το προηγούμενο μήνυμα ή κάνε paste από κάτω ...
     const audio = new Audio();
     const playerTitle = document.getElementById('player-track-title');
     const playBtn = document.getElementById('player-play-btn');
@@ -81,7 +74,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if(playBtn) playBtn.addEventListener('click', togglePlay);
-    
     audio.addEventListener('timeupdate', () => {
         if(progressBar) {
             const percent = (audio.currentTime / audio.duration) * 100;
@@ -89,11 +81,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // ==========================================
-    // 3. PAGE LOADERS (Releases, Beats, etc.)
-    // ==========================================
-    
-    // Home Latest Release
     const latestContainer = document.getElementById('latest-release-container');
     if (latestContainer) {
         fetch('releases.json').then(r => r.json()).then(data => {
@@ -108,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Home Banner
     const bannerContainer = document.getElementById('home-banner-container');
     const bannerImg = document.getElementById('home-banner-img');
     const heroTitle = document.getElementById('home-hero-title');
@@ -121,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(() => {});
     }
 
-    // Press Page
     const pressContainer = document.getElementById('press-container');
     if (pressContainer) {
         fetch('press.json').then(r => r.json()).then(data => {
@@ -144,7 +129,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(err => { pressContainer.innerHTML = '<p style="text-align:center; width:100%;">No press items found.</p>'; });
     }
 
-    // Beat Store
     const beatContainer = document.getElementById('beat-store-list');
     const filterBtns = document.querySelectorAll('.filter-btn');
     let allBeats = [];
@@ -161,7 +145,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 renderBeats(category === 'all' ? allBeats : allBeats.filter(b => b.category && b.category.toLowerCase() === category.toLowerCase()));
             });
         });
-        // Vibe Search Logic
         const vibeBtn = document.getElementById('vibe-search-btn');
         const vibeModal = document.getElementById('vibe-modal');
         const vibeClose = document.getElementById('vibe-modal-close');
@@ -214,17 +197,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Store Modal
     const bundleBtn = document.getElementById('open-bundle-modal');
     const bundleModal = document.getElementById('bundle-modal');
     const closeBundle = document.getElementById('close-bundle-modal');
+    const bundleList = document.getElementById('bundle-list-content');
     if(bundleBtn && bundleModal) {
+        if (bundleList) {
+            const items = [
+                { text: "Master Quality Track: WAV/MP3 (High Res)", icon: "fas fa-music" },
+                { text: "Εναλλακτικές Εκδόσεις: Slowed, Sped up & Edits", icon: "fas fa-random" },
+                { text: "Ringtone: Έτοιμο κομμένο αρχείο m4r/mp3", icon: "fas fa-mobile-alt" },
+                { text: "Signed Artwork: 300DPI για εκτύπωση", icon: "fas fa-image" },
+                { text: "Χειρόγραφοι Στίχοι: PDF με υπογραφή Black Vybez", icon: "fas fa-pen-nib" },
+                { text: "BTS Video: Αποκλειστικό υλικό από το στούντιο", icon: "fas fa-video" },
+                { text: "Οδηγίες Χρήσης: PDF οδηγός εγκατάστασης", icon: "fas fa-book" }
+            ];
+            bundleList.innerHTML = items.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`).join('');
+        }
         bundleBtn.addEventListener('click', () => bundleModal.classList.add('visible'));
         closeBundle.addEventListener('click', () => bundleModal.classList.remove('visible'));
         bundleModal.addEventListener('click', (e) => { if(e.target === bundleModal) bundleModal.classList.remove('visible'); });
     }
 
-    // Releases Page
     const releasesList = document.getElementById('releases-list');
     if (releasesList) {
         fetch('releases.json').then(r => r.json()).then(data => {
