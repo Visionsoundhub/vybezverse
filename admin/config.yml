@@ -6,7 +6,61 @@ media_folder: "assets/uploads"
 public_folder: "/assets/uploads"
 
 collections:
-  # --- 1. NAVIGATION MENU (ΔΙΑΧΕΙΡΙΣΗ ΜΕΝΟΥ) ---
+  # --- 1. FOOTER SETTINGS (ΝΕΟ & ΞΕΧΩΡΙΣΤΟ) ---
+  - name: "footer"
+    label: "🦶 Footer Settings"
+    files:
+      - name: "footer_config"
+        label: "Footer Content & Socials"
+        file: "footer.json"
+        fields:
+          - {label: "Artist Side Title", name: "artistTitle", widget: "string", default: "BLACK VYBEZ"}
+          - {label: "Producer Side Title", name: "prodTitle", widget: "string", default: "VYBEZMADETHIS"}
+          
+          - {label: "--- ARTIST SOCIALS ---", name: "sep1", widget: "hidden"}
+          - {label: "Facebook Link", name: "artistFb", widget: "string", required: false}
+          - {label: "Facebook Icon", name: "artistFbIcon", widget: "image", required: false}
+          - {label: "Instagram Link", name: "artistIg", widget: "string", required: false}
+          - {label: "Instagram Icon", name: "artistIgIcon", widget: "image", required: false}
+          - {label: "TikTok Link", name: "artistTt", widget: "string", required: false}
+          - {label: "TikTok Icon", name: "artistTtIcon", widget: "image", required: false}
+          - {label: "YouTube Link", name: "artistYt", widget: "string", required: false}
+          - {label: "YouTube Icon", name: "artistYtIcon", widget: "image", required: false}
+          
+          - {label: "--- PRODUCER SOCIALS ---", name: "sep2", widget: "hidden"}
+          - {label: "Facebook Link", name: "prodFb", widget: "string", required: false}
+          - {label: "Facebook Icon", name: "prodFbIcon", widget: "image", required: false}
+          - {label: "Instagram Link", name: "prodIg", widget: "string", required: false}
+          - {label: "Instagram Icon", name: "prodIgIcon", widget: "image", required: false}
+          - {label: "TikTok Link", name: "prodTt", widget: "string", required: false}
+          - {label: "TikTok Icon", name: "prodTtIcon", widget: "image", required: false}
+          - {label: "YouTube Link", name: "prodYt", widget: "string", required: false}
+          - {label: "YouTube Icon", name: "prodYtIcon", widget: "image", required: false}
+          
+          - {label: "Email Contact", name: "email", widget: "string", required: false}
+          - {label: "Copyright Text", name: "copyright", widget: "string", default: "© 2025 Vybezone. All rights reserved."}
+
+  # --- 2. GLOBAL SETTINGS (Μόνο Logo & Beat Info πλέον) ---
+  - name: "settings"
+    label: "⚙️ Global & Info"
+    files:
+      - name: "global"
+        label: "Site Config"
+        file: "settings.json"
+        fields:
+          - {label: "Logo Type", name: "logoType", widget: "select", options: ["text", "image"], default: "text"}
+          - {label: "Logo Text", name: "logoText", widget: "string", default: "BLACK VYBEZ", required: false}
+          - {label: "Logo Image", name: "logoImage", widget: "image", required: false}
+          
+          - {label: "--- BEAT INFO TEXTS ---", name: "sep_info", widget: "hidden"}
+          - {label: "Exclusive Title", name: "exclusiveTitle", widget: "string"}
+          - {label: "Exclusive Text", name: "exclusiveText", widget: "text"}
+          - {label: "AI Access Title", name: "aiTitle", widget: "string"}
+          - {label: "AI Access Text", name: "aiText", widget: "text"}
+          - {label: "Vault Beats Title", name: "vaultTitle", widget: "string"}
+          - {label: "Vault Beats Text", name: "vaultText", widget: "text"}
+
+  # --- 3. MENU ---
   - name: "navigation"
     label: "🧭 Menu Manager"
     files:
@@ -15,34 +69,16 @@ collections:
         file: "menu.json"
         fields:
           - name: "links"
-            label: "Menu Items (Drag to Reorder)"
+            label: "Menu Items"
             widget: "list"
             fields:
               - {label: "Button Text", name: "text", widget: "string"}
-              - {label: "Link / URL", name: "url", widget: "string", hint: "π.χ. index.html, beats.html ή εξωτερικό link"}
+              - {label: "Link / URL", name: "url", widget: "string"}
               - {label: "Open in New Tab?", name: "newTab", widget: "boolean", default: false}
 
-  # --- 2. PODCASTS (ΝΕΟ) ---
-  - name: "podcasts"
-    label: "🎙️ Podcasts"
-    files:
-      - name: "podcast_list"
-        label: "Podcast Episodes"
-        file: "podcasts.json"
-        fields:
-          - name: "episodes"
-            label: "Episodes"
-            widget: "list"
-            fields:
-              - {label: "Episode Title", name: "title", widget: "string"}
-              - {label: "Cover Image", name: "cover", widget: "image"}
-              - {label: "Description", name: "description", widget: "text"}
-              - {label: "YouTube/Spotify Link", name: "link", widget: "string"}
-              - {label: "Date", name: "date", widget: "date"}
-
-  # --- 3. RELEASES ---
+  # --- 4. RELEASES ---
   - name: "releases"
-    label: "🎹 Releases (My Tracks)"
+    label: "🎹 Releases"
     files:
       - name: "catalog"
         label: "Music Catalog"
@@ -59,7 +95,7 @@ collections:
               - {label: "Buy Link (Payhip)", name: "bundleUrl", widget: "string"}
               - {label: "Free Download Link", name: "downloadUrl", widget: "string", required: false}
 
-  # --- 4. BEAT STORE ---
+  # --- 5. BEAT STORE ---
   - name: "beats"
     label: "💰 Beat Store"
     files:
@@ -81,7 +117,7 @@ collections:
               - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
               - {label: "Vibe Tags", name: "tags", widget: "list"}
 
-  # --- 5. PRESS ---
+  # --- 6. PRESS ---
   - name: "press"
     label: "📰 Press & News"
     files:
@@ -93,14 +129,32 @@ collections:
             label: "News Items"
             widget: "list"
             fields:
-              - {label: "Article Title", name: "title", widget: "string"}
-              - {label: "Date/Year", name: "date", widget: "string"}
-              - {label: "Source Name", name: "source", widget: "string"}
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Date", name: "date", widget: "string"}
+              - {label: "Source", name: "source", widget: "string"}
               - {label: "Image", name: "image", widget: "image"}
-              - {label: "Summary Text", name: "summary", widget: "text"}
-              - {label: "Link to Article", name: "link", widget: "string"}
+              - {label: "Summary", name: "summary", widget: "text"}
+              - {label: "Link", name: "link", widget: "string"}
 
-  # --- 6. VIBES ---
+  # --- 7. PODCASTS ---
+  - name: "podcasts"
+    label: "🎙️ Podcasts"
+    files:
+      - name: "podcast_list"
+        label: "Episodes"
+        file: "podcasts.json"
+        fields:
+          - name: "episodes"
+            label: "Episodes"
+            widget: "list"
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Cover", name: "cover", widget: "image"}
+              - {label: "Description", name: "description", widget: "text"}
+              - {label: "Link", name: "link", widget: "string"}
+              - {label: "Date", name: "date", widget: "date"}
+
+  # --- 8. VIBES ---
   - name: "vibes"
     label: "✨ Vibe Settings"
     files:
@@ -112,52 +166,15 @@ collections:
             label: "Vibes List"
             widget: "list"
             fields:
-              - {label: "Vibe Name", name: "name", widget: "string"}
-              - {label: "Tags to Filter", name: "tags", widget: "list"}
+              - {label: "Name", name: "name", widget: "string"}
+              - {label: "Tags", name: "tags", widget: "list"}
 
-  # --- 7. SETTINGS & HOME ---
-  - name: "settings"
-    label: "⚙️ Global & Home"
+  # --- 9. HOME PAGE ---
+  - name: "pages"
+    label: "🏠 Home Page"
     files:
-      - name: "global"
-        label: "Global Settings"
-        file: "settings.json"
-        fields:
-          - {label: "Logo Type", name: "logoType", widget: "select", options: ["text", "image"], default: "text"}
-          - {label: "Logo Text", name: "logoText", widget: "string", default: "BLACK VYBEZ"}
-          - {label: "Logo Image", name: "logoImage", widget: "image", required: false}
-          
-          - {label: "--- BEAT INFO ---", name: "sep_info", widget: "hidden"}
-          - {label: "Exclusive Title", name: "exclusiveTitle", widget: "string"}
-          - {label: "Exclusive Text", name: "exclusiveText", widget: "text"}
-          - {label: "AI Access Title", name: "aiTitle", widget: "string"}
-          - {label: "AI Access Text", name: "aiText", widget: "text"}
-          - {label: "Vault Beats Title", name: "vaultTitle", widget: "string"}
-          - {label: "Vault Beats Text", name: "vaultText", widget: "text"}
-
-          - {label: "--- SOCIALS ---", name: "sep_soc", widget: "hidden"}
-          - {label: "Artist FB", name: "artistFb", widget: "string", required: false}
-          - {label: "Artist FB Icon", name: "artistFbIcon", widget: "image", required: false}
-          - {label: "Artist IG", name: "artistIg", widget: "string", required: false}
-          - {label: "Artist IG Icon", name: "artistIgIcon", widget: "image", required: false}
-          - {label: "Artist TikTok", name: "artistTt", widget: "string", required: false}
-          - {label: "Artist TikTok Icon", name: "artistTtIcon", widget: "image", required: false}
-          - {label: "Artist YT", name: "artistYt", widget: "string", required: false}
-          - {label: "Artist YT Icon", name: "artistYtIcon", widget: "image", required: false}
-
-          - {label: "Producer FB", name: "prodFb", widget: "string", required: false}
-          - {label: "Producer FB Icon", name: "prodFbIcon", widget: "image", required: false}
-          - {label: "Producer IG", name: "prodIg", widget: "string", required: false}
-          - {label: "Producer IG Icon", name: "prodIgIcon", widget: "image", required: false}
-          - {label: "Producer TikTok", name: "prodTt", widget: "string", required: false}
-          - {label: "Producer TikTok Icon", name: "prodTtIcon", widget: "image", required: false}
-          - {label: "Producer YT", name: "prodYt", widget: "string", required: false}
-          - {label: "Producer YT Icon", name: "prodYtIcon", widget: "image", required: false}
-          
-          - {label: "Email", name: "email", widget: "string", required: false}
-
       - name: "home"
-        label: "Home Page"
+        label: "Home Page Config"
         file: "home.json"
         fields:
           - {label: "Main Banner", name: "heroImage", widget: "image", required: false}
