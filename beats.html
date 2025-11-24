@@ -42,12 +42,13 @@
                 <i class="fas fa-magic" style="color:#8a2be2;"></i> VIBE SEARCH
             </button>
         </div>
-
-        <div class="filter-controls">
-            <button class="filter-btn active" data-category="all">All</button>
-            <button class="filter-btn" data-category="hiphop">Hip Hop</button>
+        
+        <div class="info-accordions-container" id="info-accordions-container"></div>
+    
+        <div class="filter-scroll-container">
+            <button class="filter-btn active" data-category="all">Όλα</button>
             <button class="filter-btn" data-category="trap">Trap / Drill</button>
-            <button class="filter-btn" data-category="boombap">Boombap</button>
+            <button class="filter-btn" data-category="boombap">Rap / Boombap</button>
             <button class="filter-btn" data-category="latin">Latin Urban / Afro</button>
             <button class="filter-btn" data-category="lofi">Lofi</button>
             <button class="filter-btn" data-category="custom">Custom</button>
@@ -56,6 +57,16 @@
         </div>
 
         <div class="beat-store-container" id="beat-store-list">Loading...</div>
+
+        <div class="modal-overlay" id="vibe-modal">
+            <div class="modal-box">
+                <button class="modal-close-btn" id="vibe-modal-close">&times;</button>
+                <h2 style="text-align:center;">VIBE SEARCH</h2>
+                <p style="text-align:center; color:#ccc; margin-bottom:2rem;">Διάλεξε ένα συναίσθημα ή είδος για να βρεις beats!</p>
+                <div id="vibe-bubbles-container" class="vibe-bubbles">
+                    </div>
+            </div>
+        </div>
     </main>
     <div id="sticky-player">
         <div class="player-inner">
@@ -68,16 +79,6 @@
     </div>
     
     <div id="dynamic-footer"></div>
-
-    <div class="modal-overlay" id="vibe-modal">
-        <div class="modal-box">
-            <button class="modal-close-btn" id="vibe-modal-close">&times;</button>
-            <h2 style="text-align:center;">VIBE SEARCH</h2>
-            <p style="text-align:center; color:#ccc; margin-bottom:2rem;">Διάλεξε ένα συναίσθημα ή είδος για να βρεις beats!</p>
-            <div id="vibe-bubbles-container" class="vibe-bubbles">
-                </div>
-        </div>
-    </div>
 
     <script src="https://unpkg.com/swup@4"></script>
     <script src="scripts.js"></script>
