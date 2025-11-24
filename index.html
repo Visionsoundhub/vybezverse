@@ -12,12 +12,16 @@
     <div class="bg-glow"></div>
 
     <nav class="main-navigation">
-        <a href="index.html" class="nav-logo"></a> <div class="nav-links"></div> </nav>
+        <a href="index.html" class="nav-logo"></a>
+        <div class="nav-links"></div>
+    </nav>
 
     <div class="hero-section">
+        
         <div id="home-banner-container" style="margin-bottom: 2rem; display: none;">
             <img id="home-banner-img" src="" alt="Banner" style="width: 100%; max-width: 1000px; border-radius: 20px; box-shadow: 0 0 30px rgba(138,43,226,0.3); border: 1px solid #333;">
         </div>
+
         <h1 class="hero-title" id="home-hero-title">VYBEZONE</h1>
         <p class="hero-subtitle" id="home-hero-subtitle">NO LIMITS IN MUSIC. JUST PURE VIBE.</p>
         
@@ -30,23 +34,28 @@
 
         <div id="home-featured-container" class="glass-container" style="max-width:800px; padding:1.5rem; margin-top:4rem; display:none;">
             <span id="drop-title-label" style="color:#8a2be2; font-weight:bold; letter-spacing:2px; display:block; margin-bottom:1.5rem;">🔥 LATEST DROP</span>
+            
             <div style="border-radius:15px; overflow:hidden; border:1px solid #444; aspect-ratio:16/9; margin-bottom:1.5rem;">
                 <iframe id="drop-iframe" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
             </div>
-            <div id="drop-buttons" style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;"></div>
+
+            <div id="drop-buttons" style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+                </div>
         </div>
+
     </div>
 
-    <footer class="site-footer">
-        <div class="footer-content">
-            <div class="footer-section"><h4 class="footer-title">VYBEZMADETHIS</h4><div class="social-icons" id="prod-socials"></div></div>
-            <div class="footer-divider"></div>
-            <div class="footer-section"><h4 class="footer-title">BLACK VYBEZ</h4><div class="social-icons" id="artist-socials"></div></div>
-        </div>
-        <div class="footer-email" id="footer-email"></div><div class="copyright">&copy; 2025 Vybezone. All rights reserved.</div>
-    </footer>
+    <div id="dynamic-footer"></div>
 
     <script src="scripts.js"></script>
-    <script>if (window.netlifyIdentity) { window.netlifyIdentity.on("init", user => { if (!user) { window.netlifyIdentity.on("login", () => { document.location.href = "/admin/"; }); } }); }</script>
+    <script>
+      if (window.netlifyIdentity) {
+        window.netlifyIdentity.on("init", user => {
+          if (!user) {
+            window.netlifyIdentity.on("login", () => { document.location.href = "/admin/"; });
+          }
+        });
+      }
+    </script>
 </body>
 </html>
