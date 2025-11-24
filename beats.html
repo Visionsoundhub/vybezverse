@@ -11,7 +11,7 @@
     <div class="bg-glow"></div>
     
     <nav class="main-navigation">
-        <a href="index.html" class="nav-logo"><span class="logo-text">BLACK VYBEZ</span></a>
+        <a href="index.html" class="nav-logo"></a>
         
         <div class="hamburger">
             <div class="bar"></div>
@@ -25,7 +25,11 @@
     <div class="hero-section" style="padding:2rem 1rem;">
         <h1 class="hero-title">VYBEZMADETHIS</h1>
         <p class="hero-subtitle">exclusive beats</p>
-        <button id="vibe-search-btn" class="btn btn-outline" style="margin-top:2rem; padding:0.8rem 2.5rem;"><i class="fas fa-magic" style="color:#8a2be2;"></i> VIBE SEARCH</button>
+        
+        <button id="vibe-search-btn" class="btn btn-outline" style="margin-top:2rem; padding:0.8rem 2.5rem;">
+            <i class="fas fa-magic" style="color:#8a2be2;"></i> VIBE SEARCH
+        </button>
+
         <div class="info-accordions-container" id="info-accordions-container"></div>
     </div>
 
@@ -42,18 +46,26 @@
 
     <div class="beat-store-container" id="beat-store-list">Loading...</div>
 
-    <div id="sticky-player"><div class="player-inner"><button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button><div style="flex-grow:1;"><div id="player-track-title" style="font-weight:700;">SELECT A BEAT</div><div style="background:#333; height:4px; width:100%;"><div id="player-progress" style="width:0%; height:100%;"></div></div></div></div></div>
-    
-    <footer class="site-footer">
-        <div class="footer-content">
-            <div class="footer-section"><h4 class="footer-title">VYBEZMADETHIS</h4><div class="social-icons" id="prod-socials"></div></div>
-            <div class="footer-divider"></div>
-            <div class="footer-section"><h4 class="footer-title">BLACK VYBEZ</h4><div class="social-icons" id="artist-socials"></div></div>
+    <div id="sticky-player">
+        <div class="player-inner">
+            <button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button>
+            <div style="flex-grow:1;">
+                <div id="player-track-title" style="font-weight:700;">SELECT A BEAT</div>
+                <div style="background:#333; height:4px; width:100%;"><div id="player-progress" style="width:0%; height:100%;"></div></div>
+            </div>
         </div>
-        <div class="footer-email" id="footer-email"></div><div class="copyright">&copy; 2025 Vybezone. All rights reserved.</div>
-    </footer>
+    </div>
+    
+    <div id="dynamic-footer"></div>
 
-    <div class="modal-overlay" id="vibe-modal"><div class="modal-box"><button class="modal-close-btn" id="vibe-modal-close">&times;</button><h2 style="margin-bottom:20px;">ΠΩΣ ΝΙΩΘΕΙΣ;</h2><div id="vibe-bubbles-container" style="display:flex; flex-wrap:wrap; justify-content:center; min-height: 200px; align-items: center;"></div></div></div>
+    <div class="modal-overlay" id="vibe-modal">
+        <div class="modal-box">
+            <button class="modal-close-btn" id="vibe-modal-close">&times;</button>
+            <h2 style="margin-bottom:20px;">ΠΩΣ ΝΙΩΘΕΙΣ;</h2>
+            <div id="vibe-bubbles-container" style="display:flex; flex-wrap:wrap; justify-content:center; min-height: 200px; align-items: center;"></div>
+        </div>
+    </div>
+
     <script src="scripts.js"></script>
 </body>
 </html>
