@@ -3,90 +3,77 @@ document.addEventListener('DOMContentLoaded', () => {
     function getYoutubeId(url) { const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
     
     // ==========================================
-    // 1. DYNAMIC MENU (NEW!)
+    // 1. DYNAMIC MENU & FOOTER (GLOBAL)
     // ==========================================
     const menuContainer = document.querySelector('.nav-links');
+    const navLogoContainer = document.querySelector('.nav-logo');
+    const footerContainer = document.getElementById('dynamic-footer');
+
+    // Load Menu
     if (menuContainer) {
         fetch('menu.json').then(r => r.json()).then(data => {
             const links = data.links || [];
             let menuHtml = '';
             const currentPath = window.location.pathname.split('/').pop() || 'index.html';
-            
             links.forEach(link => {
                 const activeClass = (link.url === currentPath) ? 'active' : '';
                 const target = link.newTab ? '_blank' : '_self';
                 menuHtml += `<a href="${link.url}" class="nav-btn ${activeClass}" target="${target}">${link.text}</a>`;
             });
             menuContainer.innerHTML = menuHtml;
-        }).catch(err => console.log('Menu not loaded, using default html if present.'));
-    }
-
-    // ==========================================
-    // 2. PODCASTS PAGE
-    // ==========================================
-    const podContainer = document.getElementById('podcasts-container');
-    if (podContainer) {
-        fetch('podcasts.json').then(r => r.json()).then(data => {
-            podContainer.innerHTML = '';
-            const episodes = data.episodes || [];
-            if (episodes.length === 0) { podContainer.innerHTML = '<p style="text-align:center;">No episodes yet.</p>'; return; }
-            
-            episodes.forEach(ep => {
-                podContainer.innerHTML += `
-                    <div class="press-card">
-                        <img src="${ep.cover}" alt="${ep.title}" class="press-image">
-                        <div class="press-content">
-                            <div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem;">${ep.date || ''}</div>
-                            <h3 style="font-size:1.2rem; margin:5px 0;">${ep.title}</h3>
-                            <p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${ep.description}</p>
-                            <a href="${ep.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem;">LISTEN / WATCH</a>
-                        </div>
-                    </div>`;
-            });
         }).catch(() => {});
     }
 
-    // ==========================================
-    // 3. GLOBAL SETTINGS, PLAYER & REST (Existing)
-    // ==========================================
-    const navLogoContainer = document.querySelector('.nav-logo');
-    const artistSocialsContainer = document.getElementById('artist-socials');
-    const prodSocialsContainer = document.getElementById('prod-socials');
-    const footerEmail = document.getElementById('footer-email');
-    const accordionsContainer = document.getElementById('info-accordions-container');
-
+    // Load Global Settings (Logo & Footer)
     fetch('settings.json').then(r => r.json()).then(data => {
+        // A. LOGO
         if (navLogoContainer) {
             if (data.logoType === 'image' && data.logoImage) { navLogoContainer.innerHTML = `<img src="${data.logoImage}" alt="Logo" style="height:50px;">`; } 
             else { navLogoContainer.innerHTML = `<span class="logo-text">${data.logoText || "BLACK VYBEZ"}</span>`; }
         }
-        if (artistSocialsContainer) {
-            let html = '';
-            if (data.artistFb && data.artistFbIcon) html += `<a href="${data.artistFb}" target="_blank" class="social-link"><img src="${data.artistFbIcon}" alt="FB"></a>`;
-            if (data.artistIg && data.artistIgIcon) html += `<a href="${data.artistIg}" target="_blank" class="social-link"><img src="${data.artistIgIcon}" alt="IG"></a>`;
-            if (data.artistTt && data.artistTtIcon) html += `<a href="${data.artistTt}" target="_blank" class="social-link"><img src="${data.artistTtIcon}" alt="TT"></a>`;
-            if (data.artistYt && data.artistYtIcon) html += `<a href="${data.artistYt}" target="_blank" class="social-link"><img src="${data.artistYtIcon}" alt="YT"></a>`;
-            artistSocialsContainer.innerHTML = html;
-        }
-        if (prodSocialsContainer) {
-            let html = '';
-            if (data.prodFb && data.prodFbIcon) html += `<a href="${data.prodFb}" target="_blank" class="social-link"><img src="${data.prodFbIcon}" alt="FB"></a>`;
-            if (data.prodIg && data.prodIgIcon) html += `<a href="${data.prodIg}" target="_blank" class="social-link"><img src="${data.prodIgIcon}" alt="IG"></a>`;
-            if (data.prodTt && data.prodTtIcon) html += `<a href="${data.prodTt}" target="_blank" class="social-link"><img src="${data.prodTtIcon}" alt="TT"></a>`;
-            if (data.prodYt && data.prodYtIcon) html += `<a href="${data.prodYt}" target="_blank" class="social-link"><img src="${data.prodYtIcon}" alt="YT"></a>`;
-            prodSocialsContainer.innerHTML = html;
-        }
-        if (footerEmail && data.email) footerEmail.innerHTML = `<i class="fas fa-envelope"></i> ${data.email}`;
 
-        if (accordionsContainer) {
-            const items = [ { title: data.exclusiveTitle, text: data.exclusiveText }, { title: data.aiTitle, text: data.aiText }, { title: data.vaultTitle, text: data.vaultText } ];
-            let accHtml = '';
-            items.forEach((item) => { if(item.text) { accHtml += `<div class="accordion"><button class="accordion-btn">${item.title || 'Info'}</button><div class="accordion-content"><p>${item.text}</p></div></div>`; } });
-            accordionsContainer.innerHTML = accHtml;
-            document.querySelectorAll('.accordion-btn').forEach(btn => { btn.addEventListener('click', function() { this.parentElement.classList.toggle('active'); const c = this.nextElementSibling; c.style.maxHeight = c.style.maxHeight ? null : c.scrollHeight + "px"; }); });
+        // B. BUILD DYNAMIC FOOTER
+        if (footerContainer) {
+            // Prepare Social Icons HTML
+            const buildIcons = (prefix) => {
+                let html = '';
+                const networks = [
+                    { id: 'Fb', icon: data[`${prefix}FbIcon`], link: data[`${prefix}Fb`] },
+                    { id: 'Ig', icon: data[`${prefix}IgIcon`], link: data[`${prefix}Ig`] },
+                    { id: 'Tt', icon: data[`${prefix}TtIcon`], link: data[`${prefix}Tt`] },
+                    { id: 'Yt', icon: data[`${prefix}YtIcon`], link: data[`${prefix}Yt`] }
+                ];
+                networks.forEach(net => {
+                    if (net.link && net.icon) {
+                        html += `<a href="${net.link}" target="_blank" class="social-link"><img src="${net.icon}" alt="${net.id}"></a>`;
+                    }
+                });
+                return html;
+            };
+
+            const artistIcons = buildIcons('artist');
+            const prodIcons = buildIcons('prod');
+
+            footerContainer.innerHTML = `
+            <footer class="site-footer">
+                <div class="footer-content">
+                    <div class="footer-section">
+                        <h4 class="footer-title">VYBEZMADETHIS</h4>
+                        <div class="social-icons">${prodIcons}</div>
+                    </div>
+                    <div class="footer-divider"></div>
+                    <div class="footer-section">
+                        <h4 class="footer-title">BLACK VYBEZ</h4>
+                        <div class="social-icons">${artistIcons}</div>
+                    </div>
+                </div>
+            </footer>`;
         }
     }).catch(() => {});
 
+    // ==========================================
+    // 2. PLAYER LOGIC
+    // ==========================================
     const audio = new Audio();
     const playerTitle = document.getElementById('player-track-title');
     const playBtn = document.getElementById('player-play-btn');
@@ -101,26 +88,32 @@ document.addEventListener('DOMContentLoaded', () => {
         audio.addEventListener('timeupdate', () => { if(progressBar) { const percent = (audio.currentTime / audio.duration) * 100; progressBar.style.width = percent + '%'; } });
     }
 
-    const latestContainer = document.getElementById('latest-release-container');
-    if (latestContainer) {
+    // ==========================================
+    // 3. PAGE SPECIFIC LOADERS
+    // ==========================================
+    
+    // Home Page
+    const homeBannerTitle = document.getElementById('home-hero-title');
+    if (homeBannerTitle) {
+        // Latest Drop
+        const latestContainer = document.getElementById('latest-release-container');
         fetch('releases.json').then(r => r.json()).then(data => {
             if(data.tracks && data.tracks.length > 0) {
                 const track = data.tracks[0];
                 const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px; font-size:0.75rem;"><i class="fas fa-download"></i> FREE</a>` : '';
-                latestContainer.innerHTML = `<div style="margin-bottom:1rem;"><h3 style="font-size:1.5rem; margin:0;">${track.title}</h3></div><a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent"><i class="fab fa-youtube"></i> WATCH NOW</a><a href="${track.streamUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px;">STREAM</a> ${downloadBtn}`;
+                if(latestContainer) {
+                    latestContainer.innerHTML = `<div style="margin-bottom:1rem;"><h3 style="font-size:1.5rem; margin:0;">${track.title}</h3></div><a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent"><i class="fab fa-youtube"></i> WATCH NOW</a><a href="${track.streamUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px;">STREAM</a> ${downloadBtn}`;
+                }
             }
         });
-    }
-
-    const bannerContainer = document.getElementById('home-banner-container');
-    const bannerImg = document.getElementById('home-banner-img');
-    const heroTitle = document.getElementById('home-hero-title');
-    const heroSubtitle = document.getElementById('home-hero-subtitle');
-    if (heroTitle) {
+        // Banner & Content
+        const bContainer = document.getElementById('home-banner-container');
+        const bImg = document.getElementById('home-banner-img');
+        const hSub = document.getElementById('home-hero-subtitle');
         fetch('home.json').then(r => r.json()).then(data => {
-            if (data.heroImage && bannerContainer) { bannerImg.src = data.heroImage; bannerContainer.style.display = 'block'; }
-            if (data.heroTitle) heroTitle.textContent = data.heroTitle;
-            if (data.heroSubtitle) heroSubtitle.textContent = data.heroSubtitle;
+            if (data.heroImage && bContainer) { bImg.src = data.heroImage; bContainer.style.display = 'block'; }
+            if (data.heroTitle) homeBannerTitle.textContent = data.heroTitle;
+            if (data.heroSubtitle) hSub.textContent = data.heroSubtitle;
             
             const annContainer = document.getElementById('home-announcement-container');
             const annIframe = document.getElementById('announcement-iframe');
@@ -148,6 +141,33 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(() => {});
     }
 
+    // Press Page
+    const pCont = document.getElementById('press-container');
+    if (pCont) {
+        fetch('press.json').then(r => r.json()).then(data => {
+            pCont.innerHTML = '';
+            let articles = Array.isArray(data) ? data : (data.articles || []);
+            if (articles.length === 0) { pCont.innerHTML = '<p style="text-align:center; width:100%;">No press items yet.</p>'; return; }
+            articles.forEach(item => {
+                pCont.innerHTML += `<div class="press-card"><img src="${item.image}" alt="${item.title}" class="press-image"><div class="press-content"><div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date} • ${item.source}</div><h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3><p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary}</p><a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">ΔΙΑΒΑΣΕ ΤΟ</a></div></div>`;
+            });
+        }).catch(() => {});
+    }
+    
+    // Podcasts Page
+    const podContainer = document.getElementById('podcasts-container');
+    if (podContainer) {
+        fetch('podcasts.json').then(r => r.json()).then(data => {
+            podContainer.innerHTML = '';
+            const episodes = data.episodes || [];
+            if (episodes.length === 0) { podContainer.innerHTML = '<p style="text-align:center; width:100%;">No episodes yet.</p>'; return; }
+            episodes.forEach(ep => {
+                podContainer.innerHTML += `<div class="press-card"><img src="${ep.cover}" alt="${ep.title}" class="press-image"><div class="press-content"><div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem;">${ep.date || ''}</div><h3 style="font-size:1.2rem; margin:5px 0;">${ep.title}</h3><p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${ep.description}</p><a href="${ep.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem;">LISTEN / WATCH</a></div></div>`;
+            });
+        }).catch(() => {});
+    }
+
+    // Releases Page
     const releasesList = document.getElementById('releases-list');
     const whyBuyBtn = document.getElementById('why-buy-btn');
     const whyBuyModal = document.getElementById('why-buy-modal');
@@ -168,6 +188,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Store Modal
     const bundleBtn = document.getElementById('open-bundle-modal');
     const bundleModal = document.getElementById('bundle-modal');
     const closeBundle = document.getElementById('close-bundle-modal');
@@ -182,9 +203,23 @@ document.addEventListener('DOMContentLoaded', () => {
         bundleModal.addEventListener('click', (e) => { if(e.target === bundleModal) bundleModal.classList.remove('visible'); });
     }
 
+    // Beat Store
     const beatContainer = document.getElementById('beat-store-list');
     const filterBtns = document.querySelectorAll('.filter-btn');
+    const accordionsContainer = document.getElementById('info-accordions-container');
     let allBeats = [];
+    
+    // Accordions Logic
+    if (accordionsContainer) {
+        fetch('settings.json').then(r => r.json()).then(data => {
+            const items = [ { title: data.exclusiveTitle, text: data.exclusiveText }, { title: data.aiTitle, text: data.aiText }, { title: data.vaultTitle, text: data.vaultText } ];
+            let accHtml = '';
+            items.forEach((item) => { if(item.text) { accHtml += `<div class="accordion"><button class="accordion-btn">${item.title || 'Info'}</button><div class="accordion-content"><p>${item.text}</p></div></div>`; } });
+            accordionsContainer.innerHTML = accHtml;
+            document.querySelectorAll('.accordion-btn').forEach(btn => { btn.addEventListener('click', function() { this.parentElement.classList.toggle('active'); const c = this.nextElementSibling; c.style.maxHeight = c.style.maxHeight ? null : c.scrollHeight + "px"; }); });
+        });
+    }
+
     if (beatContainer) {
         fetch('beats.json').then(r => r.json()).then(data => { if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } renderBeats(allBeats); });
         filterBtns.forEach(btn => { btn.addEventListener('click', () => { filterBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active'); const cat = btn.getAttribute('data-category'); renderBeats(cat === 'all' ? allBeats : allBeats.filter(b => b.category && b.category.toLowerCase() === cat.toLowerCase())); }); });
