@@ -179,13 +179,22 @@ collections:
         label: "Home Page Config"
         file: "home.json"
         fields:
+          # HERO SECTION
           - {label: "Main Banner", name: "heroImage", widget: "image", required: false}
-          - {label: "Title", name: "heroTitle", widget: "string", default: "VYBEZONE"}
-          - {label: "Subtitle", name: "heroSubtitle", widget: "string"}
-          - {label: "Announcement Video", name: "announcementVideo", widget: "string"}
-          - {label: "Announcement Text", name: "announcementText", widget: "text"}
-          - {label: "Drop Title", name: "dropTitle", widget: "string"}
-          - {label: "Drop Video", name: "dropVideo", widget: "string"}
-          - {label: "Stream Link", name: "dropStream", widget: "string"}
-          - {label: "Buy Link", name: "dropBuy", widget: "string"}
-          - {label: "Free Link", name: "dropFree", widget: "string"}
+          - {label: "Title", name: "heroTitle", widget: "string", default: "VYBEZONE", required: false}
+          - {label: "Subtitle", name: "heroSubtitle", widget: "string", required: false}
+          
+          # ANNOUNCEMENT SECTION
+          - {label: "--- ANNOUNCEMENT SECTION ---", name: "sep_ann", widget: "hidden"}
+          - {label: "Enable Announcement?", name: "showAnnouncement", widget: "boolean", default: false} 
+          - {label: "Announcement Video (YouTube URL)", name: "announcementVideo", widget: "string", required: false}
+          - {label: "Announcement Text", name: "announcementText", widget: "text", required: false}
+          
+          # LATEST DROP SECTION
+          - {label: "--- LATEST DROP SECTION ---", name: "sep_drop", widget: "hidden"}
+          - {label: "Enable Latest Drop?", name: "showDrop", widget: "boolean", default: false}
+          - {label: "Drop Title", name: "dropTitle", widget: "string", required: false}
+          - {label: "Drop Video (YouTube URL)", name: "dropVideo", widget: "string", required: false}
+          - {label: "Stream Link", name: "dropStream", widget: "string", required: false}
+          - {label: "Buy Link", name: "dropBuy", widget: "string", required: false}
+          - {label: "Free Link", name: "dropFree", widget: "string", required: false}
