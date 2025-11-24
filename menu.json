@@ -16,11 +16,6 @@
       "newTab": false
     },
     {
-      "text": "Podcasts",
-      "url": "podcasts.html",
-      "newTab": false
-    },
-    {
       "text": "Store",
       "url": "store.html",
       "newTab": false
@@ -33,6 +28,11 @@
     {
       "text": "Bio",
       "url": "bio.html",
+      "newTab": false
+    },
+    {
+      "text": "Podcasts",
+      "url": "podcasts.html",
       "newTab": false
     },
     {
