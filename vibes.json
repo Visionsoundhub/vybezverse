@@ -1,8 +1,52 @@
-[
-    {"name": "Ερωτευμένος", "tags": ["love", "romantic", "smooth"]},
-    {"name": "Μελαγχολικός", "tags": ["sad", "emotional", "dark"]},
-    {"name": "Drill / Hard", "tags": ["aggressive", "hard", "drill"]},
-    {"name": "Chill / Lofi", "tags": ["chill", "lofi", "relax"]},
-    {"name": "Για πάρτι", "tags": ["party", "upbeat", "afro"]},
-    {"name": "Dark", "tags": ["mysterious", "dark", "horror"]}
-]
+{
+  "vibes": [
+    {
+      "name": "Ερωτευμένος",
+      "tags": [
+        "love",
+        "romantic",
+        "smooth"
+      ]
+    },
+    {
+      "name": "Μελαγχολικός",
+      "tags": [
+        "sad",
+        "emotional",
+        "dark"
+      ]
+    },
+    {
+      "name": "Drill / Hard",
+      "tags": [
+        "aggressive",
+        "hard",
+        "drill"
+      ]
+    },
+    {
+      "name": "Chill / Lofi",
+      "tags": [
+        "chill",
+        "lofi",
+        "relax"
+      ]
+    },
+    {
+      "name": "Για πάρτι",
+      "tags": [
+        "party",
+        "upbeat",
+        "afro"
+      ]
+    },
+    {
+      "name": "Dark",
+      "tags": [
+        "mysterious",
+        "dark",
+        "horror"
+      ]
+    }
+  ]
+}
