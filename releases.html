@@ -18,7 +18,9 @@
         <h1 class="section-title">MUSIC CATALOG</h1>
         <div style="margin-bottom:2rem; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
             <button class="nav-btn active" style="border:1px solid #fff;">All Releases</button>
-            <button id="why-buy-btn" class="nav-btn" style="border:1px solid #8a2be2; color:#8a2be2 !important;"><i class="fas fa-info-circle"></i> ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;</button>
+            <button id="why-buy-btn" class="nav-btn" style="border:1px solid #8a2be2; color:#8a2be2 !important;">
+                <i class="fas fa-info-circle"></i> ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;
+            </button>
         </div>
         <div id="releases-list">Loading Tracks...</div>
     </div>
@@ -28,20 +30,19 @@
             <button class="modal-close-btn" id="close-why-buy">&times;</button>
             <h2 style="text-align:center; color:#fff; margin-bottom:1.5rem; border-bottom:1px solid #333; padding-bottom:10px;">ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΕΙΣ;</h2>
             <div style="color:#ccc; font-size:0.95rem; line-height:1.6;">
-                <p style="margin-bottom:1rem;"><i class="fas fa-heart" style="color:#8a2be2;"></i> <strong>ΣΤΗΡΙΞΕ ΤΟΝ ΚΑΛΛΙΤΕΧΝΗ</strong><br>Οι πλατφόρμες streaming πληρώνουν ελάχιστα. Η αγορά ισοδυναμεί με χιλιάδες streams.</p>
-                <p style="margin-bottom:1rem;"><i class="fas fa-box-open" style="color:#8a2be2;"></i> <strong>ΤΙ ΠΑΙΡΝΕΙΣ;</strong><br>WAV, Εναλλακτικές Εκδόσεις, Ringtones, Artwork, Στίχους.</p>
+                <p style="margin-bottom:1rem;">
+                    <i class="fas fa-heart" style="color:#8a2be2;"></i> <strong>ΣΤΗΡΙΞΕ ΤΟΝ ΚΑΛΛΙΤΕΧΝΗ</strong><br>
+                    Οι πλατφόρμες streaming πληρώνουν ελάχιστα. Η αγορά ισοδυναμεί με χιλιάδες streams.
+                </p>
+                <p style="margin-bottom:1rem;">
+                    <i class="fas fa-box-open" style="color:#8a2be2;"></i> <strong>ΤΙ ΠΑΙΡΝΕΙΣ;</strong><br>
+                    WAV, Εναλλακτικές Εκδόσεις, Ringtones, Artwork, Στίχους.
+                </p>
             </div>
         </div>
     </div>
 
-    <footer class="site-footer">
-        <div class="footer-content">
-            <div class="footer-section"><h4 class="footer-title">VYBEZMADETHIS</h4><div class="social-icons" id="prod-socials"></div></div>
-            <div class="footer-divider"></div>
-            <div class="footer-section"><h4 class="footer-title">BLACK VYBEZ</h4><div class="social-icons" id="artist-socials"></div></div>
-        </div>
-        <div class="footer-email" id="footer-email"></div><div class="copyright">&copy; 2025 Vybezone. All rights reserved.</div>
-    </footer>
+    <div id="dynamic-footer"></div>
     <script src="scripts.js"></script>
 </body>
 </html>
