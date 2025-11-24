@@ -8,7 +8,8 @@ body {
     color: #fff;
     font-family: 'Inter', sans-serif;
     margin: 0; padding: 0; 
-    padding-bottom: 160px; 
+    /* Αφήνουμε κενό κάτω ίσο με το ύψος Player + Footer για να μην κρύβεται τίποτα */
+    padding-bottom: 120px; 
     line-height: 1.6;
     overflow-x: hidden;
     display: flex;
@@ -40,51 +41,13 @@ h1, h2, h3, .nav-btn, .btn, .hero-title, .section-title, .footer-title {
     position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-a.nav-logo {
-    text-decoration: none !important;
-    display: flex; align-items: center;
-    color: #ffffff !important;
-}
-
-.nav-logo img {
-    max-height: 50px;
-    width: auto;
-    display: block;
-}
-
-.logo-text {
-    font-family: 'Oswald', sans-serif !important;
-    font-size: 1.8rem;
-    font-weight: 800 !important;
-    color: #ffffff !important;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-}
+a.nav-logo { text-decoration: none !important; display: flex; align-items: center; color: #ffffff !important; }
+.nav-logo img { max-height: 50px; width: auto; display: block; }
+.logo-text { font-family: 'Oswald', sans-serif !important; font-size: 1.8rem; font-weight: 800 !important; color: #ffffff !important; letter-spacing: 1px; text-transform: uppercase; text-shadow: 0 0 15px rgba(255, 255, 255, 0.1); }
 
 .nav-links { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
-
-.nav-btn {
-    background: transparent; 
-    color: #ffffff !important;
-    border: 1px solid transparent;
-    padding: 0.5rem 1.2rem; 
-    font-size: 0.9rem; 
-    font-family: 'Oswald', sans-serif;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s; 
-    border-radius: 999px; 
-    text-decoration: none;
-    text-transform: uppercase;
-}
-
-.nav-btn:hover, .nav-btn.active {
-    background: rgba(255,255,255,0.15); 
-    color: #fff !important; 
-    border-color: #fff; 
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-}
+.nav-btn { background: transparent; color: #ffffff !important; border: 1px solid transparent; padding: 0.5rem 1.2rem; font-size: 0.9rem; font-family: 'Oswald', sans-serif; font-weight: 700; cursor: pointer; transition: 0.3s; border-radius: 999px; text-decoration: none; text-transform: uppercase; }
+.nav-btn:hover, .nav-btn.active { background: rgba(255,255,255,0.15); color: #fff !important; border-color: #fff; box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); }
 
 @media (max-width: 900px) {
     .main-navigation { flex-direction: column; gap: 1rem; padding: 1rem; }
@@ -93,16 +56,8 @@ a.nav-logo {
 }
 
 /* --- GLASS CONTAINER --- */
-.glass-container {
-    max-width: 1000px; margin: 2rem auto; padding: 2rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-}
-@media (max-width: 600px) {
-    .glass-container { padding: 1.5rem; margin: 1rem; }
-}
+.glass-container { max-width: 1000px; margin: 2rem auto; padding: 2rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+@media (max-width: 600px) { .glass-container { padding: 1.5rem; margin: 1rem; } }
 
 /* --- HERO --- */
 .hero-section { text-align: center; padding: 3rem 1rem; }
@@ -113,36 +68,21 @@ a.nav-logo {
 /* --- GRIDS --- */
 .bio-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; align-items: start; }
 .press-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
-@media (max-width: 768px) {
-    .bio-grid { grid-template-columns: 1fr; } 
-    .press-grid { grid-template-columns: 1fr; } 
-}
-
+@media (max-width: 768px) { .bio-grid { grid-template-columns: 1fr; } .press-grid { grid-template-columns: 1fr; } }
 .press-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 15px; overflow: hidden; transition: 0.3s; display: flex; flex-direction: column; }
 .press-card:hover { transform: translateY(-5px); border-color: #8a2be2; }
 .press-image { width: 100%; height: 200px; object-fit: cover; }
 .press-content { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;}
-
 .bio-img { width: 100%; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); box-shadow: -10px 10px 20px rgba(138, 43, 226, 0.2); }
 
-/* --- BEATS & RELEASES --- */
+/* --- BEATS --- */
 .filter-scroll-container { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 1rem 10px; max-width: 1000px; margin: 0 auto; }
 .filter-btn { background: rgba(255,255,255,0.05); color: #aaa; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.3s; font-family: 'Inter', sans-serif; }
 .filter-btn.active, .filter-btn:hover { background: #8a2be2; color: #fff; border-color: #8a2be2; }
-
 .beat-store-container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
 .beat-row { display: grid; grid-template-columns: 70px 1fr auto auto; gap: 1rem; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 1rem; margin-bottom: 0.8rem; border-radius: 16px; transition: 0.3s; }
 .beat-row:hover { background: rgba(255, 255, 255, 0.06); border-color: #8a2be2; transform: translateY(-3px); }
-
-@media (max-width: 600px) {
-    .beat-row { display: flex; flex-direction: column; text-align: center; padding: 1.5rem; gap: 1rem; }
-    .beat-info h4 { text-align: center; }
-    .beat-meta { text-align: center; }
-    .beat-price { display: block; margin: 0; color: #8a2be2; font-size: 1.5rem; font-weight: 700; }
-    .beat-actions { display: flex; width: 100%; gap: 10px; }
-    .beat-actions .btn { flex: 1; font-size: 0.8rem; padding: 0.6rem; }
-}
-
+@media (max-width: 600px) { .beat-row { display: flex; flex-direction: column; text-align: center; padding: 1.5rem; gap: 1rem; } .beat-info h4 { text-align: center; } .beat-meta { text-align: center; } .beat-price { display: block; margin: 0; color: #8a2be2; font-size: 1.5rem; font-weight: 700; } .beat-actions { display: flex; width: 100%; gap: 10px; } .beat-actions .btn { flex: 1; font-size: 0.8rem; padding: 0.6rem; } }
 .beat-art { width: 70px; height: 70px; background: #222; border-radius: 10px; position: relative; overflow: hidden; margin: 0 auto; }
 .beat-art img { width: 100%; height: 100%; object-fit: cover; }
 .beat-play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer; }
@@ -157,125 +97,118 @@ a.nav-logo {
 .btn-outline { border: 1px solid rgba(255,255,255,0.2); background: transparent; }
 .btn-outline:hover { border-color: #8a2be2; color: #fff; box-shadow: 0 0 10px rgba(138, 43, 226, 0.2); }
 
-/* --- MODAL & PLAYER --- */
+/* --- MODAL --- */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 9999; }
 .modal-overlay.visible { display: flex !important; }
 .modal-box { background: #141414; padding: 2rem; border-radius: 20px; border: 1px solid #333; width: 90%; max-width: 500px; text-align: center; position: relative; }
 .modal-close-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; }
 
-/* FLOATING PLAYER */
-#sticky-player {
+/* ========================================== */
+/* DOCKED INTERFACE (THIN FOOTER + PLAYER)    */
+/* ========================================== */
+
+/* 1. THIN FIXED FOOTER */
+.site-footer {
     position: fixed;
-    bottom: 80px; /* Κάθεται πάνω από το footer */
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 70px;
-    background: rgba(15, 15, 15, 0.98);
-    border-top: 1px solid rgba(255,255,255,0.1);
-    border-bottom: 1px solid #111;
-    padding: 0 1rem;
-    display: flex; 
-    justify-content: center;
-    align-items: center;
-    z-index: 2001;
-    backdrop-filter: blur(15px);
-}
-
-.player-inner { width: 100%; max-width: 800px; display: flex; align-items: center; gap: 15px; }
-.play-btn-large { width: 40px; height: 40px; background: #fff; color: #000; border-radius: 50%; border: none; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.play-btn-large:hover { background: #8a2be2; color: #fff; }
-#player-progress { background: #8a2be2; height: 100%; width: 0%; transition: width 0.1s linear; }
-
-/* --- FOOTER (COMPACT & FIXED) --- */
-.site-footer {
+    height: 40px; /* Εξαιρετικά λεπτό */
     background: #000;
     border-top: 1px solid #222;
-    padding: 1.5rem 1rem 5rem 1rem; 
-    margin-top: auto;
+    z-index: 3000; /* Πάνω από όλα */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
 }
 
 .footer-content {
-    max-width: 800px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1px 1fr; 
-    gap: 1rem;
+    width: 100%;
+    max-width: 1200px;
+    display: flex; /* Όλα σε μια γραμμή */
+    justify-content: space-between;
     align-items: center;
-    padding: 0 1rem;
+    padding: 0 20px;
 }
 
-.footer-section { text-align: center; }
+/* Αριστερά & Δεξιά Ομάδες */
+.footer-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
 
 .footer-title {
     font-family: 'Oswald', sans-serif;
-    font-size: 1rem;
+    font-size: 0.8rem; /* Μικρά γράμματα */
     font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: #fff;
+    color: #888;
+    margin: 0;
     letter-spacing: 1px;
-    opacity: 0.8;
+    white-space: nowrap;
 }
 
 .footer-divider {
     background: #333;
-    height: 40px;
+    height: 20px;
     width: 1px;
-    margin: 0 auto;
+    margin: 0 10px;
 }
 
-/* Social Icons */
 .social-icons {
     display: flex;
-    justify-content: center;
-    gap: 0.8rem;
-    flex-wrap: wrap;
-    min-height: 35px;
+    align-items: center;
+    gap: 8px;
 }
 
 .social-link {
-    color: #888;
-    font-size: 1rem;
-    transition: 0.3s;
-    background: rgba(255,255,255,0.05);
-    width: 35px; height: 35px;
-    display: flex; align-items: center; justify-content: center;
+    width: 24px; height: 24px; /* Πολύ μικρά εικονίδια */
     border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.1);
-    padding: 0; /* Αφαιρούμε το padding για να γεμίζει η εικόνα */
-    overflow: hidden; /* Κόβει την εικόνα σε κύκλο */
+    background: rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    transition: 0.3s;
+    padding: 0;
+    overflow: hidden;
 }
 
-/* --- ΤΟ ΜΑΓΙΚΟ ΦΙΛΤΡΟ ΓΙΑ ΤΑ ΕΙΚΟΝΙΔΙΑ --- */
 .social-link img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: brightness(0) invert(1); /* ΛΕΥΚΑ ΕΙΚΟΝΙΔΙΑ */
+}
+
+.social-link:hover { background: #8a2be2; transform: scale(1.1); }
+
+.footer-email, .copyright { display: none; } /* Κρύβουμε τα περιττά */
+
+
+/* 2. FIXED PLAYER (Ακριβώς από πάνω) */
+#sticky-player {
+    position: fixed;
+    bottom: 40px; /* Κάθεται πάνω στο 40px footer */
+    left: 0;
     width: 100%;
-    height: 100%;
-    object-fit: contain; /* Ή cover αν θες να γεμίζει τελείως */
-    display: block;
-    /* Μετατρέπει οποιοδήποτε χρώμα (π.χ. μαύρο) σε κάτασπρο */
-    filter: brightness(0) invert(1);
+    height: 60px; /* Κανονικό ύψος player */
+    background: rgba(15, 15, 15, 0.98);
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #111;
+    display: flex; 
+    align-items: center;
+    justify-content: center;
+    z-index: 2900;
 }
 
-.social-link:hover {
-    color: #fff;
-    border-color: #8a2be2;
-    background: #8a2be2;
-    transform: translateY(-2px);
-}
+.player-inner { width: 100%; max-width: 1000px; padding: 0 20px; display: flex; align-items: center; gap: 15px; }
+.play-btn-large { width: 35px; height: 35px; background: #fff; color: #000; border-radius: 50%; border: none; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.play-btn-large:hover { background: #8a2be2; color: #fff; }
+#player-progress { background: #8a2be2; height: 100%; width: 0%; transition: width 0.1s linear; }
 
-.footer-email { margin-top: 1rem; text-align: center; color: #666; font-size: 0.8rem; }
-.copyright { text-align: center; margin-top: 0.5rem; color: #333; font-size: 0.7rem; }
-
-/* Mobile Footer */
-@media (max-width: 768px) {
-    .footer-content {
-        grid-template-columns: 1fr; 
-        gap: 1.5rem;
-    }
-    .footer-divider {
-        width: 50px; 
-        height: 1px;
-    }
-    .site-footer {
-        padding-bottom: 7rem; 
-    }
+/* Mobile Adjustments */
+@media (max-width: 600px) {
+    .footer-title { display: none; } /* Κρύβουμε τα ονόματα στο κινητό για να χωράνε τα icons */
+    .footer-content { justify-content: center; gap: 20px; }
+    .social-link { width: 30px; height: 30px; }
+    .site-footer { height: 50px; }
+    #sticky-player { bottom: 50px; }
 }
