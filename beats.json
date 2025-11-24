@@ -2,12 +2,16 @@
   "beatslist": [
     {
       "title": "Late Hours",
-      "audioSrc": "assets/audio/demo_beat.mp3",
+      "audioSrc": "/assets/uploads/solo-lio-rising-93bpm.mp3",
       "price": "79.99€",
       "status": "available",
       "category": "latin",
-      "tags": ["love", "party"],
-      "checkoutUrl": "#"
+      "tags": [
+        "love",
+        "party"
+      ],
+      "checkoutUrl": "#",
+      "bpm": "90"
     }
   ]
 }
