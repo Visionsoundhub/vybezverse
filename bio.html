@@ -12,33 +12,42 @@
     
     <nav class="main-navigation">
         <a href="index.html" class="nav-logo"></a>
-        
         <div class="hamburger">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
         </div>
-
         <div class="nav-links"></div>
     </nav>
 
-    <div class="hero-section" style="padding-bottom:0;"><h1 class="hero-title">WHO IS BLACK VYBEZ?</h1></div>
-
-    <div class="glass-container">
-        <div class="bio-grid">
-            <div class="bio-image-wrapper">
-                <img src="https://via.placeholder.com/500x600/111/333?text=Black+Vybez" alt="Black Vybez" class="bio-img">
+    <main id="swup" class="transition-fade">
+        <div class="hero-section" style="padding-bottom:0;"><h1 class="hero-title">WHO IS BLACK VYBEZ?</h1></div>
+    
+        <div class="glass-container">
+            <div class="bio-grid">
+                <div class="bio-image-wrapper">
+                    <img src="https://via.placeholder.com/500x600/111/333?text=Black+Vybez" alt="Black Vybez" class="bio-img">
+                </div>
+                <div class="bio-text">
+                    <p>Ο <span class="highlight">Black Vybez</span> (Θοδωρής Παρασχάκης Νταμάς), γεννημένος στο Μεξικό και μεγαλωμένος στην Ελλάδα, δεν είναι απλά ένας καλλιτέχνης. Είναι μια φωνή για τη νευροδιαφορετικότητα.</p>
+                    <p>Η πορεία του ξεκινά το 2008 στον σκληρό πυρήνα του underground ήχου. Συνεργάστηκε με σχήματα-σταθμούς όπως οι <strong>ΑΨ</strong>, η <strong>Στιχουργική Αναμέτρηση</strong>, οι <strong>LaCoast</strong> και οι <strong>2410 Squad</strong>.</p>
+                    <p>Το 2018 σηματοδότησε την αλλαγή. Στράφηκε στη σόλο καριέρα, πειραματίστηκε και πέρασε από labels όπως η Palmundo Music.</p>
+                    <p>Σήμερα, ως συνιδρυτής της <strong>LANDING MIND RECORD</strong> και ιδρυτής του ανεξάρτητου label <span class="highlight">flowless music</span>, συνεχίζει να χαράζει τον δικό του δρόμο.</p>
+                </div>
             </div>
-            <div class="bio-text">
-                <p>Ο <span class="highlight">Black Vybez</span> (Θοδωρής Παρασχάκης Νταμάς), γεννημένος στο Μεξικό και μεγαλωμένος στην Ελλάδα, δεν είναι απλά ένας καλλιτέχνης. Είναι μια φωνή για τη νευροδιαφορετικότητα.</p>
-                <p>Η πορεία του ξεκινά το 2008 στον σκληρό πυρήνα του underground ήχου. Συνεργάστηκε με σχήματα-σταθμούς όπως οι <strong>ΑΨ</strong>, η <strong>Στιχουργική Αναμέτρηση</strong>, οι <strong>LaCoast</strong> και οι <strong>2410 Squad</strong>.</p>
-                <p>Το 2018 σηματοδότησε την αλλαγή. Στράφηκε στη σόλο καριέρα, πειραματίστηκε και πέρασε από labels όπως η Palmundo Music.</p>
-                <p>Σήμερα, ως συνιδρυτής της <strong>LANDING MIND RECORD</strong> και ιδρυτής του ανεξάρτητου label <span class="highlight">flowless music</span>, συνεχίζει να χαράζει τον δικό του δρόμο.</p>
+        </div>
+    </main>
+    <div id="sticky-player">
+        <div class="player-inner">
+            <button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button>
+            <div style="flex-grow:1;">
+                <div id="player-track-title" style="font-weight:700;">SELECT A BEAT</div>
+                <div style="background:#333; height:4px; width:100%;"><div id="player-progress" style="width:0%; height:100%;"></div></div>
             </div>
         </div>
     </div>
 
     <div id="dynamic-footer"></div>
+
+    <script src="https://unpkg.com/swup@4"></script>
     <script src="scripts.js"></script>
 </body>
 </html>
