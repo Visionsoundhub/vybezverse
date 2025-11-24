@@ -36,6 +36,29 @@ h1, h2, h3, h4, h5, h6,
     text-align: center;
 }
 
+/* --- LOADING SPINNER (NEW) --- */
+.spinner-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 150px; /* Gives space for the spinner */
+    width: 100%;
+    color: #8a2be2;
+}
+.spinner {
+    border: 4px solid rgba(138, 43, 226, 0.3); /* Light purple border */
+    border-top: 4px solid #8a2be2; /* Dark purple/accent border */
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+
 /* --- NAVIGATION --- */
 .main-navigation {
     display: flex; justify-content: space-between; align-items: center;
