@@ -8,7 +8,7 @@ body {
     color: #fff;
     font-family: 'Inter', sans-serif;
     margin: 0; padding: 0; 
-    padding-bottom: 40px; /* FIXED: Reduced global padding for thin footer */
+    padding-bottom: 40px; /* Global padding for thin footer */
     line-height: 1.6;
     overflow-x: hidden;
     display: flex;
@@ -16,7 +16,7 @@ body {
     min-height: 100vh;
 }
 
-/* NEW: Taller padding only when player and footer are present (Beats page) */
+/* Taller padding only when player and footer are present (Beats page) */
 .has-player {
     padding-bottom: 100px; /* 60px player + 30px footer + safety */
 }
@@ -95,8 +95,8 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     /* Hamburger Menu Size Reduction */
     .nav-links.active { right: 0; }
     .nav-links.active .nav-btn { 
-        font-size: 1.2rem; /* Reduced from 1.5rem */ 
-        padding: 0.8rem 1.5rem; /* Reduced padding */
+        font-size: 1.2rem; 
+        padding: 0.8rem 1.5rem; 
         border: none; 
     }
     
@@ -107,7 +107,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 
 /* --- GLASS CONTAINER --- */
 .glass-container { max-width: 1000px; margin: 2rem auto; padding: 2rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-@media (max-width: 600px) { .glass-container { padding: 1.2rem; margin: 0.8rem; } /* General Mobile Size Reduction */ }
+@media (max-width: 600px) { .glass-container { padding: 1.2rem; margin: 0.8rem; } }
 
 /* --- HERO --- */
 .hero-section { text-align: center; padding: 3rem 1rem; }
