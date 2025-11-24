@@ -69,56 +69,56 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- 3. HOME PAGE ---
-    const latestContainer = document.getElementById('latest-release-container');
-    if (latestContainer) {
-        fetch('releases.json').then(r => r.json()).then(data => {
-            if(data.tracks && data.tracks.length > 0) {
-                const track = data.tracks[0];
-                const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px; font-size:0.75rem;"><i class="fas fa-download"></i> FREE</a>` : '';
-                latestContainer.innerHTML = `
-                    <div style="margin-bottom:1rem;"><h3 style="font-size:1.5rem; margin:0;">${track.title}</h3></div>
-                    <button class="btn btn-accent" onclick="playTrack('${track.audio}', '${track.title.replace(/'/g, "\\'")}')"><i class="fas fa-play"></i> LISTEN NOW</button>
-                    <a href="${track.streamUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px;">STREAM</a> ${downloadBtn}`;
-            }
+    // --- 3. RELEASES PAGE (DIORTHOSI) ---
+    const releasesList = document.getElementById('releases-list');
+    
+    // LOGIC ΓΙΑ ΤΟ ΚΟΥΜΠΙ "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ" (ΕΚΤΟΣ FETCH ΓΙΑ ΝΑ ΔΟΥΛΕΨΕΙ ΣΙΓΟΥΡΑ)
+    const whyBuyBtn = document.getElementById('why-buy-btn');
+    const whyBuyModal = document.getElementById('why-buy-modal');
+    const closeWhyBuy = document.getElementById('close-why-buy');
+
+    if(whyBuyBtn && whyBuyModal) {
+        whyBuyBtn.addEventListener('click', () => {
+            whyBuyModal.classList.add('visible');
+        });
+        closeWhyBuy.addEventListener('click', () => {
+            whyBuyModal.classList.remove('visible');
+        });
+        whyBuyModal.addEventListener('click', (e) => {
+            if(e.target === whyBuyModal) whyBuyModal.classList.remove('visible');
         });
     }
 
-    const bannerContainer = document.getElementById('home-banner-container');
-    const bannerImg = document.getElementById('home-banner-img');
-    const heroTitle = document.getElementById('home-hero-title');
-    const heroSubtitle = document.getElementById('home-hero-subtitle');
-    if (heroTitle) {
-        fetch('home.json').then(r => r.json()).then(data => {
-            if (data.heroImage && bannerContainer) { bannerImg.src = data.heroImage; bannerContainer.style.display = 'block'; }
-            if (data.heroTitle) heroTitle.textContent = data.heroTitle;
-            if (data.heroSubtitle) heroSubtitle.textContent = data.heroSubtitle;
-        }).catch(() => {});
-    }
+    if (releasesList) {
+        fetch('releases.json').then(r => r.json()).then(data => {
+            releasesList.innerHTML = '';
+            let tracks = Array.isArray(data) ? data : (data.tracks || []);
+            tracks.forEach(track => {
+                const downloadBtn = track.downloadUrl ? 
+                    `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : '';
 
-    // --- 4. PRESS PAGE ---
-    const pressContainer = document.getElementById('press-container');
-    if (pressContainer) {
-        fetch('press.json').then(r => r.json()).then(data => {
-            pressContainer.innerHTML = '';
-            let articles = Array.isArray(data) ? data : (data.articles || []);
-            if (articles.length === 0) { pressContainer.innerHTML = '<p style="text-align:center; width:100%;">No press items yet.</p>'; return; }
-            articles.forEach(item => {
-                pressContainer.innerHTML += `
-                    <div class="press-card">
-                        <img src="${item.image}" alt="${item.title}" class="press-image">
-                        <div class="press-content">
-                            <div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date} • ${item.source}</div>
-                            <h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3>
-                            <p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary}</p>
-                            <a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">ΔΙΑΒΑΣΕ ΤΟ</a>
-                        </div>
-                    </div>`;
+                releasesList.innerHTML += `
+                <div class="beat-row">
+                    <div class="beat-art">
+                        <img src="${track.cover || 'https://via.placeholder.com/100'}" alt="Art">
+                        <div class="beat-play-overlay" onclick="playTrack('${track.audio}', '${track.title.replace(/'/g, "\\'")}')"><i class="fas fa-play" style="color:#fff;"></i></div>
+                    </div>
+                    <div class="beat-info"><h4>${track.title}</h4><div class="beat-meta">Available Now</div></div>
+                    
+                    <div class="beat-actions">
+                        <button class="btn btn-accent play-round" onclick="playTrack('${track.audio}', '${track.title.replace(/'/g, "\\'")}')"><i class="fas fa-play"></i></button>
+                        <a href="${track.streamUrl}" target="_blank" class="btn btn-outline">STREAM</a>
+                        
+                        <a href="${track.bundleUrl}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2; font-weight:800;">ΑΓΟΡΑΣΕ ΤΟ</a>
+                        
+                        ${downloadBtn}
+                    </div>
+                </div>`;
             });
-        }).catch(() => {});
+        });
     }
 
-    // --- 5. STORE MODAL ---
+    // --- 4. STORE MODAL ---
     const bundleBtn = document.getElementById('open-bundle-modal');
     const bundleModal = document.getElementById('bundle-modal');
     const closeBundle = document.getElementById('close-bundle-modal');
@@ -141,31 +141,79 @@ document.addEventListener('DOMContentLoaded', () => {
         bundleModal.addEventListener('click', (e) => { if(e.target === bundleModal) bundleModal.classList.remove('visible'); });
     }
 
-    // --- 6. BEAT STORE & VIBE ---
-    const beatContainer = document.getElementById('beat-store-list');
-    const filterBtns = document.querySelectorAll('.filter-btn');
-    let allBeats = [];
-    if (beatContainer) {
+    // --- 5. HOME PAGE ---
+    const homeBannerTitle = document.getElementById('home-hero-title');
+    if (homeBannerTitle) {
+        fetch('releases.json').then(r => r.json()).then(data => {
+            if(data.tracks && data.tracks.length > 0) {
+                const track = data.tracks[0];
+                const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px; font-size:0.75rem;"><i class="fas fa-download"></i> FREE</a>` : '';
+                const cont = document.getElementById('latest-release-container');
+                if(cont) {
+                    cont.innerHTML = `
+                    <div style="margin-bottom:1rem;"><h3 style="font-size:1.5rem; margin:0;">${track.title}</h3></div>
+                    <button class="btn btn-accent" onclick="playTrack('${track.audio}', '${track.title.replace(/'/g, "\\'")}')"><i class="fas fa-play"></i> LISTEN NOW</button>
+                    <a href="${track.streamUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px;">STREAM</a> ${downloadBtn}`;
+                }
+            }
+        });
+        const bContainer = document.getElementById('home-banner-container');
+        const bImg = document.getElementById('home-banner-img');
+        const hSub = document.getElementById('home-hero-subtitle');
+        fetch('home.json').then(r => r.json()).then(data => {
+            if (data.heroImage && bContainer) { bImg.src = data.heroImage; bContainer.style.display = 'block'; }
+            if (data.heroTitle) homeBannerTitle.textContent = data.heroTitle;
+            if (data.heroSubtitle) hSub.textContent = data.heroSubtitle;
+        }).catch(() => {});
+    }
+
+    // --- 6. PRESS PAGE ---
+    const pCont = document.getElementById('press-container');
+    if (pCont) {
+        fetch('press.json').then(r => r.json()).then(data => {
+            pCont.innerHTML = '';
+            let articles = Array.isArray(data) ? data : (data.articles || []);
+            if (articles.length === 0) { pCont.innerHTML = '<p style="text-align:center; width:100%;">No press items yet.</p>'; return; }
+            articles.forEach(item => {
+                pCont.innerHTML += `
+                    <div class="press-card">
+                        <img src="${item.image}" alt="${item.title}" class="press-image">
+                        <div class="press-content">
+                            <div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date} • ${item.source}</div>
+                            <h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3>
+                            <p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary}</p>
+                            <a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">ΔΙΑΒΑΣΕ ΤΟ</a>
+                        </div>
+                    </div>`;
+            });
+        }).catch(() => {});
+    }
+
+    // --- 7. BEAT STORE & VIBE ---
+    const bStore = document.getElementById('beat-store-list');
+    if (bStore) {
+        let allBeats = [];
         fetch('beats.json').then(r => r.json()).then(data => {
             if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; }
             renderBeats(allBeats);
         });
-        filterBtns.forEach(btn => {
+        const filters = document.querySelectorAll('.filter-btn');
+        filters.forEach(btn => {
             btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
+                filters.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                const category = btn.getAttribute('data-category');
-                renderBeats(category === 'all' ? allBeats : allBeats.filter(b => b.category && b.category.toLowerCase() === category.toLowerCase()));
+                const cat = btn.getAttribute('data-category');
+                renderBeats(cat === 'all' ? allBeats : allBeats.filter(b => b.category && b.category.toLowerCase() === cat.toLowerCase()));
             });
         });
-        const vibeBtn = document.getElementById('vibe-search-btn');
-        const vibeModal = document.getElementById('vibe-modal');
-        const vibeClose = document.getElementById('vibe-modal-close');
-        const bubblesContainer = document.getElementById('vibe-bubbles-container');
-        if (vibeBtn && vibeModal) {
-            vibeBtn.addEventListener('click', () => {
-                vibeModal.classList.add('visible');
-                if (bubblesContainer.innerHTML === '') {
+        const vBtn = document.getElementById('vibe-search-btn');
+        const vModal = document.getElementById('vibe-modal');
+        const vClose = document.getElementById('vibe-modal-close');
+        const vBubbles = document.getElementById('vibe-bubbles-container');
+        if (vBtn && vModal) {
+            vBtn.addEventListener('click', () => {
+                vModal.classList.add('visible');
+                if (vBubbles.innerHTML === '') {
                     fetch('vibes.json').then(r => r.json()).then(data => {
                         let vibes = Array.isArray(data) ? data : (data.vibes || []);
                         vibes.forEach(vibe => {
@@ -176,74 +224,37 @@ document.addEventListener('DOMContentLoaded', () => {
                             b.onmouseover = () => { b.style.borderColor = "#8a2be2"; b.style.color = "#fff"; };
                             b.onmouseout = () => { b.style.borderColor = "#444"; b.style.color = "#ccc"; };
                             b.onclick = () => {
-                                vibeModal.classList.remove('visible');
-                                const filtered = allBeats.filter(beat => beat.tags && beat.tags.some(t => vibe.tags.includes(t)));
+                                vModal.classList.remove('visible');
+                                const filtered = allBeats.filter(beat => { if(!beat.tags) return false; return beat.tags.some(t => vibe.tags.includes(t)); });
                                 renderBeats(filtered);
-                                filterBtns.forEach(b => b.classList.remove('active'));
+                                filters.forEach(b => b.classList.remove('active'));
                             };
-                            bubblesContainer.appendChild(b);
+                            vBubbles.appendChild(b);
                         });
                     });
                 }
             });
-            vibeClose.addEventListener('click', () => vibeModal.classList.remove('visible'));
-            vibeModal.addEventListener('click', (e) => { if(e.target === vibeModal) vibeModal.classList.remove('visible'); });
+            vClose.addEventListener('click', () => vModal.classList.remove('visible'));
+            vModal.addEventListener('click', (e) => { if(e.target === vModal) vModal.classList.remove('visible'); });
         }
     }
 
     function renderBeats(beats) {
-        if (!beatContainer) return;
-        beatContainer.innerHTML = '';
-        if (beats.length === 0) { beatContainer.innerHTML = '<p style="text-align:center; padding:2rem; color:#666;">No beats found.</p>'; return; }
+        if (!bStore) return;
+        bStore.innerHTML = '';
+        if (beats.length === 0) { bStore.innerHTML = '<p style="text-align:center; padding:2rem; color:#666;">No beats found.</p>'; return; }
         beats.forEach(beat => {
             const bpm = beat.bpm || '140';
             const key = beat.key || 'Am';
             const statusLabel = beat.status === 'sold' ? 'ΠΟΥΛΗΘΗΚΕ' : 'ΑΓΟΡΑ';
-            
-            // ΕΝΙΑΙΟ ΚΟΥΜΠΙ ΑΓΟΡΑΣ
-            beatContainer.innerHTML += `
+            bStore.innerHTML += `
                 <div class="beat-row">
-                    <div class="beat-art">
-                        <img src="https://via.placeholder.com/60/111/333?text=V" alt="Art">
-                        <div class="beat-play-overlay" onclick="playTrack('${beat.audioSrc}', '${beat.title}')"><i class="fas fa-play" style="color:#fff;"></i></div>
-                    </div>
+                    <div class="beat-art"><img src="https://via.placeholder.com/60/111/333?text=V" alt="Art"><div class="beat-play-overlay" onclick="playTrack('${beat.audioSrc}', '${beat.title}')"><i class="fas fa-play" style="color:#fff;"></i></div></div>
                     <div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${bpm} BPM • ${key} • ${beat.category}</div></div>
-                    
                     <div class="beat-actions">
-                        <a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent" style="min-width:140px;">
-                            ${beat.price} | <i class="fas fa-shopping-cart" style="margin-left:5px;"></i> ${statusLabel}
-                        </a>
+                        <a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent" style="min-width:140px;">${beat.price} | <i class="fas fa-shopping-cart" style="margin-left:5px;"></i> ${statusLabel}</a>
                     </div>
                 </div>`;
-        });
-    }
-
-    // --- 7. RELEASES PAGE (UPDATED BUTTONS & SPACING) ---
-    const releasesList = document.getElementById('releases-list');
-    if (releasesList) {
-        fetch('releases.json').then(r => r.json()).then(data => {
-            releasesList.innerHTML = '';
-            let tracks = Array.isArray(data) ? data : (data.tracks || []);
-            tracks.forEach(track => {
-                const downloadBtn = track.downloadUrl ? 
-                    `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : '';
-
-                releasesList.innerHTML += `
-                <div class="beat-row">
-                    <div class="beat-art">
-                        <img src="${track.cover || 'https://via.placeholder.com/100'}" alt="Art">
-                        <div class="beat-play-overlay" onclick="playTrack('${track.audio}', '${track.title.replace(/'/g, "\\'")}')"><i class="fas fa-play" style="color:#fff;"></i></div>
-                    </div>
-                    <div class="beat-info"><h4>${track.title}</h4><div class="beat-meta">Available Now</div></div>
-                    
-                    <div class="beat-actions">
-                        <button class="btn btn-accent play-round" onclick="playTrack('${track.audio}', '${track.title.replace(/'/g, "\\'")}')"><i class="fas fa-play"></i></button>
-                        <a href="${track.streamUrl}" target="_blank" class="btn btn-outline">Stream</a>
-                        <a href="${track.bundleUrl}" target="_blank" class="btn btn-outline">Bundle</a>
-                        ${downloadBtn}
-                    </div>
-                </div>`;
-            });
         });
     }
 });
