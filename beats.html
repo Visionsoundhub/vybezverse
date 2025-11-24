@@ -9,9 +9,8 @@
 </head>
 <body>
     <div class="bg-glow"></div>
-
     <nav class="main-navigation">
-        <a href="index.html" class="nav-logo">VYBEZONE</a>
+        <a href="index.html" class="nav-logo"><span class="logo-text">BLACK VYBEZ</span></a>
         <div class="nav-links">
             <a href="index.html" class="nav-btn">Home</a>
             <a href="releases.html" class="nav-btn">Releases</a>
@@ -26,9 +25,7 @@
     <div class="hero-section" style="padding:2rem 1rem;">
         <h1 class="hero-title">VYBEZMADETHIS</h1>
         <p class="hero-subtitle">exclusive beats</p>
-        <button id="vibe-search-btn" class="btn btn-outline" style="margin-top:2rem; padding:0.8rem 2.5rem;">
-            <i class="fas fa-magic" style="color:#8a2be2; margin-right:5px;"></i> VIBE SEARCH
-        </button>
+        <button id="vibe-search-btn" class="btn btn-outline" style="margin-top:2rem; padding:0.8rem 2.5rem;"><i class="fas fa-magic" style="color:#8a2be2;"></i> VIBE SEARCH</button>
     </div>
 
     <div class="filter-scroll-container">
@@ -42,30 +39,11 @@
         <button class="filter-btn" data-category="ai">AI Access</button>
     </div>
 
-    <div class="beat-store-container" id="beat-store-list">
-        <div style="text-align:center; color:#666; margin-top:2rem;">Φόρτωση Καταλόγου...</div>
-    </div>
+    <div class="beat-store-container" id="beat-store-list">Loading...</div>
 
-    <div id="sticky-player">
-        <div class="player-inner">
-            <button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button>
-            <div style="flex-grow:1;">
-                <div id="player-track-title" style="font-weight:700; margin-bottom:5px; font-size:0.9rem;">SELECT A BEAT</div>
-                <div style="background:#333; height:4px; width:100%; border-radius:2px;">
-                    <div id="player-progress" style="width:0%; height:100%;"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="modal-overlay" id="vibe-modal">
-        <div class="modal-box">
-            <button class="modal-close-btn" id="vibe-modal-close">&times;</button>
-            <h2 style="margin-bottom:10px; border-bottom:1px solid #333; padding-bottom:10px;">ΠΩΣ ΝΙΩΘΕΙΣ;</h2>
-            <div id="vibe-bubbles-container" style="display:flex; flex-wrap:wrap; justify-content:center;"></div>
-        </div>
-    </div>
-
+    <div id="sticky-player"><div class="player-inner"><button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button><div style="flex-grow:1;"><div id="player-track-title" style="font-weight:700;">SELECT A BEAT</div><div style="background:#333; height:4px; width:100%;"><div id="player-progress" style="width:0%; height:100%;"></div></div></div></div></div>
+    
+    <div class="modal-overlay" id="vibe-modal"><div class="modal-box"><button class="modal-close-btn" id="vibe-modal-close">&times;</button><h2 style="margin-bottom:20px;">ΠΩΣ ΝΙΩΘΕΙΣ;</h2><div id="vibe-bubbles-container" style="display:flex; flex-wrap:wrap; justify-content:center;"></div></div></div>
     <script src="scripts.js"></script>
 </body>
 </html>
