@@ -1,0 +1,20 @@
+{
+  "articles": [
+    {
+      "title": "Συνέντευξη για το 'SOS'",
+      "date": "2024",
+      "source": "Ελληνική Τηλεόραση",
+      "image": "https://via.placeholder.com/600x400/111/333?text=TV+Interview",
+      "summary": "Ο Black Vybez μιλάει ανοιχτά για την ενδοοικογενειακή βία και το κοινωνικό μήνυμα πίσω από το κομμάτι.",
+      "link": "https://youtube.com"
+    },
+    {
+      "title": "H ίδρυση της Flowless Music",
+      "date": "2025",
+      "source": "Music News",
+      "image": "https://via.placeholder.com/600x400/222/444?text=Flowless+Launch",
+      "summary": "Το νέο ανεξάρτητο label που αλλάζει τα δεδομένα, μαζί με τον Evoid.",
+      "link": "#"
+    }
+  ]
+}

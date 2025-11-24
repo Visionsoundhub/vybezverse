@@ -1,0 +1,12 @@
+{
+  "tracks": [
+    {
+      "title": "Sos (Demo)",
+      "audio": "assets/audio/demo_track.mp3",
+      "cover": "https://placehold.co/400x400/1e1e2f/7e57c2?text=Cover",
+      "streamUrl": "https://youtube.com",
+      "bundleUrl": "https://payhip.com",
+      "downloadUrl": "#"
+    }
+  ]
+}

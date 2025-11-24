@@ -1,0 +1,13 @@
+{
+  "beatslist": [
+    {
+      "title": "Late Hours",
+      "audioSrc": "assets/audio/demo_beat.mp3",
+      "price": "79.99€",
+      "status": "available",
+      "category": "latin",
+      "tags": ["love", "party"],
+      "checkoutUrl": "#"
+    }
+  ]
+}

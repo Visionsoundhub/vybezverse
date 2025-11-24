@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Releases | VYBEZONE</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="bg-glow"></div>
+    <nav class="main-navigation">
+        <a href="index.html" class="nav-btn">Home</a>
+        <a href="releases.html" class="nav-btn active">Releases</a>
+        <a href="beats.html" class="nav-btn">Beats</a>
+        <a href="store.html" class="nav-btn">Store</a>
+        <a href="gallery.html" class="nav-btn">Gallery</a>
+        <a href="bio.html" class="nav-btn">Bio</a>
+        <a href="press.html" class="nav-btn">Press</a>
+    </nav>
+
+    <div class="glass-container">
+        <h1 class="section-title">MUSIC CATALOG</h1>
+        <div style="text-align:center; margin-bottom:2rem;">
+            <button class="nav-btn active">All Releases</button>
+            <button class="nav-btn">Music Videos</button>
+        </div>
+        <div id="releases-list">Loading...</div>
+    </div>
+    
+    <div id="sticky-player"><div class="player-inner"><button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button><div style="flex-grow:1;"><div id="player-track-title" style="font-weight:700;">SELECT TRACK</div><div style="background:#333; height:4px; width:100%;"><div id="player-progress" style="width:0%; height:100%;"></div></div></div></div></div>
+    <script src="scripts.js"></script>
+</body>
+</html>

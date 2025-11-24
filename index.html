@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VYBEZONE | Home</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+</head>
+<body>
+    <div class="bg-glow"></div>
+
+    <nav class="main-navigation">
+        <a href="index.html" class="nav-btn active">Home</a>
+        <a href="releases.html" class="nav-btn">Releases</a>
+        <a href="beats.html" class="nav-btn">Beats</a>
+        <a href="store.html" class="nav-btn">Store</a>
+        <a href="gallery.html" class="nav-btn">Gallery</a>
+        <a href="bio.html" class="nav-btn">Bio</a>
+        <a href="press.html" class="nav-btn">Press</a>
+    </nav>
+
+    <div class="hero-section">
+        <h1 class="hero-title">VYBEZONE</h1>
+        <p class="hero-subtitle">NO LIMITS IN MUSIC. JUST PURE VIBE.</p>
+        
+        <div style="max-width:700px; margin:3rem auto; border-radius:20px; overflow:hidden; border:2px solid #333; aspect-ratio:16/9; box-shadow: 0 0 30px rgba(138,43,226,0.2);">
+            <iframe width="100%" height="100%" src="https://www.youtube.com/embed/dQw4w9WgXcQ" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <div class="glass-container" style="max-width:600px; padding:1.5rem; margin-top:3rem;">
+            <span style="color:#8a2be2; font-weight:bold; letter-spacing:2px; display:block; margin-bottom:1rem;">🔥 LATEST DROP</span>
+            <div id="latest-release-container">
+                Loading latest track...
+            </div>
+        </div>
+    </div>
+
+    <div id="sticky-player">
+        <div class="player-inner">
+            <button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button>
+            <div style="flex-grow:1;">
+                <div id="player-track-title" style="font-weight:bold; font-size:0.9rem; margin-bottom:5px;">VYBEZONE</div>
+                <div style="background:#333; height:4px; border-radius:99px; overflow:hidden;">
+                    <div id="player-progress" style="width:0%; height:100%;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="scripts.js"></script>
+    <script>
+      if (window.netlifyIdentity) { window.netlifyIdentity.on("init", user => { if (!user) { window.netlifyIdentity.on("login", () => { document.location.href = "/admin/"; }); } }); }
+    </script>
+</body>
+</html>
