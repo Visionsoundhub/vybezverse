@@ -199,12 +199,36 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 
 /* --- MOBILE LAYOUT FIXES --- */
 @media (max-width: 600px) {
-    .footer-title { display: block !important; font-size: 0.6rem; margin-bottom: 2px; opacity: 0.6; }
-    .footer-content { flex-direction: column; justify-content: center; gap: 5px; padding: 5px 0; }
-    .footer-section { flex-direction: row; justify-content: center; gap: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 2px; width: 100%; }
-    .footer-section:last-child { border-bottom: none; }
-    .footer-divider { display: none; }
-    .site-footer { height: auto; min-height: 80px; padding: 5px 0; }
-    #sticky-player { bottom: 80px; }
-    .social-link { width: 26px; height: 26px; }
+    /* 1. Hide Icons and Dividers */
+    .social-icons, .footer-divider { display: none !important; }
+
+    /* 2. Layout: Names side-by-side with gap */
+    .footer-content { 
+        flex-direction: row; 
+        justify-content: center; 
+        gap: 15px; 
+        width: 100%; 
+        padding: 0;
+    }
+    
+    .footer-section { 
+        width: auto; 
+        border: none !important; 
+        padding: 0;
+        flex-direction: row; /* Keep text structure */
+    }
+    
+    .footer-title { 
+        display: block !important; 
+        font-size: 0.65rem; /* Small & Minimal */
+        opacity: 0.5; 
+        margin: 0;
+    }
+    
+    /* 3. Reduce Footer Height & Move Player Down */
+    .site-footer { 
+        height: 30px; /* Ultra Thin */
+        min-height: 30px;
+    }
+    #sticky-player { bottom: 30px; }
 }
