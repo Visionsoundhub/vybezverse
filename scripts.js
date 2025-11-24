@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (footerEmail && data.email) footerEmail.innerHTML = `<i class="fas fa-envelope"></i> ${data.email}`;
     }).catch(() => {});
 
-    // --- 2. PLAYER LOGIC ---
+    // --- 2. PLAYER LOGIC (ONLY FOR BEATS NOW) ---
     const audio = new Audio();
     const playerTitle = document.getElementById('player-track-title');
     const playBtn = document.getElementById('player-play-btn');
@@ -69,24 +69,17 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- 3. RELEASES PAGE (DIORTHOSI) ---
+    // --- 3. RELEASES PAGE (YOUTUBE LINKS) ---
     const releasesList = document.getElementById('releases-list');
     
-    // LOGIC ΓΙΑ ΤΟ ΚΟΥΜΠΙ "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ" (ΕΚΤΟΣ FETCH ΓΙΑ ΝΑ ΔΟΥΛΕΨΕΙ ΣΙΓΟΥΡΑ)
+    // Modal Logic
     const whyBuyBtn = document.getElementById('why-buy-btn');
     const whyBuyModal = document.getElementById('why-buy-modal');
     const closeWhyBuy = document.getElementById('close-why-buy');
-
     if(whyBuyBtn && whyBuyModal) {
-        whyBuyBtn.addEventListener('click', () => {
-            whyBuyModal.classList.add('visible');
-        });
-        closeWhyBuy.addEventListener('click', () => {
-            whyBuyModal.classList.remove('visible');
-        });
-        whyBuyModal.addEventListener('click', (e) => {
-            if(e.target === whyBuyModal) whyBuyModal.classList.remove('visible');
-        });
+        whyBuyBtn.addEventListener('click', () => whyBuyModal.classList.add('visible'));
+        closeWhyBuy.addEventListener('click', () => whyBuyModal.classList.remove('visible'));
+        whyBuyModal.addEventListener('click', (e) => { if(e.target === whyBuyModal) whyBuyModal.classList.remove('visible'); });
     }
 
     if (releasesList) {
@@ -97,20 +90,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 const downloadBtn = track.downloadUrl ? 
                     `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : '';
 
+                // ΑΛΛΑΓΗ: Το Play Button τώρα είναι Link για YouTube
                 releasesList.innerHTML += `
                 <div class="beat-row">
                     <div class="beat-art">
                         <img src="${track.cover || 'https://via.placeholder.com/100'}" alt="Art">
-                        <div class="beat-play-overlay" onclick="playTrack('${track.audio}', '${track.title.replace(/'/g, "\\'")}')"><i class="fas fa-play" style="color:#fff;"></i></div>
+                        <a href="${track.youtubeUrl}" target="_blank" class="beat-play-overlay">
+                            <i class="fab fa-youtube" style="color:#fff; font-size:1.5rem;"></i>
+                        </a>
                     </div>
                     <div class="beat-info"><h4>${track.title}</h4><div class="beat-meta">Available Now</div></div>
                     
                     <div class="beat-actions">
-                        <button class="btn btn-accent play-round" onclick="playTrack('${track.audio}', '${track.title.replace(/'/g, "\\'")}')"><i class="fas fa-play"></i></button>
+                        <a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent play-round">
+                            <i class="fab fa-youtube"></i>
+                        </a>
                         <a href="${track.streamUrl}" target="_blank" class="btn btn-outline">STREAM</a>
-                        
                         <a href="${track.bundleUrl}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2; font-weight:800;">ΑΓΟΡΑΣΕ ΤΟ</a>
-                        
                         ${downloadBtn}
                     </div>
                 </div>`;
@@ -141,7 +137,7 @@ document.addEventListener('DOMContentLoaded', () => {
         bundleModal.addEventListener('click', (e) => { if(e.target === bundleModal) bundleModal.classList.remove('visible'); });
     }
 
-    // --- 5. HOME PAGE ---
+    // --- 5. HOME PAGE (Latest Drop -> YouTube) ---
     const homeBannerTitle = document.getElementById('home-hero-title');
     if (homeBannerTitle) {
         fetch('releases.json').then(r => r.json()).then(data => {
@@ -152,7 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if(cont) {
                     cont.innerHTML = `
                     <div style="margin-bottom:1rem;"><h3 style="font-size:1.5rem; margin:0;">${track.title}</h3></div>
-                    <button class="btn btn-accent" onclick="playTrack('${track.audio}', '${track.title.replace(/'/g, "\\'")}')"><i class="fas fa-play"></i> LISTEN NOW</button>
+                    <a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent">
+                        <i class="fab fa-youtube"></i> WATCH NOW
+                    </a>
                     <a href="${track.streamUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px;">STREAM</a> ${downloadBtn}`;
                 }
             }
@@ -189,31 +187,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(() => {});
     }
 
-    // --- 7. BEAT STORE & VIBE ---
-    const bStore = document.getElementById('beat-store-list');
-    if (bStore) {
-        let allBeats = [];
+    // --- 7. BEAT STORE (MP3 Player Works Here) ---
+    const beatContainer = document.getElementById('beat-store-list');
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    let allBeats = [];
+    if (beatContainer) {
         fetch('beats.json').then(r => r.json()).then(data => {
             if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; }
             renderBeats(allBeats);
         });
-        const filters = document.querySelectorAll('.filter-btn');
-        filters.forEach(btn => {
+        filterBtns.forEach(btn => {
             btn.addEventListener('click', () => {
-                filters.forEach(b => b.classList.remove('active'));
+                filterBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 const cat = btn.getAttribute('data-category');
                 renderBeats(cat === 'all' ? allBeats : allBeats.filter(b => b.category && b.category.toLowerCase() === cat.toLowerCase()));
             });
         });
-        const vBtn = document.getElementById('vibe-search-btn');
-        const vModal = document.getElementById('vibe-modal');
-        const vClose = document.getElementById('vibe-modal-close');
-        const vBubbles = document.getElementById('vibe-bubbles-container');
-        if (vBtn && vModal) {
-            vBtn.addEventListener('click', () => {
-                vModal.classList.add('visible');
-                if (vBubbles.innerHTML === '') {
+        const vibeBtn = document.getElementById('vibe-search-btn');
+        const vibeModal = document.getElementById('vibe-modal');
+        const vibeClose = document.getElementById('vibe-modal-close');
+        const bubblesContainer = document.getElementById('vibe-bubbles-container');
+        if (vibeBtn && vibeModal) {
+            vibeBtn.addEventListener('click', () => {
+                vibeModal.classList.add('visible');
+                if (bubblesContainer.innerHTML === '') {
                     fetch('vibes.json').then(r => r.json()).then(data => {
                         let vibes = Array.isArray(data) ? data : (data.vibes || []);
                         vibes.forEach(vibe => {
@@ -224,30 +222,30 @@ document.addEventListener('DOMContentLoaded', () => {
                             b.onmouseover = () => { b.style.borderColor = "#8a2be2"; b.style.color = "#fff"; };
                             b.onmouseout = () => { b.style.borderColor = "#444"; b.style.color = "#ccc"; };
                             b.onclick = () => {
-                                vModal.classList.remove('visible');
+                                vibeModal.classList.remove('visible');
                                 const filtered = allBeats.filter(beat => { if(!beat.tags) return false; return beat.tags.some(t => vibe.tags.includes(t)); });
                                 renderBeats(filtered);
-                                filters.forEach(b => b.classList.remove('active'));
+                                filterBtns.forEach(b => b.classList.remove('active'));
                             };
-                            vBubbles.appendChild(b);
+                            bubblesContainer.appendChild(b);
                         });
                     });
                 }
             });
-            vClose.addEventListener('click', () => vModal.classList.remove('visible'));
-            vModal.addEventListener('click', (e) => { if(e.target === vModal) vModal.classList.remove('visible'); });
+            vibeClose.addEventListener('click', () => vibeModal.classList.remove('visible'));
+            vibeModal.addEventListener('click', (e) => { if(e.target === vibeModal) vibeModal.classList.remove('visible'); });
         }
     }
 
     function renderBeats(beats) {
-        if (!bStore) return;
-        bStore.innerHTML = '';
-        if (beats.length === 0) { bStore.innerHTML = '<p style="text-align:center; padding:2rem; color:#666;">No beats found.</p>'; return; }
+        if (!beatContainer) return;
+        beatContainer.innerHTML = '';
+        if (beats.length === 0) { beatContainer.innerHTML = '<p style="text-align:center; padding:2rem; color:#666;">No beats found.</p>'; return; }
         beats.forEach(beat => {
             const bpm = beat.bpm || '140';
             const key = beat.key || 'Am';
             const statusLabel = beat.status === 'sold' ? 'ΠΟΥΛΗΘΗΚΕ' : 'ΑΓΟΡΑ';
-            bStore.innerHTML += `
+            beatContainer.innerHTML += `
                 <div class="beat-row">
                     <div class="beat-art"><img src="https://via.placeholder.com/60/111/333?text=V" alt="Art"><div class="beat-play-overlay" onclick="playTrack('${beat.audioSrc}', '${beat.title}')"><i class="fas fa-play" style="color:#fff;"></i></div></div>
                     <div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${bpm} BPM • ${key} • ${beat.category}</div></div>
