@@ -3,7 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Beat Store | VYBEZMADETHIS</title>
+    <title>Exclusive Beats | VYBEZMADETHIS</title>
+
+    <meta name="description" content="Αποκλειστικά instrumentals από τον VybezMadeThis. Hip Hop, Trap, R&B και Custom παραγωγές.">
+    
+    <meta property="og:title" content="Exclusive Beats | Βρες το αποκλειστικό instrumental σου" />
+    <meta property="og:type" content="music.album" />
+    <meta property="og:url" content="[ΠΡΕΠΕΙ ΝΑ ΤΟ ΑΛΛΑΞΕΙΣ: ΒΑΣΙΚΟ URL ΤΟΥ SITE]/beats.html" />
+    <meta property="og:image" content="[ΠΡΕΠΕΙ ΝΑ ΤΟ ΑΛΛΑΞΕΙΣ: LINK ΓΙΑ ΤΗΝ ΕΙΚΟΝΑ ΚΟΙΝΟΠΟΙΗΣΗΣ (1200x630px)]" />
+    <meta property="og:site_name" content="VYBEZONE" />
+    <meta property="og:description" content="Βρες το αποκλειστικό instrumental σου από τον VybezMadeThis. Hip Hop, Trap & Custom παραγωγές." />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -12,9 +23,13 @@
     
     <nav class="main-navigation">
         <a href="index.html" class="nav-logo"></a>
+        
         <div class="hamburger">
-            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
+            <div class="bar"></div>
         </div>
+
         <div class="nav-links"></div>
     </nav>
 
@@ -26,30 +41,21 @@
             <button id="vibe-search-btn" class="btn btn-outline" style="margin-top:2rem; padding:0.8rem 2.5rem;">
                 <i class="fas fa-magic" style="color:#8a2be2;"></i> VIBE SEARCH
             </button>
-    
-            <div class="info-accordions-container" id="info-accordions-container"></div>
         </div>
-    
-        <div class="filter-scroll-container">
-            <button class="filter-btn active" data-category="all">Όλα</button>
+
+        <div class="filter-controls">
+            <button class="filter-btn active" data-category="all">All</button>
+            <button class="filter-btn" data-category="hiphop">Hip Hop</button>
             <button class="filter-btn" data-category="trap">Trap / Drill</button>
-            <button class="filter-btn" data-category="boombap">Rap / Boombap</button>
+            <button class="filter-btn" data-category="boombap">Boombap</button>
             <button class="filter-btn" data-category="latin">Latin Urban / Afro</button>
             <button class="filter-btn" data-category="lofi">Lofi</button>
             <button class="filter-btn" data-category="custom">Custom</button>
             <button class="filter-btn" data-category="vault">Vault Beats</button>
             <button class="filter-btn" data-category="ai">AI Access</button>
         </div>
-    
-        <div class="beat-store-container" id="beat-store-list">Loading...</div>
 
-        <div class="modal-overlay" id="vibe-modal">
-            <div class="modal-box">
-                <button class="modal-close-btn" id="vibe-modal-close">&times;</button>
-                <h2 style="margin-bottom:20px;">ΠΩΣ ΝΙΩΘΕΙΣ;</h2>
-                <div id="vibe-bubbles-container" style="display:flex; flex-wrap:wrap; justify-content:center; min-height: 200px; align-items: center;"></div>
-            </div>
-        </div>
+        <div class="beat-store-container" id="beat-store-list">Loading...</div>
     </main>
     <div id="sticky-player">
         <div class="player-inner">
@@ -62,6 +68,16 @@
     </div>
     
     <div id="dynamic-footer"></div>
+
+    <div class="modal-overlay" id="vibe-modal">
+        <div class="modal-box">
+            <button class="modal-close-btn" id="vibe-modal-close">&times;</button>
+            <h2 style="text-align:center;">VIBE SEARCH</h2>
+            <p style="text-align:center; color:#ccc; margin-bottom:2rem;">Διάλεξε ένα συναίσθημα ή είδος για να βρεις beats!</p>
+            <div id="vibe-bubbles-container" class="vibe-bubbles">
+                </div>
+        </div>
+    </div>
 
     <script src="https://unpkg.com/swup@4"></script>
     <script src="scripts.js"></script>
