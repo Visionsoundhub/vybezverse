@@ -12,40 +12,45 @@
     
     <nav class="main-navigation">
         <a href="index.html" class="nav-logo"></a>
-        
         <div class="hamburger">
-            <div class="bar"></div>
-            <div class="bar"></div>
-            <div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
         </div>
-
         <div class="nav-links"></div>
     </nav>
 
-    <div class="hero-section" style="padding:2rem 1rem;">
-        <h1 class="hero-title">VYBEZMADETHIS</h1>
-        <p class="hero-subtitle">exclusive beats</p>
-        
-        <button id="vibe-search-btn" class="btn btn-outline" style="margin-top:2rem; padding:0.8rem 2.5rem;">
-            <i class="fas fa-magic" style="color:#8a2be2;"></i> VIBE SEARCH
-        </button>
+    <main id="swup" class="transition-fade">
+        <div class="hero-section" style="padding:2rem 1rem;">
+            <h1 class="hero-title">VYBEZMADETHIS</h1>
+            <p class="hero-subtitle">exclusive beats</p>
+            
+            <button id="vibe-search-btn" class="btn btn-outline" style="margin-top:2rem; padding:0.8rem 2.5rem;">
+                <i class="fas fa-magic" style="color:#8a2be2;"></i> VIBE SEARCH
+            </button>
+    
+            <div class="info-accordions-container" id="info-accordions-container"></div>
+        </div>
+    
+        <div class="filter-scroll-container">
+            <button class="filter-btn active" data-category="all">Όλα</button>
+            <button class="filter-btn" data-category="trap">Trap / Drill</button>
+            <button class="filter-btn" data-category="boombap">Rap / Boombap</button>
+            <button class="filter-btn" data-category="latin">Latin Urban / Afro</button>
+            <button class="filter-btn" data-category="lofi">Lofi</button>
+            <button class="filter-btn" data-category="custom">Custom</button>
+            <button class="filter-btn" data-category="vault">Vault Beats</button>
+            <button class="filter-btn" data-category="ai">AI Access</button>
+        </div>
+    
+        <div class="beat-store-container" id="beat-store-list">Loading...</div>
 
-        <div class="info-accordions-container" id="info-accordions-container"></div>
-    </div>
-
-    <div class="filter-scroll-container">
-        <button class="filter-btn active" data-category="all">Όλα</button>
-        <button class="filter-btn" data-category="trap">Trap / Drill</button>
-        <button class="filter-btn" data-category="boombap">Rap / Boombap</button>
-        <button class="filter-btn" data-category="latin">Latin Urban / Afro</button>
-        <button class="filter-btn" data-category="lofi">Lofi</button>
-        <button class="filter-btn" data-category="custom">Custom</button>
-        <button class="filter-btn" data-category="vault">Vault Beats</button>
-        <button class="filter-btn" data-category="ai">AI Access</button>
-    </div>
-
-    <div class="beat-store-container" id="beat-store-list">Loading...</div>
-
+        <div class="modal-overlay" id="vibe-modal">
+            <div class="modal-box">
+                <button class="modal-close-btn" id="vibe-modal-close">&times;</button>
+                <h2 style="margin-bottom:20px;">ΠΩΣ ΝΙΩΘΕΙΣ;</h2>
+                <div id="vibe-bubbles-container" style="display:flex; flex-wrap:wrap; justify-content:center; min-height: 200px; align-items: center;"></div>
+            </div>
+        </div>
+    </main>
     <div id="sticky-player">
         <div class="player-inner">
             <button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button>
@@ -58,14 +63,7 @@
     
     <div id="dynamic-footer"></div>
 
-    <div class="modal-overlay" id="vibe-modal">
-        <div class="modal-box">
-            <button class="modal-close-btn" id="vibe-modal-close">&times;</button>
-            <h2 style="margin-bottom:20px;">ΠΩΣ ΝΙΩΘΕΙΣ;</h2>
-            <div id="vibe-bubbles-container" style="display:flex; flex-wrap:wrap; justify-content:center; min-height: 200px; align-items: center;"></div>
-        </div>
-    </div>
-
+    <script src="https://unpkg.com/swup@4"></script>
     <script src="scripts.js"></script>
 </body>
 </html>
