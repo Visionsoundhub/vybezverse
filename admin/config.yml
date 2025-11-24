@@ -1,12 +1,12 @@
 backend:
   name: git-gateway
-  branch: main # Σιγουρέψου ότι το branch στο GitHub λέγεται main (αλλιώς βάλε master)
+  branch: main
 
-media_folder: "assets/uploads" # Εδώ θα αποθηκεύονται οι φωτογραφίες/mp3 που ανεβάζεις
+media_folder: "assets/uploads"
 public_folder: "/assets/uploads"
 
 collections:
-  # --- 1. MUSIC RELEASES (Τα τραγούδια σου) ---
+  # --- 1. MUSIC RELEASES ---
   - name: "releases"
     label: "🎹 Releases (My Tracks)"
     files:
@@ -25,7 +25,7 @@ collections:
               - {label: "Bundle Link (Payhip)", name: "bundleUrl", widget: "string"}
               - {label: "Free Download Link", name: "downloadUrl", widget: "string", required: false}
 
-  # --- 2. BEAT STORE (Τα Beats προς πώληση) ---
+  # --- 2. BEAT STORE ---
   - name: "beats"
     label: "💰 Beat Store"
     files:
@@ -47,7 +47,7 @@ collections:
               - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
               - {label: "Vibe Tags", name: "tags", widget: "list", hint: "π.χ. dark, sad, hard"}
 
-  # --- 3. PRESS (Άρθρα & Συνεντεύξεις) ---
+  # --- 3. PRESS ---
   - name: "press"
     label: "📰 Press & News"
     files:
@@ -66,7 +66,7 @@ collections:
               - {label: "Summary Text", name: "summary", widget: "text"}
               - {label: "Link to Article", name: "link", widget: "string"}
 
-  # --- 4. VIBES CONFIG (Οι φούσκες) ---
+  # --- 4. VIBES CONFIG ---
   - name: "vibes"
     label: "✨ Vibe Settings"
     files:
@@ -80,3 +80,15 @@ collections:
             fields:
               - {label: "Vibe Name", name: "name", widget: "string"}
               - {label: "Tags to Filter", name: "tags", widget: "list"}
+
+  # --- 5. HOME PAGE SETTINGS (ΝΕΟ - ΓΙΑ ΤΟ BANNER) ---
+  - name: "pages"
+    label: "⚙️ Page Settings"
+    files:
+      - name: "home"
+        label: "Home Page Config"
+        file: "home.json"
+        fields:
+          - {label: "Main Banner Image", name: "heroImage", widget: "image", required: false, hint: "Μεγάλη εικόνα πάνω από το βίντεο"}
+          - {label: "Banner Title", name: "heroTitle", widget: "string", required: false, default: "VYBEZONE"}
+          - {label: "Banner Subtitle", name: "heroSubtitle", widget: "string", required: false, default: "NO LIMITS IN MUSIC. JUST PURE VIBE."}
