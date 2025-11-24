@@ -25,17 +25,21 @@ h1, h2, h3, .nav-btn, .btn, .hero-title, .section-title {
     font-family: 'Oswald', sans-serif; text-transform: uppercase; letter-spacing: 1px; text-align: center;
 }
 
-/* --- NAVIGATION (NEW LAYOUT WITH LOGO) --- */
+/* --- NAVIGATION (FIXED FOR MOBILE & LOGO) --- */
 .main-navigation {
     display: flex; 
-    justify-content: space-between; /* Logo αριστερά, Menu δεξιά */
+    justify-content: space-between; /* Logo Αριστερά - Menu Δεξιά */
     align-items: center;
-    padding: 1rem 2rem;
-    background: rgba(15, 15, 15, 0.9); backdrop-filter: blur(15px);
+    padding: 0.8rem 2rem;
+    background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(15px);
     position: sticky; top: 0; z-index: 1000; border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-.nav-logo img { height: 50px; width: auto; display: block; } /* Ρύθμιση ύψους Logo */
+.nav-logo {
+    font-family: 'Oswald', sans-serif; font-size: 1.5rem; font-weight: bold; 
+    color: #fff; text-decoration: none; display: flex; align-items: center;
+}
+.nav-logo img { height: 40px; width: auto; margin-right: 10px; } /* Αν βάλεις εικόνα */
 
 .nav-links { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; }
 
@@ -48,34 +52,33 @@ h1, h2, h3, .nav-btn, .btn, .hero-title, .section-title {
     background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(138, 43, 226, 0.5);
 }
 
-/* MOBILE NAV (STACKED) */
-@media (max-width: 768px) {
-    .main-navigation { flex-direction: column; gap: 1rem; padding: 1rem; }
-    .nav-logo { margin-bottom: 0.5rem; }
-    .nav-logo img { height: 60px; } /* Μεγαλύτερο logo στο κινητό */
-    .nav-links { gap: 0.3rem; }
-    .nav-btn { font-size: 0.75rem; padding: 0.4rem 0.8rem; }
+/* MOBILE MENU */
+@media (max-width: 900px) {
+    .main-navigation { flex-direction: column; padding: 1rem; gap: 1rem; }
+    .nav-logo { margin-bottom: 5px; font-size: 1.8rem; } /* Μεγαλύτερο Logo κέντρο */
+    .nav-links { gap: 0.3rem; width: 100%; justify-content: center; }
+    .nav-btn { font-size: 0.75rem; padding: 0.4rem 0.8rem; border: 1px solid rgba(255,255,255,0.1); }
 }
 
-/* --- FILTERS (BEATS) - WRAPPING FIX --- */
+/* --- HERO --- */
+.hero-section { text-align: center; padding: 3rem 1rem; }
+.hero-title { font-size: 3.5rem; margin: 0; font-weight: 800; color: #fff; line-height: 1.1; }
+.hero-subtitle { color: #888; letter-spacing: 2px; font-size: 0.9rem; margin-top: 10px; }
+
+/* --- FILTERS (BEATS) - WRAP FIX --- */
 .filter-scroll-container {
-    display: flex; 
-    justify-content: center; 
-    gap: 8px; 
-    flex-wrap: wrap; /* Τώρα διπλώνουν και φαίνονται όλα */
-    padding: 1rem 10px; 
-    max-width: 1000px; margin: 0 auto;
+    display: flex; justify-content: center; gap: 8px; 
+    flex-wrap: wrap; /* ΔΙΠΛΩΝΕΙ ΓΙΑ ΝΑ ΦΑΙΝΟΝΤΑΙ ΟΛΑ */
+    padding: 1rem 10px; max-width: 1000px; margin: 0 auto;
 }
-
 .filter-btn {
-    background: rgba(255,255,255,0.05); color: #aaa; 
-    padding: 0.5rem 1rem; border-radius: 8px; /* Λίγο πιο τετράγωνα για χώρο */
-    border: 1px solid rgba(255,255,255,0.1); cursor: pointer; 
+    background: rgba(255,255,255,0.05); color: #aaa; padding: 0.5rem 1rem; 
+    border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; 
     font-size: 0.8rem; transition: 0.3s; font-weight: 600;
 }
 .filter-btn.active, .filter-btn:hover { background: #8a2be2; color: #fff; border-color: #8a2be2; }
 
-/* --- BEAT ROWS & RELEASES (MOBILE OPTIMIZED) --- */
+/* --- BEAT & RELEASES ROWS (MOBILE OPTIMIZED) --- */
 .beat-store-container, .glass-container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
 
 .beat-row {
@@ -91,6 +94,9 @@ h1, h2, h3, .nav-btn, .btn, .hero-title, .section-title {
 .beat-meta { font-size: 0.8rem; color: #888; text-align: left; }
 .beat-price { font-family: 'Oswald', sans-serif; font-size: 1.2rem; font-weight: 700; margin-right: 1rem; }
 
+/* ΚΟΥΜΠΙΑ ΣΤΑ RELEASES */
+.beat-actions { display: flex; gap: 10px; align-items: center; }
+
 /* MOBILE CARD LAYOUT */
 @media (max-width: 600px) {
     .beat-row {
@@ -100,15 +106,16 @@ h1, h2, h3, .nav-btn, .btn, .hero-title, .section-title {
     .beat-art { width: 100px; height: 100px; margin: 0 auto; }
     .beat-info h4 { text-align: center; font-size: 1.3rem; }
     .beat-meta { text-align: center; }
-    .beat-price { display: block; margin: 0; font-size: 1.5rem; color: #8a2be2; }
+    .beat-price { display: block; margin: 0; font-size: 1.5rem; color: #8a2be2; margin-bottom: 0.5rem; }
     
-    /* ΜΙΚΡΑ ΚΟΥΜΠΙΑ ΣΤΟ ΚΙΝΗΤΟ */
+    /* ΤΑ ΚΟΥΜΠΙΑ ΜΙΚΡΑΙΝΟΥΝ ΚΑΙ ΜΠΑΙΝΟΥΝ ΔΙΠΛΑ-ΔΙΠΛΑ */
     .beat-actions { 
-        display: flex; gap: 10px; justify-content: center; width: 100%; 
+        width: 100%; justify-content: space-between; gap: 8px;
     }
-    .btn { 
-        padding: 0.6rem 1rem; font-size: 0.8rem; flex: 1; justify-content: center; 
+    .beat-actions .btn { 
+        flex: 1; padding: 0.7rem 0; font-size: 0.75rem; justify-content: center;
     }
+    .hero-title { font-size: 2.8rem; } /* Μικρότερος τίτλος */
 }
 
 /* --- BUTTONS --- */
@@ -116,17 +123,12 @@ h1, h2, h3, .nav-btn, .btn, .hero-title, .section-title {
 .btn-accent { background: #8a2be2; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.3); }
 .btn-outline { border: 1px solid rgba(255,255,255,0.2); background: transparent; }
 
-/* --- HERO --- */
-.hero-section { text-align: center; padding: 3rem 1rem; }
-.hero-title { font-size: 3rem; margin: 0; font-weight: 800; color: #fff; } /* Μικρότερο font για mobile safety */
-.hero-subtitle { color: #888; letter-spacing: 2px; font-size: 0.8rem; }
-
 /* --- PLAYER --- */
 #sticky-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; border-top: 1px solid #333; padding: 10px; display: flex; justify-content: center; z-index: 2000; }
 .player-inner { width: 100%; max-width: 800px; display: flex; align-items: center; gap: 10px; }
 .play-btn-large { width: 40px; height: 40px; background: #fff; color: #000; border-radius: 50%; border: none; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-/* --- GALLERY & BIO FIXES --- */
+/* --- GALLERY & BIO --- */
 .bio-grid { display: grid; grid-template-columns: 1fr; gap: 2rem; }
 @media (min-width: 768px) { .bio-grid { grid-template-columns: 1fr 1.5fr; } }
 .bio-img { width: 100%; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
@@ -136,3 +138,10 @@ h1, h2, h3, .nav-btn, .btn, .hero-title, .section-title {
 .press-card { background: rgba(255,255,255,0.03); border-radius: 15px; overflow: hidden; }
 .press-image { width: 100%; height: 180px; object-fit: cover; }
 .press-content { padding: 1.5rem; }
+
+/* --- MODAL --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 9999; }
+.modal-overlay.visible { display: flex !important; }
+.modal-box { background: #141414; padding: 2rem; border-radius: 20px; border: 1px solid #333; width: 90%; max-width: 500px; text-align: center; position: relative; }
+.modal-close-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; }
+#vibe-bubbles-container .btn { margin: 5px; font-size: 0.8rem; }
