@@ -22,14 +22,51 @@
         </div>
     </nav>
 
-    <div class="glass-container">
+    <div class="glass-container" style="text-align:center;">
         <h1 class="section-title">MUSIC CATALOG</h1>
-        <div style="text-align:center; margin-bottom:2rem;">
+        
+        <div style="margin-bottom:2rem; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
             <button class="nav-btn active" style="border:1px solid #fff;">All Releases</button>
+            <button id="why-buy-btn" class="nav-btn" style="border:1px solid #8a2be2; color:#8a2be2 !important;">
+                <i class="fas fa-info-circle"></i> ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;
+            </button>
         </div>
+
         <div id="releases-list">Loading Tracks...</div>
     </div>
     
+    <div class="modal-overlay" id="why-buy-modal">
+        <div class="modal-box" style="text-align:left;">
+            <button class="modal-close-btn" id="close-why-buy">&times;</button>
+            <h2 style="text-align:center; color:#fff; margin-bottom:1.5rem; border-bottom:1px solid #333; padding-bottom:10px;">
+                ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΕΙΣ;
+            </h2>
+            
+            <div style="color:#ccc; font-size:0.95rem; line-height:1.6;">
+                <p style="margin-bottom:1rem;">
+                    <i class="fas fa-heart" style="color:#8a2be2;"></i> <strong>ΣΤΗΡΙΞΕ ΤΟΝ ΚΑΛΛΙΤΕΧΝΗ</strong><br>
+                    Οι πλατφόρμες streaming (Spotify, YouTube) πληρώνουν ελάχιστα (περίπου 0.003€ ανά play). Η αγορά ενός τραγουδιού ισοδυναμεί με χιλιάδες streams και πηγαίνει απευθείας στη δημιουργία νέας μουσικής.
+                </p>
+
+                <p style="margin-bottom:1rem;">
+                    <i class="fas fa-box-open" style="color:#8a2be2;"></i> <strong>ΤΙ ΠΑΙΡΝΕΙΣ ΜΕ ΤΟ BUNDLE;</strong><br>
+                    Δεν αγοράζεις απλά ένα MP3. Το πακέτο περιλαμβάνει:
+                </p>
+                <ul style="list-style:none; padding-left:10px; margin-bottom:1rem; font-size:0.85rem; color:#888;">
+                    <li>✅ Master Quality Track (WAV)</li>
+                    <li>✅ Εναλλακτικές Εκδόσεις (Slowed/Sped Up)</li>
+                    <li>✅ Έτοιμο Ringtone για κινητά</li>
+                    <li>✅ High-Res Artwork & Χειρόγραφους Στίχους</li>
+                    <li>✅ Αποκλειστικό BTS Video</li>
+                </ul>
+
+                <p style="font-size:0.85rem; color:#666; text-align:center; border-top:1px solid #333; padding-top:1rem;">
+                    * Αν δεν μπορείς να στηρίξεις οικονομικά τώρα, υπάρχει πάντα η επιλογή <strong>Free Download</strong>. Η μουσική είναι για όλους.
+                </p>
+            </div>
+        </div>
+    </div>
+
     <div id="sticky-player"><div class="player-inner"><button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button><div style="flex-grow:1;"><div id="player-track-title" style="font-weight:700;">SELECT TRACK</div><div style="background:#333; height:4px; width:100%;"><div id="player-progress" style="width:0%; height:100%;"></div></div></div></div></div>
     
     <footer class="site-footer">
