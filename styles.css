@@ -7,9 +7,13 @@ body {
     background-color: #0f0f0f;
     color: #fff;
     font-family: 'Inter', sans-serif;
-    margin: 0; padding: 0; padding-bottom: 140px;
+    margin: 0; padding: 0; padding-bottom: 0; /* Player space handled by footer padding */
     line-height: 1.6;
     overflow-x: hidden;
+    /* STICKY FOOTER SETUP */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
 }
 
 /* --- BACKGROUND GLOW --- */
@@ -144,7 +148,8 @@ a.nav-logo {
 
 .beat-art { width: 70px; height: 70px; background: #222; border-radius: 10px; position: relative; overflow: hidden; margin: 0 auto; }
 .beat-art img { width: 100%; height: 100%; object-fit: cover; }
-.beat-play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer; }
+.beat-play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; }
+.beat-play-overlay:hover { background: rgba(138, 43, 226, 0.4); }
 .beat-info h4 { margin: 0; font-size: 1.1rem; color: #fff; font-weight: 700; }
 .beat-meta { font-size: 0.85rem; color: #888; margin-top: 4px; font-weight: 500; }
 .beat-price { font-family: 'Oswald', sans-serif; font-size: 1.3rem; color: #fff; font-weight: 700; margin-right: 1rem; }
@@ -163,59 +168,62 @@ a.nav-logo {
 .modal-close-btn { position: absolute; top: 15px; right: 20px; background: none; border: none; color: #fff; font-size: 2rem; cursor: pointer; }
 #sticky-player { position: fixed; bottom: 0; left: 0; width: 100%; background: #111; border-top: 1px solid #333; padding: 10px; display: flex; justify-content: center; z-index: 2000; }
 .player-inner { width: 100%; max-width: 800px; display: flex; align-items: center; gap: 10px; }
-.play-btn-large { width: 40px; height: 40px; background: #fff; color: #000; border-radius: 50%; border: none; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+.play-btn-large { width: 40px; height: 40px; background: #fff; color: #000; border-radius: 50%; border: none; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+.play-btn-large:hover { background: #8a2be2; color: #fff; }
 #player-progress { background: #8a2be2; height: 100%; width: 0%; transition: width 0.1s linear; }
 
-/* --- FOOTER (SPLIT BRANDING) --- */
+/* --- FOOTER (COMPACT & BOTTOM) --- */
 .site-footer {
     background: #000;
     border-top: 1px solid #222;
-    padding: 3rem 1rem 6rem 1rem; /* Extra padding bottom for player space */
-    margin-top: 4rem;
+    /* Μειωμένο padding κάτω για να μην είναι τεράστιο */
+    padding: 2rem 1rem 7rem 1rem; 
+    margin-top: auto; /* Σπρώχνει το footer τέρμα κάτω */
 }
 
 .footer-content {
-    max-width: 1000px;
+    max-width: 900px;
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1px 1fr; /* Left | Line | Right */
-    gap: 2rem;
-    align-items: start;
+    gap: 1rem;
+    align-items: center;
 }
 
-.footer-section {
-    text-align: center;
-}
+.footer-section { text-align: center; }
 
 .footer-title {
     font-family: 'Oswald', sans-serif;
-    font-size: 1.5rem;
+    font-size: 1.1rem; /* Μικρότερο */
     font-weight: 700;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
     color: #fff;
     letter-spacing: 1px;
+    opacity: 0.8;
 }
 
 .footer-divider {
-    background: #222;
-    height: 100%;
+    background: #333;
+    height: 60px; /* Μικρότερη κάθετη γραμμή */
     width: 1px;
+    margin: 0 auto;
 }
 
-/* Social Icons Grid */
+/* Social Icons */
 .social-icons {
     display: flex;
     justify-content: center;
-    gap: 1.5rem;
+    gap: 1rem;
     flex-wrap: wrap;
+    min-height: 40px;
 }
 
 .social-link {
     color: #888;
-    font-size: 1.5rem;
+    font-size: 1.1rem; /* Μικρότερα εικονίδια */
     transition: 0.3s;
     background: rgba(255,255,255,0.05);
-    width: 50px; height: 50px;
+    width: 40px; height: 40px; /* Μικρότερα κουμπιά */
     display: flex; align-items: center; justify-content: center;
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.1);
@@ -225,33 +233,21 @@ a.nav-logo {
     color: #fff;
     border-color: #8a2be2;
     background: #8a2be2;
-    transform: translateY(-3px);
-    box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
 }
 
-.footer-email {
-    margin-top: 2rem;
-    text-align: center;
-    color: #666;
-    font-size: 0.9rem;
-}
-
-.copyright {
-    text-align: center;
-    margin-top: 3rem;
-    color: #444;
-    font-size: 0.8rem;
-}
+.footer-email { margin-top: 1.5rem; text-align: center; color: #666; font-size: 0.85rem; }
+.copyright { text-align: center; margin-top: 1rem; color: #333; font-size: 0.75rem; }
 
 /* Mobile Footer */
 @media (max-width: 768px) {
     .footer-content {
-        grid-template-columns: 1fr; /* Stack them */
-        gap: 3rem;
+        grid-template-columns: 1fr; /* Στοίβαξη */
+        gap: 2rem;
     }
     .footer-divider {
-        width: 100%;
+        width: 100px; /* Οριζόντια γραμμή στο κινητό */
         height: 1px;
-        background: #222;
     }
 }
