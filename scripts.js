@@ -13,9 +13,9 @@ document.addEventListener('DOMContentLoaded', () => {
         return (m && m[2].length === 11) ? m[2] : null; 
     }
 
-    // --- 2. GLOBAL ELEMENTS (Run Once) ---
+    // --- 2. GLOBAL ELEMENTS (Run Once on DOMContentLoaded) ---
     
-    // Mobile Menu
+    // Mobile Menu Toggle Logic
     const hamburger = document.querySelector('.hamburger');
     const navLinks = document.querySelector('.nav-links');
     if (hamburger) {
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Dynamic Menu (Global)
+    // Dynamic Menu (Global - Fetches links once)
     const menuContainer = document.querySelector('.nav-links');
     if (menuContainer) {
         fetch('menu.json').then(r => r.json()).then(data => {
@@ -42,11 +42,23 @@ document.addEventListener('DOMContentLoaded', () => {
                 menuHtml += `<a href="${link.url}" class="nav-btn" target="${target}">${link.text}</a>`;
             });
             menuContainer.innerHTML = menuHtml;
-            updateActiveMenu(); 
+            updateActiveMenu(); // Set initial active
         }).catch(() => {});
     }
+    
+    // GLOBAL SETTINGS & Logo Logic (Fetches settings once)
+    const navLogoContainer = document.querySelector('.nav-logo');
+    fetch('settings.json').then(r => r.json()).then(data => {
+        if (navLogoContainer) {
+            if (data.logoType === 'image' && data.logoImage) { 
+                navLogoContainer.innerHTML = `<img src="${data.logoImage}" alt="Logo" style="height:50px;">`; 
+            } else { 
+                navLogoContainer.innerHTML = `<span class="logo-text">${data.logoText || "BLACK VYBEZ"}</span>`; 
+            }
+        }
+    }).catch(() => console.log('Settings for logo not found'));
 
-    // Dynamic Footer (Global)
+    // Dynamic Footer (Global - Fetches footer links once)
     const footerContainer = document.getElementById('dynamic-footer');
     if (footerContainer) {
         fetch('footer.json').then(r => r.json()).then(data => {
@@ -91,6 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(err => console.error("Footer JSON error:", err));
     }
 
+
     // Player Logic (Global - Never resets)
     const audio = new Audio();
     const playerTitle = document.getElementById('player-track-title');
@@ -132,7 +145,7 @@ document.addEventListener('DOMContentLoaded', () => {
         window.scrollTo(0, 0); 
         updateActiveMenu();
         
-        // GLOBAL SETTINGS (Accordions)
+        // GLOBAL SETTINGS (Accordions - Must run here to load content inside #swup)
         const accordionsContainer = document.getElementById('info-accordions-container');
 
         fetch('settings.json').then(r => r.json()).then(data => {
@@ -199,7 +212,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // ... (Store/Bundle logic implementation remains the same) ...
         }
 
-        // BEATS & VIBES (FIXED)
+        // BEATS & VIBES 
         const beatContainer = document.getElementById('beat-store-list');
         const filterBtns = document.querySelectorAll('.filter-btn');
         let allBeats = [];
@@ -220,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }); 
             });
 
-            // --- VIBE SEARCH LOGIC (FIXED TO BE MORE ROBUST) ---
+            // VIBE SEARCH LOGIC (FIXED TO BE MORE ROBUST)
             const vBtn = document.getElementById('vibe-search-btn');
             const vModal = document.getElementById('vibe-modal');
             const vBubbles = document.getElementById('vibe-bubbles-container');
@@ -228,7 +241,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (vBtn && vModal && vBubbles) {
                 // 1. Unconditionally clear and populate the Vibe bubbles on page load.
-                // This ensures the buttons are ready and eliminates the innerHTML bug.
                 vBubbles.innerHTML = ''; 
                 
                 fetch('vibes.json').then(r => r.json()).then(data => { 
@@ -272,7 +284,23 @@ document.addEventListener('DOMContentLoaded', () => {
         // PODCASTS
         const podcastContainer = document.getElementById('podcasts-container');
         if (podcastContainer) {
-            // ... (Podcasts logic implementation remains the same) ...
+            fetch('podcasts.json').then(r => r.json()).then(data => {
+                podcastContainer.innerHTML = '';
+                let eps = Array.isArray(data) ? data : (data.episodes || []);
+                if (eps.length === 0) { podcastContainer.innerHTML = '<p style="text-align:center; width:100%;">No episodes yet.</p>'; return; }
+                eps.forEach(ep => {
+                    podcastContainer.innerHTML += `
+                    <div class="press-card">
+                        <img src="${ep.cover || 'https://via.placeholder.com/400'}" alt="${ep.title}" class="press-image">
+                        <div class="press-content">
+                            <div class="press-date" style="color:#8a2be2; font-size:0.8rem;">${ep.date || ''}</div>
+                            <h3 style="font-size:1.1rem; margin:5px 0;">${ep.title}</h3>
+                            <p style="font-size:0.9rem; color:#ccc;">${ep.description}</p>
+                            <a href="${ep.link}" target="_blank" class="btn btn-outline" style="margin-top:auto;"><i class="fas fa-play"></i> LISTEN</a>
+                        </div>
+                    </div>`;
+                });
+            }).catch(() => {});
         }
     }
 
@@ -289,6 +317,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- 4. EXECUTE ---
-    initPageFunctions(); 
-    swup.hooks.on('content:replace', initPageFunctions); 
+    initPageFunctions(); // Runs first time (Logo/Footer are already fetched)
+    swup.hooks.on('content:replace', initPageFunctions); // Runs on every page swap
 });
