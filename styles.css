@@ -7,7 +7,7 @@ body {
     background-color: #0f0f0f;
     color: #fff;
     font-family: 'Inter', sans-serif;
-    margin: 0; padding: 0; padding-bottom: 0; /* Player space handled by footer padding */
+    margin: 0; padding: 0; padding-bottom: 140px;
     line-height: 1.6;
     overflow-x: hidden;
     /* STICKY FOOTER SETUP */
@@ -172,21 +172,21 @@ a.nav-logo {
 .play-btn-large:hover { background: #8a2be2; color: #fff; }
 #player-progress { background: #8a2be2; height: 100%; width: 0%; transition: width 0.1s linear; }
 
-/* --- FOOTER (COMPACT & BOTTOM) --- */
+/* --- FOOTER (SUPER COMPACT & BOTTOM) --- */
 .site-footer {
     background: #000;
     border-top: 1px solid #222;
-    /* Μειωμένο padding κάτω για να μην είναι τεράστιο */
-    padding: 2rem 1rem 7rem 1rem; 
-    margin-top: auto; /* Σπρώχνει το footer τέρμα κάτω */
+    /* Μειωμένο ύψος: 1.5rem πάνω, 5.5rem κάτω (για να χωράει ο player) */
+    padding: 1.5rem 1rem 5.5rem 1rem; 
+    margin-top: auto; 
 }
 
 .footer-content {
-    max-width: 900px;
+    max-width: 800px; /* Πιο στενό πλάτος */
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 1fr 1px 1fr; /* Left | Line | Right */
-    gap: 1rem;
+    grid-template-columns: 1fr 1px 1fr; 
+    gap: 0.5rem; /* Ελάχιστο κενό ανάμεσα στις στήλες */
     align-items: center;
 }
 
@@ -194,36 +194,36 @@ a.nav-logo {
 
 .footer-title {
     font-family: 'Oswald', sans-serif;
-    font-size: 1.1rem; /* Μικρότερο */
+    font-size: 1rem; /* Μικρότερη γραμματοσειρά */
     font-weight: 700;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem; /* Πιο κοντά στα εικονίδια */
     color: #fff;
     letter-spacing: 1px;
-    opacity: 0.8;
+    opacity: 0.9;
 }
 
 .footer-divider {
     background: #333;
-    height: 60px; /* Μικρότερη κάθετη γραμμή */
+    height: 40px; /* Πολύ πιο κοντή γραμμή */
     width: 1px;
     margin: 0 auto;
 }
 
-/* Social Icons */
+/* Social Icons Compact */
 .social-icons {
     display: flex;
     justify-content: center;
-    gap: 1rem;
+    gap: 0.8rem; /* Πιο κοντά μεταξύ τους */
     flex-wrap: wrap;
-    min-height: 40px;
+    min-height: 35px;
 }
 
 .social-link {
     color: #888;
-    font-size: 1.1rem; /* Μικρότερα εικονίδια */
+    font-size: 0.9rem; /* Μικρότερα σύμβολα */
     transition: 0.3s;
     background: rgba(255,255,255,0.05);
-    width: 40px; height: 40px; /* Μικρότερα κουμπιά */
+    width: 35px; height: 35px; /* Μικρότερα κουμπιά */
     display: flex; align-items: center; justify-content: center;
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.1);
@@ -234,20 +234,33 @@ a.nav-logo {
     border-color: #8a2be2;
     background: #8a2be2;
     transform: translateY(-2px);
-    box-shadow: 0 0 10px rgba(138, 43, 226, 0.5);
 }
 
-.footer-email { margin-top: 1.5rem; text-align: center; color: #666; font-size: 0.85rem; }
-.copyright { text-align: center; margin-top: 1rem; color: #333; font-size: 0.75rem; }
+.footer-email {
+    margin-top: 1rem;
+    text-align: center;
+    color: #666;
+    font-size: 0.8rem;
+}
+
+.copyright {
+    text-align: center;
+    margin-top: 0.5rem;
+    color: #444;
+    font-size: 0.7rem; /* Πολύ διακριτικό */
+}
 
 /* Mobile Footer */
 @media (max-width: 768px) {
     .footer-content {
         grid-template-columns: 1fr; /* Στοίβαξη */
-        gap: 2rem;
+        gap: 1.5rem; /* Πιο συμμαζεμένο κενό */
     }
     .footer-divider {
-        width: 100px; /* Οριζόντια γραμμή στο κινητό */
+        width: 50px; /* Μικρή οριζόντια γραμμή */
         height: 1px;
+    }
+    .site-footer {
+        padding-bottom: 6rem; /* Λίγο έξτρα χώρο στο κινητό για τον player */
     }
 }
