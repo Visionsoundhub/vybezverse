@@ -6,7 +6,53 @@ media_folder: "assets/uploads"
 public_folder: "/assets/uploads"
 
 collections:
-  # 1-4. (RELEASES, BEATS, PRESS, VIBES - ΙΔΙΑ ΜΕ ΠΡΙΝ)
+  # --- 1. GLOBAL SETTINGS & INFO TEXTS ---
+  - name: "settings"
+    label: "⚙️ Global & Info Settings"
+    files:
+      - name: "global"
+        label: "Site Config"
+        file: "settings.json"
+        fields:
+          - {label: "Logo Type", name: "logoType", widget: "select", options: ["text", "image"], default: "text"}
+          - {label: "Logo Text", name: "logoText", widget: "string", default: "BLACK VYBEZ", required: false}
+          - {label: "Logo Image", name: "logoImage", widget: "image", required: false}
+          
+          # INFO ACCORDIONS (BEAT STORE)
+          - {label: "--- BEAT INFO SECTION ---", name: "sep_info", widget: "hidden"}
+          - {label: "Exclusive Title", name: "exclusiveTitle", widget: "string", default: "TI EINAI TA EXCLUSIVE BEATS;"}
+          - {label: "Exclusive Text", name: "exclusiveText", widget: "text", default: "Όλα τα beats είναι exclusive..."}
+          
+          - {label: "AI Access Title", name: "aiTitle", widget: "string", default: "TI EINAI TO AI ACCESS;"}
+          - {label: "AI Access Text", name: "aiText", widget: "text", default: "Beats που είναι εν μέρει AI..."}
+          
+          - {label: "Vault Beats Title", name: "vaultTitle", widget: "string", default: "TI EINAI TA VAULT BEATS;"}
+          - {label: "Vault Beats Text", name: "vaultText", widget: "text", default: "Παλιά beats που έχουν χαθεί τα projects..."}
+
+          # SOCIALS
+          - {label: "--- ARTIST SOCIALS ---", name: "sep1", widget: "hidden"}
+          - {label: "Facebook Link", name: "artistFb", widget: "string", required: false}
+          - {label: "Facebook Icon", name: "artistFbIcon", widget: "image", required: false}
+          - {label: "Instagram Link", name: "artistIg", widget: "string", required: false}
+          - {label: "Instagram Icon", name: "artistIgIcon", widget: "image", required: false}
+          - {label: "TikTok Link", name: "artistTt", widget: "string", required: false}
+          - {label: "TikTok Icon", name: "artistTtIcon", widget: "image", required: false}
+          - {label: "YouTube Link", name: "artistYt", widget: "string", required: false}
+          - {label: "YouTube Icon", name: "artistYtIcon", widget: "image", required: false}
+          
+          - {label: "--- PRODUCER SOCIALS ---", name: "sep2", widget: "hidden"}
+          - {label: "Facebook Link", name: "prodFb", widget: "string", required: false}
+          - {label: "Facebook Icon", name: "prodFbIcon", widget: "image", required: false}
+          - {label: "Instagram Link", name: "prodIg", widget: "string", required: false}
+          - {label: "Instagram Icon", name: "prodIgIcon", widget: "image", required: false}
+          - {label: "TikTok Link", name: "prodTt", widget: "string", required: false}
+          - {label: "TikTok Icon", name: "prodTtIcon", widget: "image", required: false}
+          - {label: "YouTube Link", name: "prodYt", widget: "string", required: false}
+          - {label: "YouTube Icon", name: "prodYtIcon", widget: "image", required: false}
+          
+          - {label: "Email Contact", name: "email", widget: "string", required: false}
+
+  # (ΟΙ ΥΠΟΛΟΙΠΕΣ ΣΥΛΛΟΓΕΣ ΠΑΡΑΜΕΝΟΥΝ ΙΔΙΕΣ)
   - name: "releases"
     label: "🎹 Releases (My Tracks)"
     files:
@@ -78,38 +124,6 @@ collections:
               - {label: "Vibe Name", name: "name", widget: "string"}
               - {label: "Tags to Filter", name: "tags", widget: "list"}
 
-  # --- 5. GLOBAL SETTINGS ---
-  - name: "settings"
-    label: "⚙️ Global Settings"
-    files:
-      - name: "global"
-        label: "Site Config"
-        file: "settings.json"
-        fields:
-          - {label: "Logo Type", name: "logoType", widget: "select", options: ["text", "image"], default: "text"}
-          - {label: "Logo Text", name: "logoText", widget: "string", default: "BLACK VYBEZ", required: false}
-          - {label: "Logo Image", name: "logoImage", widget: "image", required: false}
-          - {label: "--- ARTIST SOCIALS ---", name: "sep1", widget: "hidden"}
-          - {label: "Facebook Link", name: "artistFb", widget: "string", required: false}
-          - {label: "Facebook Icon", name: "artistFbIcon", widget: "image", required: false}
-          - {label: "Instagram Link", name: "artistIg", widget: "string", required: false}
-          - {label: "Instagram Icon", name: "artistIgIcon", widget: "image", required: false}
-          - {label: "TikTok Link", name: "artistTt", widget: "string", required: false}
-          - {label: "TikTok Icon", name: "artistTtIcon", widget: "image", required: false}
-          - {label: "YouTube Link", name: "artistYt", widget: "string", required: false}
-          - {label: "YouTube Icon", name: "artistYtIcon", widget: "image", required: false}
-          - {label: "--- PRODUCER SOCIALS ---", name: "sep2", widget: "hidden"}
-          - {label: "Facebook Link", name: "prodFb", widget: "string", required: false}
-          - {label: "Facebook Icon", name: "prodFbIcon", widget: "image", required: false}
-          - {label: "Instagram Link", name: "prodIg", widget: "string", required: false}
-          - {label: "Instagram Icon", name: "prodIgIcon", widget: "image", required: false}
-          - {label: "TikTok Link", name: "prodTt", widget: "string", required: false}
-          - {label: "TikTok Icon", name: "prodTtIcon", widget: "image", required: false}
-          - {label: "YouTube Link", name: "prodYt", widget: "string", required: false}
-          - {label: "YouTube Icon", name: "prodYtIcon", widget: "image", required: false}
-          - {label: "Email Contact", name: "email", widget: "string", required: false}
-
-  # --- 6. HOME PAGE CONFIG (ΑΝΑΝΕΩΜΕΝΟ) ---
   - name: "pages"
     label: "🏠 Home Page"
     files:
@@ -117,21 +131,13 @@ collections:
         label: "Home Page Config"
         file: "home.json"
         fields:
-          # BANNER
-          - {label: "--- 1. BANNER ---", name: "sec1", widget: "hidden"}
-          - {label: "Banner Image", name: "heroImage", widget: "image", required: false}
-          - {label: "Banner Title", name: "heroTitle", widget: "string", default: "VYBEZONE"}
-          - {label: "Banner Subtitle", name: "heroSubtitle", widget: "string", default: "NO LIMITS IN MUSIC. JUST PURE VIBE."}
-          
-          # ANNOUNCEMENT
-          - {label: "--- 2. ANNOUNCEMENT ---", name: "sec2", widget: "hidden"}
-          - {label: "Announcement Video (YouTube Link)", name: "announcementVideo", widget: "string", hint: "Το βίντεο της ανακοίνωσης"}
-          - {label: "Announcement Text", name: "announcementText", widget: "text", required: false, hint: "Το κείμενο κάτω από το βίντεο"}
-          
-          # FEATURED RELEASE
-          - {label: "--- 3. FEATURED RELEASE (LATEST DROP) ---", name: "sec3", widget: "hidden"}
+          - {label: "Main Banner Image", name: "heroImage", widget: "image", required: false}
+          - {label: "Banner Title", name: "heroTitle", widget: "string", required: false, default: "VYBEZONE"}
+          - {label: "Banner Subtitle", name: "heroSubtitle", widget: "string", required: false}
+          - {label: "Announcement Video (YouTube Link)", name: "announcementVideo", widget: "string"}
+          - {label: "Announcement Text", name: "announcementText", widget: "text", required: false}
           - {label: "Drop Title", name: "dropTitle", widget: "string", default: "LATEST DROP"}
-          - {label: "Song Video (YouTube Link)", name: "dropVideo", widget: "string", hint: "Το βίντεο του τραγουδιού που προωθείς"}
+          - {label: "Song Video (YouTube Link)", name: "dropVideo", widget: "string"}
           - {label: "Stream Link", name: "dropStream", widget: "string", required: false}
           - {label: "Buy Link", name: "dropBuy", widget: "string", required: false}
           - {label: "Free DL Link", name: "dropFree", widget: "string", required: false}
