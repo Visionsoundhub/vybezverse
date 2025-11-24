@@ -1,5 +1,21 @@
 {
-  "artistTitle": "Blackvybez",
+  "artistTtIcon": "/assets/uploads/tik-tok.png",
   "prodTitle": "Vybezmadethis",
-  "copyright": "© 2025 Vybezone. Created to Inspire. All rights reserved."
+  "artistYt": "https://www.youtube.com/@BlackVybezwiththeflow",
+  "artistFb": "https://www.facebook.com/people/Black-Vybez/61555325559295/",
+  "artistIg": "https://www.instagram.com/blackvybez_",
+  "artistTt": "https://www.tiktok.com/@blackvybez",
+  "copyright": "© 2025 Vybezone. Created to Inspire. All rights reserved.",
+  "prodYtIcon": "/assets/uploads/youtubr.png",
+  "prodFbIcon": "/assets/uploads/fb.png",
+  "prodIgIcon": "/assets/uploads/insta.png",
+  "prodTtIcon": "/assets/uploads/tik-tok.png",
+  "artistTitle": "Blackvybez",
+  "prodYt": "https://www.youtube.com/@VybezMadeThisshit",
+  "prodFb": "https://www.facebook.com/profile.php?id=61579777121014",
+  "prodIg": "https://www.instagram.com/vybezmadethis/",
+  "prodTt": "https://www.tiktok.com/@vybezmadethis?lang=el-GR",
+  "artistYtIcon": "/assets/uploads/youtubr.png",
+  "artistFbIcon": "/assets/uploads/fb.png",
+  "artistIgIcon": "/assets/uploads/insta.png"
 }
