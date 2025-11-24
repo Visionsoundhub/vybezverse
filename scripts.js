@@ -3,13 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function getYoutubeId(url) { const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
     
     // ==========================================
-    // 1. DYNAMIC MENU & FOOTER (GLOBAL)
+    // 1. DYNAMIC MENU (GLOBAL)
     // ==========================================
     const menuContainer = document.querySelector('.nav-links');
     const navLogoContainer = document.querySelector('.nav-logo');
-    const footerContainer = document.getElementById('dynamic-footer');
 
-    // Load Menu
     if (menuContainer) {
         fetch('menu.json').then(r => r.json()).then(data => {
             const links = data.links || [];
@@ -24,17 +22,30 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(() => {});
     }
 
-    // Load Global Settings (Logo & Footer)
+    // Load Logo from Global Settings
     fetch('settings.json').then(r => r.json()).then(data => {
-        // A. LOGO
         if (navLogoContainer) {
             if (data.logoType === 'image' && data.logoImage) { navLogoContainer.innerHTML = `<img src="${data.logoImage}" alt="Logo" style="height:50px;">`; } 
             else { navLogoContainer.innerHTML = `<span class="logo-text">${data.logoText || "BLACK VYBEZ"}</span>`; }
         }
+        
+        // Accordions Logic (Beat Store Info)
+        const accordionsContainer = document.getElementById('info-accordions-container');
+        if (accordionsContainer) {
+            const items = [ { title: data.exclusiveTitle, text: data.exclusiveText }, { title: data.aiTitle, text: data.aiText }, { title: data.vaultTitle, text: data.vaultText } ];
+            let accHtml = '';
+            items.forEach((item) => { if(item.text) { accHtml += `<div class="accordion"><button class="accordion-btn">${item.title || 'Info'}</button><div class="accordion-content"><p>${item.text}</p></div></div>`; } });
+            accordionsContainer.innerHTML = accHtml;
+            document.querySelectorAll('.accordion-btn').forEach(btn => { btn.addEventListener('click', function() { this.parentElement.classList.toggle('active'); const c = this.nextElementSibling; c.style.maxHeight = c.style.maxHeight ? null : c.scrollHeight + "px"; }); });
+        }
+    }).catch(() => {});
 
-        // B. BUILD DYNAMIC FOOTER
-        if (footerContainer) {
-            // Prepare Social Icons HTML
+    // ==========================================
+    // 2. DYNAMIC FOOTER (NEW!)
+    // ==========================================
+    const footerContainer = document.getElementById('dynamic-footer');
+    if (footerContainer) {
+        fetch('footer.json').then(r => r.json()).then(data => {
             const buildIcons = (prefix) => {
                 let html = '';
                 const networks = [
@@ -53,26 +64,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const artistIcons = buildIcons('artist');
             const prodIcons = buildIcons('prod');
+            const artistTitle = data.artistTitle || "BLACK VYBEZ";
+            const prodTitle = data.prodTitle || "VYBEZMADETHIS";
+            const email = data.email ? `<div class="footer-email"><i class="fas fa-envelope"></i> ${data.email}</div>` : '';
+            const copyright = data.copyright ? `<div class="copyright">${data.copyright}</div>` : '';
 
             footerContainer.innerHTML = `
             <footer class="site-footer">
                 <div class="footer-content">
                     <div class="footer-section">
-                        <h4 class="footer-title">VYBEZMADETHIS</h4>
+                        <h4 class="footer-title">${prodTitle}</h4>
                         <div class="social-icons">${prodIcons}</div>
                     </div>
                     <div class="footer-divider"></div>
                     <div class="footer-section">
-                        <h4 class="footer-title">BLACK VYBEZ</h4>
+                        <h4 class="footer-title">${artistTitle}</h4>
                         <div class="social-icons">${artistIcons}</div>
                     </div>
                 </div>
+                ${email}
+                ${copyright}
             </footer>`;
-        }
-    }).catch(() => {});
+        }).catch(() => console.log('Footer settings not loaded yet.'));
+    }
 
     // ==========================================
-    // 2. PLAYER LOGIC
+    // 3. PLAYER LOGIC
     // ==========================================
     const audio = new Audio();
     const playerTitle = document.getElementById('player-track-title');
@@ -89,24 +106,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // ==========================================
-    // 3. PAGE SPECIFIC LOADERS
+    // 4. PAGE LOADERS
     // ==========================================
     
     // Home Page
     const homeBannerTitle = document.getElementById('home-hero-title');
     if (homeBannerTitle) {
-        // Latest Drop
         const latestContainer = document.getElementById('latest-release-container');
         fetch('releases.json').then(r => r.json()).then(data => {
             if(data.tracks && data.tracks.length > 0) {
                 const track = data.tracks[0];
                 const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px; font-size:0.75rem;"><i class="fas fa-download"></i> FREE</a>` : '';
-                if(latestContainer) {
-                    latestContainer.innerHTML = `<div style="margin-bottom:1rem;"><h3 style="font-size:1.5rem; margin:0;">${track.title}</h3></div><a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent"><i class="fab fa-youtube"></i> WATCH NOW</a><a href="${track.streamUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px;">STREAM</a> ${downloadBtn}`;
-                }
+                if(latestContainer) latestContainer.innerHTML = `<div style="margin-bottom:1rem;"><h3 style="font-size:1.5rem; margin:0;">${track.title}</h3></div><a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent"><i class="fab fa-youtube"></i> WATCH NOW</a><a href="${track.streamUrl}" target="_blank" class="btn btn-outline" style="margin-left:10px;">STREAM</a> ${downloadBtn}`;
             }
         });
-        // Banner & Content
         const bContainer = document.getElementById('home-banner-container');
         const bImg = document.getElementById('home-banner-img');
         const hSub = document.getElementById('home-hero-subtitle');
@@ -141,28 +154,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }).catch(() => {});
     }
 
-    // Press Page
+    // Press & Podcasts
     const pCont = document.getElementById('press-container');
     if (pCont) {
         fetch('press.json').then(r => r.json()).then(data => {
             pCont.innerHTML = '';
             let articles = Array.isArray(data) ? data : (data.articles || []);
-            if (articles.length === 0) { pCont.innerHTML = '<p style="text-align:center; width:100%;">No press items yet.</p>'; return; }
+            if (articles.length === 0) { pCont.innerHTML = '<p style="text-align:center; width:100%;">No items yet.</p>'; return; }
             articles.forEach(item => {
                 pCont.innerHTML += `<div class="press-card"><img src="${item.image}" alt="${item.title}" class="press-image"><div class="press-content"><div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date} • ${item.source}</div><h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3><p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary}</p><a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">ΔΙΑΒΑΣΕ ΤΟ</a></div></div>`;
             });
         }).catch(() => {});
     }
-    
-    // Podcasts Page
-    const podContainer = document.getElementById('podcasts-container');
-    if (podContainer) {
+    const podCont = document.getElementById('podcasts-container');
+    if (podCont) {
         fetch('podcasts.json').then(r => r.json()).then(data => {
-            podContainer.innerHTML = '';
+            podCont.innerHTML = '';
             const episodes = data.episodes || [];
-            if (episodes.length === 0) { podContainer.innerHTML = '<p style="text-align:center; width:100%;">No episodes yet.</p>'; return; }
+            if (episodes.length === 0) { podCont.innerHTML = '<p style="text-align:center; width:100%;">No episodes yet.</p>'; return; }
             episodes.forEach(ep => {
-                podContainer.innerHTML += `<div class="press-card"><img src="${ep.cover}" alt="${ep.title}" class="press-image"><div class="press-content"><div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem;">${ep.date || ''}</div><h3 style="font-size:1.2rem; margin:5px 0;">${ep.title}</h3><p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${ep.description}</p><a href="${ep.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem;">LISTEN / WATCH</a></div></div>`;
+                podCont.innerHTML += `<div class="press-card"><img src="${ep.cover}" alt="${ep.title}" class="press-image"><div class="press-content"><div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem;">${ep.date || ''}</div><h3 style="font-size:1.2rem; margin:5px 0;">${ep.title}</h3><p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${ep.description}</p><a href="${ep.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem;">LISTEN / WATCH</a></div></div>`;
             });
         }).catch(() => {});
     }
@@ -206,20 +217,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Beat Store
     const beatContainer = document.getElementById('beat-store-list');
     const filterBtns = document.querySelectorAll('.filter-btn');
-    const accordionsContainer = document.getElementById('info-accordions-container');
     let allBeats = [];
-    
-    // Accordions Logic
-    if (accordionsContainer) {
-        fetch('settings.json').then(r => r.json()).then(data => {
-            const items = [ { title: data.exclusiveTitle, text: data.exclusiveText }, { title: data.aiTitle, text: data.aiText }, { title: data.vaultTitle, text: data.vaultText } ];
-            let accHtml = '';
-            items.forEach((item) => { if(item.text) { accHtml += `<div class="accordion"><button class="accordion-btn">${item.title || 'Info'}</button><div class="accordion-content"><p>${item.text}</p></div></div>`; } });
-            accordionsContainer.innerHTML = accHtml;
-            document.querySelectorAll('.accordion-btn').forEach(btn => { btn.addEventListener('click', function() { this.parentElement.classList.toggle('active'); const c = this.nextElementSibling; c.style.maxHeight = c.style.maxHeight ? null : c.scrollHeight + "px"; }); });
-        });
-    }
-
     if (beatContainer) {
         fetch('beats.json').then(r => r.json()).then(data => { if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } renderBeats(allBeats); });
         filterBtns.forEach(btn => { btn.addEventListener('click', () => { filterBtns.forEach(b => b.classList.remove('active')); btn.classList.add('active'); const cat = btn.getAttribute('data-category'); renderBeats(cat === 'all' ? allBeats : allBeats.filter(b => b.category && b.category.toLowerCase() === cat.toLowerCase())); }); });
@@ -255,7 +253,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const bpm = beat.bpm || '140';
             const key = beat.key || 'Am';
             const statusLabel = beat.status === 'sold' ? 'ΠΟΥΛΗΘΗΚΕ' : 'ΑΓΟΡΑ';
-            beatContainer.innerHTML += `<div class="beat-row"><div class="beat-art"><img src="https://via.placeholder.com/60/111/333?text=V" alt="Art"><div class="beat-play-overlay" onclick="playTrack('${beat.audioSrc}', '${beat.title}')"><i class="fas fa-play" style="color:#fff;"></i></div></div><div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${bpm} BPM • ${key} • ${beat.category}</div></div><div class="beat-actions"><a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent" style="min-width:140px;">${beat.price} | <i class="fas fa-shopping-cart" style="margin-left:5px;"></i> ${statusLabel}</a></div></div>`;
+            beatContainer.innerHTML += `<div class="beat-row"><div class="beat-art"><img src="https://via.placeholder.com/60/111/333?text=V" alt="Art"><div class="beat-play-overlay" onclick="playTrack('${beat.audioSrc}', '${beat.title}')"><i class="fas fa-play" style="color:#fff;"></i></div></div><div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${bpm} BPM • ${key} • ${beat.category}</div></div><div class="beat-price">${beat.price}</div><div class="beat-actions"><a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent" style="min-width:140px;">${beat.price} | <i class="fas fa-shopping-cart" style="margin-left:5px;"></i> ${statusLabel}</a></div></div>`;
         });
     }
 });
