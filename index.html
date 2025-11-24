@@ -3,7 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home | VYBEZONE</title>
+    <title>VYBEZONE | Black Vybez & VybezMadeThis</title>
+
+    <meta name="description" content="Η επίσημη ζώνη του Black Vybez (Artist) & VybezMadeThis (Producer). Μουσική, beats, podcast & media.">
+    
+    <meta property="og:title" content="VYBEZONE | Χωρίς Όρια. Μόνο Καθαρά Vibez." />
+    <meta property="og:type" content="music.musician" />
+    <meta property="og:url" content="[ΠΡΕΠΕΙ ΝΑ ΤΟ ΑΛΛΑΞΕΙΣ: ΒΑΣΙΚΟ URL ΤΟΥ SITE]" />
+    <meta property="og:image" content="[ΠΡΕΠΕΙ ΝΑ ΤΟ ΑΛΛΑΞΕΙΣ: LINK ΓΙΑ ΤΗΝ ΕΙΚΟΝΑ ΚΟΙΝΟΠΟΙΗΣΗΣ (1200x630px)]" />
+    <meta property="og:site_name" content="VYBEZONE" />
+    <meta property="og:description" content="Η επίσημη ζώνη του Black Vybez & VybezMadeThis. Χωρίς Όρια. Μόνο Καθαρά Vibez." />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -19,21 +30,27 @@
     </nav>
 
     <main id="swup" class="transition-fade">
-        <div class="hero-section" id="home-banner-container" style="display:none;">
-            <img id="home-banner-img" src="" alt="Banner" style="max-width:100%; border-radius:10px; margin-bottom:1rem;">
+        <div class="hero-section">
+            <div id="home-banner-container" style="margin-bottom: 2rem; display: none;">
+                <img id="home-banner-img" src="" alt="Banner" style="width: 100%; max-width: 1000px; border-radius: 20px; box-shadow: 0 0 30px rgba(138,43,226,0.3); border: 1px solid #444; opacity:0.8;">
+            </div>
             <h1 class="hero-title" id="home-hero-title">VYBEZONE</h1>
             <p class="hero-subtitle" id="home-hero-subtitle"></p>
         </div>
 
-        <div id="home-announcement-container" class="glass-container" style="display:none; text-align:center;">
+        <div id="home-announcement-container" class="glass-container" style="max-width:800px; padding:1.5rem; display:none; text-align:center;">
             <h2 class="section-title">ANNOUNCEMENT</h2>
-            <iframe id="announcement-iframe" width="100%" height="315" src="" frameborder="0" allowfullscreen style="border-radius:10px; margin:1rem 0;"></iframe>
-            <p id="announcement-text" style="color:#ccc;"></p>
+            <div style="max-width:800px; margin:0 auto; border-radius:20px; overflow:hidden; border:2px solid #333; aspect-ratio:16/9; box-shadow: 0 0 30px rgba(138,43,226,0.2);">
+                <iframe id="announcement-iframe" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
+            </div>
+            <div id="announcement-text" style="max-width:800px; margin:1.5rem auto; text-align:center; color:#ccc; font-size:1rem; padding:0 1rem;"></div>
         </div>
 
-        <div id="home-featured-container" class="glass-container" style="display:none; text-align:center; margin-top:2rem;">
-            <h2 class="section-title" id="drop-title-label">LATEST DROP</h2>
-            <iframe id="drop-iframe" width="100%" height="315" src="" frameborder="0" allowfullscreen style="border-radius:10px; margin:1rem 0;"></iframe>
+        <div id="home-featured-container" class="glass-container" style="max-width:800px; padding:1.5rem; margin-top:4rem; display:none;">
+            <span id="drop-title-label" style="color:#8a2be2; font-weight:bold; letter-spacing:2px; display:block; margin-bottom:1.5rem;">🔥 LATEST DROP</span>
+            <div style="border-radius:15px; overflow:hidden; border:1px solid #444; aspect-ratio:16/9; margin-bottom:1.5rem;">
+                <iframe id="drop-iframe" width="100%" height="100%" src="" frameborder="0" allowfullscreen></iframe>
+            </div>
             <div id="drop-buttons" style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;"></div>
         </div>
     </main>
