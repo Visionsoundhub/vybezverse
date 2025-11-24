@@ -1,12 +1,14 @@
 {
   "heroImage": "/assets/uploads/banner.png",
-  "dropTitle": "1",
-  "dropVideo": "1",
-  "dropStream": "1",
-  "heroSubtitle": "1",
-  "announcementText": "1",
-  "announcementVideo": "1",
-  "dropBuy": "1",
-  "dropFree": "1",
-  "heroTitle": "1"
+  "showAnnouncement": false,
+  "dropTitle": "Jazz Bar των τεράτων",
+  "dropVideo": "https://www.youtube.com/watch?v=KNvq3idRHe8&list=RDKNvq3idRHe8&start_radio=1",
+  "showDrop": true,
+  "dropStream": "https://www.youtube.com/watch?v=KNvq3idRHe8&list=RDKNvq3idRHe8&start_radio=1",
+  "heroSubtitle": "No limits in music. Just pure vibes",
+  "announcementText": "",
+  "announcementVideo": "",
+  "dropBuy": "https://www.youtube.com/watch?v=KNvq3idRHe8&list=RDKNvq3idRHe8&start_radio=1",
+  "dropFree": "https://www.youtube.com/watch?v=KNvq3idRHe8&list=RDKNvq3idRHe8&start_radio=1",
+  "heroTitle": "VYBEZONE"
 }
