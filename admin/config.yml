@@ -6,7 +6,32 @@ media_folder: "assets/uploads"
 public_folder: "/assets/uploads"
 
 collections:
-  # --- 1. MUSIC RELEASES ---
+  # --- 1. GLOBAL SETTINGS (Λογότυπο & Footer) ---
+  - name: "settings"
+    label: "⚙️ Global Settings"
+    files:
+      - name: "global"
+        label: "Site Config"
+        file: "settings.json"
+        fields:
+          - {label: "Logo Type", name: "logoType", widget: "select", options: ["text", "image"], default: "text", hint: "Διάλεξε αν θες Κείμενο ή Εικόνα"}
+          - {label: "Logo Text", name: "logoText", widget: "string", default: "BLACK VYBEZ", required: false}
+          - {label: "Logo Image", name: "logoImage", widget: "image", required: false}
+          
+          - {label: "--- ARTIST SOCIALS (Black Vybez) ---", name: "sep1", widget: "hidden"}
+          - {label: "Facebook (Artist)", name: "artistFb", widget: "string", required: false}
+          - {label: "Instagram (Artist)", name: "artistIg", widget: "string", required: false}
+          - {label: "TikTok (Artist)", name: "artistTt", widget: "string", required: false}
+          - {label: "YouTube (Artist)", name: "artistYt", widget: "string", required: false}
+          
+          - {label: "--- PRODUCER SOCIALS (Vybezmadethis) ---", name: "sep2", widget: "hidden"}
+          - {label: "Facebook (Producer)", name: "prodFb", widget: "string", required: false}
+          - {label: "Instagram (Producer)", name: "prodIg", widget: "string", required: false}
+          - {label: "TikTok (Producer)", name: "prodTt", widget: "string", required: false}
+          - {label: "YouTube (Producer)", name: "prodYt", widget: "string", required: false}
+          - {label: "Email Contact", name: "email", widget: "string", required: false}
+
+  # --- 2. MUSIC RELEASES ---
   - name: "releases"
     label: "🎹 Releases (My Tracks)"
     files:
@@ -25,7 +50,7 @@ collections:
               - {label: "Bundle Link (Payhip)", name: "bundleUrl", widget: "string"}
               - {label: "Free Download Link", name: "downloadUrl", widget: "string", required: false}
 
-  # --- 2. BEAT STORE ---
+  # --- 3. BEAT STORE ---
   - name: "beats"
     label: "💰 Beat Store"
     files:
@@ -45,9 +70,9 @@ collections:
               - {label: "BPM", name: "bpm", widget: "string", required: false}
               - {label: "Key", name: "key", widget: "string", required: false}
               - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
-              - {label: "Vibe Tags", name: "tags", widget: "list", hint: "π.χ. dark, sad, hard"}
+              - {label: "Vibe Tags", name: "tags", widget: "list"}
 
-  # --- 3. PRESS ---
+  # --- 4. PRESS ---
   - name: "press"
     label: "📰 Press & News"
     files:
@@ -66,7 +91,7 @@ collections:
               - {label: "Summary Text", name: "summary", widget: "text"}
               - {label: "Link to Article", name: "link", widget: "string"}
 
-  # --- 4. VIBES CONFIG ---
+  # --- 5. VIBES CONFIG ---
   - name: "vibes"
     label: "✨ Vibe Settings"
     files:
@@ -81,14 +106,14 @@ collections:
               - {label: "Vibe Name", name: "name", widget: "string"}
               - {label: "Tags to Filter", name: "tags", widget: "list"}
 
-  # --- 5. HOME PAGE SETTINGS (ΝΕΟ - ΓΙΑ ΤΟ BANNER) ---
+  # --- 6. HOME PAGE SETTINGS ---
   - name: "pages"
-    label: "⚙️ Page Settings"
+    label: "🏠 Home Banner"
     files:
       - name: "home"
         label: "Home Page Config"
         file: "home.json"
         fields:
-          - {label: "Main Banner Image", name: "heroImage", widget: "image", required: false, hint: "Μεγάλη εικόνα πάνω από το βίντεο"}
+          - {label: "Main Banner Image", name: "heroImage", widget: "image", required: false}
           - {label: "Banner Title", name: "heroTitle", widget: "string", required: false, default: "VYBEZONE"}
-          - {label: "Banner Subtitle", name: "heroSubtitle", widget: "string", required: false, default: "NO LIMITS IN MUSIC. JUST PURE VIBE."}
+          - {label: "Banner Subtitle", name: "heroSubtitle", widget: "string", required: false}
