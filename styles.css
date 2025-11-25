@@ -8,7 +8,7 @@ body {
     color: #fff;
     font-family: 'Inter', sans-serif;
     margin: 0; padding: 0; 
-    padding-bottom: 120px; /* Adjusted for mobile layout */
+    padding-bottom: 120px;
     line-height: 1.6;
     overflow-x: hidden;
     display: flex;
@@ -68,7 +68,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .hamburger { display: none; cursor: pointer; flex-direction: column; justify-content: space-between; width: 30px; height: 21px; z-index: 1002; }
 .bar { width: 100%; height: 3px; background-color: #fff; border-radius: 3px; transition: 0.3s; }
 
-/* MOBILE MENU & NAV STYLES - UPDATED */
+/* MOBILE MENU & NAV STYLES */
 @media (max-width: 900px) {
     .main-navigation { padding: 0.8rem 1.5rem; }
     .logo-text { font-size: 1.4rem; }
@@ -79,21 +79,20 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
         position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; 
         background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(20px); 
         flex-direction: column; 
-        justify-content: flex-start; /* FIX: Starts from top instead of center */
-        align-items: center; /* Ensures buttons are centered horizontally */
+        justify-content: flex-start;
+        align-items: center; 
         gap: 1.2rem; 
-        padding-top: 6rem; /* FIX: Adds space at the top so menu items are below the header */
+        padding-top: 6rem;
         padding-bottom: 2rem;
-        overflow-y: auto; /* FIX: Enables scrolling inside the menu */
+        overflow-y: auto; 
         transition: 0.4s ease-in-out; z-index: 1001; 
     }
     .nav-links.active { right: 0; }
     
-    /* Sleeker Mobile Menu Items */
     .nav-btn { 
-        font-size: 1rem; /* FIX: Smaller text (was 1.2rem) */
-        padding: 0.6rem 1.5rem; /* FIX: Thinner buttons */
-        width: 70%; /* Slightly narrower width */
+        font-size: 1rem; 
+        padding: 0.6rem 1.5rem; 
+        width: 70%; 
         text-align: center;
         border: 1px solid rgba(255,255,255,0.1); 
     }
@@ -147,25 +146,9 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     .beat-info h4 { text-align: center; font-size: 1rem; margin-bottom: 2px; }
     .beat-meta { text-align: center; margin-bottom: 0.4rem; font-size: 0.8rem; }
     
-    .beat-actions { 
-        display: flex; 
-        width: 100%; 
-        gap: 8px; 
-        justify-content: center; 
-        flex-wrap: wrap; 
-    }
-    .beat-actions .btn { 
-        flex: 1; 
-        min-width: auto; 
-        font-size: 0.7rem; 
-        padding: 0.5rem 0.8rem; 
-    }
-    .glass-container .nav-btn {
-        font-size: 0.85rem !important;
-        padding: 0.6rem 1rem !important;
-        width: 100%; 
-        margin-bottom: 0.5rem;
-    }
+    .beat-actions { display: flex; width: 100%; gap: 8px; justify-content: center; flex-wrap: wrap; }
+    .beat-actions .btn { flex: 1; min-width: auto; font-size: 0.7rem; padding: 0.5rem 0.8rem; }
+    .glass-container .nav-btn { font-size: 0.85rem !important; padding: 0.6rem 1rem !important; width: 100%; margin-bottom: 0.5rem; }
 }
 
 .beat-art { width: 60px; height: 60px; background: #222; border-radius: 10px; position: relative; overflow: hidden; margin: 0 auto; }
@@ -235,14 +218,31 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 
 /* --- PLAYER & FOOTER (DOCKED) --- */
 #sticky-player {
-    position: fixed; bottom: 40px; left: 0; width: 100%; height: 60px; 
+    position: fixed; bottom: 40px; left: 0; width: 100%; height: 70px; 
     background: rgba(15, 15, 15, 0.98); border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid #111;
-    display: flex; justify-content: center; align-items: center; z-index: 2900; padding: 0 1rem;
+    display: none; /* ΚΡΥΜΜΕΝΟ BY DEFAULT */
+    justify-content: center; align-items: center; z-index: 2900; padding: 0 1rem;
+    backdrop-filter: blur(10px);
 }
+/* Η ΚΛΑΣΗ ΠΟΥ ΤΟ ΕΜΦΑΝΙΖΕΙ */
+#sticky-player.player-visible { display: flex !important; }
+
 .player-inner { width: 100%; max-width: 1000px; display: flex; align-items: center; gap: 15px; }
-.play-btn-large { width: 35px; height: 35px; background: #fff; color: #000; border-radius: 50%; border: none; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
-.play-btn-large:hover { background: #8a2be2; color: #fff; }
-#player-progress { background: #8a2be2; height: 100%; width: 0%; transition: width 0.1s linear; }
+
+/* Player Controls (Prev/Play/Next) */
+.player-controls { display: flex; align-items: center; gap: 15px; }
+.play-btn-large { width: 40px; height: 40px; background: #fff; color: #000; border-radius: 50%; border: none; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+.play-btn-large:hover { background: #8a2be2; color: #fff; transform: scale(1.1); }
+.control-btn { background: transparent; border: none; color: #ccc; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+.control-btn:hover { color: #fff; transform: scale(1.1); }
+
+/* Progress Bar & Info */
+.player-info-section { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
+#player-track-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9rem; margin-bottom: 5px; }
+
+/* Clickable Progress Bar */
+.progress-container { width: 100%; height: 6px; background: #333; border-radius: 3px; cursor: pointer; position: relative; overflow: hidden; touch-action: none; }
+.progress-bar { background: #8a2be2; height: 100%; width: 0%; border-radius: 3px; pointer-events: none; }
 
 .site-footer {
     position: fixed; bottom: 0; left: 0; width: 100%; height: 40px;
@@ -261,38 +261,16 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .social-link:hover { background: #8a2be2; transform: scale(1.1); }
 .footer-email, .copyright { display: none; }
 
-/* --- MOBILE LAYOUT FIXES (FOOTER/PLAYER) --- */
+/* --- MOBILE LAYOUT FIXES --- */
 @media (max-width: 600px) {
-    /* 1. Hide Icons and Dividers */
     .social-icons, .footer-divider { display: none !important; }
-
-    /* 2. Layout: Names side-by-side with gap */
-    .footer-content { 
-        flex-direction: row; 
-        justify-content: center; 
-        gap: 15px; 
-        width: 100%; 
-        padding: 0;
-    }
+    .footer-content { flex-direction: row; justify-content: center; gap: 15px; width: 100%; padding: 0; }
+    .footer-section { width: auto; border: none !important; padding: 0; flex-direction: row; }
+    .footer-title { display: block !important; font-size: 0.65rem; opacity: 0.5; margin: 0; }
+    .site-footer { height: 30px; min-height: 30px; }
     
-    .footer-section { 
-        width: auto; 
-        border: none !important; 
-        padding: 0;
-        flex-direction: row; 
-    }
-    
-    .footer-title { 
-        display: block !important; 
-        font-size: 0.65rem; 
-        opacity: 0.5; 
-        margin: 0;
-    }
-    
-    /* 3. Reduce Footer Height & Move Player Down */
-    .site-footer { 
-        height: 30px; 
-        min-height: 30px;
-    }
-    #sticky-player { bottom: 30px; }
+    #sticky-player { bottom: 30px; height: 65px; padding: 0 10px; }
+    .player-controls { gap: 10px; }
+    .play-btn-large { width: 35px; height: 35px; font-size: 1rem; }
+    .control-btn { font-size: 1rem; }
 }
