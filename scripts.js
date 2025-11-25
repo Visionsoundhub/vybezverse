@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
+    // Ξεκινάμε
     initAllScripts(); 
 
     if (window.Swup) {
@@ -30,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
         
-        // Restore Player UI
+        // Restore Player
         const playerTitle = document.getElementById('player-track-title');
         if (playerTitle) playerTitle.textContent = window.currentTitle;
         restoreHeroArt();
@@ -39,7 +40,68 @@ document.addEventListener('DOMContentLoaded', () => {
         checkPlayerVisibility();
         updateUIState();
 
-        // --- HOME PAGE LOADER ---
+        // --- 1. RELEASES LOADER (FIXED) ---
+        const releasesContainer = document.getElementById('releases-list');
+        if (releasesContainer) {
+            // Βάζουμε ?t=... για να σπάσουμε την cache και να βλέπει τις αλλαγές αμέσως
+            fetch('releases.json?t=' + new Date().getTime())
+                .then(r => {
+                    if (!r.ok) throw new Error("Releases JSON not found");
+                    return r.json();
+                })
+                .then(data => {
+                    releasesContainer.innerHTML = '';
+                    // Ελέγχουμε αν τα δεδομένα είναι μέσα σε "tracks" (όπως στο αρχείο σου) ή χύμα array
+                    let tracks = data.tracks ? data.tracks : (Array.isArray(data) ? data : []);
+                    
+                    if (tracks.length === 0) {
+                        releasesContainer.innerHTML = '<p style="text-align:center;">No releases found yet.</p>';
+                        return;
+                    }
+
+                    tracks.forEach(track => {
+                        // Προστασία για τους τίτλους (αν έχουν ' μέσα)
+                        const safeTitle = (track.title || 'Untitled').replace(/'/g, "\\'");
+                        // Σιγουρεύουμε ότι έχουμε εικόνα
+                        const coverImg = track.cover || 'https://via.placeholder.com/100';
+                        // Links (αν δεν υπάρχουν βάζουμε #)
+                        const streamLink = track.streamUrl || '#';
+                        const buyLink = track.bundleUrl || '#';
+                        const ytLink = track.youtubeUrl || '#';
+
+                        // Κουμπί Download (εμφανίζεται μόνο αν υπάρχει link)
+                        const dlButton = track.downloadUrl 
+                            ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` 
+                            : '';
+
+                        releasesContainer.innerHTML += `
+                        <div class="beat-row">
+                            <div class="beat-art">
+                                <img src="${coverImg}" alt="Art">
+                                <div class="beat-play-overlay" onclick="window.playTrack('${streamLink}', '${safeTitle}', '${coverImg}', -1)">
+                                    <i class="fas fa-play" style="color:#fff;"></i>
+                                </div>
+                            </div>
+                            <div class="beat-info">
+                                <h4>${track.title}</h4>
+                                <div class="beat-meta">Available Now</div>
+                            </div>
+                            <div class="beat-actions">
+                                <a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i></a>
+                                <a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM</a>
+                                <a href="${buyLink}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">BUY</a>
+                                ${dlButton}
+                            </div>
+                        </div>`;
+                    });
+                })
+                .catch(err => {
+                    console.error("Releases Error:", err);
+                    releasesContainer.innerHTML = '<p style="text-align:center; color:red;">Error loading releases.</p>';
+                });
+        }
+
+        // --- 2. HOME PAGE ---
         const homeTitle = document.getElementById('home-hero-title');
         if (homeTitle) {
             fetch('home.json').then(r => r.json()).then(data => {
@@ -82,7 +144,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => {});
         }
 
-        // --- BIO ---
+        // --- 3. BIO ---
         const bioContainer = document.getElementById('bio-container');
         if (bioContainer) {
             fetch('bio.json').then(r => r.json()).then(data => {
@@ -93,7 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => {});
         }
 
-        // --- GALLERY ---
+        // --- 4. GALLERY ---
         const galleryGrid = document.getElementById('gallery-grid');
         if(galleryGrid) {
             const gModal = document.getElementById('gallery-modal');
@@ -115,57 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target === gModal) gModal.classList.remove('visible'); }; }
         }
 
-        // --- FIX: RELEASES LOADER (FROM PANEL) ---
-        const releasesContainer = document.getElementById('releases-list');
-        if (releasesContainer) {
-            // Προσθέτουμε ?t=... για να μην κολλάει η μνήμη (cache) και να βλέπεις τις αλλαγές του Πάνελ
-            fetch('releases.json?t=' + new Date().getTime())
-                .then(r => {
-                    if (!r.ok) throw new Error("File not found");
-                    return r.json();
-                })
-                .then(data => {
-                    releasesContainer.innerHTML = '';
-                    let tracks = Array.isArray(data) ? data : (data.tracks || []);
-                    
-                    if (tracks.length === 0) {
-                        releasesContainer.innerHTML = '<p style="text-align:center;">No releases found yet.</p>';
-                    } else {
-                        tracks.forEach(track => {
-                            const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : ''; 
-                            const ytBtn = track.youtubeUrl ? `<a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i></a>` : '';
-                            const ytOverlay = track.youtubeUrl ? `<a href="${track.youtubeUrl}" target="_blank"><i class="fab fa-youtube" style="color:#fff; font-size:1.5rem;"></i></a>` : '';
-                            const safeTitle = track.title ? track.title : 'Untitled';
-                            
-                            releasesContainer.innerHTML += `
-                                <div class="beat-row">
-                                    <div class="beat-art">
-                                        <img src="${track.cover || 'https://via.placeholder.com/100'}" alt="Art">
-                                        <div class="beat-play-overlay">
-                                            ${ytOverlay}
-                                        </div>
-                                    </div>
-                                    <div class="beat-info">
-                                        <h4>${safeTitle}</h4>
-                                        <div class="beat-meta">Available Now</div>
-                                    </div>
-                                    <div class="beat-actions">
-                                        ${ytBtn}
-                                        <a href="${track.streamUrl || '#'}" target="_blank" class="btn btn-outline">STREAM</a>
-                                        <a href="${track.bundleUrl || '#'}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑΣΕ ΤΟ</a>
-                                        ${downloadBtn}
-                                    </div>
-                                </div>`;
-                        });
-                    }
-                })
-                .catch(err => {
-                    console.error("Releases Load Error:", err);
-                    releasesContainer.innerHTML = '<p style="text-align:center; color:#888;">Could not load tracks.</p>';
-                });
-        }
-
-        // --- MENU & FOOTER ---
+        // --- 5. MENU & FOOTER ---
         const menuContainer = document.querySelector('.nav-links');
         if (menuContainer && menuContainer.innerHTML === '') {
             fetch('menu.json').then(r => r.json()).then(data => {
@@ -207,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // --- BEATS STORE ---
+        // --- 6. BEATS STORE ---
         const beatContainer = document.getElementById('beat-store-list');
         if (beatContainer) {
             let allBeats = [];
@@ -250,7 +262,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // PRESS & PODCASTS
+        // 7. PRESS & PODCASTS
         loadSimpleList('press-container', 'press.json', 'articles', renderPress);
         loadSimpleList('podcasts-container', 'podcasts.json', 'episodes', renderPodcast);
 
