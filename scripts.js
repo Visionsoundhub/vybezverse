@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
 
-        // --- 1. BIO PAGE LOAD ---
+        // --- 1. BIO PAGE LOAD (INLINE FIX) ---
         const bioContainer = document.getElementById('bio-container');
         if (bioContainer) {
             fetch('bio.json')
@@ -182,23 +182,28 @@ document.addEventListener('DOMContentLoaded', () => {
             audio.onpause = () => { window.isPlaying = false; updateUIState(); };
         }
 
-        // --- 7. BEATS LOADER ---
+        // --- 7. BEATS LOADER (FIXED KEYS) ---
         const beatContainer = document.getElementById('beat-store-list');
         if (beatContainer) {
-            const filterGenre = document.getElementById('filter-genre');
-            const filterBpm = document.getElementById('filter-bpm');
-            const filterKey = document.getElementById('filter-key');
             let allBeats = [];
+            
             fetch('beats.json').then(r => r.json()).then(data => { 
                 if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } 
-                if(filterKey) {
+                
+                // HERE IS THE FIX: Target the list directly
+                const keyList = document.getElementById('key-options-list');
+                if(keyList) {
                     const keys = [...new Set(allBeats.map(b => b.key).filter(k => k))].sort();
                     let keyHtml = '<li data-value="all" class="selected">All Keys</li>';
                     keys.forEach(k => { keyHtml += `<li data-value="${k}">${k}</li>`; });
-                    document.getElementById('key-options-list').innerHTML = keyHtml;
+                    keyList.innerHTML = keyHtml;
                 }
-                window.currentPlaylist = allBeats; renderBeats(allBeats); setupCustomDropdowns(allBeats);
+
+                window.currentPlaylist = allBeats; 
+                renderBeats(allBeats); 
+                setupCustomDropdowns(allBeats);
             });
+            
             // Vibe Search
             const vBtn = document.getElementById('vibe-search-btn');
             const vModal = document.getElementById('vibe-modal');
@@ -277,9 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // --- 9. PRESS & PODCASTS (FIXED: SEPARATE LOADERS) ---
-        
-        // A. PRESS PAGE
+        // --- 9. PRESS & PODCASTS ---
         const pressCont = document.getElementById('press-container');
         if (pressCont) {
             fetch('press.json').then(r => r.json()).then(data => {
@@ -301,7 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => {});
         }
 
-        // B. PODCASTS PAGE (This was missing/broken)
         const podCont = document.getElementById('podcasts-container');
         if (podCont) {
             fetch('podcasts.json').then(r => r.json()).then(data => {
