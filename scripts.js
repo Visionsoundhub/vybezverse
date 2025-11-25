@@ -3,17 +3,19 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 0. GLOBAL INIT ---
     if (!window.globalAudio) { window.globalAudio = new Audio(); }
     const audio = window.globalAudio;
+    
+    // Global State
     window.currentPlaylist = window.currentPlaylist || []; 
     window.currentIndex = window.currentIndex || -1;
     window.isPlaying = window.isPlaying || false;
+    window.currentCover = window.currentCover || null; // <--- ΝΕΑ ΜΝΗΜΗ ΓΙΑ ΤΟ ΕΞΩΦΥΛΛΟ
     
-    // Κρατάμε τις επιλογές των φίλτρων εδώ
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
     // Ξεκινάμε τα scripts
     initAllScripts(); 
 
-    // Swup Listener (για αλλαγές σελίδας)
+    // Swup Listener
     if (window.Swup) {
         const swup = new window.Swup();
         swup.hooks.on('page:view', () => { initAllScripts(); });
@@ -22,9 +24,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
         
-        // Τρέχουμε τον έλεγχο του Active Menu σε κάθε αλλαγή σελίδας
         updateMenuState();
         checkPlayerVisibility();
+        restoreHeroArt(); // <--- ΕΛΕΓΧΟΣ ΓΙΑ ΕΠΑΝΑΦΟΡΑ ΕΙΚΟΝΑΣ
 
         // --- 1. BIO PAGE LOAD ---
         const bioContainer = document.getElementById('bio-container');
@@ -34,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     const content = data.content 
                         ? data.content
-                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold fix
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                             .replace(/\n/g, '<br>') 
                         : 'No bio text.';
                     const image = data.image || 'https://via.placeholder.com/500';
@@ -103,11 +105,9 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch('menu.json').then(r => r.json()).then(data => {
                 const links = data.links || [];
                 let menuHtml = '';
-                const currentPath = window.location.pathname.split('/').pop() || 'index.html';
                 links.forEach(link => {
-                    const activeClass = (link.url === currentPath) ? 'active' : '';
                     const target = link.newTab ? '_blank' : '_self';
-                    menuHtml += `<a href="${link.url}" class="nav-btn ${activeClass}" target="${target}">${link.text}</a>`;
+                    menuHtml += `<a href="${link.url}" class="nav-btn" target="${target}">${link.text}</a>`;
                 });
                 menuContainer.innerHTML = menuHtml;
                 updateMenuState(); 
@@ -148,19 +148,21 @@ document.addEventListener('DOMContentLoaded', () => {
         if(playBtn) {
             updateUIState();
             
-            // UPDATED PLAYTRACK: Accepts COVER Image
             window.playTrack = function(url, title, cover, trackIndexInList) {
                 if (audio.src === window.location.origin + url || audio.src === url) { togglePlay(); return; }
+                
                 window.currentIndex = trackIndexInList;
                 audio.src = url;
                 if(playerTitle) playerTitle.textContent = title;
                 
-                // UPDATE HERO ART (PC Only logic via CSS)
-                const heroArt = document.getElementById('hero-beat-art');
-                const heroImg = document.getElementById('hero-beat-img');
-                if (heroArt && heroImg && cover) {
-                    heroImg.src = cover;
-                    heroArt.classList.add('visible');
+                // Αποθήκευση και Ενημέρωση Hero Art
+                if (cover) {
+                    window.currentCover = cover; // Save to memory
+                    restoreHeroArt(); // Show it immediately
+                } else {
+                    // Αν δεν υπάρχει cover, βάλε placeholder
+                    window.currentCover = 'https://via.placeholder.com/600/111/333?text=V';
+                    restoreHeroArt();
                 }
 
                 audio.play(); window.isPlaying = true; updateUIState(); checkPlayerVisibility();
@@ -173,7 +175,6 @@ document.addEventListener('DOMContentLoaded', () => {
             function playNext() {
                 if (window.currentIndex < window.currentPlaylist.length - 1) {
                     const nextTrack = window.currentPlaylist[window.currentIndex + 1];
-                    // Pass cover to next track
                     const nextCover = nextTrack.cover || 'https://via.placeholder.com/600/111/333?text=V'; 
                     window.playTrack(nextTrack.audioSrc, nextTrack.title, nextCover, window.currentIndex + 1);
                 }
@@ -218,21 +219,19 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch('beats.json').then(r => r.json()).then(data => { 
                 if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } 
                 
-                // Fill Keys Dynamically
-                const keyList = document.getElementById('key-options-list');
-                if(keyList) {
+                if(filterKey) {
                     const keys = [...new Set(allBeats.map(b => b.key).filter(k => k))].sort();
                     let keyHtml = '<li data-value="all" class="selected">All Keys</li>';
                     keys.forEach(k => { keyHtml += `<li data-value="${k}">${k}</li>`; });
-                    keyList.innerHTML = keyHtml;
+                    document.getElementById('key-options-list').innerHTML = keyHtml;
                 }
 
                 window.currentPlaylist = allBeats; 
                 renderBeats(allBeats); 
                 setupCustomDropdowns(allBeats);
+                restoreHeroArt(); // Αν γυρίσουμε στη σελίδα, επαναφέρει την εικόνα
             });
             
-            // Vibe Search Logic
             const vBtn = document.getElementById('vibe-search-btn');
             const vModal = document.getElementById('vibe-modal');
             const vClose = document.getElementById('vibe-modal-close');
@@ -364,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- NEW FUNCTION: Update Menu Active State ---
+    // --- FUNCTIONS ---
     function updateMenuState() {
         const currentPath = window.location.pathname.split('/').pop() || 'index.html';
         document.querySelectorAll('.nav-btn').forEach(link => {
@@ -377,7 +376,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- FUNCTIONS ---
     function checkPlayerVisibility() {
         const stickyPlayer = document.getElementById('sticky-player');
         if (!stickyPlayer) return;
@@ -394,6 +392,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeBtn) activeBtn.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play';
     }
     
+    // --- NEW HERO ART RESTORE FUNCTION ---
+    function restoreHeroArt() {
+        const heroArt = document.getElementById('hero-beat-art');
+        const heroImg = document.getElementById('hero-beat-img');
+        // Αν υπάρχει εξώφυλλο στη μνήμη ΚΑΙ είμαστε στη σελίδα με το Hero Art
+        if (heroArt && heroImg && window.currentCover) {
+            heroImg.src = window.currentCover;
+            heroArt.classList.add('visible');
+        }
+    }
+
     // --- CUSTOM DROPDOWNS LOGIC ---
     function setupCustomDropdowns(allBeats) {
         const dropdowns = document.querySelectorAll('.custom-select');
@@ -456,7 +465,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (beats.length === 0) { beatContainer.innerHTML = '<p style="text-align:center; padding:2rem;">No beats found matching these filters.</p>'; return; } 
         beats.forEach((beat, index) => { 
             const safeTitle = beat.title.replace(/'/g, "\\'"); 
-            // Pass Image URL to PlayTrack
+            // Use cover from JSON or placeholder
             const beatImage = beat.cover || 'https://via.placeholder.com/600/111/333?text=V'; 
             
             beatContainer.innerHTML += `
