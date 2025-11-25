@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.currentIndex = window.currentIndex || -1;
     window.isPlaying = window.isPlaying || false;
     
-    // Κρατάμε τις επιλογές των φίλτρων εδώ (για τα Custom Dropdowns)
+    // Κρατάμε τις επιλογές των φίλτρων εδώ
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
     // Ξεκινάμε τα scripts
@@ -22,11 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
         
-        // Τρέχουμε τον έλεγχο του Active Menu σε κάθε αλλαγή σελίδας
+        // Τρέχουμε τον έλεγχο του Active Menu & Player Visibility
         updateMenuState();
         checkPlayerVisibility();
 
-        // --- 1. BIO PAGE LOAD ---
+        // --- 1. BIO PAGE LOAD (WITH BOLD FIX) ---
         const bioContainer = document.getElementById('bio-container');
         if (bioContainer) {
             fetch('bio.json')
@@ -147,13 +147,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(playBtn) {
             updateUIState();
+            
+            // UPDATED PLAYTRACK: Accepts COVER Image for Hero Art
             window.playTrack = function(url, title, cover, trackIndexInList) {
                 if (audio.src === window.location.origin + url || audio.src === url) { togglePlay(); return; }
                 window.currentIndex = trackIndexInList;
                 audio.src = url;
                 if(playerTitle) playerTitle.textContent = title;
+                
+                // UPDATE HERO ART (PC Only logic via CSS)
+                const heroArt = document.getElementById('hero-beat-art');
+                const heroImg = document.getElementById('hero-beat-img');
+                if (heroArt && heroImg && cover) {
+                    heroImg.src = cover;
+                    heroArt.classList.add('visible');
+                }
+
                 audio.play(); window.isPlaying = true; updateUIState(); checkPlayerVisibility();
             };
+
             function togglePlay() {
                 if (audio.paused) { audio.play(); window.isPlaying = true; } else { audio.pause(); window.isPlaying = false; }
                 updateUIState();
@@ -161,13 +173,16 @@ document.addEventListener('DOMContentLoaded', () => {
             function playNext() {
                 if (window.currentIndex < window.currentPlaylist.length - 1) {
                     const nextTrack = window.currentPlaylist[window.currentIndex + 1];
-                    window.playTrack(nextTrack.audioSrc, nextTrack.title, null, window.currentIndex + 1);
+                    // Pass cover to next track
+                    const nextCover = nextTrack.cover || 'https://via.placeholder.com/600/111/333?text=V'; 
+                    window.playTrack(nextTrack.audioSrc, nextTrack.title, nextCover, window.currentIndex + 1);
                 }
             }
             function playPrev() {
                 if (window.currentIndex > 0) {
                     const prevTrack = window.currentPlaylist[window.currentIndex - 1];
-                    window.playTrack(prevTrack.audioSrc, prevTrack.title, null, window.currentIndex - 1);
+                    const prevCover = prevTrack.cover || 'https://via.placeholder.com/600/111/333?text=V';
+                    window.playTrack(prevTrack.audioSrc, prevTrack.title, prevCover, window.currentIndex - 1);
                 }
             }
             if (progressContainer) {
@@ -192,7 +207,7 @@ document.addEventListener('DOMContentLoaded', () => {
             audio.onpause = () => { window.isPlaying = false; updateUIState(); };
         }
 
-        // --- 7. BEATS LOADER (WITH CUSTOM DROPDOWNS) ---
+        // --- 7. BEATS LOADER (WITH CUSTOM FILTERS) ---
         const beatContainer = document.getElementById('beat-store-list');
         if (beatContainer) {
             let allBeats = [];
@@ -212,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 window.currentPlaylist = allBeats; 
                 renderBeats(allBeats); 
                 
-                // 2. Initialize Custom Dropdowns (The FIX!)
+                // 2. Initialize Custom Dropdowns
                 setupCustomDropdowns(allBeats);
             });
             
@@ -294,7 +309,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // --- 9. PRESS & PODCASTS ---
+        // --- 9. PRESS & PODCASTS (SEPARATE LOGIC) ---
         const pressCont = document.getElementById('press-container');
         if (pressCont) {
             fetch('press.json').then(r => r.json()).then(data => {
@@ -348,11 +363,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- FUNCTIONS ---
+    // --- NEW FUNCTION: Update Menu Active State ---
     function updateMenuState() {
         const currentPath = window.location.pathname.split('/').pop() || 'index.html';
         document.querySelectorAll('.nav-btn').forEach(link => {
             const linkPath = link.getAttribute('href').split('/').pop();
+            // Extra check: αν είμαστε στο root (/), τότε το index.html είναι active
             if (linkPath === currentPath || (currentPath === '' && linkPath === 'index.html')) {
                 link.classList.add('active');
             } else {
@@ -361,6 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- FUNCTIONS ---
     function checkPlayerVisibility() {
         const stickyPlayer = document.getElementById('sticky-player');
         if (!stickyPlayer) return;
@@ -377,7 +394,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (activeBtn) activeBtn.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play';
     }
     
-    // --- NEW LOGIC FOR CUSTOM DROPDOWNS ---
+    // --- CUSTOM DROPDOWNS LOGIC ---
     function setupCustomDropdowns(allBeats) {
         const dropdowns = document.querySelectorAll('.custom-select');
         dropdowns.forEach(dropdown => {
@@ -439,7 +456,20 @@ document.addEventListener('DOMContentLoaded', () => {
         if (beats.length === 0) { beatContainer.innerHTML = '<p style="text-align:center; padding:2rem;">No beats found matching these filters.</p>'; return; } 
         beats.forEach((beat, index) => { 
             const safeTitle = beat.title.replace(/'/g, "\\'"); 
-            beatContainer.innerHTML += `<div class="beat-row"><div class="beat-art"><img src="https://via.placeholder.com/60/111/333?text=V" alt="Art"><div class="beat-play-overlay" onclick="playTrack('${beat.audioSrc}', '${safeTitle}', null, ${index})"><i id="beat-icon-${index}" class="fas fa-play" style="color:#fff;"></i></div></div><div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${beat.bpm || '140'} BPM • ${beat.key || 'Am'} • ${beat.category}</div></div><div class="beat-actions"><a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent">${beat.price} | <i class="fas fa-shopping-cart"></i> ΑΓΟΡΑ</a></div></div>`; 
+            // Pass Image URL to PlayTrack (Checking placeholder if cover missing)
+            const beatImage = 'https://via.placeholder.com/600/111/333?text=V'; // Placeholder logic
+            
+            beatContainer.innerHTML += `
+            <div class="beat-row">
+                <div class="beat-art">
+                    <img src="${beatImage}" alt="Art">
+                    <div class="beat-play-overlay" onclick="playTrack('${beat.audioSrc}', '${safeTitle}', '${beatImage}', ${index})">
+                        <i id="beat-icon-${index}" class="fas fa-play" style="color:#fff;"></i>
+                    </div>
+                </div>
+                <div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${beat.bpm || '140'} BPM • ${beat.key || 'Am'} • ${beat.category}</div></div>
+                <div class="beat-actions"><a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent">${beat.price} | <i class="fas fa-shopping-cart"></i> ΑΓΟΡΑ</a></div>
+            </div>`; 
         }); 
     }
 });
