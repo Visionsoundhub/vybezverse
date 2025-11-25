@@ -115,25 +115,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target === gModal) gModal.classList.remove('visible'); }; }
         }
 
-        // --- FIX: RELEASES LOADER (SAFER VERSION) ---
+        // --- FIX: RELEASES LOADER ---
+        // Ειδικός κώδικας για να φορτώνει τα Tracks σωστά
         const releasesContainer = document.getElementById('releases-list');
         if (releasesContainer) {
             fetch('releases.json')
                 .then(r => r.json())
                 .then(data => {
-                    releasesContainer.innerHTML = '';
+                    releasesContainer.innerHTML = ''; // Καθαρισμός του "Loading..."
                     let tracks = Array.isArray(data) ? data : (data.tracks || []);
                     
                     if (tracks.length === 0) {
-                        releasesContainer.innerHTML = '<p style="text-align:center;">No releases found in releases.json</p>';
+                        releasesContainer.innerHTML = '<p style="text-align:center;">No releases found.</p>';
                     } else {
                         tracks.forEach(track => {
-                            // Safe checks to prevent crash if data is missing
-                            const title = track.title ? track.title : 'Untitled Track';
-                            const safeTitle = title.replace(/'/g, "\\'");
-                            const cover = track.cover || 'https://via.placeholder.com/100';
-                            
-                            // Buttons (check if links exist)
                             const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : ''; 
                             const ytBtn = track.youtubeUrl ? `<a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i></a>` : '';
                             const ytOverlay = track.youtubeUrl ? `<a href="${track.youtubeUrl}" target="_blank"><i class="fab fa-youtube" style="color:#fff; font-size:1.5rem;"></i></a>` : '';
@@ -141,13 +136,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             releasesContainer.innerHTML += `
                                 <div class="beat-row">
                                     <div class="beat-art">
-                                        <img src="${cover}" alt="Art">
+                                        <img src="${track.cover || 'https://via.placeholder.com/100'}" alt="Art">
                                         <div class="beat-play-overlay">
                                             ${ytOverlay}
                                         </div>
                                     </div>
                                     <div class="beat-info">
-                                        <h4>${title}</h4>
+                                        <h4>${track.title || 'Unknown Title'}</h4>
                                         <div class="beat-meta">Available Now</div>
                                     </div>
                                     <div class="beat-actions">
@@ -162,7 +157,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
                 .catch(err => {
                     console.error("Releases Error:", err);
-                    releasesContainer.innerHTML = '<p style="text-align:center; color:red;">Error loading tracks. Check console.</p>';
+                    releasesContainer.innerHTML = '<p style="text-align:center; color:red;">Error loading tracks.</p>';
                 });
         }
 
