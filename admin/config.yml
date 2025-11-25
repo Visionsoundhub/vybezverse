@@ -6,7 +6,7 @@ media_folder: "assets/uploads"
 public_folder: "/assets/uploads"
 
 collections:
-  # --- 1. FOOTER SETTINGS (UPDATED LABELS) ---
+  # --- 1. FOOTER SETTINGS ---
   - name: "footer"
     label: "🦶 Footer Settings"
     files:
@@ -16,9 +16,7 @@ collections:
         fields:
           - {label: "Artist Side Title (Left)", name: "artistTitle", widget: "string", default: "BLACK VYBEZ"}
           - {label: "Producer Side Title (Right)", name: "prodTitle", widget: "string", default: "VYBEZMADETHIS"}
-          
-          # ARTIST SECTION (BLACK VYBEZ)
-          - {label: "---------------- ARTIST (Black Vybez) ----------------", name: "sep1", widget: "hidden"}
+          - {label: "--- ARTIST (Black Vybez) ---", name: "sep1", widget: "hidden"}
           - {label: "ARTIST - Facebook Link", name: "artistFb", widget: "string", required: false}
           - {label: "ARTIST - Facebook Icon", name: "artistFbIcon", widget: "image", required: false}
           - {label: "ARTIST - Instagram Link", name: "artistIg", widget: "string", required: false}
@@ -27,9 +25,7 @@ collections:
           - {label: "ARTIST - TikTok Icon", name: "artistTtIcon", widget: "image", required: false}
           - {label: "ARTIST - YouTube Link", name: "artistYt", widget: "string", required: false}
           - {label: "ARTIST - YouTube Icon", name: "artistYtIcon", widget: "image", required: false}
-          
-          # PRODUCER SECTION (VYBEZMADETHIS)
-          - {label: "---------------- PRODUCER (VybezMadeThis) ----------------", name: "sep2", widget: "hidden"}
+          - {label: "--- PRODUCER (VybezMadeThis) ---", name: "sep2", widget: "hidden"}
           - {label: "PRODUCER - Facebook Link", name: "prodFb", widget: "string", required: false}
           - {label: "PRODUCER - Facebook Icon", name: "prodFbIcon", widget: "image", required: false}
           - {label: "PRODUCER - Instagram Link", name: "prodIg", widget: "string", required: false}
@@ -38,7 +34,6 @@ collections:
           - {label: "PRODUCER - TikTok Icon", name: "prodTtIcon", widget: "image", required: false}
           - {label: "PRODUCER - YouTube Link", name: "prodYt", widget: "string", required: false}
           - {label: "PRODUCER - YouTube Icon", name: "prodYtIcon", widget: "image", required: false}
-          
           - {label: "Email Contact", name: "email", widget: "string", required: false}
           - {label: "Copyright Text", name: "copyright", widget: "string", default: "© 2025 Vybezone. All rights reserved."}
 
@@ -53,8 +48,6 @@ collections:
           - {label: "Logo Type", name: "logoType", widget: "select", options: ["text", "image"], default: "text"}
           - {label: "Logo Text", name: "logoText", widget: "string", default: "BLACK VYBEZ", required: false}
           - {label: "Logo Image", name: "logoImage", widget: "image", required: false}
-          
-          - {label: "--- BEAT INFO TEXTS ---", name: "sep_info", widget: "hidden"}
           - {label: "Exclusive Title", name: "exclusiveTitle", widget: "string"}
           - {label: "Exclusive Text", name: "exclusiveText", widget: "text"}
           - {label: "AI Access Title", name: "aiTitle", widget: "string"}
@@ -62,7 +55,34 @@ collections:
           - {label: "Vault Beats Title", name: "vaultTitle", widget: "string"}
           - {label: "Vault Beats Text", name: "vaultText", widget: "text"}
 
-  # --- 3. MENU ---
+  # --- 3. BIO PAGE (NEW) ---
+  - name: "bio"
+    label: "👤 Bio Page"
+    files:
+      - name: "bio_content"
+        label: "Biography Data"
+        file: "bio.json"
+        fields:
+          - {label: "Page Title", name: "title", widget: "string", default: "WHO IS BLACK VYBEZ?"}
+          - {label: "Main Image", name: "image", widget: "image"}
+          - {label: "Bio Text (Rich Text)", name: "content", widget: "markdown"}
+
+  # --- 4. GALLERY (NEW) ---
+  - name: "gallery"
+    label: "📸 Gallery"
+    files:
+      - name: "gallery_images"
+        label: "Photo Collection"
+        file: "gallery.json"
+        fields:
+          - name: "images"
+            label: "Photos"
+            widget: "list"
+            fields:
+              - {label: "Image", name: "src", widget: "image"}
+              - {label: "Caption/Alt Text", name: "caption", widget: "string", required: false}
+
+  # --- 5. MENU ---
   - name: "navigation"
     label: "🧭 Menu Manager"
     files:
@@ -78,7 +98,7 @@ collections:
               - {label: "Link / URL", name: "url", widget: "string"}
               - {label: "Open in New Tab?", name: "newTab", widget: "boolean", default: false}
 
-  # --- 4. RELEASES ---
+  # --- 6. RELEASES ---
   - name: "releases"
     label: "🎹 Releases"
     files:
@@ -97,7 +117,7 @@ collections:
               - {label: "Buy Link (Payhip)", name: "bundleUrl", widget: "string"}
               - {label: "Free Download Link", name: "downloadUrl", widget: "string", required: false}
 
-  # --- 5. BEAT STORE ---
+  # --- 7. BEAT STORE ---
   - name: "beats"
     label: "💰 Beat Store"
     files:
@@ -119,7 +139,7 @@ collections:
               - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
               - {label: "Vibe Tags", name: "tags", widget: "list"}
 
-  # --- 6. PRESS ---
+  # --- 8. PRESS ---
   - name: "press"
     label: "📰 Press & News"
     files:
@@ -138,7 +158,7 @@ collections:
               - {label: "Summary", name: "summary", widget: "text"}
               - {label: "Link", name: "link", widget: "string"}
 
-  # --- 7. PODCASTS ---
+  # --- 9. PODCASTS ---
   - name: "podcasts"
     label: "🎙️ Podcasts"
     files:
@@ -156,7 +176,7 @@ collections:
               - {label: "Link", name: "link", widget: "string"}
               - {label: "Date", name: "date", widget: "date"}
 
-  # --- 8. VIBES ---
+  # --- 10. VIBES ---
   - name: "vibes"
     label: "✨ Vibe Settings"
     files:
@@ -171,7 +191,7 @@ collections:
               - {label: "Name", name: "name", widget: "string"}
               - {label: "Tags", name: "tags", widget: "list"}
 
-  # --- 9. HOME PAGE ---
+  # --- 11. HOME PAGE ---
   - name: "pages"
     label: "🏠 Home Page"
     files:
@@ -179,18 +199,13 @@ collections:
         label: "Home Page Config"
         file: "home.json"
         fields:
-          # HERO SECTION
           - {label: "Main Banner", name: "heroImage", widget: "image", required: false}
           - {label: "Title", name: "heroTitle", widget: "string", default: "VYBEZONE", required: false}
           - {label: "Subtitle", name: "heroSubtitle", widget: "string", required: false}
-          
-          # ANNOUNCEMENT SECTION
           - {label: "--- ANNOUNCEMENT SECTION ---", name: "sep_ann", widget: "hidden"}
           - {label: "Enable Announcement?", name: "showAnnouncement", widget: "boolean", default: false} 
           - {label: "Announcement Video (YouTube URL)", name: "announcementVideo", widget: "string", required: false}
           - {label: "Announcement Text", name: "announcementText", widget: "text", required: false}
-          
-          # LATEST DROP SECTION
           - {label: "--- LATEST DROP SECTION ---", name: "sep_drop", widget: "hidden"}
           - {label: "Enable Latest Drop?", name: "showDrop", widget: "boolean", default: false}
           - {label: "Drop Title", name: "dropTitle", widget: "string", required: false}
