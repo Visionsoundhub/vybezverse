@@ -3,10 +3,16 @@
   "artistFb": "https://www.instagram.com/blackvybez_/",
   "artistIg": "https://www.instagram.com/blackvybez_/",
   "logoType": "text",
+  "vaultTitle": "Vault Beats",
   "artistTt": "https://www.instagram.com/blackvybez_/",
+  "exclusiveText": "Αποκτήστε τον πλήρη και αποκλειστικό έλεγχο του beat σας. Με κάθε αγορά, το συγκεκριμένο beat αφαιρείται οριστικά από το κατάστημα και είναι πλέον αποκλειστικά δικό σας. Με αυτόν τον τρόπο, εξασφαλίζετε ότι κανείς άλλος δεν θα μπορεί να το χρησιμοποιήσει στο μέλλον. Σημείωση: Τα beats της κατηγορίας \"AI Access\" εξαιρούνται από την πολιτική αποκλειστικότητας (exclusive rights).",
+  "aiTitle": "Ai Access",
   "prodYt": "https://www.instagram.com/blackvybez_/",
   "prodFb": "https://www.instagram.com/blackvybez_/",
+  "aiText": "Αυτή η κατηγορία περιλαμβάνει beats τα οποία εμπεριέχουν ποσοστό τεχνητής νοημοσύνης (AI) στη δημιουργία τους. Λόγω αυτής της φύσης, τα \"AI Access\" beats δεν διατίθενται για αποκλειστική αγορά. Μπορείτε να τα αποκτήσετε μόνο μέσω leasing (μίσθωσης), με πλήρη δικαιώματα χρήσης, αλλά το beat παραμένει διαθέσιμο και για άλλους χρήστες.",
   "prodIg": "https://www.instagram.com/blackvybez_/",
   "prodTt": "https://www.instagram.com/blackvybez_/",
-  "artistFbIcon": "/assets/uploads/facebook-1-.png"
+  "exclusiveTitle": "Exclusive Beats",
+  "artistFbIcon": "/assets/uploads/facebook-1-.png",
+  "vaultText": "Τα \"Vault Beats\" αποτελούν μία συλλογή beats σε βελτιωμένη, πιο οικονομική τιμή. Πρόκειται για παλαιότερες παραγωγές για τις οποίες δεν υπάρχει πλέον διαθέσιμο το αρχικό project και, ως εκ τούτου, δεν μπορούν να επεξεργαστούν περαιτέρω. Σημαντικό: Τα beats αυτής της κατηγορίας δεν περιλαμβάνουν τα αρχεία stems. Αποκτάτε το αρχείο beat στην καλύτερη δυνατή ποιότητα."
 }
