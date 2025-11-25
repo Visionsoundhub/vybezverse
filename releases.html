@@ -49,12 +49,19 @@
             </div>
         </div>
     </main>
-    <div id="sticky-player">
+<div id="sticky-player">
         <div class="player-inner">
-            <button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button>
-            <div style="flex-grow:1;">
+            <div class="player-controls">
+                <button id="prev-track-btn" class="control-btn"><i class="fas fa-step-backward"></i></button>
+                <button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button>
+                <button id="next-track-btn" class="control-btn"><i class="fas fa-step-forward"></i></button>
+            </div>
+
+            <div class="player-info-section">
                 <div id="player-track-title" style="font-weight:700;">SELECT A BEAT</div>
-                <div style="background:#333; height:4px; width:100%;"><div id="player-progress" style="width:0%; height:100%;"></div></div>
+                <div id="progress-container" class="progress-container">
+                    <div id="player-progress" class="progress-bar"></div>
+                </div>
             </div>
         </div>
     </div>
@@ -65,3 +72,4 @@
     <script src="scripts.js"></script>
 </body>
 </html>
+
