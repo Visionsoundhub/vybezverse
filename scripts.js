@@ -26,13 +26,19 @@ document.addEventListener('DOMContentLoaded', () => {
         updateMenuState();
         checkPlayerVisibility();
 
-        // --- 1. BIO PAGE LOAD (INLINE FIX) ---
+        // --- 1. BIO PAGE LOAD (FIXED BOLD TEXT) ---
         const bioContainer = document.getElementById('bio-container');
         if (bioContainer) {
             fetch('bio.json')
                 .then(r => { if (!r.ok) throw new Error("JSON not found"); return r.json(); })
                 .then(data => {
-                    const content = data.content ? data.content.replace(/\n/g, '<br>') : 'No bio text.';
+                    // ΕΔΩ ΕΓΙΝΕ Η ΔΙΟΡΘΩΣΗ: Προστέθηκε το replace για τα bold (**)
+                    const content = data.content 
+                        ? data.content
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Μετατρέπει τα **text** σε Bold
+                            .replace(/\n/g, '<br>') // Μετατρέπει τα Enter σε αλλαγή γραμμής
+                        : 'No bio text.';
+                        
                     const image = data.image || 'https://via.placeholder.com/500';
                     if(data.title && document.getElementById('bio-title')) {
                         document.getElementById('bio-title').textContent = data.title;
@@ -99,9 +105,11 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch('menu.json').then(r => r.json()).then(data => {
                 const links = data.links || [];
                 let menuHtml = '';
+                const currentPath = window.location.pathname.split('/').pop() || 'index.html';
                 links.forEach(link => {
+                    const activeClass = (link.url === currentPath) ? 'active' : '';
                     const target = link.newTab ? '_blank' : '_self';
-                    menuHtml += `<a href="${link.url}" class="nav-btn" target="${target}">${link.text}</a>`;
+                    menuHtml += `<a href="${link.url}" class="nav-btn ${activeClass}" target="${target}">${link.text}</a>`;
                 });
                 menuContainer.innerHTML = menuHtml;
                 updateMenuState(); 
@@ -186,31 +194,29 @@ document.addEventListener('DOMContentLoaded', () => {
             audio.onpause = () => { window.isPlaying = false; updateUIState(); };
         }
 
-        // --- 7. BEATS LOADER (FIXED FOR MODERN FILTERS) ---
+        // --- 7. BEATS LOADER ---
         const beatContainer = document.getElementById('beat-store-list');
         if (beatContainer) {
+            const filterGenre = document.getElementById('filter-genre');
+            const filterBpm = document.getElementById('filter-bpm');
+            const filterKey = document.getElementById('filter-key');
             let allBeats = [];
             
             fetch('beats.json').then(r => r.json()).then(data => { 
                 if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } 
                 
-                // 1. Fill Keys Dynamically (Targeting the UL list directly)
-                const keyList = document.getElementById('key-options-list');
-                if(keyList) {
+                if(filterKey) {
                     const keys = [...new Set(allBeats.map(b => b.key).filter(k => k))].sort();
                     let keyHtml = '<li data-value="all" class="selected">All Keys</li>';
                     keys.forEach(k => { keyHtml += `<li data-value="${k}">${k}</li>`; });
-                    keyList.innerHTML = keyHtml;
+                    document.getElementById('key-options-list').innerHTML = keyHtml;
                 }
 
                 window.currentPlaylist = allBeats; 
                 renderBeats(allBeats); 
-                
-                // 2. Initialize Custom Dropdowns
                 setupCustomDropdowns(allBeats);
             });
             
-            // Vibe Search Logic
             const vBtn = document.getElementById('vibe-search-btn');
             const vModal = document.getElementById('vibe-modal');
             const vClose = document.getElementById('vibe-modal-close');
@@ -238,7 +244,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // --- 8. HOME, PRESS, RELEASES ---
+        // --- 8. HOME & RELEASES ---
         const homeContainer = document.querySelector('.hero-section');
         if (homeContainer || document.getElementById('home-banner-container')) {
              fetch('home.json').then(r => r.json()).then(data => {
@@ -288,6 +294,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
+        // --- 9. PRESS & PODCASTS ---
         const pressCont = document.getElementById('press-container');
         if (pressCont) {
             fetch('press.json').then(r => r.json()).then(data => {
@@ -371,8 +378,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const activeBtn = document.getElementById(`beat-icon-${window.currentIndex}`);
         if (activeBtn) activeBtn.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play';
     }
-    
-    // NEW SETUP FOR CUSTOM DROPDOWNS (Logic Only)
     function setupCustomDropdowns(allBeats) {
         const dropdowns = document.querySelectorAll('.custom-select');
         dropdowns.forEach(dropdown => {
