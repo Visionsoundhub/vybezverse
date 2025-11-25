@@ -1,32 +1,75 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- GLOBAL PLAYER VARIABLES ---
-    if (!window.globalAudio) {
-        window.globalAudio = new Audio();
-    }
-    const audio = window.globalAudio;
     
-    // Global State
+    // --- 0. GLOBAL INIT ---
+    if (!window.globalAudio) { window.globalAudio = new Audio(); }
+    const audio = window.globalAudio;
     window.currentPlaylist = window.currentPlaylist || []; 
     window.currentIndex = window.currentIndex || -1;
     window.isPlaying = window.isPlaying || false;
-
-    // Filter State
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
+    // Ξεκινάμε τα scripts
     initAllScripts(); 
 
-    // --- SWUP INIT ---
+    // Swup Listener (για αλλαγές σελίδας)
     if (window.Swup) {
         const swup = new window.Swup();
-        swup.hooks.on('page:view', () => {
-            initAllScripts(); 
-        });
+        swup.hooks.on('page:view', () => { initAllScripts(); });
     }
 
     function initAllScripts() {
-        checkPlayerVisibility();
-        
-        // --- 1. MOBILE MENU ---
+        console.log("Scripts Initialized..."); 
+
+        // --- 1. BIO PAGE LOAD ---
+        const bioContainer = document.getElementById('bio-container');
+        if (bioContainer) {
+            fetch('bio.json')
+                .then(r => { if (!r.ok) throw new Error("JSON not found"); return r.json(); })
+                .then(data => {
+                    const content = data.content ? data.content.replace(/\n/g, '<br>') : 'No bio text.';
+                    const image = data.image || 'https://via.placeholder.com/500';
+                    if(data.title && document.getElementById('bio-title')) {
+                        document.getElementById('bio-title').textContent = data.title;
+                    }
+                    bioContainer.innerHTML = `
+                    <div class="bio-image-wrapper"><img src="${image}" alt="Bio Image" class="bio-img"></div>
+                    <div class="bio-text"><p>${content}</p></div>`;
+                })
+                .catch(err => { bioContainer.innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`; });
+        }
+
+        // --- 2. GALLERY LOAD ---
+        const galleryGrid = document.getElementById('gallery-grid');
+        if(galleryGrid) {
+            const gModal = document.getElementById('gallery-modal');
+            const gModalImg = document.getElementById('gallery-modal-img');
+            const gCaption = document.getElementById('gallery-caption');
+            const gClose = document.getElementById('close-gallery-modal');
+
+            fetch('gallery.json').then(r => r.json()).then(data => {
+                galleryGrid.innerHTML = '';
+                let images = Array.isArray(data) ? data : (data.images || []);
+                if(images.length === 0) { galleryGrid.innerHTML = '<p style="text-align:center;">No photos.</p>'; return; }
+                images.forEach(img => {
+                    const div = document.createElement('div');
+                    div.className = 'gallery-item';
+                    div.innerHTML = `<img src="${img.src}" alt="${img.caption || ''}">`;
+                    div.onclick = () => {
+                        gModalImg.src = img.src;
+                        gCaption.textContent = img.caption || '';
+                        gModal.classList.add('visible');
+                    };
+                    galleryGrid.appendChild(div);
+                });
+            }).catch(() => {});
+
+            if(gClose) {
+                gClose.onclick = () => gModal.classList.remove('visible');
+                gModal.onclick = (e) => { if(e.target === gModal) gModal.classList.remove('visible'); };
+            }
+        }
+
+        // --- 3. MOBILE MENU ---
         const hamburger = document.querySelector('.hamburger');
         const navLinks = document.querySelector('.nav-links');
         if (hamburger) {
@@ -44,14 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // --- HELPER: Get YouTube ID ---
-        function getYoutubeId(url) { 
-            if(!url) return null;
-            const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); 
-            return (m && m[2].length === 11) ? m[2] : null; 
-        }
-
-        // --- 2. DYNAMIC MENU ---
+        // --- 4. DYNAMIC MENU ---
         const menuContainer = document.querySelector('.nav-links');
         if (menuContainer && menuContainer.innerHTML === '') {
             fetch('menu.json').then(r => r.json()).then(data => {
@@ -67,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => {});
         }
 
-        // --- 3. FOOTER ---
+        // --- 5. FOOTER ---
         const footerContainer = document.getElementById('dynamic-footer');
         if (footerContainer && footerContainer.innerHTML === '') {
             fetch('footer.json').then(r => r.json()).then(data => {
@@ -91,67 +127,50 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => {});
         }
 
-        // --- 4. PLAYER LOGIC ---
+        // --- 6. PLAYER LOGIC & UI ---
+        checkPlayerVisibility();
         const playerTitle = document.getElementById('player-track-title');
         const playBtn = document.getElementById('player-play-btn');
         const prevBtn = document.getElementById('prev-track-btn');
         const nextBtn = document.getElementById('next-track-btn');
-        const progressBar = document.getElementById('player-progress');
         const progressContainer = document.getElementById('progress-container');
 
         if(playBtn) {
             updateUIState();
-
             window.playTrack = function(url, title, cover, trackIndexInList) {
-                if (audio.src === window.location.origin + url || audio.src === url) {
-                    togglePlay();
-                    return;
-                }
+                if (audio.src === window.location.origin + url || audio.src === url) { togglePlay(); return; }
                 window.currentIndex = trackIndexInList;
                 audio.src = url;
                 if(playerTitle) playerTitle.textContent = title;
-                audio.play();
-                window.isPlaying = true;
-                updateUIState();
-                checkPlayerVisibility();
+                audio.play(); window.isPlaying = true; updateUIState(); checkPlayerVisibility();
             };
-
             function togglePlay() {
-                if (audio.paused) { audio.play(); window.isPlaying = true; } 
-                else { audio.pause(); window.isPlaying = false; }
+                if (audio.paused) { audio.play(); window.isPlaying = true; } else { audio.pause(); window.isPlaying = false; }
                 updateUIState();
             }
-
             function playNext() {
                 if (window.currentIndex < window.currentPlaylist.length - 1) {
                     const nextTrack = window.currentPlaylist[window.currentIndex + 1];
                     window.playTrack(nextTrack.audioSrc, nextTrack.title, null, window.currentIndex + 1);
                 }
             }
-
             function playPrev() {
                 if (window.currentIndex > 0) {
                     const prevTrack = window.currentPlaylist[window.currentIndex - 1];
                     window.playTrack(prevTrack.audioSrc, prevTrack.title, null, window.currentIndex - 1);
                 }
             }
-
             if (progressContainer) {
                 const newProgress = progressContainer.cloneNode(true);
                 if(progressContainer.parentNode) progressContainer.parentNode.replaceChild(newProgress, progressContainer);
                 newProgress.addEventListener('click', (e) => {
-                    const width = newProgress.clientWidth;
-                    const clickX = e.offsetX;
-                    if (audio.duration) {
-                        audio.currentTime = (clickX / width) * audio.duration;
-                    }
+                    const width = newProgress.clientWidth; const clickX = e.offsetX;
+                    if (audio.duration) { audio.currentTime = (clickX / width) * audio.duration; }
                 });
             }
-
             playBtn.onclick = togglePlay;
             if(nextBtn) nextBtn.onclick = playNext;
             if(prevBtn) prevBtn.onclick = playPrev;
-
             audio.ontimeupdate = () => {
                 if(document.getElementById('player-progress')) {
                     const percent = (audio.currentTime / audio.duration) * 100;
@@ -163,65 +182,52 @@ document.addEventListener('DOMContentLoaded', () => {
             audio.onpause = () => { window.isPlaying = false; updateUIState(); };
         }
 
-        // --- 5. PAGE LOADERS ---
-        
-        // A. BIO PAGE (NEW)
-        const bioContainer = document.getElementById('bio-container');
-        if (bioContainer) {
-            fetch('bio.json').then(r => r.json()).then(data => {
-                // Simple Markdown Parser (Bold, Newline)
-                const parseContent = (text) => {
-                    if(!text) return '';
-                    return text
-                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
-                        .replace(/\n/g, '<br>'); // Newlines
-                };
-
-                if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title;
-                
-                bioContainer.innerHTML = `
-                <div class="bio-image-wrapper">
-                    <img src="${data.image || 'https://via.placeholder.com/500'}" alt="Black Vybez" class="bio-img">
-                </div>
-                <div class="bio-text">
-                    <p>${parseContent(data.content)}</p>
-                </div>`;
-            }).catch(() => {});
-        }
-
-        // B. GALLERY PAGE (NEW)
-        const galleryGrid = document.getElementById('gallery-grid');
-        const gModal = document.getElementById('gallery-modal');
-        const gModalImg = document.getElementById('gallery-modal-img');
-        const gCaption = document.getElementById('gallery-caption');
-        const gClose = document.getElementById('close-gallery-modal');
-
-        if(galleryGrid) {
-            fetch('gallery.json').then(r => r.json()).then(data => {
-                galleryGrid.innerHTML = '';
-                let images = Array.isArray(data) ? data : (data.images || []);
-                if(images.length === 0) { galleryGrid.innerHTML = '<p style="text-align:center;">No photos yet.</p>'; return; }
-
-                images.forEach(img => {
-                    const div = document.createElement('div');
-                    div.className = 'gallery-item';
-                    div.innerHTML = `<img src="${img.src}" alt="${img.caption || 'Photo'}">`;
-                    div.onclick = () => {
-                        gModalImg.src = img.src;
-                        gCaption.textContent = img.caption || '';
-                        gModal.classList.add('visible');
-                    };
-                    galleryGrid.appendChild(div);
-                });
+        // --- 7. BEATS LOADER ---
+        const beatContainer = document.getElementById('beat-store-list');
+        if (beatContainer) {
+            const filterGenre = document.getElementById('filter-genre');
+            const filterBpm = document.getElementById('filter-bpm');
+            const filterKey = document.getElementById('filter-key');
+            let allBeats = [];
+            fetch('beats.json').then(r => r.json()).then(data => { 
+                if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } 
+                if(filterKey) {
+                    const keys = [...new Set(allBeats.map(b => b.key).filter(k => k))].sort();
+                    let keyHtml = '<li data-value="all" class="selected">All Keys</li>';
+                    keys.forEach(k => { keyHtml += `<li data-value="${k}">${k}</li>`; });
+                    document.getElementById('key-options-list').innerHTML = keyHtml;
+                }
+                window.currentPlaylist = allBeats; renderBeats(allBeats); setupCustomDropdowns(allBeats);
             });
-
-            if(gClose) {
-                gClose.onclick = () => gModal.classList.remove('visible');
-                gModal.onclick = (e) => { if(e.target === gModal) gModal.classList.remove('visible'); };
+            // Vibe Search
+            const vBtn = document.getElementById('vibe-search-btn');
+            const vModal = document.getElementById('vibe-modal');
+            const vClose = document.getElementById('vibe-modal-close');
+            const vBubbles = document.getElementById('vibe-bubbles-container');
+            if (vBtn && vModal) {
+                vBtn.onclick = () => { 
+                    vModal.classList.add('visible'); 
+                    if (vBubbles.innerHTML === '') { 
+                        fetch('vibes.json').then(r => r.json()).then(data => { 
+                            let vibes = Array.isArray(data) ? data : (data.vibes || []); 
+                            vibes.forEach(vibe => { 
+                                const b = document.createElement('button'); b.className = 'btn floating-vibe'; b.textContent = vibe.name; 
+                                b.onclick = () => { 
+                                    vModal.classList.remove('visible'); 
+                                    const f = allBeats.filter(beat => { if(!beat.tags) return false; return beat.tags.some(t => vibe.tags.includes(t)); }); 
+                                    window.currentPlaylist = f; renderBeats(f); 
+                                }; 
+                                vBubbles.appendChild(b); 
+                            }); 
+                        }); 
+                    } 
+                }; 
+                vClose.onclick = () => vModal.classList.remove('visible'); 
+                vModal.onclick = (e) => { if(e.target === vModal) vModal.classList.remove('visible'); };
             }
         }
 
-        // C. HOME & OTHERS (Existing logic)
+        // --- 8. HOME & RELEASES ---
         const homeContainer = document.querySelector('.hero-section');
         if (homeContainer || document.getElementById('home-banner-container')) {
              fetch('home.json').then(r => r.json()).then(data => {
@@ -254,97 +260,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 } else if (dropContainer) { dropContainer.style.display = 'none'; }
             }).catch(() => {});
         }
+        function getYoutubeId(url) { if(!url) return null; const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
 
-        // BEATS LOADER (Existing)
-        const beatContainer = document.getElementById('beat-store-list');
-        if (beatContainer) {
-            const filterGenre = document.getElementById('filter-genre');
-            const filterBpm = document.getElementById('filter-bpm');
-            const filterKey = document.getElementById('filter-key');
-            let allBeats = [];
-            fetch('beats.json').then(r => r.json()).then(data => { 
-                if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } 
-                if(filterKey) {
-                    const keys = [...new Set(allBeats.map(b => b.key).filter(k => k))].sort();
-                    let keyHtml = '<li data-value="all" class="selected">All Keys</li>';
-                    keys.forEach(k => { keyHtml += `<li data-value="${k}">${k}</li>`; });
-                    document.getElementById('key-options-list').innerHTML = keyHtml;
-                }
-                window.currentPlaylist = allBeats; 
-                renderBeats(allBeats); 
-                setupCustomDropdowns(allBeats);
-            });
-            // Vibe Search
-            const vBtn = document.getElementById('vibe-search-btn');
-            const vModal = document.getElementById('vibe-modal');
-            const vClose = document.getElementById('vibe-modal-close');
-            const vBubbles = document.getElementById('vibe-bubbles-container');
-            if (vBtn && vModal) {
-                vBtn.onclick = () => { 
-                    vModal.classList.add('visible'); 
-                    if (vBubbles.innerHTML === '') { 
-                        fetch('vibes.json').then(r => r.json()).then(data => { 
-                            let vibes = Array.isArray(data) ? data : (data.vibes || []); 
-                            vibes.forEach(vibe => { 
-                                const b = document.createElement('button'); 
-                                b.className = 'btn floating-vibe'; 
-                                b.textContent = vibe.name; 
-                                b.onclick = () => { 
-                                    vModal.classList.remove('visible'); 
-                                    const f = allBeats.filter(beat => { if(!beat.tags) return false; return beat.tags.some(t => vibe.tags.includes(t)); }); 
-                                    window.currentPlaylist = f; renderBeats(f); 
-                                }; 
-                                vBubbles.appendChild(b); 
-                            }); 
-                        }); 
-                    } 
-                }; 
-                vClose.onclick = () => vModal.classList.remove('visible'); 
-                vModal.onclick = (e) => { if(e.target === vModal) vModal.classList.remove('visible'); };
-            }
-        }
-
-        function setupCustomDropdowns(allBeats) {
-            const dropdowns = document.querySelectorAll('.custom-select');
-            dropdowns.forEach(dropdown => {
-                const btn = dropdown.querySelector('.select-btn');
-                const list = dropdown.querySelector('.select-options');
-                const span = btn.querySelector('span');
-                btn.addEventListener('click', (e) => { e.stopPropagation(); dropdowns.forEach(d => { if(d !== dropdown) d.classList.remove('active'); }); dropdown.classList.toggle('active'); });
-                list.addEventListener('click', (e) => {
-                    if(e.target.tagName === 'LI') {
-                        const value = e.target.getAttribute('data-value');
-                        const text = e.target.textContent;
-                        span.textContent = dropdown.id === 'custom-genre' ? `GENRE: ${text}` : dropdown.id === 'custom-bpm' ? `BPM: ${text}` : `KEY: ${text}`;
-                        list.querySelectorAll('li').forEach(li => li.classList.remove('selected')); e.target.classList.add('selected');
-                        if(dropdown.id === 'custom-genre') activeFilters.genre = value;
-                        if(dropdown.id === 'custom-bpm') activeFilters.bpm = value;
-                        if(dropdown.id === 'custom-key') activeFilters.key = value;
-                        applyFilters(allBeats);
-                        dropdown.classList.remove('active');
-                    }
-                });
-            });
-            document.addEventListener('click', (e) => { if (!e.target.closest('.custom-select')) { dropdowns.forEach(d => d.classList.remove('active')); } });
-        }
-
-        function applyFilters(allBeats) {
-            const { genre, bpm, key } = activeFilters;
-            const filtered = allBeats.filter(beat => {
-                const matchGenre = genre === 'all' || (beat.category && beat.category.toLowerCase() === genre.toLowerCase());
-                const matchKey = key === 'all' || (beat.key === key);
-                let matchBpm = true;
-                if (bpm !== 'all' && beat.bpm) {
-                    const [min, max] = bpm.split('-').map(Number);
-                    const beatBpm = Number(beat.bpm);
-                    matchBpm = beatBpm >= min && beatBpm <= max;
-                }
-                return matchGenre && matchKey && matchBpm;
-            });
-            window.currentPlaylist = filtered; renderBeats(filtered);
-        }
-
-        // RELEASES, PRESS etc. (Existing logic kept)
         const releasesList = document.getElementById('releases-list');
         const whyBuyBtn = document.getElementById('why-buy-btn');
         const whyBuyModal = document.getElementById('why-buy-modal');
@@ -359,16 +276,54 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             });
         }
-        const pCont = document.getElementById('press-container');
-        if (pCont) {
-            const isPodcast = window.location.pathname.includes('podcasts');
-            const jsonFile = isPodcast ? 'podcasts.json' : 'press.json';
-            fetch(jsonFile).then(r => r.json()).then(data => {
-                pCont.innerHTML = ''; let items = []; if (isPodcast) items = Array.isArray(data) ? data : (data.episodes || []); else items = Array.isArray(data) ? data : (data.articles || []);
-                if (items.length === 0) { pCont.innerHTML = '<p style="text-align:center; width:100%;">Nothing found.</p>'; return; }
-                items.forEach(item => { const linkText = isPodcast ? 'LISTEN' : 'ΔΙΑΒΑΣΕ ΤΟ'; pCont.innerHTML += `<div class="press-card"><img src="${item.image || item.cover || 'https://via.placeholder.com/400'}" alt="Img" class="press-image"><div class="press-content"><div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date || ''} ${item.source ? '• '+item.source : ''}</div><h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3><p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary || item.description}</p><a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">${linkText}</a></div></div>`; });
+
+        // --- 9. PRESS & PODCASTS (FIXED: SEPARATE LOADERS) ---
+        
+        // A. PRESS PAGE
+        const pressCont = document.getElementById('press-container');
+        if (pressCont) {
+            fetch('press.json').then(r => r.json()).then(data => {
+                pressCont.innerHTML = '';
+                let items = Array.isArray(data) ? data : (data.articles || []);
+                if (items.length === 0) { pressCont.innerHTML = '<p style="text-align:center; width:100%;">Nothing found.</p>'; return; }
+                items.forEach(item => { 
+                    pressCont.innerHTML += `
+                    <div class="press-card">
+                        <img src="${item.image || item.cover || 'https://via.placeholder.com/400'}" alt="Img" class="press-image">
+                        <div class="press-content">
+                            <div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date || ''} ${item.source ? '• '+item.source : ''}</div>
+                            <h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3>
+                            <p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary || item.description}</p>
+                            <a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">ΔΙΑΒΑΣΕ ΤΟ</a>
+                        </div>
+                    </div>`; 
+                });
             }).catch(() => {});
         }
+
+        // B. PODCASTS PAGE (This was missing/broken)
+        const podCont = document.getElementById('podcasts-container');
+        if (podCont) {
+            fetch('podcasts.json').then(r => r.json()).then(data => {
+                podCont.innerHTML = '';
+                let items = Array.isArray(data) ? data : (data.episodes || []);
+                if (items.length === 0) { podCont.innerHTML = '<p style="text-align:center; width:100%;">Nothing found.</p>'; return; }
+                items.forEach(item => { 
+                    podCont.innerHTML += `
+                    <div class="press-card">
+                        <img src="${item.image || item.cover || 'https://via.placeholder.com/400'}" alt="Img" class="press-image">
+                        <div class="press-content">
+                            <div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date || ''}</div>
+                            <h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3>
+                            <p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary || item.description}</p>
+                            <a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;"><i class="fas fa-play"></i> LISTEN</a>
+                        </div>
+                    </div>`; 
+                });
+            }).catch(() => {});
+        }
+
+        // Bundle Modal
         const bundleBtn = document.getElementById('open-bundle-modal');
         const bundleModal = document.getElementById('bundle-modal');
         const closeBundle = document.getElementById('close-bundle-modal');
@@ -379,6 +334,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- FUNCTIONS ---
     function checkPlayerVisibility() {
         const stickyPlayer = document.getElementById('sticky-player');
         if (!stickyPlayer) return;
@@ -393,6 +349,43 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelectorAll('.beat-play-overlay i').forEach(icon => icon.className = 'fas fa-play');
         const activeBtn = document.getElementById(`beat-icon-${window.currentIndex}`);
         if (activeBtn) activeBtn.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play';
+    }
+    function setupCustomDropdowns(allBeats) {
+        const dropdowns = document.querySelectorAll('.custom-select');
+        dropdowns.forEach(dropdown => {
+            const btn = dropdown.querySelector('.select-btn');
+            const list = dropdown.querySelector('.select-options');
+            const span = btn.querySelector('span');
+            btn.addEventListener('click', (e) => { e.stopPropagation(); dropdowns.forEach(d => { if(d !== dropdown) d.classList.remove('active'); }); dropdown.classList.toggle('active'); });
+            list.addEventListener('click', (e) => {
+                if(e.target.tagName === 'LI') {
+                    const value = e.target.getAttribute('data-value');
+                    const text = e.target.textContent;
+                    span.textContent = dropdown.id === 'custom-genre' ? `GENRE: ${text}` : dropdown.id === 'custom-bpm' ? `BPM: ${text}` : `KEY: ${text}`;
+                    list.querySelectorAll('li').forEach(li => li.classList.remove('selected')); e.target.classList.add('selected');
+                    if(dropdown.id === 'custom-genre') activeFilters.genre = value;
+                    if(dropdown.id === 'custom-bpm') activeFilters.bpm = value;
+                    if(dropdown.id === 'custom-key') activeFilters.key = value;
+                    applyFilters(allBeats); dropdown.classList.remove('active');
+                }
+            });
+        });
+        document.addEventListener('click', (e) => { if (!e.target.closest('.custom-select')) { dropdowns.forEach(d => d.classList.remove('active')); } });
+    }
+    function applyFilters(allBeats) {
+        const { genre, bpm, key } = activeFilters;
+        const filtered = allBeats.filter(beat => {
+            const matchGenre = genre === 'all' || (beat.category && beat.category.toLowerCase() === genre.toLowerCase());
+            const matchKey = key === 'all' || (beat.key === key);
+            let matchBpm = true;
+            if (bpm !== 'all' && beat.bpm) {
+                const [min, max] = bpm.split('-').map(Number);
+                const beatBpm = Number(beat.bpm);
+                matchBpm = beatBpm >= min && beatBpm <= max;
+            }
+            return matchGenre && matchKey && matchBpm;
+        });
+        window.currentPlaylist = filtered; renderBeats(filtered);
     }
     function renderBeats(beats) { 
         const beatContainer = document.getElementById('beat-store-list');
