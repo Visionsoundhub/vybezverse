@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- GLOBAL PLAYER VARIABLES ---
-    // Make audio global so it persists
     if (!window.globalAudio) {
         window.globalAudio = new Audio();
     }
@@ -28,9 +27,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const hamburger = document.querySelector('.hamburger');
         const navLinks = document.querySelector('.nav-links');
         if (hamburger) {
-            // Remove old listeners to avoid duplicates
             const newHamburger = hamburger.cloneNode(true);
-            hamburger.parentNode.replaceChild(newHamburger, hamburger);
+            if(hamburger.parentNode) hamburger.parentNode.replaceChild(newHamburger, hamburger);
             
             newHamburger.addEventListener('click', () => {
                 newHamburger.classList.toggle('active');
@@ -42,6 +40,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     navLinks.classList.remove('active');
                 });
             });
+        }
+
+        // --- HELPER: Get YouTube ID ---
+        function getYoutubeId(url) { 
+            if(!url) return null;
+            const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); 
+            return (m && m[2].length === 11) ? m[2] : null; 
         }
 
         // --- 2. DYNAMIC MENU ---
@@ -91,7 +96,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const nextBtn = document.getElementById('next-track-btn');
         const progressBar = document.getElementById('player-progress');
         const progressContainer = document.getElementById('progress-container');
-        const stickyPlayer = document.getElementById('sticky-player');
 
         if(playBtn) {
             updateUIState(); // Sync UI on load
@@ -132,9 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // Scrubbing
             if (progressContainer) {
-                // Clone to remove old listeners
                 const newProgress = progressContainer.cloneNode(true);
-                progressContainer.parentNode.replaceChild(newProgress, progressContainer);
+                if(progressContainer.parentNode) progressContainer.parentNode.replaceChild(newProgress, progressContainer);
                 newProgress.addEventListener('click', (e) => {
                     const width = newProgress.clientWidth;
                     const clickX = e.offsetX;
@@ -160,7 +163,68 @@ document.addEventListener('DOMContentLoaded', () => {
             audio.onpause = () => { window.isPlaying = false; updateUIState(); };
         }
 
-        // --- 5. BEATS PAGE LOADER ---
+        // --- 5. PAGE LOADERS ---
+
+        // A. HOME PAGE
+        const homeContainer = document.querySelector('.hero-section');
+        if (homeContainer || document.getElementById('home-banner-container')) {
+            fetch('home.json').then(r => r.json()).then(data => {
+                // Hero Image
+                const bImg = document.getElementById('home-banner-img');
+                const bCont = document.getElementById('home-banner-container');
+                if (data.heroImage && bImg && bCont) { 
+                    bImg.src = data.heroImage; 
+                    bCont.style.display = 'block'; 
+                }
+                
+                // Titles
+                const hTitle = document.getElementById('home-hero-title');
+                const hSub = document.getElementById('home-hero-subtitle');
+                if (hTitle && data.heroTitle) hTitle.textContent = data.heroTitle;
+                if (hSub && data.heroSubtitle) hSub.textContent = data.heroSubtitle;
+
+                // Announcement
+                const annContainer = document.getElementById('home-announcement-container');
+                const annIframe = document.getElementById('announcement-iframe');
+                const annText = document.getElementById('announcement-text');
+                
+                if (data.showAnnouncement && data.announcementVideo && annContainer) { 
+                    const videoId = getYoutubeId(data.announcementVideo); 
+                    if(videoId && annIframe) { 
+                        annIframe.src = `https://www.youtube.com/embed/${videoId}`; 
+                        annContainer.style.display = 'block'; 
+                        if(data.announcementText && annText) annText.textContent = data.announcementText; 
+                    } 
+                } else if (annContainer) {
+                    annContainer.style.display = 'none';
+                }
+
+                // Latest Drop
+                const dropContainer = document.getElementById('home-featured-container');
+                const dropTitleLabel = document.getElementById('drop-title-label');
+                const dropIframe = document.getElementById('drop-iframe');
+                const dropButtons = document.getElementById('drop-buttons');
+
+                if (data.showDrop && data.dropVideo && dropContainer) { 
+                    const dropId = getYoutubeId(data.dropVideo); 
+                    if(dropId && dropIframe) { 
+                        dropIframe.src = `https://www.youtube.com/embed/${dropId}`; 
+                        dropContainer.style.display = 'block'; 
+                        if(data.dropTitle && dropTitleLabel) dropTitleLabel.innerHTML = `🔥 ${data.dropTitle}`; 
+                        
+                        let btnsHtml = ''; 
+                        if(data.dropStream) btnsHtml += `<a href="${data.dropStream}" target="_blank" class="btn btn-outline">STREAM</a>`; 
+                        if(data.dropBuy) btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑΣΕ ΤΟ</a>`; 
+                        if(data.dropFree) btnsHtml += `<a href="${data.dropFree}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>`; 
+                        if(dropButtons) dropButtons.innerHTML = btnsHtml; 
+                    } 
+                } else if (dropContainer) {
+                    dropContainer.style.display = 'none';
+                }
+            }).catch(() => {});
+        }
+
+        // B. BEATS PAGE
         const beatContainer = document.getElementById('beat-store-list');
         if (beatContainer) {
             const filterBtns = document.querySelectorAll('.filter-btn');
@@ -184,11 +248,139 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderBeats(filtered); 
                 }); 
             });
+            
+            // Vibe Search Logic
+            const vBtn = document.getElementById('vibe-search-btn');
+            const vModal = document.getElementById('vibe-modal');
+            const vClose = document.getElementById('vibe-modal-close');
+            const vBubbles = document.getElementById('vibe-bubbles-container');
+            
+            if (vBtn && vModal) {
+                vBtn.onclick = () => { 
+                    vModal.classList.add('visible'); 
+                    if (vBubbles.innerHTML === '') { 
+                        fetch('vibes.json').then(r => r.json()).then(data => { 
+                            let vibes = Array.isArray(data) ? data : (data.vibes || []); 
+                            vibes.forEach(vibe => { 
+                                const b = document.createElement('button'); 
+                                b.className = 'btn floating-vibe'; 
+                                b.textContent = vibe.name; 
+                                b.onclick = () => { 
+                                    vModal.classList.remove('visible'); 
+                                    const f = allBeats.filter(beat => { 
+                                        if(!beat.tags) return false; 
+                                        return beat.tags.some(t => vibe.tags.includes(t)); 
+                                    }); 
+                                    window.currentPlaylist = f;
+                                    renderBeats(f); 
+                                    filterBtns.forEach(b => b.classList.remove('active')); 
+                                }; 
+                                vBubbles.appendChild(b); 
+                            }); 
+                        }); 
+                    } 
+                }; 
+                vClose.onclick = () => vModal.classList.remove('visible'); 
+                vModal.onclick = (e) => { if(e.target === vModal) vModal.classList.remove('visible'); };
+            }
+        }
+
+        // C. RELEASES PAGE
+        const releasesList = document.getElementById('releases-list');
+        const whyBuyBtn = document.getElementById('why-buy-btn');
+        const whyBuyModal = document.getElementById('why-buy-modal');
+        const closeWhyBuy = document.getElementById('close-why-buy');
+        
+        if(whyBuyBtn && whyBuyModal) { 
+            whyBuyBtn.onclick = () => whyBuyModal.classList.add('visible'); 
+            closeWhyBuy.onclick = () => whyBuyModal.classList.remove('visible'); 
+            whyBuyModal.onclick = (e) => { if(e.target === whyBuyModal) whyBuyModal.classList.remove('visible'); }; 
         }
         
-        // --- OTHER PAGE LOADERS (Home, Press, etc.) ---
-        // (Keeping basic functionality for other pages)
-        // ... (Similar logic for Releases, Press, etc. as before)
+        if (releasesList) {
+            fetch('releases.json').then(r => r.json()).then(data => {
+                releasesList.innerHTML = '';
+                let tracks = Array.isArray(data) ? data : (data.tracks || []);
+                tracks.forEach((track, idx) => { 
+                    const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : ''; 
+                    const safeTitle = track.title.replace(/'/g, "\\'");
+                    
+                    // Note: For releases, we can also play them. We add them to playlist?
+                    // For simplicity, we just play single track.
+                    releasesList.innerHTML += `
+                    <div class="beat-row">
+                        <div class="beat-art">
+                            <img src="${track.cover || 'https://via.placeholder.com/100'}" alt="Art">
+                            <div class="beat-play-overlay">
+                                <a href="${track.youtubeUrl}" target="_blank"><i class="fab fa-youtube" style="color:#fff; font-size:1.5rem;"></i></a>
+                            </div>
+                        </div>
+                        <div class="beat-info"><h4>${track.title}</h4><div class="beat-meta">Available Now</div></div>
+                        <div class="beat-actions">
+                            <a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i></a>
+                            <a href="${track.streamUrl}" target="_blank" class="btn btn-outline">STREAM</a>
+                            <a href="${track.bundleUrl}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2; font-weight:800;">ΑΓΟΡΑΣΕ ΤΟ</a>
+                            ${downloadBtn}
+                        </div>
+                    </div>`; 
+                });
+            });
+        }
+
+        // D. PRESS & PODCASTS
+        const pCont = document.getElementById('press-container');
+        if (pCont) {
+            const isPodcast = window.location.pathname.includes('podcasts');
+            const jsonFile = isPodcast ? 'podcasts.json' : 'press.json';
+            
+            fetch(jsonFile).then(r => r.json()).then(data => {
+                pCont.innerHTML = '';
+                let items = [];
+                if (isPodcast) items = Array.isArray(data) ? data : (data.episodes || []);
+                else items = Array.isArray(data) ? data : (data.articles || []);
+                
+                if (items.length === 0) { pCont.innerHTML = '<p style="text-align:center; width:100%;">Nothing found.</p>'; return; }
+                
+                items.forEach(item => { 
+                    const date = item.date || '';
+                    const src = item.source || '';
+                    const linkText = isPodcast ? 'LISTEN' : 'ΔΙΑΒΑΣΕ ΤΟ';
+                    pCont.innerHTML += `
+                    <div class="press-card">
+                        <img src="${item.image || item.cover || 'https://via.placeholder.com/400'}" alt="Img" class="press-image">
+                        <div class="press-content">
+                            <div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${date} ${src ? '• '+src : ''}</div>
+                            <h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3>
+                            <p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary || item.description}</p>
+                            <a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">${linkText}</a>
+                        </div>
+                    </div>`; 
+                });
+            }).catch(() => {});
+        }
+
+        // E. STORE BUNDLES
+        const bundleBtn = document.getElementById('open-bundle-modal');
+        const bundleModal = document.getElementById('bundle-modal');
+        const closeBundle = document.getElementById('close-bundle-modal');
+        const bundleList = document.getElementById('bundle-list-content');
+        if(bundleBtn && bundleModal) { 
+            if (bundleList && bundleList.innerHTML === '') { 
+                const items = [ 
+                    { text: "Master Quality Track: WAV/MP3 (High Res)", icon: "fas fa-music" }, 
+                    { text: "Εναλλακτικές Εκδόσεις: Slowed, Sped up & Edits", icon: "fas fa-random" }, 
+                    { text: "Ringtone: Έτοιμο κομμένο αρχείο m4r/mp3", icon: "fas fa-mobile-alt" }, 
+                    { text: "Signed Artwork: 300DPI για εκτύπωση", icon: "fas fa-image" }, 
+                    { text: "Χειρόγραφοι Στίχοι: PDF με υπογραφή Black Vybez", icon: "fas fa-pen-nib" }, 
+                    { text: "BTS Video: Αποκλειστικό υλικό από το στούντιο", icon: "fas fa-video" }, 
+                    { text: "Οδηγίες Χρήσης: PDF οδηγός εγκατάστασης", icon: "fas fa-book" } 
+                ]; 
+                bundleList.innerHTML = items.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`).join(''); 
+            } 
+            bundleBtn.onclick = () => bundleModal.classList.add('visible'); 
+            closeBundle.onclick = () => bundleModal.classList.remove('visible'); 
+            bundleModal.onclick = (e) => { if(e.target === bundleModal) bundleModal.classList.remove('visible'); }; 
+        }
     }
 
     // --- VISIBILITY LOGIC ---
@@ -197,10 +389,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!stickyPlayer) return;
 
         const isBeatsPage = window.location.pathname.includes('beats.html');
-        const hasActiveTrack = audio.src && audio.src !== ''; // Έχει φορτώσει τραγούδι;
+        const hasActiveTrack = audio.src && audio.src !== '' && window.location.href !== audio.src; 
 
-        // Εμφάνιση αν είμαστε στα Beats ή αν παίζει μουσική
-        if (isBeatsPage || hasActiveTrack) {
+        if (isBeatsPage || hasActiveTrack || window.isPlaying) {
             stickyPlayer.classList.add('player-visible');
         } else {
             stickyPlayer.classList.remove('player-visible');
@@ -220,7 +411,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const beatContainer = document.getElementById('beat-store-list');
         if (!beatContainer) return; 
         beatContainer.innerHTML = ''; 
-        if (beats.length === 0) { beatContainer.innerHTML = '<p>No beats found.</p>'; return; } 
+        if (beats.length === 0) { beatContainer.innerHTML = '<p style="text-align:center; padding:2rem;">No beats found.</p>'; return; } 
         
         beats.forEach((beat, index) => { 
             const safeTitle = beat.title.replace(/'/g, "\\'"); 
@@ -233,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     </div>
                 </div>
                 <div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${beat.bpm || '140'} BPM • ${beat.category}</div></div>
-                <div class="beat-actions"><a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent">${beat.price} | ΑΓΟΡΑ</a></div>
+                <div class="beat-actions"><a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent">${beat.price} | <i class="fas fa-shopping-cart"></i> ΑΓΟΡΑ</a></div>
             </div>`; 
         }); 
     }
