@@ -22,11 +22,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
         
-        // Τρέχουμε τον έλεγχο του Active Menu & Player Visibility
+        // Τρέχουμε τον έλεγχο του Active Menu σε κάθε αλλαγή σελίδας
         updateMenuState();
         checkPlayerVisibility();
 
-        // --- 1. BIO PAGE LOAD (WITH BOLD FIX) ---
+        // --- 1. BIO PAGE LOAD ---
         const bioContainer = document.getElementById('bio-container');
         if (bioContainer) {
             fetch('bio.json')
@@ -148,7 +148,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(playBtn) {
             updateUIState();
             
-            // UPDATED PLAYTRACK: Accepts COVER Image for Hero Art
+            // UPDATED PLAYTRACK: Accepts COVER Image
             window.playTrack = function(url, title, cover, trackIndexInList) {
                 if (audio.src === window.location.origin + url || audio.src === url) { togglePlay(); return; }
                 window.currentIndex = trackIndexInList;
@@ -207,15 +207,18 @@ document.addEventListener('DOMContentLoaded', () => {
             audio.onpause = () => { window.isPlaying = false; updateUIState(); };
         }
 
-        // --- 7. BEATS LOADER (WITH CUSTOM FILTERS) ---
+        // --- 7. BEATS LOADER ---
         const beatContainer = document.getElementById('beat-store-list');
         if (beatContainer) {
+            const filterGenre = document.getElementById('filter-genre');
+            const filterBpm = document.getElementById('filter-bpm');
+            const filterKey = document.getElementById('filter-key');
             let allBeats = [];
             
             fetch('beats.json').then(r => r.json()).then(data => { 
                 if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } 
                 
-                // 1. Fill Keys Dynamically (Targeting the UL list directly)
+                // Fill Keys Dynamically
                 const keyList = document.getElementById('key-options-list');
                 if(keyList) {
                     const keys = [...new Set(allBeats.map(b => b.key).filter(k => k))].sort();
@@ -226,8 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 window.currentPlaylist = allBeats; 
                 renderBeats(allBeats); 
-                
-                // 2. Initialize Custom Dropdowns
                 setupCustomDropdowns(allBeats);
             });
             
@@ -309,7 +310,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // --- 9. PRESS & PODCASTS (SEPARATE LOGIC) ---
+        // --- 9. PRESS & PODCASTS ---
         const pressCont = document.getElementById('press-container');
         if (pressCont) {
             fetch('press.json').then(r => r.json()).then(data => {
@@ -368,7 +369,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentPath = window.location.pathname.split('/').pop() || 'index.html';
         document.querySelectorAll('.nav-btn').forEach(link => {
             const linkPath = link.getAttribute('href').split('/').pop();
-            // Extra check: αν είμαστε στο root (/), τότε το index.html είναι active
             if (linkPath === currentPath || (currentPath === '' && linkPath === 'index.html')) {
                 link.classList.add('active');
             } else {
@@ -456,8 +456,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (beats.length === 0) { beatContainer.innerHTML = '<p style="text-align:center; padding:2rem;">No beats found matching these filters.</p>'; return; } 
         beats.forEach((beat, index) => { 
             const safeTitle = beat.title.replace(/'/g, "\\'"); 
-            // Pass Image URL to PlayTrack (Checking placeholder if cover missing)
-            const beatImage = 'https://via.placeholder.com/600/111/333?text=V'; // Placeholder logic
+            // Pass Image URL to PlayTrack
+            const beatImage = beat.cover || 'https://via.placeholder.com/600/111/333?text=V'; 
             
             beatContainer.innerHTML += `
             <div class="beat-row">
