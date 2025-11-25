@@ -55,7 +55,7 @@ collections:
           - {label: "Vault Beats Title", name: "vaultTitle", widget: "string"}
           - {label: "Vault Beats Text", name: "vaultText", widget: "text"}
 
-  # --- 3. BIO PAGE (NEW) ---
+  # --- 3. BIO PAGE ---
   - name: "bio"
     label: "👤 Bio Page"
     files:
@@ -65,9 +65,9 @@ collections:
         fields:
           - {label: "Page Title", name: "title", widget: "string", default: "WHO IS BLACK VYBEZ?"}
           - {label: "Main Image", name: "image", widget: "image"}
-          - {label: "Bio Text (Rich Text)", name: "content", widget: "markdown"}
+          - {label: "Bio Text", name: "content", widget: "text"}
 
-  # --- 4. GALLERY (NEW) ---
+  # --- 4. GALLERY ---
   - name: "gallery"
     label: "📸 Gallery"
     files:
@@ -117,7 +117,7 @@ collections:
               - {label: "Buy Link (Payhip)", name: "bundleUrl", widget: "string"}
               - {label: "Free Download Link", name: "downloadUrl", widget: "string", required: false}
 
-  # --- 7. BEAT STORE ---
+  # --- 7. BEAT STORE (UPDATED WITH COVER) ---
   - name: "beats"
     label: "💰 Beat Store"
     files:
@@ -130,6 +130,7 @@ collections:
             widget: "list"
             fields:
               - {label: "Title", name: "title", widget: "string"}
+              - {label: "Cover Art", name: "cover", widget: "image", required: false} # <--- ΝΕΟ ΠΕΔΙΟ!
               - {label: "Audio Preview (MP3)", name: "audioSrc", widget: "file"}
               - {label: "Price", name: "price", widget: "string", default: "29.99€"}
               - {label: "Status", name: "status", widget: "select", options: ["available", "sold"], default: "available"}
