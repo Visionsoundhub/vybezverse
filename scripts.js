@@ -445,3 +445,17 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         renderBeats(filtered);
     }
+
+    function renderBeats(beats) { 
+        const beatContainer = document.getElementById('beat-store-list'); 
+        if (!beatContainer) return; 
+        beatContainer.innerHTML = ''; 
+        if (beats.length === 0) { beatContainer.innerHTML = '<p style="text-align:center; padding:2rem;">No beats found matching these filters.</p>'; return; } 
+        
+        beats.forEach((beat, index) => { 
+            const safeTitle = beat.title.replace(/'/g, "\\'"); 
+            const beatImage = beat.cover || 'https://via.placeholder.com/600/111/333?text=V'; 
+            beatContainer.innerHTML += `<div class="beat-row"><div class="beat-art"><img src="${beatImage}" alt="Art"><div class="beat-play-overlay" onclick="playTrack('${beat.audioSrc}', '${safeTitle}', '${beatImage}', ${index})"><i id="beat-icon-${index}" class="fas fa-play" style="color:#fff;"></i></div></div><div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${beat.bpm || '140'} BPM • ${beat.key || beat.Key || 'Am'} • ${beat.category}</div></div><div class="beat-actions"><a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent">${beat.price} | <i class="fas fa-shopping-cart"></i> ΑΓΟΡΑ</a></div></div>`; 
+        }); 
+    }
+});
