@@ -164,9 +164,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // --- 5. PAGE LOADERS ---
-
-        // A. HOME PAGE
+        
+        // A. HOME PAGE FIX
         const homeContainer = document.querySelector('.hero-section');
+        // Check if we are on index.html by looking for unique elements
         if (homeContainer || document.getElementById('home-banner-container')) {
             fetch('home.json').then(r => r.json()).then(data => {
                 // Hero Image
@@ -224,32 +225,59 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => {});
         }
 
-        // B. BEATS PAGE
+        // B. BEATS LOADER WITH DROPDOWNS
         const beatContainer = document.getElementById('beat-store-list');
         if (beatContainer) {
-            const filterBtns = document.querySelectorAll('.filter-btn');
+            const filterGenre = document.getElementById('filter-genre');
+            const filterBpm = document.getElementById('filter-bpm');
+            const filterKey = document.getElementById('filter-key');
             let allBeats = [];
             
             fetch('beats.json').then(r => r.json()).then(data => { 
                 if (Array.isArray(data)) { allBeats = data; } 
                 else if (data.beatslist) { allBeats = data.beatslist; } 
                 
+                // 1. Populate Key Dropdown dynamically
+                if(filterKey) {
+                    const keys = [...new Set(allBeats.map(b => b.key).filter(k => k))].sort();
+                    let keyHtml = '<option value="all">ΟΛΑ ΤΑ KEYS</option>';
+                    keys.forEach(k => {
+                        keyHtml += `<option value="${k}">${k}</option>`;
+                    });
+                    filterKey.innerHTML = keyHtml;
+                }
+
                 window.currentPlaylist = allBeats; 
                 renderBeats(allBeats); 
+
+                // 2. Main Filter Function
+                const applyFilters = () => {
+                    const genre = filterGenre ? filterGenre.value : 'all';
+                    const bpmRange = filterBpm ? filterBpm.value : 'all';
+                    const key = filterKey ? filterKey.value : 'all';
+
+                    const filtered = allBeats.filter(beat => {
+                        const matchGenre = genre === 'all' || (beat.category && beat.category.toLowerCase() === genre.toLowerCase());
+                        const matchKey = key === 'all' || (beat.key === key);
+                        let matchBpm = true;
+                        if (bpmRange !== 'all' && beat.bpm) {
+                            const [min, max] = bpmRange.split('-').map(Number);
+                            const beatBpm = Number(beat.bpm);
+                            matchBpm = beatBpm >= min && beatBpm <= max;
+                        }
+                        return matchGenre && matchKey && matchBpm;
+                    });
+
+                    window.currentPlaylist = filtered;
+                    renderBeats(filtered);
+                };
+
+                if(filterGenre) filterGenre.addEventListener('change', applyFilters);
+                if(filterBpm) filterBpm.addEventListener('change', applyFilters);
+                if(filterKey) filterKey.addEventListener('change', applyFilters);
             });
             
-            filterBtns.forEach(btn => { 
-                btn.addEventListener('click', () => { 
-                    filterBtns.forEach(b => b.classList.remove('active')); 
-                    btn.classList.add('active'); 
-                    const cat = btn.getAttribute('data-category'); 
-                    const filtered = cat === 'all' ? allBeats : allBeats.filter(b => b.category && b.category.toLowerCase() === cat.toLowerCase());
-                    window.currentPlaylist = filtered; 
-                    renderBeats(filtered); 
-                }); 
-            });
-            
-            // Vibe Search Logic
+            // Vibe Search (Unchanged)
             const vBtn = document.getElementById('vibe-search-btn');
             const vModal = document.getElementById('vibe-modal');
             const vClose = document.getElementById('vibe-modal-close');
@@ -273,7 +301,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                     }); 
                                     window.currentPlaylist = f;
                                     renderBeats(f); 
-                                    filterBtns.forEach(b => b.classList.remove('active')); 
                                 }; 
                                 vBubbles.appendChild(b); 
                             }); 
@@ -285,7 +312,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // C. RELEASES PAGE
+        // C. RELEASES & D. PRESS
         const releasesList = document.getElementById('releases-list');
         const whyBuyBtn = document.getElementById('why-buy-btn');
         const whyBuyModal = document.getElementById('why-buy-modal');
@@ -301,12 +328,9 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch('releases.json').then(r => r.json()).then(data => {
                 releasesList.innerHTML = '';
                 let tracks = Array.isArray(data) ? data : (data.tracks || []);
-                tracks.forEach((track, idx) => { 
+                tracks.forEach((track) => { 
                     const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : ''; 
                     const safeTitle = track.title.replace(/'/g, "\\'");
-                    
-                    // Note: For releases, we can also play them. We add them to playlist?
-                    // For simplicity, we just play single track.
                     releasesList.innerHTML += `
                     <div class="beat-row">
                         <div class="beat-art">
@@ -327,7 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // D. PRESS & PODCASTS
         const pCont = document.getElementById('press-container');
         if (pCont) {
             const isPodcast = window.location.pathname.includes('podcasts');
@@ -359,7 +382,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => {});
         }
 
-        // E. STORE BUNDLES
+        // Bundle Modal (Unchanged)
         const bundleBtn = document.getElementById('open-bundle-modal');
         const bundleModal = document.getElementById('bundle-modal');
         const closeBundle = document.getElementById('close-bundle-modal');
@@ -387,10 +410,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkPlayerVisibility() {
         const stickyPlayer = document.getElementById('sticky-player');
         if (!stickyPlayer) return;
-
         const isBeatsPage = window.location.pathname.includes('beats.html');
         const hasActiveTrack = audio.src && audio.src !== '' && window.location.href !== audio.src; 
-
         if (isBeatsPage || hasActiveTrack || window.isPlaying) {
             stickyPlayer.classList.add('player-visible');
         } else {
@@ -401,7 +422,6 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateUIState() {
         const playBtn = document.getElementById('player-play-btn');
         if(playBtn) playBtn.innerHTML = window.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
-        
         document.querySelectorAll('.beat-play-overlay i').forEach(icon => icon.className = 'fas fa-play');
         const activeBtn = document.getElementById(`beat-icon-${window.currentIndex}`);
         if (activeBtn) activeBtn.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play';
@@ -411,7 +431,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const beatContainer = document.getElementById('beat-store-list');
         if (!beatContainer) return; 
         beatContainer.innerHTML = ''; 
-        if (beats.length === 0) { beatContainer.innerHTML = '<p style="text-align:center; padding:2rem;">No beats found.</p>'; return; } 
+        if (beats.length === 0) { beatContainer.innerHTML = '<p style="text-align:center; padding:2rem;">No beats found matching these filters.</p>'; return; } 
         
         beats.forEach((beat, index) => { 
             const safeTitle = beat.title.replace(/'/g, "\\'"); 
@@ -423,7 +443,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         <i id="beat-icon-${index}" class="fas fa-play" style="color:#fff;"></i>
                     </div>
                 </div>
-                <div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${beat.bpm || '140'} BPM • ${beat.category}</div></div>
+                <div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${beat.bpm || '140'} BPM • ${beat.key || 'Am'} • ${beat.category}</div></div>
                 <div class="beat-actions"><a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent">${beat.price} | <i class="fas fa-shopping-cart"></i> ΑΓΟΡΑ</a></div>
             </div>`; 
         }); 
