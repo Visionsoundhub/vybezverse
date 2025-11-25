@@ -4,13 +4,21 @@
       "title": "Sos (Demo)",
       "cover": "https://via.placeholder.com/400x400/1e1e2f/7e57c2?text=SOS",
       "youtubeUrl": "https://www.youtube.com",
-      "streamUrl": "https://spotify.com",
-      "bundleUrl": "https://payhip.com",
+      "streamUrl": "#",
+      "bundleUrl": "#",
       "downloadUrl": "#"
     },
     {
       "title": "Late Hours",
       "cover": "https://via.placeholder.com/400x400/000000/ffffff?text=LATE",
+      "youtubeUrl": "https://www.youtube.com",
+      "streamUrl": "#",
+      "bundleUrl": "#",
+      "downloadUrl": "#"
+    },
+    {
+      "title": "Night Vibes",
+      "cover": "https://via.placeholder.com/400x400/333333/cccccc?text=VIBES",
       "youtubeUrl": "https://www.youtube.com",
       "streamUrl": "#",
       "bundleUrl": "#",
