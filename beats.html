@@ -31,39 +31,50 @@
         </div>
     
         <div class="compact-filters-container">
-            <div class="select-wrapper">
-                <select id="filter-genre" class="filter-select">
-                    <option value="all">ΟΛΑ ΤΑ GENRES</option>
-                    <option value="trap">Trap / Drill</option>
-                    <option value="boombap">Rap / Boombap</option>
-                    <option value="latin">Latin Urban / Afro</option>
-                    <option value="lofi">Lofi</option>
-                    <option value="vault">Vault Beats</option>
-                    <option value="ai">AI Access</option>
-                </select>
-                <i class="fas fa-chevron-down"></i>
+            
+            <div class="custom-select" id="custom-genre">
+                <button class="select-btn">
+                    <span>GENRE: ALL</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <ul class="select-options">
+                    <li data-value="all" class="selected">All Genres</li>
+                    <li data-value="trap">Trap / Drill</li>
+                    <li data-value="boombap">Rap / Boombap</li>
+                    <li data-value="latin">Latin Urban / Afro</li>
+                    <li data-value="lofi">Lofi</li>
+                    <li data-value="vault">Vault Beats</li>
+                    <li data-value="ai">AI Access</li>
+                </ul>
             </div>
 
-            <div class="select-wrapper">
-                <select id="filter-bpm" class="filter-select">
-                    <option value="all">ΟΛΑ ΤΑ BPM</option>
-                    <option value="70-80">70 - 80 BPM</option>
-                    <option value="80-90">80 - 90 BPM</option>
-                    <option value="90-100">90 - 100 BPM</option>
-                    <option value="100-110">100 - 110 BPM</option>
-                    <option value="110-130">110 - 130 BPM</option>
-                    <option value="130-140">130 - 140 BPM</option>
-                    <option value="140-160">140 - 160 BPM</option>
-                </select>
-                <i class="fas fa-chevron-down"></i>
+            <div class="custom-select" id="custom-bpm">
+                <button class="select-btn">
+                    <span>BPM: ALL</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <ul class="select-options">
+                    <li data-value="all" class="selected">All BPM</li>
+                    <li data-value="70-80">70 - 80</li>
+                    <li data-value="80-90">80 - 90</li>
+                    <li data-value="90-100">90 - 100</li>
+                    <li data-value="100-110">100 - 110</li>
+                    <li data-value="110-130">110 - 130</li>
+                    <li data-value="130-140">130 - 140</li>
+                    <li data-value="140-160">140 - 160</li>
+                </ul>
             </div>
 
-            <div class="select-wrapper">
-                <select id="filter-key" class="filter-select">
-                    <option value="all">ΟΛΑ ΤΑ KEYS</option>
-                </select>
-                <i class="fas fa-chevron-down"></i>
+            <div class="custom-select" id="custom-key">
+                <button class="select-btn">
+                    <span>KEY: ALL</span>
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+                <ul class="select-options" id="key-options-list">
+                    <li data-value="all" class="selected">All Keys</li>
+                    </ul>
             </div>
+            
         </div>
     
         <div class="beat-store-container" id="beat-store-list">Loading...</div>
