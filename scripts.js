@@ -6,6 +6,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.currentPlaylist = window.currentPlaylist || []; 
     window.currentIndex = window.currentIndex || -1;
     window.isPlaying = window.isPlaying || false;
+    
+    // Κρατάμε τις επιλογές των φίλτρων εδώ
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
     // Ξεκινάμε τα scripts
@@ -22,6 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         // Τρέχουμε τον έλεγχο του Active Menu σε κάθε αλλαγή σελίδας
         updateMenuState();
+        checkPlayerVisibility();
 
         // --- 1. BIO PAGE LOAD (INLINE FIX) ---
         const bioContainer = document.getElementById('bio-container');
@@ -92,7 +95,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- 4. DYNAMIC MENU ---
         const menuContainer = document.querySelector('.nav-links');
-        // Αν το μενού είναι άδειο, το φτιάχνουμε. Αν υπάρχει, απλά ενημερώνουμε το active state.
         if (menuContainer && menuContainer.innerHTML === '') {
             fetch('menu.json').then(r => r.json()).then(data => {
                 const links = data.links || [];
@@ -102,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     menuHtml += `<a href="${link.url}" class="nav-btn" target="${target}">${link.text}</a>`;
                 });
                 menuContainer.innerHTML = menuHtml;
-                updateMenuState(); // Καλούμε την ενημέρωση μόλις φορτώσει το μενού
+                updateMenuState(); 
             }).catch(() => {});
         }
 
@@ -131,7 +133,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         // --- 6. PLAYER LOGIC & UI ---
-        checkPlayerVisibility();
         const playerTitle = document.getElementById('player-track-title');
         const playBtn = document.getElementById('player-play-btn');
         const prevBtn = document.getElementById('prev-track-btn');
@@ -185,26 +186,31 @@ document.addEventListener('DOMContentLoaded', () => {
             audio.onpause = () => { window.isPlaying = false; updateUIState(); };
         }
 
-        // --- 7. BEATS LOADER ---
+        // --- 7. BEATS LOADER (FIXED FOR MODERN FILTERS) ---
         const beatContainer = document.getElementById('beat-store-list');
         if (beatContainer) {
-            const filterGenre = document.getElementById('filter-genre');
-            const filterBpm = document.getElementById('filter-bpm');
-            const filterKey = document.getElementById('filter-key');
             let allBeats = [];
             
             fetch('beats.json').then(r => r.json()).then(data => { 
                 if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } 
                 
-                if(filterKey) {
+                // 1. Fill Keys Dynamically (Targeting the UL list directly)
+                const keyList = document.getElementById('key-options-list');
+                if(keyList) {
                     const keys = [...new Set(allBeats.map(b => b.key).filter(k => k))].sort();
                     let keyHtml = '<li data-value="all" class="selected">All Keys</li>';
                     keys.forEach(k => { keyHtml += `<li data-value="${k}">${k}</li>`; });
-                    document.getElementById('key-options-list').innerHTML = keyHtml;
+                    keyList.innerHTML = keyHtml;
                 }
-                window.currentPlaylist = allBeats; renderBeats(allBeats); setupCustomDropdowns(allBeats);
+
+                window.currentPlaylist = allBeats; 
+                renderBeats(allBeats); 
+                
+                // 2. Initialize Custom Dropdowns
+                setupCustomDropdowns(allBeats);
             });
             
+            // Vibe Search Logic
             const vBtn = document.getElementById('vibe-search-btn');
             const vModal = document.getElementById('vibe-modal');
             const vClose = document.getElementById('vibe-modal-close');
@@ -232,7 +238,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // --- 8. HOME & RELEASES ---
+        // --- 8. HOME, PRESS, RELEASES ---
         const homeContainer = document.querySelector('.hero-section');
         if (homeContainer || document.getElementById('home-banner-container')) {
              fetch('home.json').then(r => r.json()).then(data => {
@@ -282,7 +288,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // --- 9. PRESS & PODCASTS ---
         const pressCont = document.getElementById('press-container');
         if (pressCont) {
             fetch('press.json').then(r => r.json()).then(data => {
@@ -341,7 +346,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const currentPath = window.location.pathname.split('/').pop() || 'index.html';
         document.querySelectorAll('.nav-btn').forEach(link => {
             const linkPath = link.getAttribute('href').split('/').pop();
-            if (linkPath === currentPath) {
+            // Extra check: αν είμαστε στο root (/), τότε το index.html είναι active
+            if (linkPath === currentPath || (currentPath === '' && linkPath === 'index.html')) {
                 link.classList.add('active');
             } else {
                 link.classList.remove('active');
@@ -365,28 +371,46 @@ document.addEventListener('DOMContentLoaded', () => {
         const activeBtn = document.getElementById(`beat-icon-${window.currentIndex}`);
         if (activeBtn) activeBtn.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play';
     }
+    
+    // NEW SETUP FOR CUSTOM DROPDOWNS (Logic Only)
     function setupCustomDropdowns(allBeats) {
         const dropdowns = document.querySelectorAll('.custom-select');
         dropdowns.forEach(dropdown => {
             const btn = dropdown.querySelector('.select-btn');
             const list = dropdown.querySelector('.select-options');
             const span = btn.querySelector('span');
-            btn.addEventListener('click', (e) => { e.stopPropagation(); dropdowns.forEach(d => { if(d !== dropdown) d.classList.remove('active'); }); dropdown.classList.toggle('active'); });
-            list.addEventListener('click', (e) => {
+            
+            // Toggle
+            btn.onclick = (e) => { 
+                e.stopPropagation(); 
+                dropdowns.forEach(d => { if(d !== dropdown) d.classList.remove('active'); }); 
+                dropdown.classList.toggle('active'); 
+            };
+
+            // Selection
+            list.onclick = (e) => {
                 if(e.target.tagName === 'LI') {
                     const value = e.target.getAttribute('data-value');
                     const text = e.target.textContent;
-                    span.textContent = dropdown.id === 'custom-genre' ? `GENRE: ${text}` : dropdown.id === 'custom-bpm' ? `BPM: ${text}` : `KEY: ${text}`;
-                    list.querySelectorAll('li').forEach(li => li.classList.remove('selected')); e.target.classList.add('selected');
+                    
+                    span.textContent = dropdown.id === 'custom-genre' ? `GENRE: ${text}` : 
+                                       dropdown.id === 'custom-bpm' ? `BPM: ${text}` : `KEY: ${text}`;
+                    
+                    list.querySelectorAll('li').forEach(li => li.classList.remove('selected')); 
+                    e.target.classList.add('selected');
+
                     if(dropdown.id === 'custom-genre') activeFilters.genre = value;
                     if(dropdown.id === 'custom-bpm') activeFilters.bpm = value;
                     if(dropdown.id === 'custom-key') activeFilters.key = value;
-                    applyFilters(allBeats); dropdown.classList.remove('active');
+
+                    applyFilters(allBeats); 
+                    dropdown.classList.remove('active');
                 }
-            });
+            };
         });
-        document.addEventListener('click', (e) => { if (!e.target.closest('.custom-select')) { dropdowns.forEach(d => d.classList.remove('active')); } });
+        document.onclick = (e) => { if (!e.target.closest('.custom-select')) { dropdowns.forEach(d => d.classList.remove('active')); } };
     }
+
     function applyFilters(allBeats) {
         const { genre, bpm, key } = activeFilters;
         const filtered = allBeats.filter(beat => {
@@ -402,6 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         window.currentPlaylist = filtered; renderBeats(filtered);
     }
+
     function renderBeats(beats) { 
         const beatContainer = document.getElementById('beat-store-list');
         if (!beatContainer) return; 
