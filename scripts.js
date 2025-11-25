@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!window.globalAudio) { window.globalAudio = new Audio(); }
     const audio = window.globalAudio;
     
-    // Global State Variables
+    // Global State
     window.currentPlaylist = window.currentPlaylist || []; 
     window.currentIndex = window.currentIndex || -1;
     window.isPlaying = window.isPlaying || false;
@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
         
-        // Restore Player
+        // Restore Player UI
         const playerTitle = document.getElementById('player-track-title');
         if (playerTitle) playerTitle.textContent = window.currentTitle;
         restoreHeroArt();
@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         checkPlayerVisibility();
         updateUIState();
 
-        // --- HOME PAGE ---
+        // --- HOME PAGE LOADER ---
         const homeTitle = document.getElementById('home-hero-title');
         if (homeTitle) {
             fetch('home.json').then(r => r.json()).then(data => {
@@ -115,23 +115,27 @@ document.addEventListener('DOMContentLoaded', () => {
             if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target === gModal) gModal.classList.remove('visible'); }; }
         }
 
-        // --- FIX: RELEASES LOADER ---
-        // Ειδικός κώδικας για να φορτώνει τα Tracks σωστά
+        // --- FIX: RELEASES LOADER (FROM PANEL) ---
         const releasesContainer = document.getElementById('releases-list');
         if (releasesContainer) {
-            fetch('releases.json')
-                .then(r => r.json())
+            // Προσθέτουμε ?t=... για να μην κολλάει η μνήμη (cache) και να βλέπεις τις αλλαγές του Πάνελ
+            fetch('releases.json?t=' + new Date().getTime())
+                .then(r => {
+                    if (!r.ok) throw new Error("File not found");
+                    return r.json();
+                })
                 .then(data => {
-                    releasesContainer.innerHTML = ''; // Καθαρισμός του "Loading..."
+                    releasesContainer.innerHTML = '';
                     let tracks = Array.isArray(data) ? data : (data.tracks || []);
                     
                     if (tracks.length === 0) {
-                        releasesContainer.innerHTML = '<p style="text-align:center;">No releases found.</p>';
+                        releasesContainer.innerHTML = '<p style="text-align:center;">No releases found yet.</p>';
                     } else {
                         tracks.forEach(track => {
                             const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : ''; 
                             const ytBtn = track.youtubeUrl ? `<a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i></a>` : '';
                             const ytOverlay = track.youtubeUrl ? `<a href="${track.youtubeUrl}" target="_blank"><i class="fab fa-youtube" style="color:#fff; font-size:1.5rem;"></i></a>` : '';
+                            const safeTitle = track.title ? track.title : 'Untitled';
                             
                             releasesContainer.innerHTML += `
                                 <div class="beat-row">
@@ -142,7 +146,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                         </div>
                                     </div>
                                     <div class="beat-info">
-                                        <h4>${track.title || 'Unknown Title'}</h4>
+                                        <h4>${safeTitle}</h4>
                                         <div class="beat-meta">Available Now</div>
                                     </div>
                                     <div class="beat-actions">
@@ -156,8 +160,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 })
                 .catch(err => {
-                    console.error("Releases Error:", err);
-                    releasesContainer.innerHTML = '<p style="text-align:center; color:red;">Error loading tracks.</p>';
+                    console.error("Releases Load Error:", err);
+                    releasesContainer.innerHTML = '<p style="text-align:center; color:#888;">Could not load tracks.</p>';
                 });
         }
 
