@@ -23,7 +23,8 @@
             <h1 class="section-title">MUSIC CATALOG</h1>
             <div style="margin-bottom:2rem; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
                 <button class="nav-btn active" style="border:1px solid #fff;">All Releases</button>
-                <button id="why-buy-btn" class="nav-btn" style="border:1px solid #8a2be2; color:#8a2be2 !important;">
+                
+                <button id="why-buy-btn" class="nav-btn" style="border:1px solid #8a2be2; color:#8a2be2 !important;" onclick="document.getElementById('why-buy-modal').classList.add('visible')">
                     <i class="fas fa-info-circle"></i> ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;
                 </button>
             </div>
@@ -32,7 +33,7 @@
         
         <div class="modal-overlay" id="why-buy-modal">
             <div class="modal-box" style="text-align:left;">
-                <button class="modal-close-btn" id="close-why-buy">&times;</button>
+                <button class="modal-close-btn" id="close-why-buy" onclick="document.getElementById('why-buy-modal').classList.remove('visible')">&times;</button>
                 <h2 style="text-align:center; color:#fff; margin-bottom:1.5rem; border-bottom:1px solid #333; padding-bottom:10px;">
                     ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΕΙΣ;
                 </h2>
@@ -72,5 +73,3 @@
     <script src="scripts.js"></script>
 </body>
 </html>
-
-
