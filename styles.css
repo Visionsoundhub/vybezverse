@@ -125,7 +125,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .press-content { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;}
 .bio-img { width: 100%; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); box-shadow: -10px 10px 20px rgba(138, 43, 226, 0.2); }
 
-/* --- COMPACT FILTERS (DROPDOWNS) --- */
+/* --- MODERN CUSTOM FILTERS --- */
 .compact-filters-container {
     display: flex;
     justify-content: center;
@@ -134,55 +134,97 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     max-width: 1000px;
     margin: 0 auto;
     flex-wrap: wrap; 
-}
-
-.select-wrapper {
     position: relative;
-    min-width: 180px;
+    z-index: 50; 
 }
 
-.filter-select {
-    width: 100%;
-    appearance: none; 
-    background: rgba(255, 255, 255, 0.05);
-    color: #fff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 0.8rem 1rem;
-    padding-right: 2.5rem; 
+.custom-select {
+    position: relative;
+    min-width: 200px;
     font-family: 'Century Gothic', sans-serif;
+}
+
+/* Button (Closed) */
+.select-btn {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    color: #fff;
     font-size: 0.9rem;
     font-weight: 600;
-    border-radius: 8px;
     cursor: pointer;
-    outline: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     transition: 0.3s;
     text-transform: uppercase;
 }
 
-.filter-select:hover, .filter-select:focus {
+.select-btn:hover, .custom-select.active .select-btn {
     border-color: #8a2be2;
-    background: rgba(138, 43, 226, 0.05);
-    box-shadow: 0 0 10px rgba(138, 43, 226, 0.2);
+    background: rgba(138, 43, 226, 0.1);
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.15);
 }
 
-.filter-select option {
-    background: #111; 
-    color: #fff;
-}
-
-.select-wrapper i {
-    position: absolute;
-    right: 15px;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #8a2be2;
-    pointer-events: none; 
+.select-btn i {
     font-size: 0.8rem;
+    transition: transform 0.3s;
+    color: #8a2be2;
+}
+
+.custom-select.active .select-btn i { transform: rotate(180deg); }
+
+/* Options List (Open) */
+.select-options {
+    position: absolute;
+    top: 110%;
+    left: 0;
+    width: 100%;
+    background: #111;
+    border: 1px solid #333;
+    border-radius: 8px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+    display: none;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    z-index: 100;
+    max-height: 250px;
+    overflow-y: auto;
+}
+
+.custom-select.active .select-options {
+    display: block;
+    animation: fadeInDown 0.2s ease;
+}
+
+.select-options li {
+    padding: 12px 15px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: 0.2s;
+    color: #ccc;
+    text-transform: uppercase;
+}
+.select-options li:last-child { border-bottom: none; }
+.select-options li:hover { background: rgba(138, 43, 226, 0.2); color: #fff; padding-left: 20px; }
+.select-options li.selected { background: #8a2be2; color: #fff; }
+
+.select-options::-webkit-scrollbar { width: 6px; }
+.select-options::-webkit-scrollbar-track { background: #111; }
+.select-options::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 @media (max-width: 600px) {
-    .compact-filters-container { flex-direction: column; gap: 10px; }
-    .select-wrapper { width: 100%; }
+    .compact-filters-container { flex-direction: column; gap: 12px; }
+    .custom-select { width: 100%; }
 }
 
 /* --- BEAT ROWS --- */
@@ -221,40 +263,6 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .modal-close-btn:hover { background: #ff4444; border-color: #ff4444; transform: rotate(90deg); }
 .modal-box h2 { font-family: 'Century Gothic', 'Segoe UI', sans-serif; font-size: 2rem; margin-bottom: 1.5rem; background: linear-gradient(90deg, #fff, #a8a8a8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; text-shadow: 0 0 20px rgba(138, 43, 226, 0.3); }
 
-/* VIBE BUBBLES */
-#vibe-bubbles-container { display: flex; flex-wrap: wrap; justify-content: center; align-content: center; gap: 15px; min-height: 200px; padding: 10px; }
-.floating-vibe { 
-    background: rgba(255, 255, 255, 0.05) !important; backdrop-filter: blur(5px); border: 1px solid rgba(255, 255, 255, 0.1) !important; color: #fff !important; padding: 0.8rem 1.5rem !important; font-size: 1rem !important; font-weight: 600; border-radius: 50px !important; cursor: pointer; transition: all 0.3s ease;
-    animation: floatBubble 4s ease-in-out infinite; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
-.floating-vibe:nth-child(odd) { animation-duration: 4.5s; animation-delay: 0.2s; }
-.floating-vibe:nth-child(2n) { animation-duration: 3.8s; animation-delay: 0.5s; }
-.floating-vibe:hover { background: #8a2be2 !important; border-color: #fff !important; transform: scale(1.1) !important; box-shadow: 0 0 20px #8a2be2, 0 0 40px #2196f3; z-index: 10; }
-@keyframes floatBubble { 0% { transform: translateY(0px); } 50% { transform: translateY(-15px); } 100% { transform: translateY(0px); } }
-
-/* VIBE BUTTON */
-#vibe-search-btn { 
-    margin-top: 2rem; padding: 1rem 3rem; font-size: 1.1rem; font-weight: 800; letter-spacing: 2px; color: #fff; border: none; border-radius: 50px; cursor: pointer; 
-    background: linear-gradient(90deg, #7e57c2, #2196f3); background-size: 200% 200%; 
-    animation: gradientMove 3s ease infinite, pulseGlow 2s infinite alternate;
-    box-shadow: 0 0 20px rgba(126, 87, 194, 0.5); text-transform: uppercase; font-family: 'Century Gothic', 'Segoe UI', sans-serif;
-}
-#vibe-search-btn:hover { transform: scale(1.05) translateY(-3px); box-shadow: 0 0 40px rgba(33, 150, 243, 0.8); }
-#vibe-search-btn i { margin-right: 10px; color: #fff !important; }
-@keyframes gradientMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
-@keyframes pulseGlow { from { box-shadow: 0 0 10px rgba(126, 87, 194, 0.5); } to { box-shadow: 0 0 30px rgba(33, 150, 243, 0.8), 0 0 10px #fff; } }
-
-/* --- INFO ACCORDIONS --- */
-.info-accordions-container { max-width: 800px; margin: 2rem auto; display: flex; flex-direction: column; gap: 10px; }
-.accordion { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; overflow: hidden; transition: 0.3s; }
-.accordion-btn { width: 100%; padding: 1rem; background: transparent; border: none; color: #fff; font-family: 'Century Gothic', 'Segoe UI', sans-serif; font-size: 1rem; font-weight: 700; text-align: left; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
-.accordion-btn:hover { background: rgba(138, 43, 226, 0.1); }
-.accordion-btn:after { content: '+'; font-size: 1.2rem; color: #8a2be2; }
-.accordion.active .accordion-btn:after { content: '-'; }
-.accordion-content { max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; padding: 0 1rem; background: rgba(0,0,0,0.2); }
-.accordion.active .accordion-content { padding: 1rem; max-height: 300px; }
-.accordion-content p { font-size: 0.9rem; color: #ccc; margin: 0; }
-
 /* --- PLAYER & FOOTER (DOCKED) --- */
 #sticky-player {
     position: fixed; bottom: 40px; left: 0; width: 100%; height: 70px; 
@@ -263,19 +271,16 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     justify-content: center; align-items: center; z-index: 2900; padding: 0 1rem;
     backdrop-filter: blur(10px);
 }
-/* Η ΚΛΑΣΗ ΠΟΥ ΤΟ ΕΜΦΑΝΙΖΕΙ */
 #sticky-player.player-visible { display: flex !important; }
 
 .player-inner { width: 100%; max-width: 1000px; display: flex; align-items: center; gap: 15px; }
 
-/* Player Controls */
 .player-controls { display: flex; align-items: center; gap: 15px; }
 .play-btn-large { width: 40px; height: 40px; background: #fff; color: #000; border-radius: 50%; border: none; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
 .play-btn-large:hover { background: #8a2be2; color: #fff; transform: scale(1.1); }
 .control-btn { background: transparent; border: none; color: #ccc; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
 .control-btn:hover { color: #fff; transform: scale(1.1); }
 
-/* Progress Bar & Info */
 .player-info-section { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
 #player-track-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9rem; margin-bottom: 5px; }
 .progress-container { width: 100%; height: 6px; background: #333; border-radius: 3px; cursor: pointer; position: relative; overflow: hidden; touch-action: none; }
@@ -291,16 +296,14 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .footer-title { font-family: 'Century Gothic', 'Segoe UI', sans-serif; font-size: 0.7rem; font-weight: 700; color: #666; margin: 0; letter-spacing: 1px; white-space: nowrap; }
 .footer-divider { background: #333; height: 20px; width: 1px; margin: 0 10px; }
 
-/* Social Icons */
 .social-icons { display: flex; align-items: center; gap: 8px; }
 .social-link { width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; transition: 0.3s; padding: 0; overflow: hidden; }
 .social-link img { width: 100%; height: 100%; object-fit: cover; filter: brightness(0) invert(1); }
 .social-link:hover { background: #8a2be2; transform: scale(1.1); }
 .footer-email, .copyright { display: none; }
 
-/* --- MOBILE OPTIMIZATIONS (ΤΟΠΟΘΕΤΗΜΕΝΑ ΣΤΟ ΤΕΛΟΣ ΓΙΑ ΝΑ ΙΣΧΥΟΥΝ) --- */
+/* --- MOBILE OPTIMIZATIONS (ΣΤΟ ΤΕΛΟΣ) --- */
 @media (max-width: 600px) {
-    /* Footer & Player Fixes */
     .social-icons, .footer-divider { display: none !important; }
     .footer-content { flex-direction: row; justify-content: center; gap: 15px; width: 100%; padding: 0; }
     .footer-section { width: auto; border: none !important; padding: 0; flex-direction: row; }
@@ -312,61 +315,22 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     .play-btn-large { width: 35px; height: 35px; font-size: 1rem; }
     .control-btn { font-size: 1rem; }
 
-    /* --- NEW LIST VIEW FOR BEATS --- */
+    /* List View Beats */
     .beat-row { 
-        display: grid; /* Αλλαγή σε Grid */
-        grid-template-columns: 90px 1fr; /* 90px Εικόνα - Υπόλοιπο Κείμενο */
-        grid-template-areas: 
-            "art info"
-            "actions actions"; 
+        display: grid; 
+        grid-template-columns: 90px 1fr; 
+        grid-template-areas: "art info" "actions actions"; 
         gap: 12px; 
         text-align: left; 
         padding: 1.2rem; 
         align-items: center; 
     }
 
-    .beat-art { 
-        grid-area: art; 
-        width: 90px; height: 90px; 
-        margin: 0; 
-    }
-
-    .beat-info { 
-        grid-area: info; 
-        display: flex; 
-        flex-direction: column; 
-        justify-content: center;
-        padding-left: 5px;
-    }
-    .beat-info h4 { 
-        text-align: left; 
-        font-size: 1.2rem; 
-        margin-bottom: 5px;
-    }
-    .beat-meta { 
-        text-align: left; 
-        font-size: 0.85rem; 
-    }
-    
-    .beat-actions { 
-        grid-area: actions;
-        display: flex; 
-        width: 100%; 
-        gap: 8px; 
-        margin-top: 5px;
-    }
-    
-    .beat-actions .btn { 
-        flex: 1; 
-        min-width: auto; 
-        font-size: 0.85rem; 
-        padding: 0.7rem; 
-    }
-
-    .glass-container .nav-btn {
-        font-size: 0.85rem !important;
-        padding: 0.6rem 1rem !important;
-        width: 100%; 
-        margin-bottom: 0.5rem;
-    }
+    .beat-art { grid-area: art; width: 90px; height: 90px; margin: 0; }
+    .beat-info { grid-area: info; display: flex; flex-direction: column; justify-content: center; padding-left: 5px; }
+    .beat-info h4 { text-align: left; font-size: 1.2rem; margin-bottom: 5px; }
+    .beat-meta { text-align: left; font-size: 0.85rem; }
+    .beat-actions { grid-area: actions; display: flex; width: 100%; gap: 8px; margin-top: 5px; }
+    .beat-actions .btn { flex: 1; min-width: auto; font-size: 0.85rem; padding: 0.7rem; }
+    .glass-container .nav-btn { font-size: 0.85rem !important; padding: 0.6rem 1rem !important; width: 100%; margin-bottom: 0.5rem; }
 }
