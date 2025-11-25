@@ -24,7 +24,8 @@
         <div class="glass-container" style="text-align:center;">
             <h2 style="margin-bottom:1rem;">TRACK BUNDLES</h2>
             <p style="color:#aaa; margin-bottom:2rem;">Το πλήρες επαγγελματικό πακέτο για τις κυκλοφορίες σου.</p>
-            <button id="open-bundle-modal" class="btn btn-accent" style="padding:1rem 3rem; font-size:1.1rem;">
+            
+            <button id="open-bundle-modal" class="btn btn-accent" style="padding:1rem 3rem; font-size:1.1rem;" onclick="document.getElementById('bundle-modal').classList.add('visible')">
                 <i class="fas fa-info-circle"></i> ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;
             </button>
         </div>
@@ -36,7 +37,7 @@
 
         <div class="modal-overlay" id="bundle-modal">
             <div class="modal-box">
-                <button class="modal-close-btn" id="close-bundle-modal">&times;</button>
+                <button class="modal-close-btn" id="close-bundle-modal" onclick="document.getElementById('bundle-modal').classList.remove('visible')">&times;</button>
                 <h2 style="border-bottom:1px solid #333; padding-bottom:1rem; margin-bottom:1.5rem;">ΠΕΡΙΕΧΟΜΕΝΑ</h2>
                 <ul class="bundle-list" id="bundle-list-content" style="list-style:none; padding:0; text-align:left;"></ul>
                 <div style="margin-top:2rem; text-align:center;">
@@ -68,5 +69,3 @@
     <script src="scripts.js"></script>
 </body>
 </html>
-
-
