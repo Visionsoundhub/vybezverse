@@ -3,17 +3,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 0. GLOBAL INIT ---
     if (!window.globalAudio) { window.globalAudio = new Audio(); }
     const audio = window.globalAudio;
-    
-    // Global State
     window.currentPlaylist = window.currentPlaylist || []; 
     window.currentIndex = window.currentIndex || -1;
     window.isPlaying = window.isPlaying || false;
     window.currentCover = window.currentCover || null;
-    window.currentTitle = window.currentTitle || "SELECT A BEAT";
-
+    
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // Ξεκινάμε
     initAllScripts(); 
 
     if (window.Swup) {
@@ -21,8 +17,26 @@ document.addEventListener('DOMContentLoaded', () => {
         swup.hooks.on('page:view', () => { initAllScripts(); });
     }
 
-    // --- GLOBAL CLICK HANDLER ---
+    // --- GLOBAL CLICK LISTENER FOR BUTTONS (FIXES STORE BUTTON) ---
     document.addEventListener('click', (e) => {
+        // Fix for Store Bundle Button
+        if (e.target.closest('#open-bundle-modal')) {
+            const modal = document.getElementById('bundle-modal');
+            if(modal) modal.classList.add('visible');
+        }
+        if (e.target.closest('#close-bundle-modal')) {
+            const modal = document.getElementById('bundle-modal');
+            if(modal) modal.classList.remove('visible');
+        }
+        // Fix for Releases Why Buy
+        if (e.target.closest('#why-buy-btn')) {
+            const modal = document.getElementById('why-buy-modal');
+            if(modal) modal.classList.add('visible');
+        }
+        if (e.target.closest('#close-why-buy')) {
+            const modal = document.getElementById('why-buy-modal');
+            if(modal) modal.classList.remove('visible');
+        }
         if (e.target.classList.contains('modal-overlay')) {
             e.target.classList.remove('visible');
         }
@@ -30,427 +44,417 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
-        
-        // Restore Player
-        const playerTitle = document.getElementById('player-track-title');
-        if (playerTitle) playerTitle.textContent = window.currentTitle;
-        restoreHeroArt();
-        
-        updateMenuState();
-        checkPlayerVisibility();
-        updateUIState();
+        safeRun(updateMenuState);
+        safeRun(checkPlayerVisibility);
+        safeRun(restoreHeroArt);
 
-        // --- 1. RELEASES LOADER (FIXED) ---
-        const releasesContainer = document.getElementById('releases-list');
-        if (releasesContainer) {
-            // Βάζουμε ?t=... για να σπάσουμε την cache και να βλέπει τις αλλαγές αμέσως
-            fetch('releases.json?t=' + new Date().getTime())
-                .then(r => {
-                    if (!r.ok) throw new Error("Releases JSON not found");
-                    return r.json();
-                })
-                .then(data => {
-                    releasesContainer.innerHTML = '';
-                    // Ελέγχουμε αν τα δεδομένα είναι μέσα σε "tracks" (όπως στο αρχείο σου) ή χύμα array
-                    let tracks = data.tracks ? data.tracks : (Array.isArray(data) ? data : []);
+        // --- 1. HOME PAGE (FIXED DISPLAY) ---
+        safeRun(() => {
+            const homeTitle = document.getElementById('home-hero-title');
+            if (homeTitle) {
+                const bContainer = document.getElementById('home-banner-container'); // Container fix
+                
+                fetch('home.json').then(r => r.json()).then(data => {
+                    // FIX: Αυτό έλειπε ή ήταν λάθος. Τώρα εμφανίζεται σίγουρα.
+                    if(bContainer) bContainer.style.display = 'block'; 
                     
-                    if (tracks.length === 0) {
-                        releasesContainer.innerHTML = '<p style="text-align:center;">No releases found yet.</p>';
-                        return;
-                    }
-
-                    tracks.forEach(track => {
-                        // Προστασία για τους τίτλους (αν έχουν ' μέσα)
-                        const safeTitle = (track.title || 'Untitled').replace(/'/g, "\\'");
-                        // Σιγουρεύουμε ότι έχουμε εικόνα
-                        const coverImg = track.cover || 'https://via.placeholder.com/100';
-                        // Links (αν δεν υπάρχουν βάζουμε #)
-                        const streamLink = track.streamUrl || '#';
-                        const buyLink = track.bundleUrl || '#';
-                        const ytLink = track.youtubeUrl || '#';
-
-                        // Κουμπί Download (εμφανίζεται μόνο αν υπάρχει link)
-                        const dlButton = track.downloadUrl 
-                            ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` 
-                            : '';
-
-                        releasesContainer.innerHTML += `
-                        <div class="beat-row">
-                            <div class="beat-art">
-                                <img src="${coverImg}" alt="Art">
-                                <div class="beat-play-overlay" onclick="window.playTrack('${streamLink}', '${safeTitle}', '${coverImg}', -1)">
-                                    <i class="fas fa-play" style="color:#fff;"></i>
-                                </div>
-                            </div>
-                            <div class="beat-info">
-                                <h4>${track.title || 'Untitled'}</h4>
-                                <div class="beat-meta">Available Now</div>
-                            </div>
-                            <div class="beat-actions">
-                                <a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i></a>
-                                <a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM</a>
-                                <a href="${buyLink}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑΣΕ ΤΟ</a>
-                                ${dlButton}
-                            </div>
-                        </div>`;
-                    });
-                })
-                .catch(err => {
-                    console.error("Releases Error:", err);
-                    releasesContainer.innerHTML = '<p style="text-align:center; color:red;">ERROR: Releases failed to load. Check console for details.</p>';
-                });
-        }
-
-        // --- 2. HOME PAGE (FIXED) ---
-        const homeTitle = document.getElementById('home-hero-title');
-        if (homeTitle) {
-            const bContainer = document.getElementById('home-banner-container'); // Πρέπει να το εμφανίσουμε
-            
-            fetch('home.json').then(r => r.json()).then(data => {
-                if(bContainer) bContainer.style.display = 'block'; // FIX: Εμφάνιση του container
-                
-                if (data.heroTitle) homeTitle.textContent = data.heroTitle;
-                const subTitle = document.getElementById('home-hero-subtitle');
-                if (subTitle && data.heroSubtitle) subTitle.textContent = data.heroSubtitle;
-                
-                const bImg = document.getElementById('home-banner-img');
-                if (bImg && data.heroImage) { bImg.src = data.heroImage; bImg.style.display = 'block'; }
-
-                const dropCont = document.getElementById('home-featured-container');
-                const dropIframe = document.getElementById('drop-iframe');
-                if (dropCont && data.showDrop && data.dropVideo) {
-                    const videoId = getYoutubeId(data.dropVideo);
-                    if (videoId && dropIframe) {
-                        dropIframe.src = `https://www.youtube.com/embed/${videoId}`;
-                        dropCont.style.display = 'block';
-                        const dropBtns = document.getElementById('drop-buttons');
-                        if(dropBtns) {
-                            let btnsHtml = '';
-                            if(data.dropStream) btnsHtml += `<a href="${data.dropStream}" target="_blank" class="btn btn-outline">STREAM</a>`;
-                            if(data.dropBuy) btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑΣΕ ΤΟ</a>`;
-                            if(data.dropFree) btnsHtml += `<a href="${data.dropFree}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>`;
-                            dropBtns.innerHTML = btnsHtml;
+                    if (data.heroTitle) homeTitle.textContent = data.heroTitle;
+                    const subTitle = document.getElementById('home-hero-subtitle');
+                    if (subTitle && data.heroSubtitle) subTitle.textContent = data.heroSubtitle;
+                    
+                    const bImg = document.getElementById('home-banner-img');
+                    if (bImg && data.heroImage) { bImg.src = data.heroImage; bImg.style.display = 'block'; } // Εμφανίζεται η εικόνα
+                    
+                    // Latest Drop
+                    const dropCont = document.getElementById('home-featured-container');
+                    const dropIframe = document.getElementById('drop-iframe');
+                    if (dropCont && data.showDrop && data.dropVideo) {
+                        const videoId = getYoutubeId(data.dropVideo);
+                        if (videoId && dropIframe) {
+                            dropIframe.src = `https://www.youtube.com/embed/${videoId}`;
+                            dropCont.style.display = 'block'; 
+                            const dropBtns = document.getElementById('drop-buttons');
+                            if(dropBtns) {
+                                let btnsHtml = '';
+                                if(data.dropStream) btnsHtml += `<a href="${data.dropStream}" target="_blank" class="btn btn-outline">STREAM</a>`;
+                                if(data.dropBuy) btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑΣΕ ΤΟ</a>`;
+                                if(data.dropFree) btnsHtml += `<a href="${data.dropFree}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>`;
+                                dropBtns.innerHTML = btnsHtml;
+                            }
                         }
                     }
-                }
 
-                const annCont = document.getElementById('home-announcement-container');
-                const annIframe = document.getElementById('announcement-iframe');
-                const annText = document.getElementById('announcement-text');
-                if (annCont && data.showAnnouncement && data.announcementVideo) {
-                    const videoId = getYoutubeId(data.announcementVideo);
-                    if (videoId && annIframe) {
-                        annIframe.src = `https://www.youtube.com/embed/${videoId}`;
-                        annCont.style.display = 'block';
-                        if (annText && data.announcementText) annText.textContent = data.announcementText;
+                    // Announcements
+                    const annCont = document.getElementById('home-announcement-container');
+                    const annIframe = document.getElementById('announcement-iframe');
+                    const annText = document.getElementById('announcement-text');
+                    if (annCont && data.showAnnouncement && data.announcementVideo) {
+                        const videoId = getYoutubeId(data.announcementVideo);
+                        if (videoId && annIframe) {
+                            annIframe.src = `https://www.youtube.com/embed/${videoId}`;
+                            annCont.style.display = 'block';
+                            if (annText && data.announcementText) annText.textContent = data.announcementText;
+                        }
                     }
-                }
-            }).catch(e => {
-                if(bContainer) bContainer.style.display = 'block'; // Εμφάνιση ακόμα και σε σφάλμα
-            });
-        }
+                    
+                }).catch(e => {
+                    if(bContainer) bContainer.style.display = 'block'; // Εμφάνιση ακόμα και σε σφάλμα
+                });
+            }
+        });
+
+
+        // --- 2. RELEASES LOADER (FIXED LOADING) ---
+        safeRun(() => {
+            const releasesContainer = document.getElementById('releases-list');
+            if (releasesContainer) {
+                // Χρησιμοποιούμε timestamp για να μην κρατάει παλιά δεδομένα (cache)
+                fetch('releases.json?t=' + new Date().getTime())
+                    .then(r => {
+                        if (!r.ok) throw new Error("Releases JSON not found");
+                        return r.json();
+                    })
+                    .then(data => {
+                        releasesContainer.innerHTML = '';
+                        // Ελέγχουμε αν τα δεδομένα είναι μέσα σε "tracks" (όπως στο αρχείο σου) ή χύμα array
+                        let tracks = data.tracks ? data.tracks : (Array.isArray(data) ? data : []);
+                        
+                        if (tracks.length === 0) {
+                            releasesContainer.innerHTML = '<p style="text-align:center;">No releases found yet.</p>';
+                            return;
+                        }
+
+                        tracks.forEach(track => {
+                            const safeTitle = (track.title || 'Untitled').replace(/'/g, "\\'");
+                            const coverImg = track.cover || 'https://via.placeholder.com/100';
+                            const streamLink = track.streamUrl || '#';
+                            const buyLink = track.bundleUrl || '#';
+                            const ytLink = track.youtubeUrl || '#';
+
+                            const downloadBtn = track.downloadUrl 
+                                ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` 
+                                : '';
+
+                            releasesContainer.innerHTML += `
+                            <div class="beat-row">
+                                <div class="beat-art">
+                                    <img src="${coverImg}" alt="Art">
+                                    <div class="beat-play-overlay" onclick="window.playTrack('${streamLink}', '${safeTitle}', '${coverImg}', -1)">
+                                        <i class="fas fa-play" style="color:#fff;"></i>
+                                    </div>
+                                </div>
+                                <div class="beat-info">
+                                    <h4>${track.title || 'Untitled'}</h4>
+                                    <div class="beat-meta">Available Now</div>
+                                </div>
+                                <div class="beat-actions">
+                                    <a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i></a>
+                                    <a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM</a>
+                                    <a href="${buyLink}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑΣΕ ΤΟ</a>
+                                    ${downloadBtn}
+                                </div>
+                            </div>`;
+                        });
+                    })
+                    .catch(err => {
+                        console.error("Releases Error:", err);
+                        releasesContainer.innerHTML = '<p style="text-align:center; color:red;">ERROR: Releases failed to load. Check console for details.</p>';
+                    });
+            }
+        });
+
 
         // --- 3. BIO ---
-        const bioContainer = document.getElementById('bio-container');
-        if (bioContainer) {
-            fetch('bio.json').then(r => r.json()).then(data => {
-                const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '';
-                const image = data.image || 'https://via.placeholder.com/500';
-                if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title;
-                bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${image}" alt="Bio Image" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`;
-            }).catch(() => {});
-        }
+        safeRun(() => {
+            const bioContainer = document.getElementById('bio-container');
+            if (bioContainer) {
+                fetch('bio.json')
+                    .then(r => r.ok ? r.json() : Promise.reject('Bio not found'))
+                    .then(data => {
+                        const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...';
+                        if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title;
+                        bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${data.image}" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`;
+                    })
+                    .catch(() => {});
+            }
+        });
 
         // --- 4. GALLERY ---
-        const galleryGrid = document.getElementById('gallery-grid');
-        if(galleryGrid) {
-            const gModal = document.getElementById('gallery-modal');
-            const gModalImg = document.getElementById('gallery-modal-img');
-            const gCaption = document.getElementById('gallery-caption');
-            const gClose = document.getElementById('close-gallery-modal');
-            
-            fetch('gallery.json').then(r => r.json()).then(data => {
-                galleryGrid.innerHTML = '';
-                let images = Array.isArray(data) ? data : (data.images || []);
-                if(images.length === 0) { galleryGrid.innerHTML = '<p style="text-align:center;">No photos found.</p>'; return; }
-                images.forEach(img => {
-                    const div = document.createElement('div'); div.className = 'gallery-item';
-                    div.innerHTML = `<img src="${img.src}" alt="${img.caption || ''}">`;
-                    div.onclick = () => { gModalImg.src = img.src; gCaption.textContent = img.caption || ''; gModal.classList.add('visible'); };
-                    galleryGrid.appendChild(div);
-                });
-            }).catch(() => {});
-            if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target === gModal) gModal.classList.remove('visible'); }; }
-        }
+        safeRun(() => {
+            const galleryGrid = document.getElementById('gallery-grid');
+            if(galleryGrid) {
+                const gModal = document.getElementById('gallery-modal');
+                const gImg = document.getElementById('gallery-modal-img');
+                const gCap = document.getElementById('gallery-caption');
+                const gClose = document.getElementById('close-gallery-modal');
+                
+                fetch('gallery.json').then(r => r.json()).then(data => {
+                    galleryGrid.innerHTML = '';
+                    (data.images || []).forEach(img => {
+                        const div = document.createElement('div'); div.className = 'gallery-item';
+                        div.innerHTML = `<img src="${img.src}" alt="${img.caption || ''}">`;
+                        div.onclick = () => { gImg.src = img.src; gCap.innerText = img.caption || ''; gModal.classList.add('visible'); };
+                        galleryGrid.appendChild(div);
+                    });
+                }).catch(() => {});
+                if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target===gModal) gModal.classList.remove('visible'); }; }
+            }
+        });
 
         // --- 5. MENU & FOOTER ---
-        const menuContainer = document.querySelector('.nav-links');
-        if (menuContainer && menuContainer.innerHTML === '') {
-            fetch('menu.json').then(r => r.json()).then(data => {
-                const links = data.links || []; let menuHtml = '';
-                links.forEach(link => { 
-                    const target = link.newTab ? '_blank' : '_self'; 
-                    menuHtml += `<a href="${link.url}" class="nav-btn" target="${target}">${link.text}</a>`; 
-                });
-                menuContainer.innerHTML = menuHtml; updateMenuState(); 
-            }).catch(() => {});
-        }
-
-        const footerContainer = document.getElementById('dynamic-footer');
-        if (footerContainer && footerContainer.innerHTML === '') {
-            fetch('footer.json').then(r => r.json()).then(data => {
-                const buildIcons = (prefix) => {
-                    const networks = [ { id: 'Fb', icon: data[`${prefix}FbIcon`], link: data[`${prefix}Fb`] }, { id: 'Ig', icon: data[`${prefix}IgIcon`], link: data[`${prefix}Ig`] }, { id: 'Tt', icon: data[`${prefix}TtIcon`], link: data[`${prefix}Tt`] }, { id: 'Yt', icon: data[`${prefix}YtIcon`], link: data[`${prefix}Yt`] } ];
-                    return networks.map(net => (net.link && net.icon) ? `<a href="${net.link}" target="_blank" class="social-link"><img src="${net.icon}" alt="${net.id}"></a>` : '').join('');
-                };
-                footerContainer.innerHTML = `<footer class="site-footer"><div class="footer-content"><div class="footer-section"><h4 class="footer-title">${data.prodTitle || "VYBEZMADETHIS"}</h4><div class="social-icons">${buildIcons('prod')}</div></div><div class="footer-divider"></div><div class="footer-section"><h4 class="footer-title">${data.artistTitle || "BLACK VYBEZ"}</h4><div class="social-icons">${buildIcons('artist')}</div></div></div></footer>`;
-            }).catch(() => {});
-        }
-        
-        // Hamburger
-        const hamburger = document.querySelector('.hamburger');
-        const navLinks = document.querySelector('.nav-links');
-        if (hamburger) {
-            const newHamburger = hamburger.cloneNode(true);
-            if(hamburger.parentNode) hamburger.parentNode.replaceChild(newHamburger, hamburger);
-            newHamburger.addEventListener('click', () => { 
-                newHamburger.classList.toggle('active'); 
-                navLinks.classList.toggle('active'); 
-            });
-            document.querySelectorAll('.nav-btn').forEach(link => { 
-                link.onclick = () => { 
-                    newHamburger.classList.remove('active'); 
-                    navLinks.classList.remove('active'); 
-                }; 
-            });
-        }
-
-        // --- 6. BEATS STORE ---
-        const beatContainer = document.getElementById('beat-store-list');
-        if (beatContainer) {
-            let allBeats = [];
-            fetch('beats.json').then(r => r.json()).then(data => { 
-                if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } 
-                const keyList = document.getElementById('key-options-list');
-                if(keyList) {
-                    const keys = [...new Set(allBeats.map(b => b.key || b.Key).filter(k => k))].sort();
-                    let keyHtml = '<li data-value="all" class="selected">All Keys</li>';
-                    keys.forEach(k => { keyHtml += `<li data-value="${k}">${k}</li>`; });
-                    keyList.innerHTML = keyHtml;
-                }
-                window.currentPlaylist = allBeats; 
-                renderBeats(allBeats); 
-                setupCustomDropdowns(allBeats);
-            }).catch(() => {});
-            
-            const vBtn = document.getElementById('vibe-search-btn');
-            if (vBtn) {
-                vBtn.onclick = () => { 
-                    document.getElementById('vibe-modal').classList.add('visible'); 
-                    const bubbles = document.getElementById('vibe-bubbles-container');
-                    if (bubbles.innerHTML === '') { 
-                        fetch('vibes.json').then(r => r.json()).then(data => { 
-                            let vibes = Array.isArray(data) ? data : (data.vibes || []); 
-                            vibes.forEach(vibe => { 
-                                const b = document.createElement('button'); b.className = 'btn floating-vibe'; b.textContent = vibe.name; 
-                                b.onclick = () => { 
-                                    document.getElementById('vibe-modal').classList.remove('visible'); 
-                                    const f = allBeats.filter(beat => { if(!beat.tags) return false; return beat.tags.some(t => vibe.tags.includes(t)); }); 
-                                    window.currentPlaylist = f; renderBeats(f); 
-                                }; 
-                                bubbles.appendChild(b); 
-                            }); 
-                        }); 
-                    } 
-                }; 
-                const vClose = document.getElementById('vibe-modal-close');
-                if(vClose) vClose.onclick = () => document.getElementById('vibe-modal').classList.remove('visible');
+        safeRun(() => {
+            const burger = document.querySelector('.hamburger');
+            const nav = document.querySelector('.nav-links');
+            if(burger) {
+                const clone = burger.cloneNode(true); burger.parentNode.replaceChild(clone, burger);
+                clone.onclick = () => { clone.classList.toggle('active'); nav.classList.toggle('active'); };
+                document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => { clone.classList.remove('active'); nav.classList.remove('active'); });
             }
-        }
+        });
 
-        // 7. PRESS & PODCASTS
-        loadSimpleList('press-container', 'press.json', 'articles', renderPress);
-        loadSimpleList('podcasts-container', 'podcasts.json', 'episodes', renderPodcast);
+        safeRun(() => {
+            const menuCont = document.querySelector('.nav-links');
+            if (menuCont && menuCont.innerHTML === '') {
+                fetch('menu.json').then(r => r.json()).then(d => {
+                    let html = ''; (d.links || []).forEach(l => html += `<a href="${l.url}" class="nav-btn" target="${l.newTab?'_blank':'_self'}">${l.text}</a>`);
+                    menuCont.innerHTML = html; updateMenuState();
+                });
+            }
+        });
 
-        // Bundle List
-        const bundleList = document.getElementById('bundle-list-content');
-        if(bundleList && bundleList.innerHTML === '') { 
-            const items = [ 
-                { text: "Master Quality Track: WAV/MP3", icon: "fas fa-music" }, 
-                { text: "Εναλλακτικές Εκδόσεις", icon: "fas fa-random" }, 
-                { text: "Ringtone: Έτοιμο αρχείο", icon: "fas fa-mobile-alt" }, 
-                { text: "Signed Artwork: 300DPI", icon: "fas fa-image" }, 
-                { text: "Χειρόγραφοι Στίχοι: PDF", icon: "fas fa-pen-nib" } 
-            ]; 
-            bundleList.innerHTML = items.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2;"></i> ${item.text}</li>`).join(''); 
-        }
+        safeRun(() => {
+            const foot = document.getElementById('dynamic-footer');
+            if (foot) {
+                fetch('footer.json').then(r => r.json()).then(d => {
+                    const icons = (p) => [{icon: d[`${p}FbIcon`], link:d[`${p}Fb`]},{icon: d[`${p}IgIcon`], link:d[`${p}Ig`]},{icon: d[`${p}TtIcon`], link:d[`${p}Tt`]},{icon: d[`${p}YtIcon`], link:d[`${p}Yt`]}].map(n => n.link && n.icon ? `<a href="${n.link}" target="_blank" class="social-link"><img src="${n.icon}"></a>` : '').join('');
+                    foot.innerHTML = `<footer class="site-footer"><div class="footer-content"><div class="footer-section"><h4 class="footer-title">${d.prodTitle}</h4><div class="social-icons">${icons('prod')}</div></div><div class="footer-divider"></div><div class="footer-section"><h4 class="footer-title">${d.artistTitle}</h4><div class="social-icons">${icons('artist')}</div></div></div></footer>`;
+                });
+            }
+        });
+
+        // --- 6. PLAYER UI ---
+        safeRun(() => {
+            const pBtn = document.getElementById('player-play-btn');
+            const next = document.getElementById('next-track-btn');
+            const prev = document.getElementById('prev-track-btn');
+            const prog = document.getElementById('progress-container');
+            
+            if(pBtn) {
+                updateUIState();
+                pBtn.onclick = () => { if(audio.paused) { audio.play(); window.isPlaying=true; } else { audio.pause(); window.isPlaying=false; } updateUIState(); };
+                if(next) next.onclick = () => { if(window.currentIndex < window.currentPlaylist.length-1) playTrackByIndex(window.currentIndex+1); };
+                if(prev) prev.onclick = () => { if(window.currentIndex > 0) playTrackByIndex(window.currentIndex-1); };
+                
+                if(prog) {
+                    const progClone = prog.cloneNode(true); prog.parentNode.replaceChild(progClone, prog);
+                    progClone.onclick = (e) => { if(audio.duration) audio.currentTime = (e.offsetX / progClone.clientWidth) * audio.duration; };
+                }
+                
+                audio.ontimeupdate = () => { if(document.getElementById('player-progress')) document.getElementById('player-progress').style.width = (audio.currentTime/audio.duration)*100 + '%'; };
+                audio.onended = () => { if(window.currentIndex < window.currentPlaylist.length-1) playTrackByIndex(window.currentIndex+1); };
+                audio.onplay = () => { window.isPlaying = true; updateUIState(); checkPlayerVisibility(); };
+                audio.onpause = () => { window.isPlaying = false; updateUIState(); };
+            }
+        });
+
+        // --- 7. BEATS & FILTERS (COVER FIX) ---
+        safeRun(() => {
+            const beatCont = document.getElementById('beat-store-list');
+            if (beatCont) {
+                fetch('beats.json').then(r => r.json()).then(data => {
+                    let allBeats = Array.isArray(data) ? data : (data.beatslist || []);
+                    window.currentPlaylist = allBeats;
+                    
+                    // FILL KEYS DYNAMICALLY
+                    const keyList = document.getElementById('key-options-list');
+                    if(keyList) {
+                        const keys = [...new Set(allBeats.map(b => b.key || b.Key).filter(k => k))].sort();
+                        let html = '<li data-value="all" class="selected">All Keys</li>';
+                        keys.forEach(k => html += `<li data-value="${k}">${k}</li>`);
+                        keyList.innerHTML = html;
+                    }
+
+                    renderBeats(allBeats);
+                    setupCustomDropdowns(allBeats);
+                }).catch(e => beatCont.innerHTML = '<p>No beats found.</p>');
+                
+                // Vibe Search
+                const vBtn = document.getElementById('vibe-search-btn');
+                if(vBtn) {
+                    vBtn.onclick = () => {
+                        document.getElementById('vibe-modal').classList.add('visible');
+                        const bubbles = document.getElementById('vibe-bubbles-container');
+                        if(bubbles.innerHTML === '') {
+                            fetch('vibes.json').then(r=>r.json()).then(d => {
+                                (d.vibes||[]).forEach(v => {
+                                    const b = document.createElement('button'); b.className='btn floating-vibe'; b.textContent=v.name;
+                                    b.onclick = () => { 
+                                        document.getElementById('vibe-modal').classList.remove('visible');
+                                        const f = window.currentPlaylist.filter(beat => beat.tags && beat.tags.some(t => v.tags.includes(t)));
+                                        renderBeats(f);
+                                    };
+                                    bubbles.appendChild(b);
+                                });
+                            });
+                        }
+                    };
+                    document.getElementById('vibe-modal-close').onclick = () => document.getElementById('vibe-modal').classList.remove('visible');
+                }
+            }
+        });
+
+        // --- 8. PRESS, PODCASTS ---
+        safeRun(() => {
+            // Home Page content loading is handled in section 2
+            const press = document.getElementById('press-container');
+            if(press) {
+                fetch('press.json').then(r=>r.json()).then(d => {
+                    press.innerHTML=''; (d.articles||[]).forEach(i => press.innerHTML += `<div class="press-card"><img src="${i.image}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">READ</a></div></div>`);
+                });
+            }
+            const pods = document.getElementById('podcasts-container');
+            if(pods) {
+                fetch('podcasts.json').then(r=>r.json()).then(d => {
+                    pods.innerHTML=''; (d.episodes||[]).forEach(i => pods.innerHTML += `<div class="press-card"><img src="${i.cover}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">LISTEN</a></div></div>`);
+                });
+            }
+        });
         
-        setupPlayerControls();
+        // Bundle Modal List
+        const bundleList = document.getElementById('bundle-list-content');
+        if(bundleList && bundleList.innerHTML === '') {
+             const items = [ { text: "Master Quality Track: WAV/MP3 (High Res)", icon: "fas fa-music" }, { text: "Εναλλακτικές Εκδόσεις", icon: "fas fa-random" }, { text: "Ringtone", icon: "fas fa-mobile-alt" }, { text: "Signed Artwork", icon: "fas fa-image" }, { text: "Χειρόγραφοι Στίχοι", icon: "fas fa-pen-nib" }, { text: "BTS Video", icon: "fas fa-video" }, { text: "Οδηγίες Χρήσης", icon: "fas fa-book" } ]; 
+             bundleList.innerHTML = items.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`).join('');
+        }
     }
 
     // --- HELPERS ---
-
+    function safeRun(fn) { try { fn(); } catch(e) { console.error("Script Error:", e); } }
     function getYoutubeId(url) { if(!url) return null; const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
 
-    function updateMenuState() {
-        const currentPath = window.location.pathname.split('/').pop().replace('.html', '') || 'index';
-        document.querySelectorAll('.nav-btn').forEach(link => { 
-            const linkHref = link.getAttribute('href').split('/').pop().replace('.html', '');
-            if (linkHref === currentPath || (currentPath === 'index' && linkHref === 'index')) { 
-                link.classList.add('active'); 
-            } else { 
-                link.classList.remove('active'); 
-            } 
-        });
-    }
+    window.playTrack = function(url, title, cover, index) {
+        if (audio.src === window.location.origin + url || audio.src === url) { 
+            if(audio.paused) { audio.play(); window.isPlaying=true; } else { audio.pause(); window.isPlaying=false; }
+        } else {
+            window.currentIndex = index; audio.src = url; 
+            const titleEl = document.getElementById('player-track-title');
+            if(titleEl) titleEl.textContent = title;
+            if(cover) { window.currentCover = cover; restoreHeroArt(); }
+            audio.play(); window.isPlaying = true;
+        }
+        updateUIState(); checkPlayerVisibility();
+    };
 
-    function checkPlayerVisibility() {
-        const stickyPlayer = document.getElementById('sticky-player'); 
-        if (!stickyPlayer) return;
-        const isBeatsPage = window.location.href.includes('beats');
-        const hasTrack = audio.src && audio.src !== '';
-        if (isBeatsPage || window.isPlaying || hasTrack) { stickyPlayer.classList.add('player-visible'); } 
-        else { stickyPlayer.classList.remove('player-visible'); }
+    function playTrackByIndex(idx) {
+        if(idx >= 0 && idx < window.currentPlaylist.length) {
+            const t = window.currentPlaylist[idx];
+            const cov = t.cover || 'https://via.placeholder.com/100';
+            // FIX: Εδώ διορθώθηκε η κλήση για να περνάει σωστά τα data
+            window.playTrack(t.audioSrc, t.title, cov, idx);
+        }
     }
 
     function restoreHeroArt() {
-        const heroArt = document.getElementById('hero-beat-art'); 
-        const heroImg = document.getElementById('hero-beat-img');
-        if (heroArt && heroImg && window.currentCover) { heroImg.src = window.currentCover; heroArt.classList.add('visible'); }
-    }
-
-    function setupPlayerControls() {
-        const playBtn = document.getElementById('player-play-btn');
-        const prevBtn = document.getElementById('prev-track-btn');
-        const nextBtn = document.getElementById('next-track-btn');
-        const progressContainer = document.getElementById('progress-container');
-
-        if(playBtn) {
-            playBtn.onclick = togglePlay;
-            if(nextBtn) nextBtn.onclick = playNext;
-            if(prevBtn) prevBtn.onclick = playPrev;
-
-            if (progressContainer) {
-                const newProgress = progressContainer.cloneNode(true);
-                if(progressContainer.parentNode) progressContainer.parentNode.replaceChild(newProgress, progressContainer);
-                newProgress.addEventListener('click', (e) => { 
-                    const width = newProgress.clientWidth; 
-                    const clickX = e.offsetX; 
-                    if (audio.duration) { audio.currentTime = (clickX / width) * audio.duration; } 
-                });
-            }
-        }
-        
-        audio.ontimeupdate = () => { if(document.getElementById('player-progress')) { const percent = (audio.currentTime / audio.duration) * 100; document.getElementById('player-progress').style.width = percent + '%'; } };
-        audio.onended = playNext;
-        audio.onplay = () => { window.isPlaying = true; updateUIState(); checkPlayerVisibility(); };
-        audio.onpause = () => { window.isPlaying = false; updateUIState(); };
-    }
-
-    window.playTrack = function(url, title, cover, trackIndexInList) {
-        if (audio.src === window.location.origin + url || audio.src === url) { togglePlay(); return; }
-        window.currentIndex = trackIndexInList;
-        audio.src = url;
-        window.currentTitle = title;
-        window.currentCover = cover || 'https://via.placeholder.com/600/111/333?text=V';
-        const playerTitle = document.getElementById('player-track-title');
-        if(playerTitle) playerTitle.textContent = title;
-        restoreHeroArt();
-        audio.play();
-    };
-
-    function togglePlay() { if (audio.paused) { audio.play(); } else { audio.pause(); } }
-    
-    function playNext() { 
-        if (window.currentIndex < window.currentPlaylist.length - 1) { 
-            const nextTrack = window.currentPlaylist[window.currentIndex + 1]; 
-            const nextCover = nextTrack.cover || 'https://via.placeholder.com/600/111/333?text=V'; 
-            window.playTrack(nextTrack.audioSrc, nextTrack.title, nextCover, window.currentIndex + 1); 
-        } 
-    }
-    
-    function playPrev() { 
-        if (window.currentIndex > 0) { 
-            const prevTrack = window.currentPlaylist[window.currentIndex - 1]; 
-            const prevCover = prevTrack.cover || 'https://via.placeholder.com/600/111/333?text=V'; 
-            window.playTrack(prevTrack.audioSrc, prevTrack.title, prevCover, window.currentIndex - 1); 
-        } 
+        const hero = document.getElementById('hero-beat-art');
+        const img = document.getElementById('hero-beat-img');
+        if(hero && img && window.currentCover) { img.src = window.currentCover; hero.classList.add('visible'); }
     }
 
     function updateUIState() {
-        const playBtn = document.getElementById('player-play-btn');
-        if(playBtn) playBtn.innerHTML = window.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
-        document.querySelectorAll('.beat-play-overlay i').forEach(icon => icon.className = 'fas fa-play');
-        const activeBtn = document.getElementById(`beat-icon-${window.currentIndex}`);
-        if (activeBtn && window.isPlaying) activeBtn.className = 'fas fa-pause';
+        const pBtn = document.getElementById('player-play-btn');
+        if(pBtn) pBtn.innerHTML = window.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
+        document.querySelectorAll('.beat-play-overlay i').forEach(i => i.className = 'fas fa-play');
+        const active = document.getElementById(`beat-icon-${window.currentIndex}`);
+        if(active) active.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play';
     }
 
-    function loadSimpleList(containerId, jsonFile, arrayKey, renderFunc) {
-        const container = document.getElementById(containerId);
-        if (container) {
-            fetch(jsonFile).then(r => r.json()).then(data => {
-                container.innerHTML = '';
-                let items = Array.isArray(data) ? data : (data[arrayKey] || []);
-                if (items.length === 0) { container.innerHTML = '<p style="text-align:center;">Coming Soon.</p>'; return; }
-                items.forEach(item => { container.innerHTML += renderFunc(item); });
-            }).catch(() => {});
-        }
-    }
-    
-    function renderPress(item) {
-        return `<div class="press-card"><img src="${item.image || 'https://via.placeholder.com/400'}" alt="Img" class="press-image"><div class="press-content"><div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date || ''}</div><h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3><p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary || item.description || ''}</p><a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">ΔΙΑΒΑΣΕ ΤΟ</a></div></div>`;
-    }
-
-    function renderPodcast(item) {
-        return `<div class="press-card"><img src="${item.image || item.cover || 'https://via.placeholder.com/400'}" alt="Img" class="press-image"><div class="press-content"><div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date || ''}</div><h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3><p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary || item.description || ''}</p><a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;"><i class="fas fa-play"></i> LISTEN</a></div></div>`;
+    function checkPlayerVisibility() {
+        const stick = document.getElementById('sticky-player');
+        if(!stick) return;
+        const isBeats = window.location.pathname.includes('beats.html');
+        // FIX: Το isPlaying ελέγχεται πλέον σωστά
+        if(isBeats || window.isPlaying || (audio.src && audio.src !== '')) stick.classList.add('player-visible');
+        else stick.classList.remove('player-visible');
     }
 
     function setupCustomDropdowns(allBeats) {
-        const dropdowns = document.querySelectorAll('.custom-select');
-        dropdowns.forEach(dropdown => {
-            const btn = dropdown.querySelector('.select-btn'); 
-            const list = dropdown.querySelector('.select-options'); 
-            const span = btn.querySelector('span');
-            btn.onclick = (e) => { 
-                e.stopPropagation(); 
-                dropdowns.forEach(d => { if(d !== dropdown) d.classList.remove('active'); }); 
-                dropdown.classList.toggle('active'); 
-            };
+        const drops = document.querySelectorAll('.custom-select');
+        drops.forEach(d => {
+            const btn = d.querySelector('.select-btn'); const list = d.querySelector('.select-options'); const span = btn.querySelector('span');
+            btn.onclick = (e) => { e.stopPropagation(); drops.forEach(x=>x!==d && x.classList.remove('active')); d.classList.toggle('active'); };
             list.onclick = (e) => {
                 if(e.target.tagName === 'LI') {
-                    const value = e.target.getAttribute('data-value'); const text = e.target.textContent;
-                    span.textContent = dropdown.id === 'custom-genre' ? `GENRE: ${text}` : dropdown.id === 'custom-bpm' ? `BPM: ${text}` : `KEY: ${text}`;
-                    list.querySelectorAll('li').forEach(li => li.classList.remove('selected')); e.target.classList.add('selected');
-                    if(dropdown.id === 'custom-genre') activeFilters.genre = value; if(dropdown.id === 'custom-bpm') activeFilters.bpm = value; if(dropdown.id === 'custom-key') activeFilters.key = value;
-                    applyFilters(allBeats); dropdown.classList.remove('active');
+                    const val = e.target.getAttribute('data-value');
+                    span.textContent = `${d.id.split('-')[1].toUpperCase()}: ${e.target.textContent}`;
+                    if(d.id==='custom-genre') activeFilters.genre=val;
+                    if(d.id==='custom-bpm') activeFilters.bpm=val;
+                    if(d.id==='custom-key') activeFilters.key=val;
+                    
+                    // APPLY FILTERS (FIXED KEY LOGIC)
+                    const filtered = allBeats.filter(b => {
+                        const g = activeFilters.genre==='all' || (b.category && b.category.toLowerCase()===activeFilters.genre.toLowerCase());
+                        // Check both key and Key
+                        const bKey = b.key || b.Key;
+                        const k = activeFilters.key==='all' || (bKey === activeFilters.key);
+                        let bpm = true;
+                        if(activeFilters.bpm!=='all' && b.bpm) { const [min,max] = activeFilters.bpm.split('-').map(Number); bpm = Number(b.bpm)>=min && Number(b.bpm)<=max; }
+                        return g && k && bpm;
+                    });
+                    window.currentPlaylist = filtered; renderBeats(filtered);
+                    d.classList.remove('active');
                 }
-            };
+            }
         });
-        document.onclick = (e) => { if (!e.target.closest('.custom-select')) { dropdowns.forEach(d => d.classList.remove('active')); } };
-    }
-    
-    function applyFilters(allBeats) {
-        const { genre, bpm, key } = activeFilters;
-        const filtered = allBeats.filter(beat => {
-            const matchGenre = genre === 'all' || (beat.category && beat.category.toLowerCase() === genre.toLowerCase());
-            const matchKey = key === 'all' || (beat.key === key);
-            let matchBpm = true;
-            if (bpm !== 'all' && beat.bpm) { const [min, max] = bpm.split('-').map(Number); const beatBpm = Number(beat.bpm); matchBpm = beatBpm >= min && beatBpm <= max; }
-            return matchGenre && matchKey && matchBpm;
-        });
-        renderBeats(filtered);
+        document.onclick = (e) => { if(!e.target.closest('.custom-select')) drops.forEach(d=>d.classList.remove('active')); };
     }
 
-    function renderBeats(beats) { 
-        const beatContainer = document.getElementById('beat-store-list'); 
-        if (!beatContainer) return; 
-        beatContainer.innerHTML = ''; 
-        if (beats.length === 0) { beatContainer.innerHTML = '<p style="text-align:center; padding:2rem;">No beats found matching these filters.</p>'; return; } 
-        beats.forEach((beat, index) => { 
-            const safeTitle = beat.title.replace(/'/g, "\\'"); 
-            // FIX: Εδώ διορθώθηκε το beatImage. Πριν ήταν data:image/jpeg...
-            const beatImage = beat.cover || 'https://via.placeholder.com/600/111/333?text=V'; 
-            beatContainer.innerHTML += `<div class="beat-row"><div class="beat-art"><img src="${beatImage}" alt="Art"><div class="beat-play-overlay" onclick="playTrack('${beat.audioSrc}', '${safeTitle}', '${beatImage}', ${index})"><i id="beat-icon-${index}" class="fas fa-play" style="color:#fff;"></i></div></div><div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${beat.bpm || '140'} BPM • ${beat.key || beat.Key || 'Am'} • ${beat.category}</div></div><div class="beat-actions"><a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent">${beat.price} | <i class="fas fa-shopping-cart"></i> ΑΓΟΡΑ</a></div></div>`; 
-        }); 
+    function renderBeats(beats) {
+        const cont = document.getElementById('beat-store-list');
+        if(!cont) return;
+        cont.innerHTML = '';
+        if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats.</p>'; return; }
+        beats.forEach((b, i) => {
+            const safeTitle = b.title.replace(/'/g, "\\'");
+            // FIX: Η εικόνα είναι πλέον σωστό URL, όχι base64 string
+            const img = b.cover || 'https://via.placeholder.com/100'; 
+            cont.innerHTML += `
+            <div class="beat-row">
+                <div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div>
+                <div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div>
+                <div class="beat-actions"><a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a></div>
+            </div>`;
+        });
+    }
+
+    // --- NON-CRITICAL HELPERS ---
+    function updateMenuState() {
+        const path = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-btn').forEach(l => {
+            if(l.getAttribute('href').includes(path)) l.classList.add('active'); else l.classList.remove('active');
+        });
+    }
+
+    function setupPlayerControls() {
+        const pBtn = document.getElementById('player-play-btn');
+        const next = document.getElementById('next-track-btn');
+        const prev = document.getElementById('prev-track-btn');
+        const prog = document.getElementById('progress-container');
+        
+        if(pBtn) {
+            updateUIState();
+            pBtn.onclick = () => { if(audio.paused) { audio.play(); window.isPlaying=true; } else { audio.pause(); window.isPlaying=false; } updateUIState(); };
+            if(next) next.onclick = () => { if(window.currentIndex < window.currentPlaylist.length-1) playTrackByIndex(window.currentIndex+1); };
+            if(prev) prev.onclick = () => { if(window.currentIndex > 0) playTrackByIndex(window.currentIndex-1); };
+            
+            if(prog) {
+                const progClone = prog.cloneNode(true); prog.parentNode.replaceChild(progClone, prog);
+                progClone.onclick = (e) => { if(audio.duration) audio.currentTime = (e.offsetX / progClone.clientWidth) * audio.duration; };
+            }
+            
+            audio.ontimeupdate = () => { if(document.getElementById('player-progress')) document.getElementById('player-progress').style.width = (audio.currentTime/audio.duration)*100 + '%'; };
+            audio.onended = () => { if(window.currentIndex < window.currentPlaylist.length-1) playTrackByIndex(window.currentIndex+1); };
+            audio.onplay = () => { window.isPlaying = true; updateUIState(); checkPlayerVisibility(); };
+            audio.onpause = () => { window.isPlaying = false; updateUIState(); };
+        }
     }
 });
