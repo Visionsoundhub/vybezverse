@@ -1,11 +1,10 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- 0. GLOBAL INIT ---
-    // Αρχικοποίηση Audio Player
     if (!window.globalAudio) { window.globalAudio = new Audio(); }
     const audio = window.globalAudio;
     
-    // Global State Variables (για να μην χάνονται στις αλλαγές σελίδας)
+    // Global State Variables
     window.currentPlaylist = window.currentPlaylist || []; 
     window.currentIndex = window.currentIndex || -1;
     window.isPlaying = window.isPlaying || false;
@@ -14,116 +13,86 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // Εκκίνηση όλων των λειτουργιών
     initAllScripts(); 
 
-    // Υποστήριξη SWUP (αν υπάρχει)
     if (window.Swup) {
         const swup = new window.Swup();
         swup.hooks.on('page:view', () => { initAllScripts(); });
     }
 
-    // --- GLOBAL CLICK HANDLER (Για Modals και Buttons) ---
+    // --- GLOBAL CLICK HANDLER ---
     document.addEventListener('click', (e) => {
-        // Κλείσιμο Modals όταν πατάμε στο μαύρο background
         if (e.target.classList.contains('modal-overlay')) {
             e.target.classList.remove('visible');
         }
     });
 
-    // --- MAIN FUNCTION: Τρέχει κάθε φορά που φορτώνει μια σελίδα ---
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
         
-        // 1. Επαναφορά Player Title & Cover
+        // Restore Player
         const playerTitle = document.getElementById('player-track-title');
         if (playerTitle) playerTitle.textContent = window.currentTitle;
         restoreHeroArt();
         
-        // 2. Ενημέρωση Μενού & Player UI
         updateMenuState();
         checkPlayerVisibility();
         updateUIState();
 
-        // 3. HOME PAGE LOADER (ΔΙΟΡΘΩΣΗ ΓΙΑ ΤΟ "LOADING...")
+        // --- HOME PAGE (ΑΦΗΝΟΥΜΕ ΤΟΝ ΚΩΔΙΚΑ ΠΟΥ ΔΟΥΛΕΥΕΙ) ---
         const homeTitle = document.getElementById('home-hero-title');
         if (homeTitle) {
-            fetch('home.json')
-                .then(response => {
-                    if (!response.ok) throw new Error("Home JSON not found");
-                    return response.json();
-                })
-                .then(data => {
-                    // Τίτλοι
-                    if (data.heroTitle) homeTitle.textContent = data.heroTitle;
-                    const subTitle = document.getElementById('home-hero-subtitle');
-                    if (subTitle && data.heroSubtitle) subTitle.textContent = data.heroSubtitle;
+            fetch('home.json').then(r => r.json()).then(data => {
+                if (data.heroTitle) homeTitle.textContent = data.heroTitle;
+                const subTitle = document.getElementById('home-hero-subtitle');
+                if (subTitle && data.heroSubtitle) subTitle.textContent = data.heroSubtitle;
+                
+                const bImg = document.getElementById('home-banner-img');
+                if (bImg && data.heroImage) { bImg.src = data.heroImage; bImg.style.display = 'block'; }
 
-                    // Εικόνα Banner
-                    const bImg = document.getElementById('home-banner-img');
-                    if (bImg && data.heroImage) {
-                        bImg.src = data.heroImage;
-                        bImg.style.display = 'block';
-                    }
-
-                    // Latest Drop (Video)
-                    const dropCont = document.getElementById('home-featured-container');
-                    const dropIframe = document.getElementById('drop-iframe');
-                    if (dropCont && data.showDrop && data.dropVideo) {
-                        const videoId = getYoutubeId(data.dropVideo);
-                        if (videoId && dropIframe) {
-                            dropIframe.src = `https://www.youtube.com/embed/${videoId}`;
-                            dropCont.style.display = 'block';
-                            
-                            // Κουμπιά Drop
-                            const dropBtns = document.getElementById('drop-buttons');
-                            if(dropBtns) {
-                                let btnsHtml = '';
-                                if(data.dropStream) btnsHtml += `<a href="${data.dropStream}" target="_blank" class="btn btn-outline">STREAM</a>`;
-                                if(data.dropBuy) btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑΣΕ ΤΟ</a>`;
-                                if(data.dropFree) btnsHtml += `<a href="${data.dropFree}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>`;
-                                dropBtns.innerHTML = btnsHtml;
-                            }
+                const dropCont = document.getElementById('home-featured-container');
+                const dropIframe = document.getElementById('drop-iframe');
+                if (dropCont && data.showDrop && data.dropVideo) {
+                    const videoId = getYoutubeId(data.dropVideo);
+                    if (videoId && dropIframe) {
+                        dropIframe.src = `https://www.youtube.com/embed/${videoId}`;
+                        dropCont.style.display = 'block';
+                        const dropBtns = document.getElementById('drop-buttons');
+                        if(dropBtns) {
+                            let btnsHtml = '';
+                            if(data.dropStream) btnsHtml += `<a href="${data.dropStream}" target="_blank" class="btn btn-outline">STREAM</a>`;
+                            if(data.dropBuy) btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑΣΕ ΤΟ</a>`;
+                            if(data.dropFree) btnsHtml += `<a href="${data.dropFree}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>`;
+                            dropBtns.innerHTML = btnsHtml;
                         }
                     }
+                }
 
-                    // Announcements
-                    const annCont = document.getElementById('home-announcement-container');
-                    const annIframe = document.getElementById('announcement-iframe');
-                    const annText = document.getElementById('announcement-text');
-                    if (annCont && data.showAnnouncement && data.announcementVideo) {
-                        const videoId = getYoutubeId(data.announcementVideo);
-                        if (videoId && annIframe) {
-                            annIframe.src = `https://www.youtube.com/embed/${videoId}`;
-                            annCont.style.display = 'block';
-                            if (annText && data.announcementText) annText.textContent = data.announcementText;
-                        }
+                const annCont = document.getElementById('home-announcement-container');
+                const annIframe = document.getElementById('announcement-iframe');
+                const annText = document.getElementById('announcement-text');
+                if (annCont && data.showAnnouncement && data.announcementVideo) {
+                    const videoId = getYoutubeId(data.announcementVideo);
+                    if (videoId && annIframe) {
+                        annIframe.src = `https://www.youtube.com/embed/${videoId}`;
+                        annCont.style.display = 'block';
+                        if (annText && data.announcementText) annText.textContent = data.announcementText;
                     }
-                })
-                .catch(err => {
-                    console.error("Error loading home.json:", err);
-                    // Fallback για να μην μένει το "Loading..."
-                    if(document.getElementById('home-hero-subtitle')) {
-                        document.getElementById('home-hero-subtitle').textContent = "WELCOME TO THE ZONE";
-                    }
-                });
+                }
+            }).catch(() => {});
         }
 
-        // 4. BIO PAGE
+        // --- BIO & GALLERY ---
         const bioContainer = document.getElementById('bio-container');
         if (bioContainer) {
-            fetch('bio.json')
-                .then(r => r.json())
-                .then(data => {
-                    const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '';
-                    const image = data.image || 'https://via.placeholder.com/500';
-                    if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title;
-                    bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${image}" alt="Bio Image" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`;
-                })
-                .catch(e => console.log(e));
+            fetch('bio.json').then(r => r.json()).then(data => {
+                const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '';
+                const image = data.image || 'https://via.placeholder.com/500';
+                if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title;
+                bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${image}" alt="Bio Image" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`;
+            }).catch(() => {});
         }
 
-        // 5. GALLERY
         const galleryGrid = document.getElementById('gallery-grid');
         if(galleryGrid) {
             const gModal = document.getElementById('gallery-modal');
@@ -142,14 +111,55 @@ document.addEventListener('DOMContentLoaded', () => {
                     galleryGrid.appendChild(div);
                 });
             }).catch(() => {});
-            
-            if(gClose) { 
-                gClose.onclick = () => gModal.classList.remove('visible'); 
-                gModal.onclick = (e) => { if(e.target === gModal) gModal.classList.remove('visible'); }; 
-            }
+            if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target === gModal) gModal.classList.remove('visible'); }; }
         }
 
-        // 6. MENU & FOOTER LOADERS
+        // --- FIX: RELEASES LOADER ---
+        // Αυτό το κομμάτι φτιάχνει το "Loading Tracks"
+        const releasesContainer = document.getElementById('releases-list');
+        if (releasesContainer) {
+            fetch('releases.json')
+                .then(r => r.json())
+                .then(data => {
+                    releasesContainer.innerHTML = '';
+                    let tracks = Array.isArray(data) ? data : (data.tracks || []);
+                    
+                    if (tracks.length === 0) {
+                        releasesContainer.innerHTML = '<p style="text-align:center;">No releases found.</p>';
+                    } else {
+                        tracks.forEach(track => {
+                            const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : ''; 
+                            const safeTitle = track.title ? track.title.replace(/'/g, "\\'") : 'Unknown Track';
+                            
+                            releasesContainer.innerHTML += `
+                                <div class="beat-row">
+                                    <div class="beat-art">
+                                        <img src="${track.cover || 'https://via.placeholder.com/100'}" alt="Art">
+                                        <div class="beat-play-overlay">
+                                            <a href="${track.youtubeUrl}" target="_blank"><i class="fab fa-youtube" style="color:#fff; font-size:1.5rem;"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="beat-info">
+                                        <h4>${track.title}</h4>
+                                        <div class="beat-meta">Available Now</div>
+                                    </div>
+                                    <div class="beat-actions">
+                                        <a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i></a>
+                                        <a href="${track.streamUrl}" target="_blank" class="btn btn-outline">STREAM</a>
+                                        <a href="${track.bundleUrl}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑΣΕ ΤΟ</a>
+                                        ${downloadBtn}
+                                    </div>
+                                </div>`;
+                        });
+                    }
+                })
+                .catch(err => {
+                    console.error(err);
+                    releasesContainer.innerHTML = '<p style="text-align:center;">Error loading tracks.</p>';
+                });
+        }
+
+        // --- MENU & FOOTER ---
         const menuContainer = document.querySelector('.nav-links');
         if (menuContainer && menuContainer.innerHTML === '') {
             fetch('menu.json').then(r => r.json()).then(data => {
@@ -158,8 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     const target = link.newTab ? '_blank' : '_self'; 
                     menuHtml += `<a href="${link.url}" class="nav-btn" target="${target}">${link.text}</a>`; 
                 });
-                menuContainer.innerHTML = menuHtml; 
-                updateMenuState(); 
+                menuContainer.innerHTML = menuHtml; updateMenuState(); 
             }).catch(() => {});
         }
 
@@ -174,7 +183,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => {});
         }
         
-        // Hamburger Logic (Safe Clone)
+        // Hamburger
         const hamburger = document.querySelector('.hamburger');
         const navLinks = document.querySelector('.nav-links');
         if (hamburger) {
@@ -192,14 +201,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // 7. BEATS STORE
+        // --- BEATS STORE ---
         const beatContainer = document.getElementById('beat-store-list');
         if (beatContainer) {
             let allBeats = [];
             fetch('beats.json').then(r => r.json()).then(data => { 
                 if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } 
-                
-                // Key Filter Logic
                 const keyList = document.getElementById('key-options-list');
                 if(keyList) {
                     const keys = [...new Set(allBeats.map(b => b.key || b.Key).filter(k => k))].sort();
@@ -207,13 +214,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     keys.forEach(k => { keyHtml += `<li data-value="${k}">${k}</li>`; });
                     keyList.innerHTML = keyHtml;
                 }
-                
                 window.currentPlaylist = allBeats; 
                 renderBeats(allBeats); 
                 setupCustomDropdowns(allBeats);
             }).catch(() => {});
             
-            // Vibe Search Logic
             const vBtn = document.getElementById('vibe-search-btn');
             if (vBtn) {
                 vBtn.onclick = () => { 
@@ -239,12 +244,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        // 8. PRESS & RELEASES & PODCASTS
-        loadSimpleList('releases-list', 'releases.json', 'tracks', renderRelease);
+        // PRESS & PODCASTS
         loadSimpleList('press-container', 'press.json', 'articles', renderPress);
         loadSimpleList('podcasts-container', 'podcasts.json', 'episodes', renderPodcast);
 
-        // Bundle List Logic
+        // Bundle List
         const bundleList = document.getElementById('bundle-list-content');
         if(bundleList && bundleList.innerHTML === '') { 
             const items = [ 
@@ -257,11 +261,10 @@ document.addEventListener('DOMContentLoaded', () => {
             bundleList.innerHTML = items.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2;"></i> ${item.text}</li>`).join(''); 
         }
         
-        // SETUP PLAYER BUTTONS
         setupPlayerControls();
     }
 
-    // --- HELPER FUNCTIONS ---
+    // --- HELPERS ---
 
     function getYoutubeId(url) { if(!url) return null; const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
 
@@ -280,25 +283,16 @@ document.addEventListener('DOMContentLoaded', () => {
     function checkPlayerVisibility() {
         const stickyPlayer = document.getElementById('sticky-player'); 
         if (!stickyPlayer) return;
-        
-        // Εμφάνιση αν είμαστε στα Beats ή αν παίζει κάτι ή αν έχει φορτώσει τραγούδι
         const isBeatsPage = window.location.href.includes('beats');
         const hasTrack = audio.src && audio.src !== '';
-        
-        if (isBeatsPage || window.isPlaying || hasTrack) { 
-            stickyPlayer.classList.add('player-visible'); 
-        } else { 
-            stickyPlayer.classList.remove('player-visible'); 
-        }
+        if (isBeatsPage || window.isPlaying || hasTrack) { stickyPlayer.classList.add('player-visible'); } 
+        else { stickyPlayer.classList.remove('player-visible'); }
     }
 
     function restoreHeroArt() {
         const heroArt = document.getElementById('hero-beat-art'); 
         const heroImg = document.getElementById('hero-beat-img');
-        if (heroArt && heroImg && window.currentCover) { 
-            heroImg.src = window.currentCover; 
-            heroArt.classList.add('visible'); 
-        }
+        if (heroArt && heroImg && window.currentCover) { heroImg.src = window.currentCover; heroArt.classList.add('visible'); }
     }
 
     function setupPlayerControls() {
@@ -308,7 +302,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const progressContainer = document.getElementById('progress-container');
 
         if(playBtn) {
-            // Unbind old events to prevent stacking
             playBtn.onclick = togglePlay;
             if(nextBtn) nextBtn.onclick = playNext;
             if(prevBtn) prevBtn.onclick = playPrev;
@@ -324,37 +317,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
         
-        // Audio Events
-        audio.ontimeupdate = () => { 
-            if(document.getElementById('player-progress')) { 
-                const percent = (audio.currentTime / audio.duration) * 100; 
-                document.getElementById('player-progress').style.width = percent + '%'; 
-            } 
-        };
+        audio.ontimeupdate = () => { if(document.getElementById('player-progress')) { const percent = (audio.currentTime / audio.duration) * 100; document.getElementById('player-progress').style.width = percent + '%'; } };
         audio.onended = playNext;
         audio.onplay = () => { window.isPlaying = true; updateUIState(); checkPlayerVisibility(); };
         audio.onpause = () => { window.isPlaying = false; updateUIState(); };
     }
 
-    // Player Logic
     window.playTrack = function(url, title, cover, trackIndexInList) {
         if (audio.src === window.location.origin + url || audio.src === url) { togglePlay(); return; }
-        
         window.currentIndex = trackIndexInList;
         audio.src = url;
-        window.currentTitle = title; // Save title
+        window.currentTitle = title;
         window.currentCover = cover || 'https://via.placeholder.com/600/111/333?text=V';
-        
         const playerTitle = document.getElementById('player-track-title');
         if(playerTitle) playerTitle.textContent = title;
-        
         restoreHeroArt();
         audio.play();
     };
 
-    function togglePlay() { 
-        if (audio.paused) { audio.play(); } else { audio.pause(); } 
-    }
+    function togglePlay() { if (audio.paused) { audio.play(); } else { audio.pause(); } }
     
     function playNext() { 
         if (window.currentIndex < window.currentPlaylist.length - 1) { 
@@ -375,13 +356,11 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateUIState() {
         const playBtn = document.getElementById('player-play-btn');
         if(playBtn) playBtn.innerHTML = window.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>';
-        
         document.querySelectorAll('.beat-play-overlay i').forEach(icon => icon.className = 'fas fa-play');
         const activeBtn = document.getElementById(`beat-icon-${window.currentIndex}`);
         if (activeBtn && window.isPlaying) activeBtn.className = 'fas fa-pause';
     }
 
-    // Generic Loaders
     function loadSimpleList(containerId, jsonFile, arrayKey, renderFunc) {
         const container = document.getElementById(containerId);
         if (container) {
@@ -393,11 +372,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => {});
         }
     }
-
-    function renderRelease(track) {
-        const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : ''; 
-        return `<div class="beat-row"><div class="beat-art"><img src="${track.cover || 'https://via.placeholder.com/100'}" alt="Art"><div class="beat-play-overlay"><a href="${track.youtubeUrl}" target="_blank"><i class="fab fa-youtube" style="color:#fff; font-size:1.5rem;"></i></a></div></div><div class="beat-info"><h4>${track.title}</h4><div class="beat-meta">Available Now</div></div><div class="beat-actions"><a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i></a><a href="${track.streamUrl}" target="_blank" class="btn btn-outline">STREAM</a><a href="${track.bundleUrl}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑ</a>${downloadBtn}</div></div>`; 
-    }
     
     function renderPress(item) {
         return `<div class="press-card"><img src="${item.image || 'https://via.placeholder.com/400'}" alt="Img" class="press-image"><div class="press-content"><div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date || ''}</div><h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3><p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary || item.description || ''}</p><a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;">ΔΙΑΒΑΣΕ ΤΟ</a></div></div>`;
@@ -407,20 +381,17 @@ document.addEventListener('DOMContentLoaded', () => {
         return `<div class="press-card"><img src="${item.image || item.cover || 'https://via.placeholder.com/400'}" alt="Img" class="press-image"><div class="press-content"><div class="press-date" style="color:#8a2be2; font-weight:bold; font-size:0.8rem; margin-bottom:5px;">${item.date || ''}</div><h3 style="font-size:1.2rem; margin:0 0 10px 0;">${item.title}</h3><p style="font-size:0.9rem; color:#ccc; margin-bottom:15px;">${item.summary || item.description || ''}</p><a href="${item.link}" target="_blank" class="btn btn-outline" style="font-size:0.75rem; padding:0.5rem 1rem; align-self:start;"><i class="fas fa-play"></i> LISTEN</a></div></div>`;
     }
 
-    // Dropdowns & Filtering
     function setupCustomDropdowns(allBeats) {
         const dropdowns = document.querySelectorAll('.custom-select');
         dropdowns.forEach(dropdown => {
             const btn = dropdown.querySelector('.select-btn'); 
             const list = dropdown.querySelector('.select-options'); 
             const span = btn.querySelector('span');
-            
             btn.onclick = (e) => { 
                 e.stopPropagation(); 
                 dropdowns.forEach(d => { if(d !== dropdown) d.classList.remove('active'); }); 
                 dropdown.classList.toggle('active'); 
             };
-            
             list.onclick = (e) => {
                 if(e.target.tagName === 'LI') {
                     const value = e.target.getAttribute('data-value'); const text = e.target.textContent;
@@ -451,7 +422,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!beatContainer) return; 
         beatContainer.innerHTML = ''; 
         if (beats.length === 0) { beatContainer.innerHTML = '<p style="text-align:center; padding:2rem;">No beats found matching these filters.</p>'; return; } 
-        
         beats.forEach((beat, index) => { 
             const safeTitle = beat.title.replace(/'/g, "\\'"); 
             const beatImage = beat.cover || 'https://via.placeholder.com/600/111/333?text=V'; 
