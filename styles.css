@@ -125,7 +125,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .press-content { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;}
 .bio-img { width: 100%; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); box-shadow: -10px 10px 20px rgba(138, 43, 226, 0.2); }
 
-/* --- BEATS & RELEASES --- */
+/* --- BEATS & RELEASES (DEFAULT DESKTOP STYLES) --- */
 .filter-scroll-container { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 1rem 10px; max-width: 1000px; margin: 0 auto; }
 .filter-btn { background: rgba(255,255,255,0.05); color: #aaa; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.3s; font-family: 'Inter', sans-serif; }
 .filter-btn.active, .filter-btn:hover { background: #8a2be2; color: #fff; border-color: #8a2be2; }
@@ -133,23 +133,6 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .beat-store-container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
 .beat-row { display: grid; grid-template-columns: 60px 1fr auto auto; gap: 1.5rem; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 0.8rem 1.2rem; margin-bottom: 0.8rem; border-radius: 12px; transition: 0.3s; }
 .beat-row:hover { background: rgba(255, 255, 255, 0.06); border-color: #8a2be2; transform: translateY(-2px); }
-
-/* MOBILE CARDS OPTIMIZATION */
-@media (max-width: 600px) {
-    .beat-row { 
-        display: flex; 
-        flex-direction: column; 
-        text-align: center; 
-        padding: 1rem; 
-        gap: 0.6rem; 
-    }
-    .beat-info h4 { text-align: center; font-size: 1rem; margin-bottom: 2px; }
-    .beat-meta { text-align: center; margin-bottom: 0.4rem; font-size: 0.8rem; }
-    
-    .beat-actions { display: flex; width: 100%; gap: 8px; justify-content: center; flex-wrap: wrap; }
-    .beat-actions .btn { flex: 1; min-width: auto; font-size: 0.7rem; padding: 0.5rem 0.8rem; }
-    .glass-container .nav-btn { font-size: 0.85rem !important; padding: 0.6rem 1rem !important; width: 100%; margin-bottom: 0.5rem; }
-}
 
 .beat-art { width: 60px; height: 60px; background: #222; border-radius: 10px; position: relative; overflow: hidden; margin: 0 auto; }
 .beat-art img { width: 100%; height: 100%; object-fit: cover; }
@@ -229,7 +212,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 
 .player-inner { width: 100%; max-width: 1000px; display: flex; align-items: center; gap: 15px; }
 
-/* Player Controls (Prev/Play/Next) */
+/* Player Controls */
 .player-controls { display: flex; align-items: center; gap: 15px; }
 .play-btn-large { width: 40px; height: 40px; background: #fff; color: #000; border-radius: 50%; border: none; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
 .play-btn-large:hover { background: #8a2be2; color: #fff; transform: scale(1.1); }
@@ -239,8 +222,6 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 /* Progress Bar & Info */
 .player-info-section { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; overflow: hidden; }
 #player-track-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 0.9rem; margin-bottom: 5px; }
-
-/* Clickable Progress Bar */
 .progress-container { width: 100%; height: 6px; background: #333; border-radius: 3px; cursor: pointer; position: relative; overflow: hidden; touch-action: none; }
 .progress-bar { background: #8a2be2; height: 100%; width: 0%; border-radius: 3px; pointer-events: none; }
 
@@ -261,8 +242,9 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .social-link:hover { background: #8a2be2; transform: scale(1.1); }
 .footer-email, .copyright { display: none; }
 
-/* --- MOBILE LAYOUT FIXES --- */
+/* --- MOBILE OPTIMIZATIONS (ΤΟΠΟΘΕΤΗΜΕΝΑ ΣΤΟ ΤΕΛΟΣ ΓΙΑ ΝΑ ΙΣΧΥΟΥΝ) --- */
 @media (max-width: 600px) {
+    /* Footer & Player Fixes */
     .social-icons, .footer-divider { display: none !important; }
     .footer-content { flex-direction: row; justify-content: center; gap: 15px; width: 100%; padding: 0; }
     .footer-section { width: auto; border: none !important; padding: 0; flex-direction: row; }
@@ -273,4 +255,62 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     .player-controls { gap: 10px; }
     .play-btn-large { width: 35px; height: 35px; font-size: 1rem; }
     .control-btn { font-size: 1rem; }
+
+    /* --- NEW LIST VIEW FOR BEATS --- */
+    .beat-row { 
+        display: grid; /* Αλλαγή σε Grid */
+        grid-template-columns: 90px 1fr; /* 90px Εικόνα - Υπόλοιπο Κείμενο */
+        grid-template-areas: 
+            "art info"
+            "actions actions"; 
+        gap: 12px; 
+        text-align: left; 
+        padding: 1.2rem; 
+        align-items: center; 
+    }
+
+    .beat-art { 
+        grid-area: art; 
+        width: 90px; height: 90px; 
+        margin: 0; 
+    }
+
+    .beat-info { 
+        grid-area: info; 
+        display: flex; 
+        flex-direction: column; 
+        justify-content: center;
+        padding-left: 5px;
+    }
+    .beat-info h4 { 
+        text-align: left; 
+        font-size: 1.2rem; 
+        margin-bottom: 5px;
+    }
+    .beat-meta { 
+        text-align: left; 
+        font-size: 0.85rem; 
+    }
+    
+    .beat-actions { 
+        grid-area: actions;
+        display: flex; 
+        width: 100%; 
+        gap: 8px; 
+        margin-top: 5px;
+    }
+    
+    .beat-actions .btn { 
+        flex: 1; 
+        min-width: auto; 
+        font-size: 0.85rem; 
+        padding: 0.7rem; 
+    }
+
+    .glass-container .nav-btn {
+        font-size: 0.85rem !important;
+        padding: 0.6rem 1rem !important;
+        width: 100%; 
+        margin-bottom: 0.5rem;
+    }
 }
