@@ -125,11 +125,67 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .press-content { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;}
 .bio-img { width: 100%; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); box-shadow: -10px 10px 20px rgba(138, 43, 226, 0.2); }
 
-/* --- BEATS & RELEASES (DEFAULT DESKTOP STYLES) --- */
-.filter-scroll-container { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; padding: 1rem 10px; max-width: 1000px; margin: 0 auto; }
-.filter-btn { background: rgba(255,255,255,0.05); color: #aaa; padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.3s; font-family: 'Inter', sans-serif; }
-.filter-btn.active, .filter-btn:hover { background: #8a2be2; color: #fff; border-color: #8a2be2; }
+/* --- COMPACT FILTERS (DROPDOWNS) --- */
+.compact-filters-container {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    padding: 1rem;
+    max-width: 1000px;
+    margin: 0 auto;
+    flex-wrap: wrap; 
+}
 
+.select-wrapper {
+    position: relative;
+    min-width: 180px;
+}
+
+.filter-select {
+    width: 100%;
+    appearance: none; 
+    background: rgba(255, 255, 255, 0.05);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 0.8rem 1rem;
+    padding-right: 2.5rem; 
+    font-family: 'Century Gothic', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    outline: none;
+    transition: 0.3s;
+    text-transform: uppercase;
+}
+
+.filter-select:hover, .filter-select:focus {
+    border-color: #8a2be2;
+    background: rgba(138, 43, 226, 0.05);
+    box-shadow: 0 0 10px rgba(138, 43, 226, 0.2);
+}
+
+.filter-select option {
+    background: #111; 
+    color: #fff;
+}
+
+.select-wrapper i {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #8a2be2;
+    pointer-events: none; 
+    font-size: 0.8rem;
+}
+
+@media (max-width: 600px) {
+    .compact-filters-container { flex-direction: column; gap: 10px; }
+    .select-wrapper { width: 100%; }
+}
+
+/* --- BEAT ROWS --- */
 .beat-store-container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; }
 .beat-row { display: grid; grid-template-columns: 60px 1fr auto auto; gap: 1.5rem; align-items: center; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); padding: 0.8rem 1.2rem; margin-bottom: 0.8rem; border-radius: 12px; transition: 0.3s; }
 .beat-row:hover { background: rgba(255, 255, 255, 0.06); border-color: #8a2be2; transform: translateY(-2px); }
