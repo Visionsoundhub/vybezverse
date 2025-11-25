@@ -3,13 +3,11 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- 0. GLOBAL INIT ---
     if (!window.globalAudio) { window.globalAudio = new Audio(); }
     const audio = window.globalAudio;
-    
-    // Global State
     window.currentPlaylist = window.currentPlaylist || []; 
     window.currentIndex = window.currentIndex || -1;
     window.isPlaying = window.isPlaying || false;
-    window.currentCover = window.currentCover || null; // <--- ΝΕΑ ΜΝΗΜΗ ΓΙΑ ΤΟ ΕΞΩΦΥΛΛΟ
     
+    // Κρατάμε τις επιλογές των φίλτρων εδώ
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
     // Ξεκινάμε τα scripts
@@ -26,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         
         updateMenuState();
         checkPlayerVisibility();
-        restoreHeroArt(); // <--- ΕΛΕΓΧΟΣ ΓΙΑ ΕΠΑΝΑΦΟΡΑ ΕΙΚΟΝΑΣ
+        restoreHeroArt();
 
         // --- 1. BIO PAGE LOAD ---
         const bioContainer = document.getElementById('bio-container');
@@ -35,9 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(r => { if (!r.ok) throw new Error("JSON not found"); return r.json(); })
                 .then(data => {
                     const content = data.content 
-                        ? data.content
-                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                            .replace(/\n/g, '<br>') 
+                        ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') 
                         : 'No bio text.';
                     const image = data.image || 'https://via.placeholder.com/500';
                     if(data.title && document.getElementById('bio-title')) {
@@ -105,6 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
             fetch('menu.json').then(r => r.json()).then(data => {
                 const links = data.links || [];
                 let menuHtml = '';
+                const currentPath = window.location.pathname.split('/').pop() || 'index.html';
                 links.forEach(link => {
                     const target = link.newTab ? '_blank' : '_self';
                     menuHtml += `<a href="${link.url}" class="nav-btn" target="${target}">${link.text}</a>`;
@@ -147,20 +144,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if(playBtn) {
             updateUIState();
-            
             window.playTrack = function(url, title, cover, trackIndexInList) {
                 if (audio.src === window.location.origin + url || audio.src === url) { togglePlay(); return; }
-                
                 window.currentIndex = trackIndexInList;
                 audio.src = url;
                 if(playerTitle) playerTitle.textContent = title;
                 
-                // Αποθήκευση και Ενημέρωση Hero Art
                 if (cover) {
-                    window.currentCover = cover; // Save to memory
-                    restoreHeroArt(); // Show it immediately
+                    window.currentCover = cover; 
+                    restoreHeroArt(); 
                 } else {
-                    // Αν δεν υπάρχει cover, βάλε placeholder
                     window.currentCover = 'https://via.placeholder.com/600/111/333?text=V';
                     restoreHeroArt();
                 }
@@ -211,25 +204,23 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- 7. BEATS LOADER ---
         const beatContainer = document.getElementById('beat-store-list');
         if (beatContainer) {
-            const filterGenre = document.getElementById('filter-genre');
-            const filterBpm = document.getElementById('filter-bpm');
-            const filterKey = document.getElementById('filter-key');
             let allBeats = [];
             
             fetch('beats.json').then(r => r.json()).then(data => { 
                 if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } 
                 
-                if(filterKey) {
-                    const keys = [...new Set(allBeats.map(b => b.key).filter(k => k))].sort();
+                // FIX: Check for 'key' OR 'Key'
+                const keyList = document.getElementById('key-options-list');
+                if(keyList) {
+                    const keys = [...new Set(allBeats.map(b => b.key || b.Key).filter(k => k))].sort();
                     let keyHtml = '<li data-value="all" class="selected">All Keys</li>';
                     keys.forEach(k => { keyHtml += `<li data-value="${k}">${k}</li>`; });
-                    document.getElementById('key-options-list').innerHTML = keyHtml;
+                    keyList.innerHTML = keyHtml;
                 }
 
                 window.currentPlaylist = allBeats; 
                 renderBeats(allBeats); 
                 setupCustomDropdowns(allBeats);
-                restoreHeroArt(); // Αν γυρίσουμε στη σελίδα, επαναφέρει την εικόνα
             });
             
             const vBtn = document.getElementById('vibe-search-btn');
@@ -376,6 +367,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    function restoreHeroArt() {
+        const heroArt = document.getElementById('hero-beat-art');
+        const heroImg = document.getElementById('hero-beat-img');
+        if (heroArt && heroImg && window.currentCover) {
+            heroImg.src = window.currentCover;
+            heroArt.classList.add('visible');
+        }
+    }
+
     function checkPlayerVisibility() {
         const stickyPlayer = document.getElementById('sticky-player');
         if (!stickyPlayer) return;
@@ -391,62 +391,35 @@ document.addEventListener('DOMContentLoaded', () => {
         const activeBtn = document.getElementById(`beat-icon-${window.currentIndex}`);
         if (activeBtn) activeBtn.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play';
     }
-    
-    // --- NEW HERO ART RESTORE FUNCTION ---
-    function restoreHeroArt() {
-        const heroArt = document.getElementById('hero-beat-art');
-        const heroImg = document.getElementById('hero-beat-img');
-        // Αν υπάρχει εξώφυλλο στη μνήμη ΚΑΙ είμαστε στη σελίδα με το Hero Art
-        if (heroArt && heroImg && window.currentCover) {
-            heroImg.src = window.currentCover;
-            heroArt.classList.add('visible');
-        }
-    }
-
-    // --- CUSTOM DROPDOWNS LOGIC ---
     function setupCustomDropdowns(allBeats) {
         const dropdowns = document.querySelectorAll('.custom-select');
         dropdowns.forEach(dropdown => {
             const btn = dropdown.querySelector('.select-btn');
             const list = dropdown.querySelector('.select-options');
             const span = btn.querySelector('span');
-            
-            // Toggle
-            btn.onclick = (e) => { 
-                e.stopPropagation(); 
-                dropdowns.forEach(d => { if(d !== dropdown) d.classList.remove('active'); }); 
-                dropdown.classList.toggle('active'); 
-            };
-
-            // Selection
-            list.onclick = (e) => {
+            btn.addEventListener('click', (e) => { e.stopPropagation(); dropdowns.forEach(d => { if(d !== dropdown) d.classList.remove('active'); }); dropdown.classList.toggle('active'); });
+            list.addEventListener('click', (e) => {
                 if(e.target.tagName === 'LI') {
                     const value = e.target.getAttribute('data-value');
                     const text = e.target.textContent;
-                    
-                    span.textContent = dropdown.id === 'custom-genre' ? `GENRE: ${text}` : 
-                                       dropdown.id === 'custom-bpm' ? `BPM: ${text}` : `KEY: ${text}`;
-                    
-                    list.querySelectorAll('li').forEach(li => li.classList.remove('selected')); 
-                    e.target.classList.add('selected');
-
+                    span.textContent = dropdown.id === 'custom-genre' ? `GENRE: ${text}` : dropdown.id === 'custom-bpm' ? `BPM: ${text}` : `KEY: ${text}`;
+                    list.querySelectorAll('li').forEach(li => li.classList.remove('selected')); e.target.classList.add('selected');
                     if(dropdown.id === 'custom-genre') activeFilters.genre = value;
                     if(dropdown.id === 'custom-bpm') activeFilters.bpm = value;
                     if(dropdown.id === 'custom-key') activeFilters.key = value;
-
-                    applyFilters(allBeats); 
-                    dropdown.classList.remove('active');
+                    applyFilters(allBeats); dropdown.classList.remove('active');
                 }
-            };
+            });
         });
         document.onclick = (e) => { if (!e.target.closest('.custom-select')) { dropdowns.forEach(d => d.classList.remove('active')); } };
     }
-
     function applyFilters(allBeats) {
         const { genre, bpm, key } = activeFilters;
         const filtered = allBeats.filter(beat => {
             const matchGenre = genre === 'all' || (beat.category && beat.category.toLowerCase() === genre.toLowerCase());
-            const matchKey = key === 'all' || (beat.key === key);
+            // Check key case-insensitive
+            const bKey = beat.key || beat.Key;
+            const matchKey = key === 'all' || (bKey === key);
             let matchBpm = true;
             if (bpm !== 'all' && beat.bpm) {
                 const [min, max] = bpm.split('-').map(Number);
@@ -457,7 +430,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         window.currentPlaylist = filtered; renderBeats(filtered);
     }
-
     function renderBeats(beats) { 
         const beatContainer = document.getElementById('beat-store-list');
         if (!beatContainer) return; 
@@ -465,20 +437,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (beats.length === 0) { beatContainer.innerHTML = '<p style="text-align:center; padding:2rem;">No beats found matching these filters.</p>'; return; } 
         beats.forEach((beat, index) => { 
             const safeTitle = beat.title.replace(/'/g, "\\'"); 
-            // Use cover from JSON or placeholder
             const beatImage = beat.cover || 'https://via.placeholder.com/600/111/333?text=V'; 
-            
-            beatContainer.innerHTML += `
-            <div class="beat-row">
-                <div class="beat-art">
-                    <img src="${beatImage}" alt="Art">
-                    <div class="beat-play-overlay" onclick="playTrack('${beat.audioSrc}', '${safeTitle}', '${beatImage}', ${index})">
-                        <i id="beat-icon-${index}" class="fas fa-play" style="color:#fff;"></i>
-                    </div>
-                </div>
-                <div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${beat.bpm || '140'} BPM • ${beat.key || 'Am'} • ${beat.category}</div></div>
-                <div class="beat-actions"><a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent">${beat.price} | <i class="fas fa-shopping-cart"></i> ΑΓΟΡΑ</a></div>
-            </div>`; 
+            beatContainer.innerHTML += `<div class="beat-row"><div class="beat-art"><img src="${beatImage}" alt="Art"><div class="beat-play-overlay" onclick="playTrack('${beat.audioSrc}', '${safeTitle}', '${beatImage}', ${index})"><i id="beat-icon-${index}" class="fas fa-play" style="color:#fff;"></i></div></div><div class="beat-info"><h4>${beat.title}</h4><div class="beat-meta">${beat.bpm || '140'} BPM • ${beat.key || beat.Key || 'Am'} • ${beat.category}</div></div><div class="beat-actions"><a href="${beat.checkoutUrl}" target="_blank" class="btn btn-accent">${beat.price} | <i class="fas fa-shopping-cart"></i> ΑΓΟΡΑ</a></div></div>`; 
         }); 
     }
 });
