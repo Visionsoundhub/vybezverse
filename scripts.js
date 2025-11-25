@@ -39,7 +39,7 @@ document.addEventListener('DOMContentLoaded', () => {
         checkPlayerVisibility();
         updateUIState();
 
-        // --- HOME PAGE (ΑΦΗΝΟΥΜΕ ΤΟΝ ΚΩΔΙΚΑ ΠΟΥ ΔΟΥΛΕΥΕΙ) ---
+        // --- HOME PAGE ---
         const homeTitle = document.getElementById('home-hero-title');
         if (homeTitle) {
             fetch('home.json').then(r => r.json()).then(data => {
@@ -82,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => {});
         }
 
-        // --- BIO & GALLERY ---
+        // --- BIO ---
         const bioContainer = document.getElementById('bio-container');
         if (bioContainer) {
             fetch('bio.json').then(r => r.json()).then(data => {
@@ -93,6 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }).catch(() => {});
         }
 
+        // --- GALLERY ---
         const galleryGrid = document.getElementById('gallery-grid');
         if(galleryGrid) {
             const gModal = document.getElementById('gallery-modal');
@@ -114,8 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target === gModal) gModal.classList.remove('visible'); }; }
         }
 
-        // --- FIX: RELEASES LOADER ---
-        // Αυτό το κομμάτι φτιάχνει το "Loading Tracks"
+        // --- FIX: RELEASES LOADER (SAFER VERSION) ---
         const releasesContainer = document.getElementById('releases-list');
         if (releasesContainer) {
             fetch('releases.json')
@@ -125,28 +125,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     let tracks = Array.isArray(data) ? data : (data.tracks || []);
                     
                     if (tracks.length === 0) {
-                        releasesContainer.innerHTML = '<p style="text-align:center;">No releases found.</p>';
+                        releasesContainer.innerHTML = '<p style="text-align:center;">No releases found in releases.json</p>';
                     } else {
                         tracks.forEach(track => {
+                            // Safe checks to prevent crash if data is missing
+                            const title = track.title ? track.title : 'Untitled Track';
+                            const safeTitle = title.replace(/'/g, "\\'");
+                            const cover = track.cover || 'https://via.placeholder.com/100';
+                            
+                            // Buttons (check if links exist)
                             const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` : ''; 
-                            const safeTitle = track.title ? track.title.replace(/'/g, "\\'") : 'Unknown Track';
+                            const ytBtn = track.youtubeUrl ? `<a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i></a>` : '';
+                            const ytOverlay = track.youtubeUrl ? `<a href="${track.youtubeUrl}" target="_blank"><i class="fab fa-youtube" style="color:#fff; font-size:1.5rem;"></i></a>` : '';
                             
                             releasesContainer.innerHTML += `
                                 <div class="beat-row">
                                     <div class="beat-art">
-                                        <img src="${track.cover || 'https://via.placeholder.com/100'}" alt="Art">
+                                        <img src="${cover}" alt="Art">
                                         <div class="beat-play-overlay">
-                                            <a href="${track.youtubeUrl}" target="_blank"><i class="fab fa-youtube" style="color:#fff; font-size:1.5rem;"></i></a>
+                                            ${ytOverlay}
                                         </div>
                                     </div>
                                     <div class="beat-info">
-                                        <h4>${track.title}</h4>
+                                        <h4>${title}</h4>
                                         <div class="beat-meta">Available Now</div>
                                     </div>
                                     <div class="beat-actions">
-                                        <a href="${track.youtubeUrl}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i></a>
-                                        <a href="${track.streamUrl}" target="_blank" class="btn btn-outline">STREAM</a>
-                                        <a href="${track.bundleUrl}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑΣΕ ΤΟ</a>
+                                        ${ytBtn}
+                                        <a href="${track.streamUrl || '#'}" target="_blank" class="btn btn-outline">STREAM</a>
+                                        <a href="${track.bundleUrl || '#'}" target="_blank" class="btn btn-outline" style="border-color:#8a2be2; color:#8a2be2;">ΑΓΟΡΑΣΕ ΤΟ</a>
                                         ${downloadBtn}
                                     </div>
                                 </div>`;
@@ -154,8 +161,8 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 })
                 .catch(err => {
-                    console.error(err);
-                    releasesContainer.innerHTML = '<p style="text-align:center;">Error loading tracks.</p>';
+                    console.error("Releases Error:", err);
+                    releasesContainer.innerHTML = '<p style="text-align:center; color:red;">Error loading tracks. Check console.</p>';
                 });
         }
 
