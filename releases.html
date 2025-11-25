@@ -24,11 +24,14 @@
             <div style="margin-bottom:2rem; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
                 <button class="nav-btn active" style="border:1px solid #fff;">All Releases</button>
                 
+                <!-- Κουμπί με απευθείας εντολή για να ανοίγει σίγουρα -->
                 <button id="why-buy-btn" class="nav-btn" style="border:1px solid #8a2be2; color:#8a2be2 !important;" onclick="document.getElementById('why-buy-modal').classList.add('visible')">
                     <i class="fas fa-info-circle"></i> ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;
                 </button>
             </div>
-            <div id="releases-list">Loading Tracks...</div>
+            
+            <!-- ΕΔΩ ΕΙΝΑΙ ΤΟ ΚΟΥΤΙ ΠΟΥ ΨΑΧΝΕΙ ΤΟ SCRIPT -->
+            <div id="releases-list" style="min-height: 100px;">Loading Tracks...</div>
         </div>
         
         <div class="modal-overlay" id="why-buy-modal">
@@ -50,7 +53,8 @@
             </div>
         </div>
     </main>
-<div id="sticky-player">
+
+    <div id="sticky-player">
         <div class="player-inner">
             <div class="player-controls">
                 <button id="prev-track-btn" class="control-btn"><i class="fas fa-step-backward"></i></button>
