@@ -42,7 +42,7 @@ h1, h2, h3, h4, h5, h6,
     padding: 1rem 2rem;
     background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(15px);
     position: sticky; top: 0; 
-    z-index: 9999; /* ΣΗΜΑΝΤΙΚΟ: Πάντα πάνω από όλα */
+    z-index: 9999; /* Πάντα πάνω από όλα */
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
@@ -71,13 +71,34 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .hamburger { display: none; cursor: pointer; flex-direction: column; justify-content: space-between; width: 30px; height: 21px; z-index: 10002; }
 .bar { width: 100%; height: 3px; background-color: #fff; border-radius: 3px; transition: 0.3s; }
 
-/* --- GLASS CONTAINER --- */
-.glass-container { max-width: 1000px; margin: 2rem auto; padding: 2rem; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.05); border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); position: relative; z-index: 10; }
+/* MOBILE MENU */
+@media (max-width: 900px) {
+    .main-navigation { padding: 0.8rem 1.5rem; }
+    .logo-text { font-size: 1.2rem; }
+    
+    .hamburger { display: flex; }
+    .nav-links { 
+        position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; 
+        background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(20px); 
+        flex-direction: column; justify-content: flex-start; align-items: center; 
+        gap: 1.2rem; padding-top: 6rem; padding-bottom: 2rem; overflow-y: auto; 
+        transition: 0.4s ease-in-out; z-index: 10001; 
+    }
+    .nav-links.active { right: 0; }
+    .nav-btn { font-size: 1rem; padding: 0.6rem 1.5rem; width: 70%; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
+    .hamburger.active .bar:nth-child(1) { transform: translateY(9px) rotate(45deg); background-color: #8a2be2; }
+    .hamburger.active .bar:nth-child(2) { opacity: 0; }
+    .hamburger.active .bar:nth-child(3) { transform: translateY(-9px) rotate(-45deg); background-color: #8a2be2; }
+}
 
 /* --- HERO --- */
 .hero-section { text-align: center; padding: 3rem 1rem; position: relative; z-index: 10; }
 .hero-title { font-size: 4rem; margin: 0; font-weight: 800; color: #fff; }
 .hero-subtitle { color: #888; letter-spacing: 3px; font-size: 0.9rem; margin-top: 10px; }
+@media (max-width: 600px) { 
+    .hero-title { font-size: 2.2rem !important; } 
+    .hero-section { padding: 1rem 1rem 0.5rem 1rem; } 
+}
 
 /* --- HERO BEAT ART (PC ONLY) --- */
 .hero-beat-art {
@@ -88,6 +109,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .hero-beat-art.visible { display: block; opacity: 1; animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 .hero-beat-art img { width: 100%; height: 100%; object-fit: cover; }
 @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (max-width: 900px) { .hero-beat-art { display: none !important; } }
 
 /* --- GRIDS --- */
 .bio-grid { display: grid; grid-template-columns: 1fr 1.5fr; gap: 2rem; align-items: start; }
@@ -127,6 +149,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .select-options::-webkit-scrollbar-track { background: #111; }
 .select-options::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 600px) { .compact-filters-container { flex-direction: column; gap: 12px; margin-top: 0; padding-top: 0; } .custom-select { width: 100%; } }
 
 /* --- BEAT ROWS --- */
 .beat-store-container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; position: relative; z-index: 20; }
@@ -194,29 +217,8 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .social-link:hover { background: #8a2be2; transform: scale(1.1); }
 .footer-email, .copyright { display: none; }
 
-/* --- MOBILE OPTIMIZATIONS (ALL INSIDE HERE) --- */
+/* --- MOBILE OPTIMIZATIONS (INSIDE MEDIA QUERY) --- */
 @media (max-width: 900px) {
-    .main-navigation { padding: 0.8rem 1.5rem; }
-    .logo-text { font-size: 1.2rem; }
-    
-    .hamburger { display: flex; z-index: 10002; }
-    .nav-links { 
-        position: fixed; top: 0; right: -100%; width: 100%; height: 100vh; 
-        background: rgba(10, 10, 10, 0.98); backdrop-filter: blur(20px); 
-        flex-direction: column; justify-content: flex-start; align-items: center; 
-        gap: 1.2rem; padding-top: 6rem; padding-bottom: 2rem; overflow-y: auto; 
-        transition: 0.4s ease-in-out; z-index: 10001; 
-    }
-    .nav-links.active { right: 0; }
-    .nav-btn { font-size: 1rem; padding: 0.6rem 1.5rem; width: 70%; text-align: center; border: 1px solid rgba(255,255,255,0.1); }
-    
-    .hero-title { font-size: 2.2rem !important; } 
-    .hero-section { padding: 1rem 1rem 0.5rem 1rem; }
-    .hero-beat-art { display: none !important; }
-    
-    .compact-filters-container { flex-direction: column; gap: 12px; margin-top: 0; padding-top: 0; } 
-    .custom-select { width: 100%; } 
-    
     .social-icons, .footer-divider { display: none !important; }
     .footer-content { flex-direction: row; justify-content: center; gap: 15px; width: 100%; padding: 0; }
     .footer-section { width: auto; border: none !important; padding: 0; flex-direction: row; }
@@ -235,23 +237,36 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     .beat-meta { text-align: left; font-size: 0.85rem; }
     .beat-actions { grid-area: actions; display: flex; width: 100%; gap: 8px; margin-top: 5px; }
     .beat-actions .btn { flex: 1; min-width: auto; font-size: 0.85rem; padding: 0.7rem; }
-    .glass-container .nav-btn { font-size: 0.85rem !important; padding: 0.6rem 1rem !important; width: 100%; margin-bottom: 0.5rem; }
     
+    /* Fix for container padding on mobile */
     .glass-container { padding: 1.5rem 1rem; margin: 1rem; }
 }
 
-/* --- GLOBAL FIXES FOR CLICKABILITY (OUTSIDE MEDIA QUERY) --- */
-.glass-container {
+/* --- ULTIMATE CLICK FIX (GLOBAL - OUTSIDE MEDIA QUERY) --- */
+.glass-container, .hero-section {
     position: relative;
-    z-index: 50 !important;
+    z-index: 50;
 }
 
-.nav-btn, .btn {
+/* Raise buttons and filters above everything */
+.nav-btn, .btn, .filter-btn, .select-btn, .accordion-btn {
     position: relative;
-    z-index: 60 !important;
+    z-index: 100 !important;
     cursor: pointer;
 }
 
+/* Custom Dropdowns on top */
+.select-options {
+    z-index: 999 !important;
+}
+
+/* Modal on very top */
 .modal-overlay {
     z-index: 99999 !important;
+}
+
+/* Releases list specifically */
+#releases-list {
+    position: relative;
+    z-index: 60;
 }
