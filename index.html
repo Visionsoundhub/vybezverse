@@ -19,32 +19,44 @@
     </nav>
 
     <main id="swup" class="transition-fade">
-        <div class="hero-section" id="home-banner-container" style="display:none;">
-            <img id="home-banner-img" src="" alt="Banner" style="max-width:100%; border-radius:10px; margin-bottom:1rem;">
+        <div class="hero-section" id="home-banner-container" style="text-align:center; padding-top:2rem;">
             <h1 class="hero-title" id="home-hero-title">VYBEZONE</h1>
-            <p class="hero-subtitle" id="home-hero-subtitle"></p>
+            <p class="hero-subtitle" id="home-hero-subtitle">LOADING...</p>
+            
+            <div style="margin-top:2rem; max-width:800px; margin-left:auto; margin-right:auto; padding:0 1rem;">
+                <img id="home-banner-img" src="" alt="Banner" style="width:100%; border-radius:15px; box-shadow:0 0 30px rgba(138,43,226,0.3); display:none;">
+            </div>
         </div>
 
-        <div id="home-announcement-container" class="glass-container" style="display:none; text-align:center;">
-            <h2 class="section-title">ANNOUNCEMENT</h2>
-            <iframe id="announcement-iframe" width="100%" height="315" src="" frameborder="0" allowfullscreen style="border-radius:10px; margin:1rem 0;"></iframe>
-            <p id="announcement-text" style="color:#ccc;"></p>
+        <div class="glass-container" id="home-featured-container" style="display:none; text-align:center; margin-top:3rem;">
+            <h2 id="drop-title-label" style="margin-bottom:1.5rem; color:#fff;">🔥 LATEST DROP</h2>
+            <div class="video-wrapper" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; margin-bottom:1.5rem; border-radius:12px; background:#000;">
+                <iframe id="drop-iframe" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
+            </div>
+            <div id="drop-buttons" style="display:flex; justify-content:center; gap:15px; flex-wrap:wrap;">
+                </div>
         </div>
 
-        <div id="home-featured-container" class="glass-container" style="display:none; text-align:center; margin-top:2rem;">
-            <h2 class="section-title" id="drop-title-label">LATEST DROP</h2>
-            <iframe id="drop-iframe" width="100%" height="315" src="" frameborder="0" allowfullscreen style="border-radius:10px; margin:1rem 0;"></iframe>
-            <div id="drop-buttons" style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;"></div>
+        <div class="glass-container" id="home-announcement-container" style="display:none; border-color:rgba(138,43,226,0.3); margin-top:2rem;">
+            <h2 style="margin-bottom:1rem; text-align:center;">ANNOUNCEMENT</h2>
+            <div class="bio-grid" style="display:grid; grid-template-columns: 1fr; gap:2rem; align-items:center;">
+                <div class="video-wrapper" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; background:#000;">
+                    <iframe id="announcement-iframe" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
+                </div>
+                <div>
+                    <p id="announcement-text" style="color:#ccc; font-size:1.1rem; text-align:left; padding:1rem;"></p>
+                </div>
+            </div>
         </div>
     </main>
-   <div id="sticky-player">
+
+    <div id="sticky-player">
         <div class="player-inner">
             <div class="player-controls">
                 <button id="prev-track-btn" class="control-btn"><i class="fas fa-step-backward"></i></button>
                 <button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button>
                 <button id="next-track-btn" class="control-btn"><i class="fas fa-step-forward"></i></button>
             </div>
-
             <div class="player-info-section">
                 <div id="player-track-title" style="font-weight:700;">SELECT A BEAT</div>
                 <div id="progress-container" class="progress-container">
@@ -53,12 +65,10 @@
             </div>
         </div>
     </div>
-    
+
     <div id="dynamic-footer"></div>
 
     <script src="https://unpkg.com/swup@4"></script>
     <script src="scripts.js"></script>
 </body>
 </html>
-
-
