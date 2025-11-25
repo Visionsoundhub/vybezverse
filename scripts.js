@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
+        
+        // Τρέχουμε τον έλεγχο του Active Menu σε κάθε αλλαγή σελίδας
+        updateMenuState();
 
         // --- 1. BIO PAGE LOAD (INLINE FIX) ---
         const bioContainer = document.getElementById('bio-container');
@@ -89,17 +92,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- 4. DYNAMIC MENU ---
         const menuContainer = document.querySelector('.nav-links');
+        // Αν το μενού είναι άδειο, το φτιάχνουμε. Αν υπάρχει, απλά ενημερώνουμε το active state.
         if (menuContainer && menuContainer.innerHTML === '') {
             fetch('menu.json').then(r => r.json()).then(data => {
                 const links = data.links || [];
                 let menuHtml = '';
-                const currentPath = window.location.pathname.split('/').pop() || 'index.html';
                 links.forEach(link => {
-                    const activeClass = (link.url === currentPath) ? 'active' : '';
                     const target = link.newTab ? '_blank' : '_self';
-                    menuHtml += `<a href="${link.url}" class="nav-btn ${activeClass}" target="${target}">${link.text}</a>`;
+                    menuHtml += `<a href="${link.url}" class="nav-btn" target="${target}">${link.text}</a>`;
                 });
                 menuContainer.innerHTML = menuHtml;
+                updateMenuState(); // Καλούμε την ενημέρωση μόλις φορτώσει το μενού
             }).catch(() => {});
         }
 
@@ -182,29 +185,26 @@ document.addEventListener('DOMContentLoaded', () => {
             audio.onpause = () => { window.isPlaying = false; updateUIState(); };
         }
 
-        // --- 7. BEATS LOADER (FIXED KEYS) ---
+        // --- 7. BEATS LOADER ---
         const beatContainer = document.getElementById('beat-store-list');
         if (beatContainer) {
+            const filterGenre = document.getElementById('filter-genre');
+            const filterBpm = document.getElementById('filter-bpm');
+            const filterKey = document.getElementById('filter-key');
             let allBeats = [];
             
             fetch('beats.json').then(r => r.json()).then(data => { 
                 if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } 
                 
-                // HERE IS THE FIX: Target the list directly
-                const keyList = document.getElementById('key-options-list');
-                if(keyList) {
+                if(filterKey) {
                     const keys = [...new Set(allBeats.map(b => b.key).filter(k => k))].sort();
                     let keyHtml = '<li data-value="all" class="selected">All Keys</li>';
                     keys.forEach(k => { keyHtml += `<li data-value="${k}">${k}</li>`; });
-                    keyList.innerHTML = keyHtml;
+                    document.getElementById('key-options-list').innerHTML = keyHtml;
                 }
-
-                window.currentPlaylist = allBeats; 
-                renderBeats(allBeats); 
-                setupCustomDropdowns(allBeats);
+                window.currentPlaylist = allBeats; renderBeats(allBeats); setupCustomDropdowns(allBeats);
             });
             
-            // Vibe Search
             const vBtn = document.getElementById('vibe-search-btn');
             const vModal = document.getElementById('vibe-modal');
             const vClose = document.getElementById('vibe-modal-close');
@@ -334,6 +334,19 @@ document.addEventListener('DOMContentLoaded', () => {
             if (bundleList && bundleList.innerHTML === '') { const items = [ { text: "Master Quality Track: WAV/MP3 (High Res)", icon: "fas fa-music" }, { text: "Εναλλακτικές Εκδόσεις: Slowed, Sped up & Edits", icon: "fas fa-random" }, { text: "Ringtone: Έτοιμο κομμένο αρχείο m4r/mp3", icon: "fas fa-mobile-alt" }, { text: "Signed Artwork: 300DPI για εκτύπωση", icon: "fas fa-image" }, { text: "Χειρόγραφοι Στίχοι: PDF με υπογραφή Black Vybez", icon: "fas fa-pen-nib" }, { text: "BTS Video: Αποκλειστικό υλικό από το στούντιο", icon: "fas fa-video" }, { text: "Οδηγίες Χρήσης: PDF οδηγός εγκατάστασης", icon: "fas fa-book" } ]; bundleList.innerHTML = items.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`).join(''); } 
             bundleBtn.onclick = () => bundleModal.classList.add('visible'); closeBundle.onclick = () => bundleModal.classList.remove('visible'); bundleModal.onclick = (e) => { if(e.target === bundleModal) bundleModal.classList.remove('visible'); }; 
         }
+    }
+
+    // --- NEW FUNCTION: Update Menu Active State ---
+    function updateMenuState() {
+        const currentPath = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-btn').forEach(link => {
+            const linkPath = link.getAttribute('href').split('/').pop();
+            if (linkPath === currentPath) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
     }
 
     // --- FUNCTIONS ---
