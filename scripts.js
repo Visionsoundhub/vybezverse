@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', () => {
     window.currentIndex = window.currentIndex || -1;
     window.isPlaying = window.isPlaying || false;
     
-    // Κρατάμε τις επιλογές των φίλτρων εδώ
+    // Κρατάμε τις επιλογές των φίλτρων εδώ (για τα Custom Dropdowns)
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
     // Ξεκινάμε τα scripts
@@ -26,19 +26,17 @@ document.addEventListener('DOMContentLoaded', () => {
         updateMenuState();
         checkPlayerVisibility();
 
-        // --- 1. BIO PAGE LOAD (FIXED BOLD TEXT) ---
+        // --- 1. BIO PAGE LOAD ---
         const bioContainer = document.getElementById('bio-container');
         if (bioContainer) {
             fetch('bio.json')
                 .then(r => { if (!r.ok) throw new Error("JSON not found"); return r.json(); })
                 .then(data => {
-                    // ΕΔΩ ΕΓΙΝΕ Η ΔΙΟΡΘΩΣΗ: Προστέθηκε το replace για τα bold (**)
                     const content = data.content 
                         ? data.content
-                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Μετατρέπει τα **text** σε Bold
-                            .replace(/\n/g, '<br>') // Μετατρέπει τα Enter σε αλλαγή γραμμής
+                            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold fix
+                            .replace(/\n/g, '<br>') 
                         : 'No bio text.';
-                        
                     const image = data.image || 'https://via.placeholder.com/500';
                     if(data.title && document.getElementById('bio-title')) {
                         document.getElementById('bio-title').textContent = data.title;
@@ -194,29 +192,31 @@ document.addEventListener('DOMContentLoaded', () => {
             audio.onpause = () => { window.isPlaying = false; updateUIState(); };
         }
 
-        // --- 7. BEATS LOADER ---
+        // --- 7. BEATS LOADER (WITH CUSTOM DROPDOWNS) ---
         const beatContainer = document.getElementById('beat-store-list');
         if (beatContainer) {
-            const filterGenre = document.getElementById('filter-genre');
-            const filterBpm = document.getElementById('filter-bpm');
-            const filterKey = document.getElementById('filter-key');
             let allBeats = [];
             
             fetch('beats.json').then(r => r.json()).then(data => { 
                 if (Array.isArray(data)) { allBeats = data; } else if (data.beatslist) { allBeats = data.beatslist; } 
                 
-                if(filterKey) {
+                // 1. Fill Keys Dynamically (Targeting the UL list directly)
+                const keyList = document.getElementById('key-options-list');
+                if(keyList) {
                     const keys = [...new Set(allBeats.map(b => b.key).filter(k => k))].sort();
                     let keyHtml = '<li data-value="all" class="selected">All Keys</li>';
                     keys.forEach(k => { keyHtml += `<li data-value="${k}">${k}</li>`; });
-                    document.getElementById('key-options-list').innerHTML = keyHtml;
+                    keyList.innerHTML = keyHtml;
                 }
 
                 window.currentPlaylist = allBeats; 
                 renderBeats(allBeats); 
+                
+                // 2. Initialize Custom Dropdowns (The FIX!)
                 setupCustomDropdowns(allBeats);
             });
             
+            // Vibe Search Logic
             const vBtn = document.getElementById('vibe-search-btn');
             const vModal = document.getElementById('vibe-modal');
             const vClose = document.getElementById('vibe-modal-close');
@@ -348,12 +348,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // --- NEW FUNCTION: Update Menu Active State ---
+    // --- FUNCTIONS ---
     function updateMenuState() {
         const currentPath = window.location.pathname.split('/').pop() || 'index.html';
         document.querySelectorAll('.nav-btn').forEach(link => {
             const linkPath = link.getAttribute('href').split('/').pop();
-            // Extra check: αν είμαστε στο root (/), τότε το index.html είναι active
             if (linkPath === currentPath || (currentPath === '' && linkPath === 'index.html')) {
                 link.classList.add('active');
             } else {
@@ -362,7 +361,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- FUNCTIONS ---
     function checkPlayerVisibility() {
         const stickyPlayer = document.getElementById('sticky-player');
         if (!stickyPlayer) return;
@@ -378,6 +376,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const activeBtn = document.getElementById(`beat-icon-${window.currentIndex}`);
         if (activeBtn) activeBtn.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play';
     }
+    
+    // --- NEW LOGIC FOR CUSTOM DROPDOWNS ---
     function setupCustomDropdowns(allBeats) {
         const dropdowns = document.querySelectorAll('.custom-select');
         dropdowns.forEach(dropdown => {
