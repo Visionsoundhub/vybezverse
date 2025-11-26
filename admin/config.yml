@@ -220,7 +220,8 @@ collections:
         label: "Store Page"
         file: "store.json"
         fields:
-          - {label: "Page Title", name: "title", widget: "string", default: "STORE"}
+          - {label: "Page Title (H1)", name: "title", widget: "string", default: "STORE"}
+          - {label: "Section Title (H2)", name: "sectionTitle", widget: "string", default: "TRACK BUNDLES"}
           - {label: "Subtitle", name: "subtitle", widget: "string", default: "Το πλήρες πακέτο περιεχομένου για κάθε τραγούδι που αγοράζεις."}
           - name: "bundleItems"
             label: "Bundle List Items"
