@@ -121,12 +121,11 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .select-options li { padding: 12px 15px; cursor: pointer; font-size: 0.9rem; border-bottom: 1px solid rgba(255,255,255,0.05); color: #ccc; }
 .select-options li:hover { background: rgba(138, 43, 226, 0.2); color: #fff; }
 
-/* --- BEAT/RELEASE ROWS (UPDATED) --- */
+/* --- BEAT/RELEASE ROWS --- */
 .beat-store-container { max-width: 1000px; margin: 2rem auto; padding: 0 1rem; position: relative; z-index: 20; }
 
 .beat-row { 
     display: grid; 
-    /* Desktop: Μεγαλύτερη εικόνα (140px), Τίτλος/Περιγραφή, Κουμπιά */
     grid-template-columns: 140px 1fr auto; 
     gap: 2rem; 
     align-items: center; 
@@ -151,30 +150,19 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .beat-art img { width: 100%; height: 100%; object-fit: cover; }
 .beat-play-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; cursor: pointer; }
 
-.beat-info { 
-    display: flex; 
-    flex-direction: column; 
-    justify-content: center; 
-}
+.beat-info { display: flex; flex-direction: column; justify-content: center; }
 .beat-info h4 { margin: 0; font-size: 1.5rem; color: #fff; font-weight: 800; letter-spacing: 0.5px; text-align: left; }
 .beat-desc { font-family: 'Inter', sans-serif; font-size: 0.95rem; color: #ccc; margin-top: 8px; line-height: 1.4; text-transform: none; text-align: left; }
 .beat-meta { font-size: 0.85rem; color: #888; margin-top: 5px; font-weight: 500; text-align: left; }
 
-/* Buttons & Actions */
-.beat-actions { 
-    display: flex; 
-    align-items: center; 
-    gap: 10px; 
-    flex-wrap: wrap;
-    justify-content: flex-end;
-}
+.beat-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end;}
 
 .btn, .nav-btn { 
     padding: 0.7rem 1.4rem; 
     font-size: 0.85rem; 
     border: none; cursor: pointer; 
     display: inline-flex; align-items: center; justify-content: center; gap: 8px; 
-    border-radius: 8px; /* Λίγο πιο τετραγωνισμένα για μοντέρνο look */
+    border-radius: 8px; 
     font-weight: 700; 
     letter-spacing: 0.5px; 
     text-transform: uppercase; 
@@ -182,14 +170,13 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     font-family: 'Inter', sans-serif; 
     transition: 0.2s ease-in-out; 
     position: relative; z-index: 60; 
-    white-space: nowrap; /* Να μην σπάει το κείμενο */
+    white-space: nowrap; 
 }
 
 .btn-accent { background: #8a2be2; box-shadow: 0 4px 15px rgba(138, 43, 226, 0.2); }
 .btn-outline { border: 1px solid rgba(255,255,255,0.2); background: transparent; }
 .btn-outline:hover { background: rgba(255,255,255,0.1); border-color: #fff; }
 
-/* GLOW BUTTON (BUY) */
 .btn-glow {
     background: transparent;
     border: 1px solid #8a2be2;
@@ -211,8 +198,63 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 /* --- MODAL --- */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); display: none; justify-content: center; align-items: center; z-index: 99999; opacity: 0; transition: opacity 0.3s ease; }
 .modal-overlay.visible { display: flex !important; opacity: 1; }
-.modal-box { background: rgba(20, 20, 25, 0.75); backdrop-filter: blur(25px); border: 1px solid rgba(138, 43, 226, 0.3); box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(138, 43, 226, 0.15), inset 0 0 20px rgba(255, 255, 255, 0.03); padding: 2.5rem; border-radius: 30px; width: 90%; max-width: 550px; text-align: center; position: relative; }
+.modal-box { background: rgba(20, 20, 25, 0.75); backdrop-filter: blur(25px); border: 1px solid rgba(138, 43, 226, 0.3); box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(138, 43, 226, 0.15), inset 0 0 20px rgba(255, 255, 255, 0.03); padding: 2.5rem; border-radius: 30px; width: 90%; max-width: 550px; text-align: center; position: relative; overflow: hidden; /* Added for Waveform containment */ }
 .modal-close-btn { position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1.5rem; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 100; }
+
+/* --- WAVEFORM EQUALIZER (NEW) --- */
+.waveform-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 3px;
+    z-index: 0;
+    pointer-events: none;
+    padding: 0 20px;
+}
+
+.waveform-bar {
+    width: 8px;
+    background: #8a2be2;
+    border-radius: 5px 5px 0 0;
+    animation: equalizer 1s infinite ease-in-out;
+    opacity: 0.6;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+@keyframes equalizer {
+    0% { height: 10px; }
+    50% { height: 80px; }
+    100% { height: 10px; }
+}
+
+/* --- VIBE GLASS BUTTONS (NEW) --- */
+.floating-vibe {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-radius: 50px;
+    padding: 10px 25px;
+    margin: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+    z-index: 10;
+}
+
+.floating-vibe:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.1);
+    border-color: #fff;
+    box-shadow: 0 0 20px currentColor; /* Takes color from inline style */
+}
 
 /* --- PLAYER & FOOTER --- */
 #sticky-player { position: fixed; bottom: 40px; left: 0; width: 100%; height: 70px; background: rgba(15, 15, 15, 0.98); border-top: 1px solid rgba(255,255,255,0.1); border-bottom: 1px solid #111; display: none; justify-content: center; align-items: center; z-index: 2900; padding: 0 1rem; backdrop-filter: blur(10px); }
@@ -265,29 +307,16 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     #sticky-player { bottom: 30px; height: 65px; padding: 0 10px; }
     .player-controls { gap: 10px; }
 
-    /* MOBILE BEAT ROW (RE-DESIGNED) */
     .beat-row { 
-        grid-template-columns: 100px 1fr; /* Εικόνα | Πληροφορίες */
-        grid-template-areas: 
-            "art info"
-            "actions actions";
-        gap: 15px; 
-        padding: 1.2rem;
+        grid-template-columns: 100px 1fr; 
+        grid-template-areas: "art info" "actions actions";
+        gap: 15px; padding: 1.2rem;
     }
     .beat-art { grid-area: art; width: 100px; height: 100px; }
     .beat-info { grid-area: info; padding-left: 0; }
     .beat-info h4 { font-size: 1.3rem; }
-    .beat-desc { font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; } /* Κόβει το κείμενο αν είναι τεράστιο */
-
-    /* Buttons σε 2x2 Grid στο κινητό για να χωράνε */
-    .beat-actions { 
-        grid-area: actions; 
-        display: grid; 
-        grid-template-columns: 1fr 1fr; /* 2 στήλες */
-        gap: 10px; 
-        width: 100%; 
-        margin-top: 5px; 
-    }
+    .beat-desc { font-size: 0.85rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; } 
+    .beat-actions { grid-area: actions; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 5px; }
     .btn { width: 100%; min-width: 0; padding: 0.8rem 0.5rem; font-size: 0.8rem; }
 }
 
