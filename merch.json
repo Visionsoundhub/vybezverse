@@ -1,3 +1,10 @@
 {
-  "products": []
+  "products": [
+    {
+      "price": "25.00€",
+      "name": "ρρρρρ",
+      "image": "/assets/uploads/gf.jpg",
+      "link": "ρρρρρρρρρρ"
+    }
+  ]
 }
