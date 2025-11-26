@@ -23,8 +23,13 @@
             <h1 class="section-title">MUSIC CATALOG</h1>
             <div style="margin-bottom:2rem; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
                 <button class="nav-btn active" style="border:1px solid #fff;">All Releases</button>
+                
                 <button id="why-buy-btn" class="nav-btn" style="border:1px solid #8a2be2; color:#8a2be2 !important;">
-                    <i class="fas fa-info-circle"></i> ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;
+                    <i class="fas fa-heart"></i> ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;
+                </button>
+
+                <button id="open-bundle-modal" class="nav-btn" style="border:1px solid #fff; color:#fff !important;">
+                    <i class="fas fa-box-open"></i> ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;
                 </button>
             </div>
             <div id="releases-list">Loading Tracks...</div>
@@ -43,20 +48,30 @@
                     </p>
                     <p style="margin-bottom:1rem;">
                         <i class="fas fa-box-open" style="color:#8a2be2;"></i> <strong>ΤΙ ΠΑΙΡΝΕΙΣ;</strong><br>
-                        WAV, Εναλλακτικές Εκδόσεις, Ringtones, Artwork, Στίχους.
+                        High Quality Audio, Εναλλακτικές Εκδόσεις, Ringtones, Artwork, Στίχους.
                     </p>
                 </div>
             </div>
         </div>
+
+        <div class="modal-overlay" id="bundle-modal">
+            <div class="modal-box">
+                <button class="modal-close-btn" id="close-bundle-modal">&times;</button>
+                <h2 style="border-bottom:1px solid #333; padding-bottom:1rem; margin-bottom:1rem;">ΠΕΡΙΕΧΟΜΕΝΑ</h2>
+                <p id="store-subtitle" style="color:#aaa; font-size:0.9rem; margin-bottom:1.5rem;">Loading...</p>
+                <ul class="bundle-list" id="bundle-list-content" style="list-style:none; padding:0; text-align:left;"></ul>
+            </div>
+        </div>
+
     </main>
-<div id="sticky-player">
+    
+    <div id="sticky-player">
         <div class="player-inner">
             <div class="player-controls">
                 <button id="prev-track-btn" class="control-btn"><i class="fas fa-step-backward"></i></button>
                 <button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button>
                 <button id="next-track-btn" class="control-btn"><i class="fas fa-step-forward"></i></button>
             </div>
-
             <div class="player-info-section">
                 <div id="player-track-title" style="font-weight:700;">SELECT A BEAT</div>
                 <div id="progress-container" class="progress-container">
@@ -72,5 +87,3 @@
     <script src="scripts.js"></script>
 </body>
 </html>
-
-
