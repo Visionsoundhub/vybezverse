@@ -19,42 +19,28 @@
     </nav>
 
     <main id="swup" class="transition-fade">
-        <div class="hero-section"><h1 class="hero-title">STORE</h1></div>
-    
-        <div class="glass-container" style="text-align:center;">
-            <h2 id="store-section-title" style="margin-bottom:1rem;">Loading...</h2>
-            
-            <p id="store-subtitle" style="color:#aaa; margin-bottom:2rem;">Loading...</p>
-            
-            <button id="open-bundle-modal" class="btn btn-accent" style="padding:1rem 3rem; font-size:1.1rem;" onclick="document.getElementById('bundle-modal').classList.add('visible')">
-                <i class="fas fa-info-circle"></i> ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;
-            </button>
+        <div class="hero-section">
+            <h1 class="hero-title" id="store-page-title">STORE</h1>
         </div>
     
-        <div style="text-align:center; margin-top:4rem; opacity:0.5; filter:blur(1px);">
-            <h2>MERCH DROP 2025</h2>
-            <p>ΡΟΥΧΑ . ΑΞΕΣΟΥΑΡ . ΣΥΛΛΕΚΤΙΚΑ</p>
+        <div class="glass-container" id="merch-grid-container" style="display:none;">
+            <div id="merch-grid" class="gallery-grid" style="grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:2rem;"></div>
+        </div>
+    
+        <div id="merch-coming-soon" style="text-align:center; margin-top:4rem; opacity:0.7;">
+            <h2 id="coming-soon-text" style="filter:blur(1px);">MERCH DROP 2025<br>COMING SOON</h2>
+            <p style="margin-top:1rem; color:#888;">APPAREL . ACCESSORIES . COLLECTIBLES</p>
         </div>
 
-        <div class="modal-overlay" id="bundle-modal">
-            <div class="modal-box">
-                <button class="modal-close-btn" id="close-bundle-modal" onclick="document.getElementById('bundle-modal').classList.remove('visible')">&times;</button>
-                <h2 style="border-bottom:1px solid #333; padding-bottom:1rem; margin-bottom:1.5rem;">ΠΕΡΙΕΧΟΜΕΝΑ</h2>
-                <ul class="bundle-list" id="bundle-list-content" style="list-style:none; padding:0; text-align:left;"></ul>
-                <div style="margin-top:2rem; text-align:center;">
-                    <a href="releases.html" class="btn btn-outline" style="width:100%;">ΠΑΜΕ ΣΤΑ RELEASES</a>
-                </div>
-            </div>
-        </div>
     </main>
- <div id="sticky-player">
+
+    <div id="sticky-player">
         <div class="player-inner">
             <div class="player-controls">
                 <button id="prev-track-btn" class="control-btn"><i class="fas fa-step-backward"></i></button>
                 <button id="player-play-btn" class="play-btn-large"><i class="fas fa-play"></i></button>
                 <button id="next-track-btn" class="control-btn"><i class="fas fa-step-forward"></i></button>
             </div>
-
             <div class="player-info-section">
                 <div id="player-track-title" style="font-weight:700;">SELECT A BEAT</div>
                 <div id="progress-container" class="progress-container">
