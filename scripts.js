@@ -147,6 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
         safeRun(() => {
             const releasesContainer = document.getElementById('releases-list');
             const relDesc = document.getElementById('releases-description');
+            const allReleasesBtn = document.getElementById('all-releases-btn'); // New: Target all releases button
 
             if (releasesContainer) {
                 // Fetch Tracks and render lists
@@ -160,7 +161,37 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
                 
-                // Fetch Settings (Buttons, Title, Description)
+                // --- ALL RELEASES BUTTON RESET LOGIC (NEW) ---
+                if (allReleasesBtn) {
+                    allReleasesBtn.onclick = () => {
+                        // 1. Reset Global State
+                        activeReleasesFilters = { genre: 'all', type: 'all' };
+                        
+                        // 2. Reset UI Spans/Classes for Genre
+                        const genreContainer = document.getElementById('custom-releases-genre');
+                        if (genreContainer) {
+                            genreContainer.querySelector('.select-btn span').textContent = 'GENRE: ALL';
+                            genreContainer.classList.remove('active');
+                            genreContainer.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+                            genreContainer.querySelector('[data-value="all"]').classList.add('selected');
+                        }
+
+                        // 3. Reset UI Spans/Classes for Type
+                        const typeContainer = document.getElementById('custom-releases-type');
+                        if (typeContainer) {
+                            typeContainer.querySelector('.select-btn span').textContent = 'TYPE: ALL';
+                            typeContainer.classList.remove('active');
+                            typeContainer.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+                            typeContainer.querySelector('[data-value="all"]').classList.add('selected');
+                        }
+
+                        // 4. Re-render the list
+                        renderFilteredReleases();
+                    };
+                }
+
+
+                // Fetch Settings (Buttons, Title, Description, Modals)
                 const bundleList = document.getElementById('bundle-list-content');
                 const storeSub = document.getElementById('store-subtitle');
                 const relTitle = document.getElementById('releases-title');
@@ -354,7 +385,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         let allLoadedVibes = [];
                         let waveform = modal.querySelector('.modal-box .waveform-container');
                         if(!waveform) {
-                            const box = modal.querySelector('.modal-box');
+                            const box = document.querySelector('#vibe-modal .modal-box');
                             waveform = document.createElement('div'); waveform.className = 'waveform-container';
                             for(let i=0; i<30; i++) { const bar = document.createElement('div'); bar.className = 'waveform-bar'; bar.style.animationDelay = `${Math.random()}s`; waveform.appendChild(bar); }
                             box.appendChild(waveform);
@@ -437,14 +468,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- HELPERS ---
     function safeRun(fn) { try { fn(); } catch(e) { console.error("Script Error:", e); } }
     function getYoutubeId(url) { if(!url) return null; const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
-    function slugify(text) { return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '') /*removed other replacements for simplicity*/ .replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, ''); }
+    function slugify(text) { return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, ''); }
     window.shareBeat = function(title) { const slug = slugify(title); const shareUrl = `${window.location.origin}${window.location.pathname}?beat=${slug}`; navigator.clipboard.writeText(shareUrl).then(() => { let feedback = document.getElementById('copy-feedback'); if(!feedback) { feedback = document.createElement('div'); feedback.id = 'copy-feedback'; feedback.className = 'copy-feedback'; feedback.innerText = 'LINK COPIED! 📋'; document.body.appendChild(feedback); } feedback.classList.add('show'); setTimeout(() => feedback.classList.remove('show'), 2000); }); };
     window.playTrack = function(url, title, cover, index) { if (audio.src === window.location.origin + url || audio.src === url) { if(audio.paused) { audio.play(); window.isPlaying=true; } else { audio.pause(); window.isPlaying=false; } } else { window.currentIndex = index; audio.src = url; const titleEl = document.getElementById('player-track-title'); if(titleEl) titleEl.textContent = title; if(cover) { window.currentCover = cover; restoreHeroArt(); } audio.play(); window.isPlaying = true; } updateUIState(); checkPlayerVisibility(); };
     function playTrackByIndex(idx) { if(idx >= 0 && idx < window.currentPlaylist.length) { const t = window.currentPlaylist[idx]; const cov = t.cover || 'https://via.placeholder.com/100'; window.playTrack(t.audioSrc, t.title, cov, idx); } }
     function restoreHeroArt() { const hero = document.getElementById('hero-beat-art'); const img = document.getElementById('hero-beat-img'); if(hero && img && window.currentCover) { img.src = window.currentCover; hero.classList.add('visible'); } }
     function updateUIState() { const pBtn = document.getElementById('player-play-btn'); if(pBtn) pBtn.innerHTML = window.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>'; document.querySelectorAll('.beat-play-overlay i').forEach(i => i.className = 'fas fa-play'); const active = document.getElementById(`beat-icon-${window.currentIndex}`); if(active) active.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play'; }
     function checkPlayerVisibility() { const stick = document.getElementById('sticky-player'); if(!stick) return; const isBeats = window.location.pathname.includes('beats.html'); if(isBeats || window.isPlaying || (audio.src && audio.src !== '')) stick.classList.add('player-visible'); else stick.classList.remove('player-visible'); }
-    function setupCustomDropdowns(allBeats) { const drops = document.querySelectorAll('.custom-select'); drops.forEach(d => { const btn = d.querySelector('.select-btn'); const list = d.querySelector('.select-options'); const span = btn.querySelector('span'); btn.onclick = (e) => { e.stopPropagation(); drops.forEach(x=>x!==d && x.classList.remove('active')); d.classList.toggle('active'); }; list.onclick = (e) => { if(e.target.tagName === 'LI') { const val = e.target.getAttribute('data-value'); span.textContent = `${d.id.split('-')[1].toUpperCase()}: ${e.target.textContent}`; if(d.id==='custom-genre') activeFilters.genre=val; if(d.id==='custom-bpm') activeFilters.bpm=val; if(d.id==='custom-key') activeFilters.key=val; const filtered = allBeats.filter(b => { const g = activeFilters.genre==='all' || (b.category && b.category.toLowerCase()===activeFilters.genre.toLowerCase()); const bKey = b.key || b.Key; const k = activeFilters.key==='all' || (bKey === activeFilters.key); let bpm = true; if(activeFilters.bpm!=='all' && b.bpm) { const [min,max] = activeFilters.bpm.split('-').map(Number); bpm = Number(b.bpm)>=min && Number(b.bpm)<=max; } return g && k && bpm; }); window.currentPlaylist = filtered; renderBeats(filtered); d.classList.remove('active'); } } }); document.onclick = (e) => { if(!e.target.closest('.custom-select')) drops.forEach(d=>d.classList.remove('active')); }; }
+    function setupCustomDropdowns(allBeats) { const drops = document.querySelectorAll('.custom-select'); drops.forEach(d => { const btn = d.querySelector('.select-btn'); const list = d.querySelector('.select-options'); const span = btn.querySelector('span'); btn.onclick = (e) => { e.stopPropagation(); document.querySelectorAll('.custom-select').forEach(x=>x!==d && x.classList.remove('active')); d.classList.toggle('active'); }; list.onclick = (e) => { if(e.target.tagName === 'LI') { const val = e.target.getAttribute('data-value'); span.textContent = `${d.id.split('-')[1].toUpperCase()}: ${e.target.textContent}`; if(d.id==='custom-genre') activeFilters.genre=val; if(d.id==='custom-bpm') activeFilters.bpm=val; if(d.id==='custom-key') activeFilters.key=val; const filtered = allBeats.filter(b => { const g = activeFilters.genre==='all' || (b.category && b.category.toLowerCase()===activeFilters.genre.toLowerCase()); const bKey = b.key || b.Key; const k = activeFilters.key==='all' || (bKey === activeFilters.key); let bpm = true; if(activeFilters.bpm!=='all' && b.bpm) { const [min,max] = activeFilters.bpm.split('-').map(Number); bpm = Number(b.bpm)>=min && Number(b.bpm)<=max; } return g && k && bpm; }); window.currentPlaylist = filtered; renderBeats(filtered); d.classList.remove('active'); } } }); document.onclick = (e) => { if(!e.target.closest('.custom-select')) drops.forEach(d=>d.classList.remove('active')); }; }
     function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button><a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a></div></div>`; }); }
     function updateMenuState() { const path = window.location.pathname.split('/').pop() || 'index.html'; document.querySelectorAll('.nav-btn').forEach(l => { if(l.getAttribute('href').includes(path)) l.classList.add('active'); else l.classList.remove('active'); }); }
 });
