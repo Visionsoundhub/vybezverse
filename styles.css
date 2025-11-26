@@ -205,7 +205,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     border: 1px solid rgba(138, 43, 226, 0.5); 
     box-shadow: 0 0 30px rgba(138, 43, 226, 0.2); 
     padding: 2.5rem; 
-    border-radius: 50px; /* SUPER ROUNDED */
+    border-radius: 50px; 
     width: 90%; 
     max-width: 550px; 
     text-align: center; 
@@ -247,7 +247,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     100% { height: 5px; }
 }
 
-/* --- VIBE GLASS BUTTONS (WITH FLOAT ANIMATION) --- */
+/* --- VIBE GLASS BUTTONS (WITH FLOAT) --- */
 .floating-vibe {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(5px);
@@ -262,21 +262,19 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     cursor: pointer;
     position: relative;
     z-index: 10;
-    animation: float 6s ease-in-out infinite; /* NEW SUBTLE FLOAT */
+    animation: float 6s ease-in-out infinite;
 }
 
 .floating-vibe:hover {
-    /* No scale transform to avoid glitch with float */
     background: rgba(255, 255, 255, 0.1);
     border-color: #fff;
     box-shadow: 0 0 20px currentColor; 
-    animation-play-state: paused; /* Optional: Stop floating when hovering */
+    animation-play-state: paused; 
 }
 
-/* --- FLOAT ANIMATION KEYFRAMES --- */
 @keyframes float {
     0% { transform: translateY(0px); }
-    50% { transform: translateY(-8px); } /* Gentle up and down */
+    50% { transform: translateY(-8px); }
     100% { transform: translateY(0px); }
 }
 
@@ -347,3 +345,59 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 /* --- ANIMATIONS --- */
 @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 @keyframes fadeInDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* --- 404 PAGE GLITCH EFFECT --- */
+.error-icon {
+    font-size: 10rem;
+    color: #222;
+    position: relative;
+    animation: glitch 2s infinite;
+}
+
+.error-icon::before, .error-icon::after {
+    content: "\f51f"; /* FontAwesome Compact Disc Unicode */
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #0f0f0f;
+}
+
+.error-icon::before {
+    color: #8a2be2;
+    animation: glitch-top 2s infinite linear alternate-reverse;
+    clip-path: polygon(0 0, 100% 0, 100% 33%, 0 33%);
+    transform: translate(-5px, -5px);
+    z-index: -1;
+    opacity: 0.7;
+}
+
+.error-icon::after {
+    color: #ff4545;
+    animation: glitch-bottom 3s infinite linear alternate-reverse;
+    clip-path: polygon(0 67%, 100% 67%, 100% 100%, 0 100%);
+    transform: translate(5px, 5px);
+    z-index: -1;
+    opacity: 0.7;
+}
+
+@keyframes glitch {
+    2%, 64% { transform: translate(2px, 0) skew(0deg); }
+    4%, 60% { transform: translate(-2px, 0) skew(0deg); }
+    62% { transform: translate(0, 0) skew(5deg); }
+}
+
+@keyframes glitch-top {
+    2%, 64% { transform: translate(2px, -2px); }
+    4%, 60% { transform: translate(-2px, 2px); }
+    62% { transform: translate(13px, -1px) skew(-13deg); }
+}
+
+@keyframes glitch-bottom {
+    2%, 64% { transform: translate(-2px, 0); }
+    4%, 60% { transform: translate(-2px, 0); }
+    62% { transform: translate(-22px, 5px) skew(21deg); }
+}
