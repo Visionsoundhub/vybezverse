@@ -195,19 +195,34 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     100% { box-shadow: 0 0 18px rgba(138, 43, 226, 0.5); border-color: #8a2be2; }
 }
 
-/* --- MODAL --- */
+/* --- MODAL (UPDATED: SUPER ROUNDED + GLOW) --- */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); display: none; justify-content: center; align-items: center; z-index: 99999; opacity: 0; transition: opacity 0.3s ease; }
 .modal-overlay.visible { display: flex !important; opacity: 1; }
-.modal-box { background: rgba(20, 20, 25, 0.75); backdrop-filter: blur(25px); border: 1px solid rgba(138, 43, 226, 0.3); box-shadow: 0 0 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(138, 43, 226, 0.15), inset 0 0 20px rgba(255, 255, 255, 0.03); padding: 2.5rem; border-radius: 30px; width: 90%; max-width: 550px; text-align: center; position: relative; overflow: hidden; /* Added for Waveform containment */ }
+
+.modal-box { 
+    background: rgba(20, 20, 25, 0.85); /* Λίγο πιο σκούρο για να φαίνεται η λάμψη */
+    backdrop-filter: blur(25px); 
+    border: 1px solid rgba(138, 43, 226, 0.5); /* Default Border */
+    box-shadow: 0 0 30px rgba(138, 43, 226, 0.2); /* Default Glow */
+    padding: 2.5rem; 
+    border-radius: 50px; /* SUPER ROUNDED */
+    width: 90%; 
+    max-width: 550px; 
+    text-align: center; 
+    position: relative; 
+    overflow: hidden; 
+    transition: box-shadow 0.3s ease, border-color 0.3s ease; /* Smooth transition for color changes */
+}
+
 .modal-close-btn { position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1.5rem; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 100; }
 
-/* --- WAVEFORM EQUALIZER (NEW) --- */
+/* --- WAVEFORM EQUALIZER (UPDATED: CALMER) --- */
 .waveform-container {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 100px;
+    height: 60px; /* Χαμηλότερο container */
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -221,18 +236,18 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     width: 8px;
     background: #8a2be2;
     border-radius: 5px 5px 0 0;
-    animation: equalizer 1s infinite ease-in-out;
-    opacity: 0.6;
+    animation: equalizer 1.2s infinite ease-in-out; /* Πιο αργό/χαλαρό */
+    opacity: 0.5; /* Λιγότερο έντονο */
     transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 @keyframes equalizer {
-    0% { height: 10px; }
-    50% { height: 80px; }
-    100% { height: 10px; }
+    0% { height: 5px; }
+    50% { height: 35px; } /* ΜΕΙΩΜΕΝΟ ΥΨΟΣ (Πιο χαλαρό) */
+    100% { height: 5px; }
 }
 
-/* --- VIBE GLASS BUTTONS (NEW) --- */
+/* --- VIBE GLASS BUTTONS --- */
 .floating-vibe {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(5px);
@@ -253,7 +268,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     transform: scale(1.1);
     background: rgba(255, 255, 255, 0.1);
     border-color: #fff;
-    box-shadow: 0 0 20px currentColor; /* Takes color from inline style */
+    box-shadow: 0 0 20px currentColor; 
 }
 
 /* --- PLAYER & FOOTER --- */
