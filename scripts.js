@@ -92,9 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     }
 
-                    // --- NEW: DYNAMIC CONTENT STREAM ---
                     if (dynArea && data.stream && data.stream.length > 0) {
-                        dynArea.innerHTML = ''; // Clear previous
+                        dynArea.innerHTML = ''; 
                         data.stream.forEach(item => {
                             let html = '';
                             const boxStyle = 'margin-top:2rem; text-align:center; padding:2rem;';
@@ -102,40 +101,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (item.type === 'article') {
                                 const imgHtml = item.image ? `<img src="${item.image}" style="width:100%; max-height:400px; object-fit:cover; border-radius:12px; margin-bottom:1rem;">` : '';
                                 const linkHtml = item.url ? `<div style="margin-top:1.5rem;"><a href="${item.url}" class="btn btn-accent">${item.btnText || 'READ MORE'}</a></div>` : '';
-                                html = `
-                                <div class="glass-container" style="${boxStyle}">
-                                    ${imgHtml}
-                                    <h2 style="margin-bottom:1rem;">${item.headline || ''}</h2>
-                                    <div style="color:#ccc; line-height:1.6;">${item.body ? item.body.replace(/\n/g, '<br>') : ''}</div>
-                                    ${linkHtml}
-                                </div>`;
+                                html = `<div class="glass-container" style="${boxStyle}">${imgHtml}<h2 style="margin-bottom:1rem;">${item.headline || ''}</h2><div style="color:#ccc; line-height:1.6;">${item.body ? item.body.replace(/\n/g, '<br>') : ''}</div>${linkHtml}</div>`;
                             } 
                             else if (item.type === 'video') {
                                 const vId = getYoutubeId(item.videoUrl);
-                                if (vId) {
-                                    html = `
-                                    <div class="glass-container" style="${boxStyle}">
-                                        ${item.headline ? `<h2 style="margin-bottom:1rem;">${item.headline}</h2>` : ''}
-                                        <div class="video-wrapper" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; background:#000; margin-bottom:1rem;">
-                                            <iframe src="https://www.youtube.com/embed/${vId}" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
-                                        </div>
-                                        ${item.body ? `<p style="color:#ccc;">${item.body}</p>` : ''}
-                                    </div>`;
-                                }
+                                if (vId) html = `<div class="glass-container" style="${boxStyle}">${item.headline ? `<h2 style="margin-bottom:1rem;">${item.headline}</h2>` : ''}<div class="video-wrapper" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; background:#000; margin-bottom:1rem;"><iframe src="https://www.youtube.com/embed/${vId}" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe></div>${item.body ? `<p style="color:#ccc;">${item.body}</p>` : ''}</div>`;
                             }
                             else if (item.type === 'photo') {
-                                html = `
-                                <div class="glass-container" style="${boxStyle}">
-                                    <img src="${item.image}" style="width:100%; border-radius:12px; box-shadow:0 5px 20px rgba(0,0,0,0.5);">
-                                    ${item.headline ? `<h3 style="margin-top:1.5rem; margin-bottom:0.5rem;">${item.headline}</h3>` : ''}
-                                    ${item.body ? `<p style="color:#aaa;">${item.body}</p>` : ''}
-                                </div>`;
+                                html = `<div class="glass-container" style="${boxStyle}"><img src="${item.image}" style="width:100%; border-radius:12px; box-shadow:0 5px 20px rgba(0,0,0,0.5);">${item.headline ? `<h3 style="margin-top:1.5rem; margin-bottom:0.5rem;">${item.headline}</h3>` : ''}${item.body ? `<p style="color:#aaa;">${item.body}</p>` : ''}</div>`;
                             }
-                            
                             dynArea.innerHTML += html;
                         });
                     }
-
                 }).catch(e => { if(bContainer) bContainer.style.display = 'block'; });
             }
         });
@@ -251,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 7. BEATS & VIBES (UPDATED FOR FLOATING DELAY) ---
+        // --- 7. BEATS & VIBES (UPDATED WITH SHARE FUNCTION) ---
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
@@ -267,6 +244,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     renderBeats(allBeats);
                     setupCustomDropdowns(allBeats);
+                    
+                    // CHECK URL FOR SHARED BEAT (NEW)
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const sharedBeatSlug = urlParams.get('beat');
+                    if(sharedBeatSlug) {
+                        setTimeout(() => {
+                            const targetRow = document.getElementById(`beat-row-${sharedBeatSlug}`);
+                            if(targetRow) {
+                                targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                targetRow.classList.add('beat-highlight');
+                            }
+                        }, 500); // Small delay to ensure render is done
+                    }
+
                 }).catch(e => beatCont.innerHTML = '<p>No beats found.</p>');
                 
                 const vBtn = document.getElementById('vibe-search-btn');
@@ -275,7 +266,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         const modal = document.getElementById('vibe-modal');
                         modal.classList.add('visible');
                         const bubbles = document.getElementById('vibe-bubbles-container');
-                        
                         let waveform = modal.querySelector('.modal-box .waveform-container');
                         if(!waveform) {
                             const box = modal.querySelector('.modal-box');
@@ -289,49 +279,24 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                             box.appendChild(waveform);
                         }
-
                         if(bubbles.innerHTML === '') {
                             fetch('vibes.json').then(r=>r.json()).then(d => {
                                 (d.vibes||[]).forEach(v => {
                                     const b = document.createElement('button'); 
                                     b.className='floating-vibe'; 
                                     b.textContent=v.name;
-                                    
-                                    // ADD RANDOM FLOAT DELAY (NEW)
                                     b.style.animationDelay = `${Math.random() * 2}s`;
-                                    
-                                    // HOVER EFFECT
                                     b.onmouseenter = () => {
                                         const color = v.color || '#8a2be2';
-                                        b.style.color = color;
-                                        b.style.borderColor = color;
-                                        b.style.boxShadow = `0 0 15px ${color}`;
-                                        document.querySelectorAll('.waveform-bar').forEach(bar => {
-                                            bar.style.background = color;
-                                            bar.style.boxShadow = `0 0 10px ${color}`;
-                                        });
-                                        const modalBox = document.querySelector('.modal-box');
-                                        if(modalBox) {
-                                            modalBox.style.borderColor = color;
-                                            modalBox.style.boxShadow = `0 0 40px ${color}40`; 
-                                        }
+                                        b.style.color = color; b.style.borderColor = color; b.style.boxShadow = `0 0 15px ${color}`;
+                                        document.querySelectorAll('.waveform-bar').forEach(bar => { bar.style.background = color; bar.style.boxShadow = `0 0 10px ${color}`; });
+                                        const modalBox = document.querySelector('.modal-box'); if(modalBox) { modalBox.style.borderColor = color; modalBox.style.boxShadow = `0 0 40px ${color}40`; }
                                     };
-                                    
                                     b.onmouseleave = () => {
-                                        b.style.color = '#fff';
-                                        b.style.borderColor = 'rgba(255,255,255,0.1)';
-                                        b.style.boxShadow = 'none';
-                                        document.querySelectorAll('.waveform-bar').forEach(bar => {
-                                            bar.style.background = '#8a2be2';
-                                            bar.style.boxShadow = 'none';
-                                        });
-                                        const modalBox = document.querySelector('.modal-box');
-                                        if(modalBox) {
-                                            modalBox.style.borderColor = 'rgba(138, 43, 226, 0.5)';
-                                            modalBox.style.boxShadow = '0 0 30px rgba(138, 43, 226, 0.2)';
-                                        }
+                                        b.style.color = '#fff'; b.style.borderColor = 'rgba(255,255,255,0.1)'; b.style.boxShadow = 'none';
+                                        document.querySelectorAll('.waveform-bar').forEach(bar => { bar.style.background = '#8a2be2'; bar.style.boxShadow = 'none'; });
+                                        const modalBox = document.querySelector('.modal-box'); if(modalBox) { modalBox.style.borderColor = 'rgba(138, 43, 226, 0.5)'; modalBox.style.boxShadow = '0 0 30px rgba(138, 43, 226, 0.2)'; }
                                     };
-
                                     b.onclick = () => { 
                                         document.getElementById('vibe-modal').classList.remove('visible');
                                         const f = window.currentPlaylist.filter(beat => beat.tags && beat.tags.some(t => v.tags.includes(t)));
@@ -347,20 +312,12 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 8. STORE DATA & PRESS ---
+        // --- 8. STORE DATA ---
         safeRun(() => {
             const press = document.getElementById('press-container');
-            if(press) {
-                fetch('press.json').then(r=>r.json()).then(d => {
-                    press.innerHTML=''; (d.articles||[]).forEach(i => press.innerHTML += `<div class="press-card"><img src="${i.image}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">READ</a></div></div>`);
-                });
-            }
+            if(press) { fetch('press.json').then(r=>r.json()).then(d => { press.innerHTML=''; (d.articles||[]).forEach(i => press.innerHTML += `<div class="press-card"><img src="${i.image}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">READ</a></div></div>`); }); }
             const pods = document.getElementById('podcasts-container');
-            if(pods) {
-                fetch('podcasts.json').then(r=>r.json()).then(d => {
-                    pods.innerHTML=''; (d.episodes||[]).forEach(i => pods.innerHTML += `<div class="press-card"><img src="${i.cover}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">LISTEN</a></div></div>`);
-                });
-            }
+            if(pods) { fetch('podcasts.json').then(r=>r.json()).then(d => { pods.innerHTML=''; (d.episodes||[]).forEach(i => pods.innerHTML += `<div class="press-card"><img src="${i.cover}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">LISTEN</a></div></div>`); }); }
             const storeSub = document.getElementById('store-subtitle');
             const storeTitle = document.getElementById('store-section-title');
             const bundleList = document.getElementById('bundle-list-content');
@@ -368,16 +325,45 @@ document.addEventListener('DOMContentLoaded', () => {
                  fetch('store.json').then(r => r.json()).then(data => {
                      if(storeSub && data.subtitle) storeSub.textContent = data.subtitle;
                      if(storeTitle && data.sectionTitle) storeTitle.textContent = data.sectionTitle;
-                     if(bundleList && data.bundleItems) {
-                         bundleList.innerHTML = data.bundleItems.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`).join('');
-                     }
+                     if(bundleList && data.bundleItems) { bundleList.innerHTML = data.bundleItems.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`).join(''); }
                  }).catch(e => console.log("Store json load error"));
             }
         });
     }
 
+    // --- HELPERS (UPDATED WITH SHARE LOGIC) ---
     function safeRun(fn) { try { fn(); } catch(e) { console.error("Script Error:", e); } }
     function getYoutubeId(url) { if(!url) return null; const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
+    
+    // Slugify for URL friendly IDs
+    function slugify(text) {
+        return text.toString().toLowerCase()
+            .replace(/\s+/g, '-')           // Replace spaces with -
+            .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+            .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+            .replace(/^-+/, '')             // Trim - from start of text
+            .replace(/-+$/, '');            // Trim - from end of text
+    }
+
+    // EXPOSE SHARE FUNCTION TO WINDOW
+    window.shareBeat = function(title) {
+        const slug = slugify(title);
+        const shareUrl = `${window.location.origin}${window.location.pathname}?beat=${slug}`;
+        
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            // Show Feedback
+            let feedback = document.getElementById('copy-feedback');
+            if(!feedback) {
+                feedback = document.createElement('div');
+                feedback.id = 'copy-feedback';
+                feedback.className = 'copy-feedback';
+                feedback.innerText = 'LINK COPIED! 📋';
+                document.body.appendChild(feedback);
+            }
+            feedback.classList.add('show');
+            setTimeout(() => feedback.classList.remove('show'), 2000);
+        });
+    };
 
     window.playTrack = function(url, title, cover, index) {
         if (audio.src === window.location.origin + url || audio.src === url) { 
@@ -458,12 +444,16 @@ document.addEventListener('DOMContentLoaded', () => {
         if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats.</p>'; return; }
         beats.forEach((b, i) => {
             const safeTitle = b.title.replace(/'/g, "\\'");
+            const slug = slugify(b.title); // Unique ID helper
             const img = b.cover || 'https://via.placeholder.com/100'; 
             cont.innerHTML += `
-            <div class="beat-row">
+            <div class="beat-row" id="beat-row-${slug}">
                 <div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div>
                 <div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div>
-                <div class="beat-actions"><a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a></div>
+                <div class="beat-actions">
+                    <button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button>
+                    <a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a>
+                </div>
             </div>`;
         });
     }
