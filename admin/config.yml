@@ -118,7 +118,7 @@ collections:
               - {label: "Buy Link (Payhip)", name: "bundleUrl", widget: "string"}
               - {label: "Free Download Link", name: "downloadUrl", widget: "string", required: false}
 
-  # --- 7. BEAT STORE (UPDATED WITH COVER) ---
+  # --- 7. BEAT STORE ---
   - name: "beats"
     label: "💰 Beat Store"
     files:
@@ -193,12 +193,12 @@ collections:
               - {label: "Name", name: "name", widget: "string"}
               - {label: "Tags", name: "tags", widget: "list"}
 
-  # --- 11. HOME PAGE ---
+  # --- 11. GENERAL PAGES ---
   - name: "pages"
-    label: "🏠 Home Page"
+    label: "🌐 General Pages"
     files:
       - name: "home"
-        label: "Home Page Config"
+        label: "Home Page"
         file: "home.json"
         fields:
           - {label: "Main Banner", name: "heroImage", widget: "image", required: false}
@@ -215,3 +215,16 @@ collections:
           - {label: "Stream Link", name: "dropStream", widget: "string", required: false}
           - {label: "Buy Link", name: "dropBuy", widget: "string", required: false}
           - {label: "Free Link", name: "dropFree", widget: "string", required: false}
+      
+      - name: "store"
+        label: "Store Page"
+        file: "store.json"
+        fields:
+          - {label: "Page Title", name: "title", widget: "string", default: "STORE"}
+          - {label: "Subtitle", name: "subtitle", widget: "string", default: "Το πλήρες πακέτο περιεχομένου για κάθε τραγούδι που αγοράζεις."}
+          - name: "bundleItems"
+            label: "Bundle List Items"
+            widget: "list"
+            fields:
+              - {label: "Item Text", name: "text", widget: "string"}
+              - {label: "FontAwesome Icon Class (e.g. fas fa-music)", name: "icon", widget: "string"}
