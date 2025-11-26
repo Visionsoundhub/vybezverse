@@ -53,7 +53,7 @@ collections:
           - {label: "AI Access Title", name: "aiTitle", widget: "string"}
           - {label: "AI Access Text", name: "aiText", widget: "text"}
           - {label: "Vault Beats Title", name: "vaultTitle", widget: "string"}
-          - {label: "Vault Beats Text", widget: "text"}
+          - {label: "Vault Beats Text", name: "vaultText", widget: "text"}
 
   # --- 3. BIO PAGE ---
   - name: "bio"
@@ -98,7 +98,7 @@ collections:
               - {label: "Link / URL", name: "url", widget: "string"}
               - {label: "Open in New Tab?", name: "newTab", widget: "boolean", default: false}
 
-  # --- 6. RELEASES (UPDATED FOR FILTERS) ---
+  # --- 6. RELEASES ---
   - name: "releases"
     label: "🎹 Releases"
     files:
