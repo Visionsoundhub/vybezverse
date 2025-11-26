@@ -277,5 +277,12 @@ collections:
             fields:
               - {label: "Product Name", name: "name", widget: "string"}
               - {label: "Price", name: "price", widget: "string", default: "25.00€"}
-              - {label: "Image", name: "image", widget: "image"}
+              - {label: "Main Image", name: "image", widget: "image"}
+              - {label: "Description", name: "description", widget: "text", required: false}
+              - name: "gallery"
+                label: "Additional Images (Gallery)"
+                widget: "list"
+                required: false
+                fields:
+                  - {label: "Image", name: "img", widget: "image"}
               - {label: "Buy Link", name: "link", widget: "string"}
