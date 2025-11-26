@@ -191,6 +191,7 @@ collections:
             widget: "list"
             fields:
               - {label: "Name", name: "name", widget: "string"}
+              - {label: "Color (Hex)", name: "color", widget: "color", required: false} # NEW COLOR FIELD
               - {label: "Tags", name: "tags", widget: "list"}
 
   # --- 11. GENERAL PAGES ---
