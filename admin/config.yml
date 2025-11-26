@@ -98,7 +98,7 @@ collections:
               - {label: "Link / URL", name: "url", widget: "string"}
               - {label: "Open in New Tab?", name: "newTab", widget: "boolean", default: false}
 
-  # --- 6. RELEASES ---
+  # --- 6. RELEASES (UPDATED FOR FILTERS) ---
   - name: "releases"
     label: "🎹 Releases"
     files:
@@ -112,6 +112,8 @@ collections:
             fields:
               - {label: "Title", name: "title", widget: "string"}
               - {label: "Short Description", name: "description", widget: "text", required: false}
+              - {label: "Genre", name: "genre", widget: "select", options: ["Rap", "Trap", "Reggaeton", "Amapiano", "Afrobeats", "Rap/Rock", "Swing", "Alternative", "Pop"], required: true}
+              - {label: "Release Type", name: "type", widget: "select", options: ["Single", "EP", "Album"], required: true}
               - {label: "YouTube Video URL", name: "youtubeUrl", widget: "string"}
               - {label: "Cover Art", name: "cover", widget: "image"}
               - {label: "Stream Link", name: "streamUrl", widget: "string"}
@@ -139,7 +141,6 @@ collections:
               - {label: "BPM", name: "bpm", widget: "string", required: false}
               - {label: "Key", name: "key", widget: "string", required: false}
               - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
-              # RELATION WIDGET ΓΙΑ ΤΑ VIBES
               - label: "Vibe Tags"
                 name: "tags"
                 widget: "relation"
@@ -203,7 +204,7 @@ collections:
               - {label: "Color (Hex)", name: "color", widget: "color", required: false}
               - {label: "Tags", name: "tags", widget: "list"}
 
-  # --- 11. GENERAL PAGES ---
+  # --- 11. GENERAL PAGES (UPDATED FOR RELEASES SETTINGS) ---
   - name: "pages"
     label: "🌐 General Pages"
     files:
@@ -261,6 +262,7 @@ collections:
         file: "releases_settings.json"
         fields:
           - {label: "Page Title", name: "pageTitle", widget: "string", default: "MUSIC CATALOG"}
+          - {label: "Page Description", name: "pageDescription", widget: "text", default: "Δεν είναι απλά Releases. Είναι το ημερολόγιο μιας δημιουργικής υπερφόρτωσης..."}
           - {label: "Button: All Releases", name: "allReleasesText", widget: "string", default: "All Releases"}
           - {label: "Button: Why Buy", name: "whyBuyText", widget: "string", default: "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;"}
           - {label: "Button: What's Included", name: "whatsIncludedText", widget: "string", default: "ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;"}
@@ -276,7 +278,6 @@ collections:
         file: "store.json"
         fields:
           - {label: "Page Title (H1)", name: "title", widget: "string", default: "STORE"}
-          # MOVED STATUS & COMING SOON TO MERCH COLLECTION BELOW
           - {label: "--- BUNDLE LIST (For Releases Modal) ---", name: "sep_bund", widget: "hidden"}
           - {label: "Bundle Subtitle", name: "subtitle", widget: "string", default: "Το πλήρες πακέτο περιεχομένου για κάθε τραγούδι που αγοράζεις."}
           - name: "bundleItems"
