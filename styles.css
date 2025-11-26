@@ -449,7 +449,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 }
 .copy-feedback.show { opacity: 1; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-/* --- MOBILE OPTIMIZATIONS (Updated for Compact Info) --- */
+/* --- MOBILE OPTIMIZATIONS (FIXED MODAL VISIBILITY) --- */
 @media (max-width: 900px) {
     .main-navigation { padding: 0.8rem 1.5rem; }
     .logo-text { font-size: 1.2rem; }
@@ -468,10 +468,16 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     .hero-section { padding: 1rem 1rem 0.5rem 1rem; }
     .hero-beat-art { display: none !important; }
     
-    /* HIDE ACCORDIONS ON MOBILE */
-    .info-accordions-container { display: none; }
+    /* --- ΔΙΟΡΘΩΣΗ ΕΔΩ --- */
+    /* Κρύβουμε ΜΟΝΟ το Desktop Container (με βάση το ID) */
+    #info-accordions-container { display: none; }
+    
+    /* Εμφανίζουμε το περιεχόμενο μέσα στο Modal */
+    #info-modal-content { display: flex !important; flex-direction: column; gap: 10px; }
+    
     /* SHOW MOBILE INFO BUTTON */
     #mobile-info-btn { display: inline-flex !important; margin-top: 10px; }
+    /* ------------------- */
     
     .compact-filters-container { flex-direction: column; gap: 12px; margin-top: 0; padding-top: 0; } 
     .custom-select { width: 100%; } 
