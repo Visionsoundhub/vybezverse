@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 7. BEATS & VIBES ---
+        // --- 7. BEATS & VIBES (UPDATED FOR GLOW) ---
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
@@ -269,7 +269,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     setupCustomDropdowns(allBeats);
                 }).catch(e => beatCont.innerHTML = '<p>No beats found.</p>');
                 
-                // VIBE SEARCH LOGIC (UPDATED WITH WAVEFORM)
                 const vBtn = document.getElementById('vibe-search-btn');
                 if(vBtn) {
                     vBtn.onclick = () => {
@@ -277,13 +276,11 @@ document.addEventListener('DOMContentLoaded', () => {
                         modal.classList.add('visible');
                         const bubbles = document.getElementById('vibe-bubbles-container');
                         
-                        // Add Waveform Container if not exists
                         let waveform = modal.querySelector('.modal-box .waveform-container');
                         if(!waveform) {
                             const box = modal.querySelector('.modal-box');
                             waveform = document.createElement('div');
                             waveform.className = 'waveform-container';
-                            // Create bars
                             for(let i=0; i<30; i++) {
                                 const bar = document.createElement('div');
                                 bar.className = 'waveform-bar';
@@ -300,26 +297,42 @@ document.addEventListener('DOMContentLoaded', () => {
                                     b.className='floating-vibe'; 
                                     b.textContent=v.name;
                                     
-                                    // HOVER EFFECT ON WAVEFORM
+                                    // HOVER EFFECT ON MODAL & WAVEFORM
                                     b.onmouseenter = () => {
                                         const color = v.color || '#8a2be2';
+                                        // Button
                                         b.style.color = color;
                                         b.style.borderColor = color;
                                         b.style.boxShadow = `0 0 15px ${color}`;
+                                        // Waveform
                                         document.querySelectorAll('.waveform-bar').forEach(bar => {
                                             bar.style.background = color;
                                             bar.style.boxShadow = `0 0 10px ${color}`;
                                         });
+                                        // Modal Box (NEW)
+                                        const modalBox = document.querySelector('.modal-box');
+                                        if(modalBox) {
+                                            modalBox.style.borderColor = color;
+                                            modalBox.style.boxShadow = `0 0 40px ${color}40`; // Transparent glow
+                                        }
                                     };
                                     
                                     b.onmouseleave = () => {
+                                        // Reset Button
                                         b.style.color = '#fff';
                                         b.style.borderColor = 'rgba(255,255,255,0.1)';
                                         b.style.boxShadow = 'none';
+                                        // Reset Waveform
                                         document.querySelectorAll('.waveform-bar').forEach(bar => {
-                                            bar.style.background = '#8a2be2'; // reset to brand purple
+                                            bar.style.background = '#8a2be2';
                                             bar.style.boxShadow = 'none';
                                         });
+                                        // Reset Modal Box
+                                        const modalBox = document.querySelector('.modal-box');
+                                        if(modalBox) {
+                                            modalBox.style.borderColor = 'rgba(138, 43, 226, 0.5)';
+                                            modalBox.style.boxShadow = '0 0 30px rgba(138, 43, 226, 0.2)';
+                                        }
                                     };
 
                                     b.onclick = () => { 
