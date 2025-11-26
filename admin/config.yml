@@ -136,14 +136,14 @@ collections:
           - {label: "Key", name: "key", widget: "string", required: false}
           - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
           # --- ΑΛΛΑΓΗ ΕΔΩ: RELATION WIDGET ---
-          - label: "Vibe Tags"
+         - label: "Vibe Tags"
             name: "tags"
             widget: "relation"
             collection: "vibes"
             file: "vibesConfig"
-            search_fields: ["vibes.name"]
-            value_field: "vibes.tags"
-            display_fields: ["vibes.name"]
+            search_fields: ["vibes.*.name"]   # ΠΡΟΣΘΕΣΑ ΤΟ .*
+            value_field: "vibes.*.tags"       # ΠΡΟΣΘΕΣΑ ΤΟ .*
+            display_fields: ["vibes.*.name"]  # ΠΡΟΣΘΕΣΑ ΤΟ .*
             multiple: true
 
   # --- 8. PRESS ---
@@ -307,4 +307,5 @@ collections:
                 fields:
                   - {label: "Image", name: "img", widget: "image"}
               - {label: "Buy Link", name: "link", widget: "string"}
+
 
