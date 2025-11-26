@@ -32,6 +32,6 @@
       "icon": "fas fa-book"
     }
   ],
-  "merchActive": false,
+  "merchActive": true,
   "comingSoonText": "MERCH DROP 2025 COMING SOON"
 }
