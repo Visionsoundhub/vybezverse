@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 setTimeout(() => preloader.style.display = 'none', 800);
             }
         };
-        // Fallback safety (max 5 sec)
         setTimeout(() => {
             const preloader = document.getElementById('neuro-preloader');
             if(preloader && !preloader.classList.contains('loaded')) {
@@ -140,7 +139,7 @@ document.addEventListener('DOMContentLoaded', () => {
         safeRun(() => {
             const releasesContainer = document.getElementById('releases-list');
             if (releasesContainer) {
-                fetch('releases.json?t=' + new Date().getTime()).then(r => r.ok ? r.json() : Promise.reject()).then(data => {
+                fetch('releases.json?t=' + new Date().getTime()).then(r => r.ok ? r.json() : Promise.reject("No releases")).then(data => {
                     releasesContainer.innerHTML = '';
                     let tracks = data.tracks ? data.tracks : (Array.isArray(data) ? data : []);
                     if (tracks.length === 0) { releasesContainer.innerHTML = '<p style="text-align:center;">No releases found yet.</p>'; return; }
@@ -152,12 +151,33 @@ document.addEventListener('DOMContentLoaded', () => {
                         releasesContainer.innerHTML += `<div class="beat-row"><div class="beat-art"><img src="${coverImg}" alt="Art"></div><div class="beat-info"><h4>${track.title || 'Untitled'}</h4>${descHtml}<div class="beat-meta">Available Now</div></div><div class="beat-actions"><a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i> YOUTUBE</a><a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM IT</a><a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>${downloadBtn}</div></div>`;
                     });
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error.</p>'; });
-                const bundleList = document.getElementById('bundle-list-content'); const storeSub = document.getElementById('store-subtitle');
-                if(bundleList) { fetch('store.json').then(r => r.json()).then(data => { if(storeSub && data.subtitle) storeSub.textContent = data.subtitle; if(data.bundleItems) bundleList.innerHTML = data.bundleItems.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`).join(''); }).catch(() => {}); }
+                
+                const bundleList = document.getElementById('bundle-list-content');
+                const storeSub = document.getElementById('store-subtitle');
+                
+                // FETCH RELEASES PAGE SETTINGS (NEW BUTTONS & TITLE)
+                const relTitle = document.getElementById('releases-title');
+                const allBtn = document.getElementById('all-releases-btn');
+                const whyBtn = document.getElementById('why-buy-text');
+                const bundBtn = document.getElementById('bundle-text');
+
+                fetch('releases_settings.json').then(r=>r.json()).then(s => {
+                    if(relTitle && s.pageTitle) relTitle.textContent = s.pageTitle;
+                    if(allBtn && s.allReleasesText) allBtn.textContent = s.allReleasesText;
+                    if(whyBtn && s.whyBuyText) whyBtn.textContent = s.whyBuyText;
+                    if(bundBtn && s.whatsIncludedText) bundBtn.textContent = s.whatsIncludedText;
+                }).catch(() => {});
+
+                if(bundleList) {
+                    fetch('store.json').then(r => r.json()).then(data => {
+                        if(storeSub && data.subtitle) storeSub.textContent = data.subtitle;
+                        if(data.bundleItems) bundleList.innerHTML = data.bundleItems.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`).join('');
+                    }).catch(() => {});
+                }
             }
         });
 
-        // --- 3. STORE (MERCH STATUS LOGIC) ---
+        // --- 3. STORE ---
         safeRun(() => {
             const merchGrid = document.getElementById('merch-grid');
             const comingSoon = document.getElementById('merch-coming-soon');
@@ -166,35 +186,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if(merchGrid || comingSoon) {
                 fetch('store.json').then(r => r.json()).then(settings => { if(pageTitle && settings.title) pageTitle.textContent = settings.title; });
-                
                 fetch('merch.json?t=' + new Date().getTime()).then(r => r.json()).then(data => {
-                    // STATUS CHECK FROM MERCH.JSON (New Logic)
                     if (data.storeStatus) {
                         if(comingSoon) comingSoon.style.display = 'none';
                         if(document.getElementById('merch-grid-container')) document.getElementById('merch-grid-container').style.display = 'block';
-                        
                         window.loadedProducts = data.products || []; 
-                        if(window.loadedProducts.length === 0) {
-                            merchGrid.innerHTML = '<p style="text-align:center; width:100%;">No products found.</p>';
-                        } else {
+                        if(window.loadedProducts.length === 0) { merchGrid.innerHTML = '<p style="text-align:center; width:100%;">No products found.</p>'; } 
+                        else {
                             merchGrid.innerHTML = '';
                             window.loadedProducts.forEach((prod, index) => {
-                                if(prod.status === 'hidden') return; // SKIP HIDDEN
-
+                                if(prod.status === 'hidden') return; 
                                 const isSoldOut = prod.status === 'sold_out';
                                 const soldClass = isSoldOut ? 'sold-out' : '';
                                 const btnText = isSoldOut ? 'SOLD OUT' : 'DETAILS';
                                 const clickAction = isSoldOut ? '' : `onclick="window.openProductModal(${index})"`;
-
-                                merchGrid.innerHTML += `
-                                <div class="gallery-item ${soldClass}" style="aspect-ratio:auto;" ${clickAction}>
-                                    <div style="height:250px; overflow:hidden;"><img src="${prod.image}" style="width:100%; height:100%; object-fit:cover;"></div>
-                                    <div style="padding:1rem; text-align:center; background:rgba(0,0,0,0.5);">
-                                        <h4 style="margin:0 0 0.5rem 0;">${prod.name}</h4>
-                                        <div style="color:#8a2be2; font-weight:bold; margin-bottom:1rem;">${prod.price}</div>
-                                        <button class="btn btn-outline" style="width:100%;">${btnText}</button>
-                                    </div>
-                                </div>`;
+                                merchGrid.innerHTML += `<div class="gallery-item ${soldClass}" style="aspect-ratio:auto;" ${clickAction}><div style="height:250px; overflow:hidden;"><img src="${prod.image}" style="width:100%; height:100%; object-fit:cover;"></div><div style="padding:1rem; text-align:center; background:rgba(0,0,0,0.5);"><h4 style="margin:0 0 0.5rem 0;">${prod.name}</h4><div style="color:#8a2be2; font-weight:bold; margin-bottom:1rem;">${prod.price}</div><button class="btn btn-outline" style="width:100%;">${btnText}</button></div></div>`;
                             });
                         }
                     } else {
@@ -226,28 +232,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     const sharedBeatSlug = urlParams.get('beat');
                     if(sharedBeatSlug) { setTimeout(() => { const targetRow = document.getElementById(`beat-row-${sharedBeatSlug}`); if(targetRow) { targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' }); targetRow.classList.add('beat-highlight'); } }, 500); }
                 }).catch(e => beatCont.innerHTML = '<p>No beats found.</p>');
-                
-                const accordionCont = document.getElementById('info-accordions-container');
-                const mobileInfoBtn = document.getElementById('mobile-info-btn');
+                const accordionCont = document.getElementById('info-accordions-container'); const mobileInfoBtn = document.getElementById('mobile-info-btn');
                 if(accordionCont) {
                     fetch('settings.json').then(r => r.json()).then(settings => {
                         const items = [ { title: settings.exclusiveTitle, text: settings.exclusiveText, icon: 'fas fa-crown' }, { title: settings.aiTitle, text: settings.aiText, icon: 'fas fa-robot' }, { title: settings.vaultTitle, text: settings.vaultText, icon: 'fas fa-dungeon' } ];
                         let html = ''; items.forEach(item => { if(item.title && item.text) { html += `<div class="accordion-item"><button class="accordion-btn"><span><i class="${item.icon}" style="margin-right:10px; color:#8a2be2;"></i> ${item.title}</span><i class="fas fa-chevron-down"></i></button><div class="accordion-content"><p style="margin:0; color:#ccc; font-size:0.95rem; line-height:1.6;">${item.text}</p></div></div>`; } });
-                        accordionCont.innerHTML = html;
-                        accordionCont.querySelectorAll('.accordion-btn').forEach(btn => { btn.onclick = () => { const item = btn.parentElement; item.classList.toggle('active'); }; });
-                        if(mobileInfoBtn) {
-                            mobileInfoBtn.onclick = () => {
-                                const modalContent = document.getElementById('info-modal-content');
-                                const modal = document.getElementById('info-modal');
-                                modalContent.innerHTML = accordionCont.innerHTML;
-                                modalContent.querySelectorAll('.accordion-btn').forEach(btn => { btn.onclick = () => { const item = btn.parentElement; item.classList.toggle('active'); }; });
-                                modal.classList.add('visible');
-                            };
-                        }
+                        accordionCont.innerHTML = html; accordionCont.querySelectorAll('.accordion-btn').forEach(btn => { btn.onclick = () => { const item = btn.parentElement; item.classList.toggle('active'); }; });
+                        if(mobileInfoBtn) { mobileInfoBtn.onclick = () => { const modalContent = document.getElementById('info-modal-content'); const modal = document.getElementById('info-modal'); modalContent.innerHTML = accordionCont.innerHTML; modalContent.querySelectorAll('.accordion-btn').forEach(btn => { btn.onclick = () => { const item = btn.parentElement; item.classList.toggle('active'); }; }); modal.classList.add('visible'); }; }
                     });
                 }
                 const vBtn = document.getElementById('vibe-search-btn');
-                if(vBtn) { vBtn.onclick = () => { document.getElementById('vibe-modal').classList.add('visible'); let bubbles = document.getElementById('vibe-bubbles-container'); if(bubbles.innerHTML === '') { fetch('vibes.json').then(r=>r.json()).then(d => { (d.vibes||[]).forEach(v => { const b = document.createElement('button'); b.className='floating-vibe'; b.textContent=v.name; b.style.animationDelay = `${Math.random() * 2}s`; b.onclick = () => { document.getElementById('vibe-modal').classList.remove('visible'); const f = window.currentPlaylist.filter(beat => beat.tags && beat.tags.some(t => v.tags.includes(t))); renderBeats(f); }; bubbles.appendChild(b); }); }); } }; document.getElementById('vibe-modal-close').onclick = () => document.getElementById('vibe-modal').classList.remove('visible'); }
+                if(vBtn) { vBtn.onclick = () => { document.getElementById('vibe-modal').classList.add('visible'); let bubbles = document.getElementById('vibe-bubbles-container'); let waveform = document.querySelector('.modal-box .waveform-container'); if(!waveform) { const box = document.querySelector('#vibe-modal .modal-box'); waveform = document.createElement('div'); waveform.className = 'waveform-container'; for(let i=0; i<30; i++) { const bar = document.createElement('div'); bar.className = 'waveform-bar'; bar.style.animationDelay = `${Math.random()}s`; waveform.appendChild(bar); } box.appendChild(waveform); } if(bubbles.innerHTML === '') { fetch('vibes.json').then(r=>r.json()).then(d => { (d.vibes||[]).forEach(v => { const b = document.createElement('button'); b.className='floating-vibe'; b.textContent=v.name; b.style.animationDelay = `${Math.random() * 2}s`; b.onmouseenter = () => { const color = v.color || '#8a2be2'; b.style.color = color; b.style.borderColor = color; b.style.boxShadow = `0 0 15px ${color}`; document.querySelectorAll('.waveform-bar').forEach(bar => { bar.style.background = color; bar.style.boxShadow = `0 0 10px ${color}`; }); const modalBox = document.querySelector('#vibe-modal .modal-box'); if(modalBox) { modalBox.style.borderColor = color; modalBox.style.boxShadow = `0 0 40px ${color}40`; } }; b.onmouseleave = () => { b.style.color = '#fff'; b.style.borderColor = 'rgba(255,255,255,0.1)'; b.style.boxShadow = 'none'; document.querySelectorAll('.waveform-bar').forEach(bar => { bar.style.background = '#8a2be2'; bar.style.boxShadow = 'none'; }); const modalBox = document.querySelector('#vibe-modal .modal-box'); if(modalBox) { modalBox.style.borderColor = 'rgba(138, 43, 226, 0.5)'; modalBox.style.boxShadow = '0 0 30px rgba(138, 43, 226, 0.2)'; } }; b.onclick = () => { document.getElementById('vibe-modal').classList.remove('visible'); const f = window.currentPlaylist.filter(beat => beat.tags && beat.tags.some(t => v.tags.includes(t))); renderBeats(f); }; bubbles.appendChild(b); }); }); } }; document.getElementById('vibe-modal-close').onclick = () => document.getElementById('vibe-modal').classList.remove('visible'); }
             }
         });
 
