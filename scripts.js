@@ -160,23 +160,13 @@ document.addEventListener('DOMContentLoaded', () => {
                             const streamLink = track.streamUrl || '#';
                             const buyLink = track.bundleUrl || '#';
                             const ytLink = track.youtubeUrl || '#';
-                            
                             const descHtml = track.description ? `<div class="beat-desc">${track.description}</div>` : '';
-
-                            const downloadBtn = track.downloadUrl 
-                                ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>` 
-                                : '';
+                            const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>` : '';
 
                             releasesContainer.innerHTML += `
                             <div class="beat-row">
-                                <div class="beat-art">
-                                    <img src="${coverImg}" alt="Art">
-                                </div>
-                                <div class="beat-info">
-                                    <h4>${track.title || 'Untitled'}</h4>
-                                    ${descHtml}
-                                    <div class="beat-meta">Available Now</div>
-                                </div>
+                                <div class="beat-art"><img src="${coverImg}" alt="Art"></div>
+                                <div class="beat-info"><h4>${track.title || 'Untitled'}</h4>${descHtml}<div class="beat-meta">Available Now</div></div>
                                 <div class="beat-actions">
                                     <a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i> YOUTUBE</a>
                                     <a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM IT</a>
@@ -185,12 +175,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 </div>
                             </div>`;
                         });
-                    })
-                    .catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error.</p>'; });
+                    }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error.</p>'; });
             }
         });
 
-        // --- 3. BIO ---
+        // --- 3. BIO, GALLERY, MENU, FOOTER ---
         safeRun(() => {
             const bioContainer = document.getElementById('bio-container');
             if (bioContainer) {
@@ -200,10 +189,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${data.image}" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`;
                 }).catch(() => {});
             }
-        });
-
-        // --- 4. GALLERY ---
-        safeRun(() => {
             const galleryGrid = document.getElementById('gallery-grid');
             if(galleryGrid) {
                 const gModal = document.getElementById('gallery-modal');
@@ -221,10 +206,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }).catch(() => {});
                 if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target===gModal) gModal.classList.remove('visible'); }; }
             }
-        });
-
-        // --- 5. MENU & FOOTER ---
-        safeRun(() => {
             const burger = document.querySelector('.hamburger');
             const nav = document.querySelector('.nav-links');
             if(burger) {
@@ -232,9 +213,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 clone.onclick = () => { clone.classList.toggle('active'); nav.classList.toggle('active'); };
                 document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => { clone.classList.remove('active'); nav.classList.remove('active'); });
             }
-        });
-
-        safeRun(() => {
             const menuCont = document.querySelector('.nav-links');
             if (menuCont && menuCont.innerHTML === '') {
                 fetch('menu.json').then(r => r.json()).then(d => {
@@ -242,9 +220,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     menuCont.innerHTML = html; updateMenuState();
                 });
             }
-        });
-
-        safeRun(() => {
             const foot = document.getElementById('dynamic-footer');
             if (foot) {
                 fetch('footer.json').then(r => r.json()).then(d => {
@@ -294,15 +269,59 @@ document.addEventListener('DOMContentLoaded', () => {
                     setupCustomDropdowns(allBeats);
                 }).catch(e => beatCont.innerHTML = '<p>No beats found.</p>');
                 
+                // VIBE SEARCH LOGIC (UPDATED WITH WAVEFORM)
                 const vBtn = document.getElementById('vibe-search-btn');
                 if(vBtn) {
                     vBtn.onclick = () => {
-                        document.getElementById('vibe-modal').classList.add('visible');
+                        const modal = document.getElementById('vibe-modal');
+                        modal.classList.add('visible');
                         const bubbles = document.getElementById('vibe-bubbles-container');
+                        
+                        // Add Waveform Container if not exists
+                        let waveform = modal.querySelector('.modal-box .waveform-container');
+                        if(!waveform) {
+                            const box = modal.querySelector('.modal-box');
+                            waveform = document.createElement('div');
+                            waveform.className = 'waveform-container';
+                            // Create bars
+                            for(let i=0; i<30; i++) {
+                                const bar = document.createElement('div');
+                                bar.className = 'waveform-bar';
+                                bar.style.animationDelay = `${Math.random()}s`;
+                                waveform.appendChild(bar);
+                            }
+                            box.appendChild(waveform);
+                        }
+
                         if(bubbles.innerHTML === '') {
                             fetch('vibes.json').then(r=>r.json()).then(d => {
                                 (d.vibes||[]).forEach(v => {
-                                    const b = document.createElement('button'); b.className='btn floating-vibe'; b.textContent=v.name;
+                                    const b = document.createElement('button'); 
+                                    b.className='floating-vibe'; 
+                                    b.textContent=v.name;
+                                    
+                                    // HOVER EFFECT ON WAVEFORM
+                                    b.onmouseenter = () => {
+                                        const color = v.color || '#8a2be2';
+                                        b.style.color = color;
+                                        b.style.borderColor = color;
+                                        b.style.boxShadow = `0 0 15px ${color}`;
+                                        document.querySelectorAll('.waveform-bar').forEach(bar => {
+                                            bar.style.background = color;
+                                            bar.style.boxShadow = `0 0 10px ${color}`;
+                                        });
+                                    };
+                                    
+                                    b.onmouseleave = () => {
+                                        b.style.color = '#fff';
+                                        b.style.borderColor = 'rgba(255,255,255,0.1)';
+                                        b.style.boxShadow = 'none';
+                                        document.querySelectorAll('.waveform-bar').forEach(bar => {
+                                            bar.style.background = '#8a2be2'; // reset to brand purple
+                                            bar.style.boxShadow = 'none';
+                                        });
+                                    };
+
                                     b.onclick = () => { 
                                         document.getElementById('vibe-modal').classList.remove('visible');
                                         const f = window.currentPlaylist.filter(beat => beat.tags && beat.tags.some(t => v.tags.includes(t)));
@@ -320,35 +339,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- 8. STORE DATA & PRESS ---
         safeRun(() => {
-            // PRESS
             const press = document.getElementById('press-container');
             if(press) {
                 fetch('press.json').then(r=>r.json()).then(d => {
                     press.innerHTML=''; (d.articles||[]).forEach(i => press.innerHTML += `<div class="press-card"><img src="${i.image}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">READ</a></div></div>`);
                 });
             }
-            // PODCASTS
             const pods = document.getElementById('podcasts-container');
             if(pods) {
                 fetch('podcasts.json').then(r=>r.json()).then(d => {
                     pods.innerHTML=''; (d.episodes||[]).forEach(i => pods.innerHTML += `<div class="press-card"><img src="${i.cover}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">LISTEN</a></div></div>`);
                 });
             }
-            
-            // STORE PAGE DATA
             const storeSub = document.getElementById('store-subtitle');
             const storeTitle = document.getElementById('store-section-title');
             const bundleList = document.getElementById('bundle-list-content');
-            
             if (storeSub || bundleList || storeTitle) {
                  fetch('store.json').then(r => r.json()).then(data => {
                      if(storeSub && data.subtitle) storeSub.textContent = data.subtitle;
                      if(storeTitle && data.sectionTitle) storeTitle.textContent = data.sectionTitle;
-                     
                      if(bundleList && data.bundleItems) {
-                         bundleList.innerHTML = data.bundleItems.map(item => 
-                            `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`
-                         ).join('');
+                         bundleList.innerHTML = data.bundleItems.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`).join('');
                      }
                  }).catch(e => console.log("Store json load error"));
             }
