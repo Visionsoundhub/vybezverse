@@ -228,7 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 7. BEATS & VIBES (UPDATED WITH SHARE FUNCTION) ---
+        // --- 7. BEATS & VIBES (UPDATED WITH ACCORDION LOGIC) ---
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
@@ -245,7 +245,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderBeats(allBeats);
                     setupCustomDropdowns(allBeats);
                     
-                    // CHECK URL FOR SHARED BEAT (NEW)
                     const urlParams = new URLSearchParams(window.location.search);
                     const sharedBeatSlug = urlParams.get('beat');
                     if(sharedBeatSlug) {
@@ -255,11 +254,47 @@ document.addEventListener('DOMContentLoaded', () => {
                                 targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
                                 targetRow.classList.add('beat-highlight');
                             }
-                        }, 500); // Small delay to ensure render is done
+                        }, 500);
                     }
 
                 }).catch(e => beatCont.innerHTML = '<p>No beats found.</p>');
                 
+                // --- NEW: FETCH SETTINGS FOR ACCORDIONS ---
+                const accordionCont = document.getElementById('info-accordions-container');
+                if(accordionCont) {
+                    fetch('settings.json').then(r => r.json()).then(settings => {
+                        const items = [
+                            { title: settings.exclusiveTitle, text: settings.exclusiveText, icon: 'fas fa-crown' },
+                            { title: settings.aiTitle, text: settings.aiText, icon: 'fas fa-robot' },
+                            { title: settings.vaultTitle, text: settings.vaultText, icon: 'fas fa-dungeon' }
+                        ];
+                        let html = '';
+                        items.forEach(item => {
+                            if(item.title && item.text) {
+                                html += `
+                                <div class="accordion-item">
+                                    <button class="accordion-btn">
+                                        <span><i class="${item.icon}" style="margin-right:10px; color:#8a2be2;"></i> ${item.title}</span>
+                                        <i class="fas fa-chevron-down"></i>
+                                    </button>
+                                    <div class="accordion-content">
+                                        <p style="margin:0; color:#ccc; font-size:0.95rem; line-height:1.6;">${item.text}</p>
+                                    </div>
+                                </div>`;
+                            }
+                        });
+                        accordionCont.innerHTML = html;
+                        
+                        // Add Toggle Logic
+                        accordionCont.querySelectorAll('.accordion-btn').forEach(btn => {
+                            btn.onclick = () => {
+                                const item = btn.parentElement;
+                                item.classList.toggle('active');
+                            };
+                        });
+                    });
+                }
+
                 const vBtn = document.getElementById('vibe-search-btn');
                 if(vBtn) {
                     vBtn.onclick = () => {
@@ -335,23 +370,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function safeRun(fn) { try { fn(); } catch(e) { console.error("Script Error:", e); } }
     function getYoutubeId(url) { if(!url) return null; const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
     
-    // Slugify for URL friendly IDs
     function slugify(text) {
         return text.toString().toLowerCase()
-            .replace(/\s+/g, '-')           // Replace spaces with -
-            .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
-            .replace(/\-\-+/g, '-')         // Replace multiple - with single -
-            .replace(/^-+/, '')             // Trim - from start of text
-            .replace(/-+$/, '');            // Trim - from end of text
+            .replace(/\s+/g, '-')           
+            .replace(/[^\w\-]+/g, '')       
+            .replace(/\-\-+/g, '-')         
+            .replace(/^-+/, '')             
+            .replace(/-+$/, '');            
     }
 
-    // EXPOSE SHARE FUNCTION TO WINDOW
     window.shareBeat = function(title) {
         const slug = slugify(title);
         const shareUrl = `${window.location.origin}${window.location.pathname}?beat=${slug}`;
         
         navigator.clipboard.writeText(shareUrl).then(() => {
-            // Show Feedback
             let feedback = document.getElementById('copy-feedback');
             if(!feedback) {
                 feedback = document.createElement('div');
@@ -444,7 +476,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats.</p>'; return; }
         beats.forEach((b, i) => {
             const safeTitle = b.title.replace(/'/g, "\\'");
-            const slug = slugify(b.title); // Unique ID helper
+            const slug = slugify(b.title); 
             const img = b.cover || 'https://via.placeholder.com/100'; 
             cont.innerHTML += `
             <div class="beat-row" id="beat-row-${slug}">
