@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 2. RELEASES ---
+        // --- 2. RELEASES (UPDATED WITH MODAL CONTENT) ---
         safeRun(() => {
             const releasesContainer = document.getElementById('releases-list');
             if (releasesContainer) {
@@ -155,17 +155,28 @@ document.addEventListener('DOMContentLoaded', () => {
                 const bundleList = document.getElementById('bundle-list-content');
                 const storeSub = document.getElementById('store-subtitle');
                 
-                // FETCH RELEASES PAGE SETTINGS (NEW BUTTONS & TITLE)
+                // FETCH RELEASES PAGE SETTINGS (BUTTONS & MODAL TEXT)
                 const relTitle = document.getElementById('releases-title');
                 const allBtn = document.getElementById('all-releases-btn');
                 const whyBtn = document.getElementById('why-buy-text');
                 const bundBtn = document.getElementById('bundle-text');
+                const modalT = document.getElementById('why-buy-modal-title');
+                const supT = document.getElementById('support-title');
+                const supTxt = document.getElementById('support-text');
+                const getT = document.getElementById('get-title');
+                const getTxt = document.getElementById('get-text');
 
                 fetch('releases_settings.json').then(r=>r.json()).then(s => {
                     if(relTitle && s.pageTitle) relTitle.textContent = s.pageTitle;
                     if(allBtn && s.allReleasesText) allBtn.textContent = s.allReleasesText;
                     if(whyBtn && s.whyBuyText) whyBtn.textContent = s.whyBuyText;
                     if(bundBtn && s.whatsIncludedText) bundBtn.textContent = s.whatsIncludedText;
+                    // Modal Content
+                    if(modalT && s.modalTitle) modalT.textContent = s.modalTitle;
+                    if(supT && s.supportTitle) supT.textContent = s.supportTitle;
+                    if(supTxt && s.supportText) supTxt.textContent = s.supportText;
+                    if(getT && s.getTitle) getT.textContent = s.getTitle;
+                    if(getTxt && s.getText) getTxt.textContent = s.getText;
                 }).catch(() => {});
 
                 if(bundleList) {
@@ -232,13 +243,24 @@ document.addEventListener('DOMContentLoaded', () => {
                     const sharedBeatSlug = urlParams.get('beat');
                     if(sharedBeatSlug) { setTimeout(() => { const targetRow = document.getElementById(`beat-row-${sharedBeatSlug}`); if(targetRow) { targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' }); targetRow.classList.add('beat-highlight'); } }, 500); }
                 }).catch(e => beatCont.innerHTML = '<p>No beats found.</p>');
-                const accordionCont = document.getElementById('info-accordions-container'); const mobileInfoBtn = document.getElementById('mobile-info-btn');
+                
+                const accordionCont = document.getElementById('info-accordions-container');
+                const mobileInfoBtn = document.getElementById('mobile-info-btn');
                 if(accordionCont) {
                     fetch('settings.json').then(r => r.json()).then(settings => {
                         const items = [ { title: settings.exclusiveTitle, text: settings.exclusiveText, icon: 'fas fa-crown' }, { title: settings.aiTitle, text: settings.aiText, icon: 'fas fa-robot' }, { title: settings.vaultTitle, text: settings.vaultText, icon: 'fas fa-dungeon' } ];
                         let html = ''; items.forEach(item => { if(item.title && item.text) { html += `<div class="accordion-item"><button class="accordion-btn"><span><i class="${item.icon}" style="margin-right:10px; color:#8a2be2;"></i> ${item.title}</span><i class="fas fa-chevron-down"></i></button><div class="accordion-content"><p style="margin:0; color:#ccc; font-size:0.95rem; line-height:1.6;">${item.text}</p></div></div>`; } });
-                        accordionCont.innerHTML = html; accordionCont.querySelectorAll('.accordion-btn').forEach(btn => { btn.onclick = () => { const item = btn.parentElement; item.classList.toggle('active'); }; });
-                        if(mobileInfoBtn) { mobileInfoBtn.onclick = () => { const modalContent = document.getElementById('info-modal-content'); const modal = document.getElementById('info-modal'); modalContent.innerHTML = accordionCont.innerHTML; modalContent.querySelectorAll('.accordion-btn').forEach(btn => { btn.onclick = () => { const item = btn.parentElement; item.classList.toggle('active'); }; }); modal.classList.add('visible'); }; }
+                        accordionCont.innerHTML = html;
+                        accordionCont.querySelectorAll('.accordion-btn').forEach(btn => { btn.onclick = () => { const item = btn.parentElement; item.classList.toggle('active'); }; });
+                        if(mobileInfoBtn) {
+                            mobileInfoBtn.onclick = () => {
+                                const modalContent = document.getElementById('info-modal-content');
+                                const modal = document.getElementById('info-modal');
+                                modalContent.innerHTML = accordionCont.innerHTML;
+                                modalContent.querySelectorAll('.accordion-btn').forEach(btn => { btn.onclick = () => { const item = btn.parentElement; item.classList.toggle('active'); }; });
+                                modal.classList.add('visible');
+                            };
+                        }
                     });
                 }
                 const vBtn = document.getElementById('vibe-search-btn');
@@ -279,28 +301,19 @@ document.addEventListener('DOMContentLoaded', () => {
         if(!window.loadedProducts || !window.loadedProducts[index]) return;
         const prod = window.loadedProducts[index];
         const modal = document.getElementById('product-modal');
-        
         document.getElementById('prod-title').textContent = prod.name;
         document.getElementById('prod-price').textContent = prod.price;
         document.getElementById('prod-desc').innerHTML = prod.description ? prod.description.replace(/\n/g, '<br>') : '';
         document.getElementById('prod-buy-btn').href = prod.link || '#';
-        
         const mainImg = document.getElementById('prod-main-img');
         mainImg.src = prod.image;
-        
         const thumbsCont = document.getElementById('prod-thumbnails');
         thumbsCont.innerHTML = '';
         if (prod.gallery && prod.gallery.length > 0) {
             let allImages = [prod.image, ...prod.gallery.map(g => g.img)];
             allImages.forEach(imgSrc => {
-                const thumb = document.createElement('div');
-                thumb.className = 'prod-thumb';
-                thumb.innerHTML = `<img src="${imgSrc}">`;
-                thumb.onclick = () => {
-                    mainImg.src = imgSrc;
-                    document.querySelectorAll('.prod-thumb').forEach(t => t.classList.remove('active'));
-                    thumb.classList.add('active');
-                };
+                const thumb = document.createElement('div'); thumb.className = 'prod-thumb'; thumb.innerHTML = `<img src="${imgSrc}">`;
+                thumb.onclick = () => { mainImg.src = imgSrc; document.querySelectorAll('.prod-thumb').forEach(t => t.classList.remove('active')); thumb.classList.add('active'); };
                 thumbsCont.appendChild(thumb);
             });
             thumbsCont.firstElementChild.classList.add('active');
