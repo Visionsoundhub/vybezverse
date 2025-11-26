@@ -8,6 +8,8 @@ document.addEventListener('DOMContentLoaded', () => {
     window.isPlaying = window.isPlaying || false;
     window.currentCover = window.currentCover || null;
     window.loadedProducts = []; 
+
+    let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
     
     // Global Filter State for Releases
     let activeReleasesFilters = { genre: 'all', type: 'all' };
@@ -151,13 +153,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetch('releases.json?t=' + new Date().getTime()).then(r => r.ok ? r.json() : Promise.reject("No releases")).then(data => {
                     allReleasesTracks = data.tracks || [];
                     
-                    // Populate Filters
                     const uniqueGenres = [...new Set(allReleasesTracks.map(t => t.genre).filter(g => g))];
                     const uniqueTypes = [...new Set(allReleasesTracks.map(t => t.type).filter(t => t))];
                     
                     setupReleaseFilters(uniqueGenres, uniqueTypes);
                     renderFilteredReleases();
-                }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error.</p>'; });
+                }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
                 
                 // Fetch Settings (Buttons, Title, Description)
                 const bundleList = document.getElementById('bundle-list-content');
@@ -382,7 +383,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         // --- 5. OTHER PAGES ---
         safeRun(() => {
-            const bioContainer = document.getElementById('bio-container'); if (bioContainer) { fetch('bio.json').then(r => r.ok ? r.json() : Promise.reject()).then(data => { const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...'; if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title; bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${data.image}" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`; }).catch(() => {}); }
+            const bioContainer = document.getElementById('bio-container'); if (bioContainer) { fetch('bio.json').then(r => r.json()).then(data => { const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...'; if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title; bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${data.image}" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`; }).catch(() => {}); }
             const galleryGrid = document.getElementById('gallery-grid'); if(galleryGrid && !document.getElementById('merch-grid')) { const gModal = document.getElementById('gallery-modal'); const gImg = document.getElementById('gallery-modal-img'); const gCap = document.getElementById('gallery-caption'); const gClose = document.getElementById('close-gallery-modal'); fetch('gallery.json').then(r => r.json()).then(data => { galleryGrid.innerHTML = ''; (data.images || []).forEach(img => { const div = document.createElement('div'); div.className = 'gallery-item'; div.innerHTML = `<img src="${img.src}" alt="${img.caption || ''}">`; div.onclick = () => { gImg.src = img.src; gCap.innerText = img.caption || ''; gModal.classList.add('visible'); }; galleryGrid.appendChild(div); }); }).catch(() => {}); if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target===gModal) gModal.classList.remove('visible'); }; } }
             const burger = document.querySelector('.hamburger'); const nav = document.querySelector('.nav-links'); if(burger) { const clone = burger.cloneNode(true); burger.parentNode.replaceChild(clone, burger); clone.onclick = () => { clone.classList.toggle('active'); nav.classList.toggle('active'); }; document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => { clone.classList.remove('active'); nav.classList.remove('active'); }); }
             const menuCont = document.querySelector('.nav-links'); if (menuCont && menuCont.innerHTML === '') { fetch('menu.json').then(r => r.json()).then(d => { let html = ''; (d.links || []).forEach(l => html += `<a href="${l.url}" class="nav-btn" target="${l.newTab?'_blank':'_self'}">${l.text}</a>`); menuCont.innerHTML = html; updateMenuState(); }); }
@@ -436,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- HELPERS ---
     function safeRun(fn) { try { fn(); } catch(e) { console.error("Script Error:", e); } }
     function getYoutubeId(url) { if(!url) return null; const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
-    function slugify(text) { return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, ''); }
+    function slugify(text) { return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '') /*removed other replacements for simplicity*/ .replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, ''); }
     window.shareBeat = function(title) { const slug = slugify(title); const shareUrl = `${window.location.origin}${window.location.pathname}?beat=${slug}`; navigator.clipboard.writeText(shareUrl).then(() => { let feedback = document.getElementById('copy-feedback'); if(!feedback) { feedback = document.createElement('div'); feedback.id = 'copy-feedback'; feedback.className = 'copy-feedback'; feedback.innerText = 'LINK COPIED! 📋'; document.body.appendChild(feedback); } feedback.classList.add('show'); setTimeout(() => feedback.classList.remove('show'), 2000); }); };
     window.playTrack = function(url, title, cover, index) { if (audio.src === window.location.origin + url || audio.src === url) { if(audio.paused) { audio.play(); window.isPlaying=true; } else { audio.pause(); window.isPlaying=false; } } else { window.currentIndex = index; audio.src = url; const titleEl = document.getElementById('player-track-title'); if(titleEl) titleEl.textContent = title; if(cover) { window.currentCover = cover; restoreHeroArt(); } audio.play(); window.isPlaying = true; } updateUIState(); checkPlayerVisibility(); };
     function playTrackByIndex(idx) { if(idx >= 0 && idx < window.currentPlaylist.length) { const t = window.currentPlaylist[idx]; const cov = t.cover || 'https://via.placeholder.com/100'; window.playTrack(t.audioSrc, t.title, cov, idx); } }
