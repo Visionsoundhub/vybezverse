@@ -8,10 +8,12 @@ document.addEventListener('DOMContentLoaded', () => {
     window.isPlaying = window.isPlaying || false;
     window.currentCover = window.currentCover || null;
     window.loadedProducts = []; 
+    
+    // Global Filter State for Releases
+    let activeReleasesFilters = { genre: 'all', type: 'all' };
+    let allReleasesTracks = [];
 
-    let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
-
-    // --- NEURO-SYNC PRELOADER ---
+    // NEURO-SYNC PRELOADER LOGIC
     const preloader = document.getElementById('neuro-preloader');
     const preloaderText = document.getElementById('neuro-text');
 
@@ -139,23 +141,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 2. RELEASES ---
+        // --- 2. RELEASES (FILTERS & DESCRIPTION) ---
         safeRun(() => {
             const releasesContainer = document.getElementById('releases-list');
+            const relDesc = document.getElementById('releases-description');
+
             if (releasesContainer) {
+                // Fetch Tracks and render lists
                 fetch('releases.json?t=' + new Date().getTime()).then(r => r.ok ? r.json() : Promise.reject("No releases")).then(data => {
-                    releasesContainer.innerHTML = '';
-                    let tracks = data.tracks ? data.tracks : (Array.isArray(data) ? data : []);
-                    if (tracks.length === 0) { releasesContainer.innerHTML = '<p style="text-align:center;">No releases found yet.</p>'; return; }
-                    tracks.forEach(track => {
-                        const coverImg = track.cover || 'https://via.placeholder.com/150';
-                        const streamLink = track.streamUrl || '#'; const buyLink = track.bundleUrl || '#'; const ytLink = track.youtubeUrl || '#';
-                        const descHtml = track.description ? `<div class="beat-desc">${track.description}</div>` : '';
-                        const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>` : '';
-                        releasesContainer.innerHTML += `<div class="beat-row"><div class="beat-art"><img src="${coverImg}" alt="Art"></div><div class="beat-info"><h4>${track.title || 'Untitled'}</h4>${descHtml}<div class="beat-meta">Available Now</div></div><div class="beat-actions"><a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i> YOUTUBE</a><a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM IT</a><a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>${downloadBtn}</div></div>`;
-                    });
+                    allReleasesTracks = data.tracks || [];
+                    
+                    // Populate Filters
+                    const uniqueGenres = [...new Set(allReleasesTracks.map(t => t.genre).filter(g => g))];
+                    const uniqueTypes = [...new Set(allReleasesTracks.map(t => t.type).filter(t => t))];
+                    
+                    setupReleaseFilters(uniqueGenres, uniqueTypes);
+                    renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error.</p>'; });
                 
+                // Fetch Settings (Buttons, Title, Description)
                 const bundleList = document.getElementById('bundle-list-content');
                 const storeSub = document.getElementById('store-subtitle');
                 const relTitle = document.getElementById('releases-title');
@@ -170,9 +174,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 fetch('releases_settings.json').then(r=>r.json()).then(s => {
                     if(relTitle && s.pageTitle) relTitle.textContent = s.pageTitle;
+                    if(relDesc && s.pageDescription) relDesc.textContent = s.pageDescription;
                     if(allBtn && s.allReleasesText) allBtn.textContent = s.allReleasesText;
                     if(whyBtn && s.whyBuyText) whyBtn.textContent = s.whyBuyText;
                     if(bundBtn && s.whatsIncludedText) bundBtn.textContent = s.whatsIncludedText;
+                    
                     if(modalT && s.modalTitle) modalT.textContent = s.modalTitle;
                     if(supT && s.supportTitle) supT.textContent = s.supportTitle;
                     if(supTxt && s.supportText) supTxt.textContent = s.supportText;
@@ -188,6 +194,80 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
+        
+        // Render function for Releases
+        function renderFilteredReleases() {
+            const container = document.getElementById('releases-list');
+            if(!container) return;
+            
+            let filteredTracks = allReleasesTracks.filter(track => {
+                const genreMatch = activeReleasesFilters.genre === 'all' || 
+                                   (track.genre && track.genre.toLowerCase() === activeReleasesFilters.genre);
+                const typeMatch = activeReleasesFilters.type === 'all' || 
+                                  (track.type && track.type.toLowerCase() === activeReleasesFilters.type);
+                return genreMatch && typeMatch;
+            });
+            
+            container.innerHTML = '';
+            if (filteredTracks.length === 0) {
+                container.innerHTML = '<p style="text-align:center;">No releases found for selected filters.</p>';
+                return;
+            }
+
+            filteredTracks.forEach(track => {
+                const coverImg = track.cover || 'https://via.placeholder.com/150';
+                const streamLink = track.streamUrl || '#'; const buyLink = track.bundleUrl || '#'; const ytLink = track.youtubeUrl || '#';
+                const descHtml = track.description ? `<div class="beat-desc">${track.description}</div>` : '';
+                const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>` : '';
+
+                container.innerHTML += `<div class="beat-row"><div class="beat-art"><img src="${coverImg}" alt="Art"></div><div class="beat-info"><h4>${track.title || 'Untitled'}</h4>${descHtml}<div class="beat-meta">Available Now / Type: ${track.type || 'Single'} / Genre: ${track.genre || 'Various'}</div></div><div class="beat-actions"><a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i> YOUTUBE</a><a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM IT</a><a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>${downloadBtn}</div></div>`;
+            });
+        }
+        
+        // Setup function for Releases Filters
+        function setupReleaseFilters(genres, types) {
+            const genreList = document.getElementById('genre-options-list');
+            const typeList = document.getElementById('type-options-list');
+            
+            // Generate Genre Options
+            genreList.innerHTML = '<li data-value="all" class="selected">All Genres</li>';
+            genres.forEach(g => { genreList.innerHTML += `<li data-value="${g.toLowerCase()}">${g}</li>`; });
+
+            // Generate Type Options
+            typeList.innerHTML = '<li data-value="all" class="selected">All Types</li>';
+            types.forEach(t => { typeList.innerHTML += `<li data-value="${t.toLowerCase()}">${t}</li>`; });
+            
+            // Attach Filter Change Logic (Using common function to handle filtering)
+            const filterContainers = [
+                { id: 'custom-releases-genre', type: 'genre' },
+                { id: 'custom-releases-type', type: 'type' }
+            ];
+            
+            filterContainers.forEach(fc => {
+                const container = document.getElementById(fc.id);
+                if (container) {
+                    const btn = container.querySelector('.select-btn');
+                    const options = container.querySelector('.select-options');
+                    const span = btn.querySelector('span');
+
+                    btn.onclick = (e) => { e.stopPropagation(); document.querySelectorAll('.custom-select').forEach(x=>x!==container && x.classList.remove('active')); container.classList.toggle('active'); };
+                    
+                    options.onclick = (e) => {
+                        if(e.target.tagName === 'LI') {
+                            const val = e.target.getAttribute('data-value');
+                            span.textContent = `${fc.type.toUpperCase()}: ${e.target.textContent}`;
+                            
+                            activeReleasesFilters[fc.type] = val;
+                            renderFilteredReleases();
+                            
+                            container.classList.remove('active');
+                            e.target.parentElement.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+                            e.target.classList.add('selected');
+                        }
+                    };
+                }
+            });
+        }
 
         // --- 3. STORE ---
         safeRun(() => {
@@ -224,7 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 4. BEATS & VIBES (UPDATED: SHUFFLE 6 + SWITCH FREQUENCY) ---
+        // --- 4. BEATS & VIBES ---
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
@@ -264,64 +344,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
                 }
-
-                // --- NEW VIBE SEARCH LOGIC (6 ITEMS + SHUFFLE) ---
                 const vBtn = document.getElementById('vibe-search-btn');
-                let allLoadedVibes = []; // Store all vibes here
-
-                // Function to render random 6 vibes + switch button
-                const renderVibeSubset = () => {
-                    const bubbles = document.getElementById('vibe-bubbles-container');
-                    bubbles.innerHTML = '';
-                    
-                    // Shuffle and pick 6
-                    const shuffled = allLoadedVibes.sort(() => 0.5 - Math.random());
-                    const selected = shuffled.slice(0, 6);
-
-                    // Render 6 Vibes
-                    selected.forEach(v => {
-                        const b = document.createElement('button'); 
-                        b.className='floating-vibe'; 
-                        b.textContent=v.name;
-                        b.style.animationDelay = `${Math.random() * 2}s`;
-                        
-                        b.onmouseenter = () => {
-                            const color = v.color || '#8a2be2';
-                            b.style.color = color; b.style.borderColor = color; b.style.boxShadow = `0 0 15px ${color}`;
-                            document.querySelectorAll('.waveform-bar').forEach(bar => { bar.style.background = color; bar.style.boxShadow = `0 0 10px ${color}`; });
-                            const modalBox = document.querySelector('#vibe-modal .modal-box'); if(modalBox) { modalBox.style.borderColor = color; modalBox.style.boxShadow = `0 0 40px ${color}40`; }
-                        };
-                        b.onmouseleave = () => {
-                            b.style.color = '#fff'; b.style.borderColor = 'rgba(255,255,255,0.1)'; b.style.boxShadow = 'none';
-                            document.querySelectorAll('.waveform-bar').forEach(bar => { bar.style.background = '#8a2be2'; bar.style.boxShadow = 'none'; });
-                            const modalBox = document.querySelector('#vibe-modal .modal-box'); if(modalBox) { modalBox.style.borderColor = 'rgba(138, 43, 226, 0.5)'; modalBox.style.boxShadow = '0 0 30px rgba(138, 43, 226, 0.2)'; }
-                        };
-                        b.onclick = () => { 
-                            document.getElementById('vibe-modal').classList.remove('visible');
-                            const f = window.currentPlaylist.filter(beat => beat.tags && beat.tags.some(t => v.tags.includes(t)));
-                            renderBeats(f);
-                        };
-                        bubbles.appendChild(b);
-                    });
-
-                    // Render Switch Frequency Button
-                    const switchBtn = document.createElement('button');
-                    switchBtn.className = 'floating-vibe';
-                    switchBtn.innerHTML = '<i class="fas fa-random" style="color:#8a2be2; margin-right:8px;"></i> SWITCH FREQUENCY';
-                    switchBtn.style.borderColor = '#8a2be2';
-                    switchBtn.onclick = (e) => {
-                        e.stopPropagation(); // Prevent closing modal
-                        renderVibeSubset(); // Re-roll
-                    };
-                    bubbles.appendChild(switchBtn);
-                };
-
                 if(vBtn) {
                     vBtn.onclick = () => {
                         const modal = document.getElementById('vibe-modal');
                         modal.classList.add('visible');
-                        
-                        // Waveform Init
+                        const bubbles = document.getElementById('vibe-bubbles-container');
+                        let allLoadedVibes = [];
                         let waveform = modal.querySelector('.modal-box .waveform-container');
                         if(!waveform) {
                             const box = modal.querySelector('.modal-box');
@@ -329,22 +358,28 @@ document.addEventListener('DOMContentLoaded', () => {
                             for(let i=0; i<30; i++) { const bar = document.createElement('div'); bar.className = 'waveform-bar'; bar.style.animationDelay = `${Math.random()}s`; waveform.appendChild(bar); }
                             box.appendChild(waveform);
                         }
-
-                        // Load Data & Render
-                        if(allLoadedVibes.length === 0) {
-                            fetch('vibes.json').then(r=>r.json()).then(d => {
-                                allLoadedVibes = d.vibes || [];
-                                renderVibeSubset();
+                        const renderVibeSubset = () => {
+                            bubbles.innerHTML = '';
+                            const shuffled = allLoadedVibes.sort(() => 0.5 - Math.random());
+                            const selected = shuffled.slice(0, 6);
+                            selected.forEach(v => {
+                                const b = document.createElement('button'); b.className='floating-vibe'; b.textContent=v.name; b.style.animationDelay = `${Math.random() * 2}s`;
+                                b.onmouseenter = () => { const color = v.color || '#8a2be2'; b.style.color = color; b.style.borderColor = color; b.style.boxShadow = `0 0 15px ${color}`; document.querySelectorAll('.waveform-bar').forEach(bar => { bar.style.background = color; bar.style.boxShadow = `0 0 10px ${color}`; }); const modalBox = document.querySelector('#vibe-modal .modal-box'); if(modalBox) { modalBox.style.borderColor = color; modalBox.style.boxShadow = `0 0 40px ${color}40`; } };
+                                b.onmouseleave = () => { b.style.color = '#fff'; b.style.borderColor = 'rgba(255,255,255,0.1)'; b.style.boxShadow = 'none'; document.querySelectorAll('.waveform-bar').forEach(bar => { bar.style.background = '#8a2be2'; bar.style.boxShadow = 'none'; }); const modalBox = document.querySelector('#vibe-modal .modal-box'); if(modalBox) { modalBox.style.borderColor = 'rgba(138, 43, 226, 0.5)'; modalBox.style.boxShadow = '0 0 30px rgba(138, 43, 226, 0.2)'; } };
+                                b.onclick = () => { document.getElementById('vibe-modal').classList.remove('visible'); const f = window.currentPlaylist.filter(beat => beat.tags && beat.tags.some(t => v.tags.includes(t))); renderBeats(f); };
+                                bubbles.appendChild(b);
                             });
-                        } else {
-                            renderVibeSubset(); // Re-render if already loaded
-                        }
+                            const switchBtn = document.createElement('button'); switchBtn.className = 'floating-vibe'; switchBtn.innerHTML = '<i class="fas fa-random" style="color:#8a2be2; margin-right:8px;"></i> SWITCH FREQUENCY'; switchBtn.style.borderColor = '#8a2be2'; switchBtn.onclick = (e) => { e.stopPropagation(); renderVibeSubset(); }; bubbles.appendChild(switchBtn);
+                        };
+
+                        if(allLoadedVibes.length === 0) {
+                            fetch('vibes.json').then(r=>r.json()).then(d => { allLoadedVibes = d.vibes || []; renderVibeSubset(); });
+                        } else { renderVibeSubset(); }
                     };
                     document.getElementById('vibe-modal-close').onclick = () => document.getElementById('vibe-modal').classList.remove('visible');
                 }
             }
         });
-
         // --- 5. OTHER PAGES ---
         safeRun(() => {
             const bioContainer = document.getElementById('bio-container'); if (bioContainer) { fetch('bio.json').then(r => r.ok ? r.json() : Promise.reject()).then(data => { const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...'; if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title; bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${data.image}" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`; }).catch(() => {}); }
