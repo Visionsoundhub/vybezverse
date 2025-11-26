@@ -32,6 +32,28 @@
             <p style="margin-top:1rem; color:#888;">APPAREL . ACCESSORIES . COLLECTIBLES</p>
         </div>
 
+        <div class="modal-overlay" id="product-modal">
+            <div class="modal-box" id="product-modal-box" style="max-width:900px; padding:0; overflow:hidden; display:flex; flex-direction:column;">
+                <button class="modal-close-btn" id="close-product-modal" style="z-index:100;">&times;</button>
+                
+                <div class="product-modal-content">
+                    <div class="product-gallery-section">
+                        <div class="main-img-container">
+                            <img id="prod-main-img" src="" alt="Product">
+                        </div>
+                        <div id="prod-thumbnails" class="prod-thumbnails"></div>
+                    </div>
+
+                    <div class="product-info-section">
+                        <h2 id="prod-title" style="text-align:left; margin-bottom:0.5rem;">PRODUCT TITLE</h2>
+                        <div id="prod-price" style="font-size:1.5rem; color:#8a2be2; font-weight:bold; margin-bottom:1.5rem;">25.00€</div>
+                        <div id="prod-desc" style="color:#ccc; margin-bottom:2rem; line-height:1.6; flex-grow:1;"></div>
+                        <a id="prod-buy-btn" href="#" target="_blank" class="btn btn-glow" style="width:100%; text-align:center; justify-content:center;">BUY NOW</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <div id="sticky-player">
