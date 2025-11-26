@@ -252,8 +252,7 @@ collections:
         file: "store.json"
         fields:
           - {label: "Page Title (H1)", name: "title", widget: "string", default: "STORE"}
-          - {label: "Store Status (ON = Show Products, OFF = Coming Soon)", name: "merchActive", widget: "boolean", default: false}
-          - {label: "Coming Soon Text", name: "comingSoonText", widget: "string", default: "MERCH DROP 2025. COMING SOON."}
+          # MOVED STATUS & COMING SOON TO MERCH COLLECTION BELOW
           - {label: "--- BUNDLE LIST (For Releases Modal) ---", name: "sep_bund", widget: "hidden"}
           - {label: "Bundle Subtitle", name: "subtitle", widget: "string", default: "Το πλήρες πακέτο περιεχομένου για κάθε τραγούδι που αγοράζεις."}
           - name: "bundleItems"
@@ -263,18 +262,21 @@ collections:
               - {label: "Item Text", name: "text", widget: "string"}
               - {label: "FontAwesome Icon Class (e.g. fas fa-music)", name: "icon", widget: "string"}
 
-  # --- 12. MERCH STORE ---
+  # --- 12. MERCH STORE (CONSOLIDATED) ---
   - name: "merch"
     label: "👕 Merch Store"
     files:
       - name: "merch_catalog"
-        label: "Products"
+        label: "Store Settings & Products"
         file: "merch.json"
         fields:
+          - {label: "Store Status (ON = Show Products, OFF = Coming Soon)", name: "storeStatus", widget: "boolean", default: false}
+          - {label: "Coming Soon Text", name: "comingSoonText", widget: "string", default: "MERCH DROP 2025. COMING SOON."}
           - name: "products"
             label: "Product List"
             widget: "list"
             fields:
+              - {label: "Product Status", name: "status", widget: "select", options: ["available", "sold_out", "hidden"], default: "available"}
               - {label: "Product Name", name: "name", widget: "string"}
               - {label: "Price", name: "price", widget: "string", default: "25.00€"}
               - {label: "Main Image", name: "image", widget: "image"}
