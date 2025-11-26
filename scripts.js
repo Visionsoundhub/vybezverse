@@ -19,6 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GLOBAL CLICK LISTENER ---
     document.addEventListener('click', (e) => {
+        // BUNDLE MODAL
         if (e.target.closest('#open-bundle-modal')) {
             const modal = document.getElementById('bundle-modal');
             if(modal) modal.classList.add('visible');
@@ -27,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const modal = document.getElementById('bundle-modal');
             if(modal) modal.classList.remove('visible');
         }
+        // RELEASES WHY BUY
         if (e.target.closest('#why-buy-btn')) {
             const modal = document.getElementById('why-buy-modal');
             if(modal) modal.classList.add('visible');
@@ -35,6 +37,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const modal = document.getElementById('why-buy-modal');
             if(modal) modal.classList.remove('visible');
         }
+        // INFO MODAL (NEW FOR MOBILE)
+        if (e.target.closest('#info-modal-close')) {
+            const modal = document.getElementById('info-modal');
+            if(modal) modal.classList.remove('visible');
+        }
+        // OVERLAY CLOSE
         if (e.target.classList.contains('modal-overlay')) {
             e.target.classList.remove('visible');
         }
@@ -228,7 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 7. BEATS & VIBES (UPDATED WITH ACCORDION LOGIC) ---
+        // --- 7. BEATS & VIBES (UPDATED WITH MOBILE INFO LOGIC) ---
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
@@ -259,8 +267,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 }).catch(e => beatCont.innerHTML = '<p>No beats found.</p>');
                 
-                // --- NEW: FETCH SETTINGS FOR ACCORDIONS ---
+                // FETCH SETTINGS & SETUP INFO MODAL (FOR MOBILE)
                 const accordionCont = document.getElementById('info-accordions-container');
+                const mobileInfoBtn = document.getElementById('mobile-info-btn');
+                
                 if(accordionCont) {
                     fetch('settings.json').then(r => r.json()).then(settings => {
                         const items = [
@@ -285,13 +295,28 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                         accordionCont.innerHTML = html;
                         
-                        // Add Toggle Logic
+                        // Logic for Desktop Accordions
                         accordionCont.querySelectorAll('.accordion-btn').forEach(btn => {
-                            btn.onclick = () => {
-                                const item = btn.parentElement;
-                                item.classList.toggle('active');
-                            };
+                            btn.onclick = () => { const item = btn.parentElement; item.classList.toggle('active'); };
                         });
+
+                        // Logic for Mobile Modal Button
+                        if(mobileInfoBtn) {
+                            mobileInfoBtn.onclick = () => {
+                                const modalContent = document.getElementById('info-modal-content');
+                                const modal = document.getElementById('info-modal');
+                                
+                                // Copy content from desktop container to modal
+                                modalContent.innerHTML = accordionCont.innerHTML;
+                                
+                                // Re-attach click events for modal accordions
+                                modalContent.querySelectorAll('.accordion-btn').forEach(btn => {
+                                    btn.onclick = () => { const item = btn.parentElement; item.classList.toggle('active'); };
+                                });
+                                
+                                modal.classList.add('visible');
+                            };
+                        }
                     });
                 }
 
