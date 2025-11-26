@@ -1,0 +1,34 @@
+{
+  "title": "STORE",
+  "subtitle": "Το πλήρες πακέτο περιεχομένου για κάθε τραγούδι που αγοράζεις.",
+  "bundleItems": [
+    {
+      "text": "High Quality MP3 (320kbps)",
+      "icon": "fas fa-music"
+    },
+    {
+      "text": "Εναλλακτικές Εκδόσεις",
+      "icon": "fas fa-random"
+    },
+    {
+      "text": "Ringtone",
+      "icon": "fas fa-mobile-alt"
+    },
+    {
+      "text": "Signed Artwork",
+      "icon": "fas fa-image"
+    },
+    {
+      "text": "Χειρόγραφοι Στίχοι",
+      "icon": "fas fa-pen-nib"
+    },
+    {
+      "text": "BTS Video",
+      "icon": "fas fa-video"
+    },
+    {
+      "text": "Οδηγίες Χρήσης",
+      "icon": "fas fa-book"
+    }
+  ]
+}
