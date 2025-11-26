@@ -55,7 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const bContainer = document.getElementById('home-banner-container'); // Container fix
                 
                 fetch('home.json').then(r => r.json()).then(data => {
-                    // FIX: Αυτό έλειπε ή ήταν λάθος. Τώρα εμφανίζεται σίγουρα.
                     if(bContainer) bContainer.style.display = 'block'; 
                     
                     if (data.heroTitle) homeTitle.textContent = data.heroTitle;
@@ -63,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (subTitle && data.heroSubtitle) subTitle.textContent = data.heroSubtitle;
                     
                     const bImg = document.getElementById('home-banner-img');
-                    if (bImg && data.heroImage) { bImg.src = data.heroImage; bImg.style.display = 'block'; } // Εμφανίζεται η εικόνα
+                    if (bImg && data.heroImage) { bImg.src = data.heroImage; bImg.style.display = 'block'; } 
                     
                     // Latest Drop
                     const dropCont = document.getElementById('home-featured-container');
@@ -98,17 +97,16 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                     
                 }).catch(e => {
-                    if(bContainer) bContainer.style.display = 'block'; // Εμφάνιση ακόμα και σε σφάλμα
+                    if(bContainer) bContainer.style.display = 'block';
                 });
             }
         });
 
 
-        // --- 2. RELEASES LOADER (FIXED LOADING) ---
+        // --- 2. RELEASES LOADER (FIXED: NO PLAY BUTTON) ---
         safeRun(() => {
             const releasesContainer = document.getElementById('releases-list');
             if (releasesContainer) {
-                // Χρησιμοποιούμε timestamp για να μην κρατάει παλιά δεδομένα (cache)
                 fetch('releases.json?t=' + new Date().getTime())
                     .then(r => {
                         if (!r.ok) throw new Error("Releases JSON not found");
@@ -116,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     })
                     .then(data => {
                         releasesContainer.innerHTML = '';
-                        // Ελέγχουμε αν τα δεδομένα είναι μέσα σε "tracks" (όπως στο αρχείο σου) ή χύμα array
                         let tracks = data.tracks ? data.tracks : (Array.isArray(data) ? data : []);
                         
                         if (tracks.length === 0) {
@@ -125,7 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
 
                         tracks.forEach(track => {
-                            const safeTitle = (track.title || 'Untitled').replace(/'/g, "\\'");
                             const coverImg = track.cover || 'https://via.placeholder.com/100';
                             const streamLink = track.streamUrl || '#';
                             const buyLink = track.bundleUrl || '#';
@@ -135,13 +131,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i></a>` 
                                 : '';
 
+                            // Αλλαγή εδώ: Αφαιρέθηκε το onclick και το overlay play button
                             releasesContainer.innerHTML += `
                             <div class="beat-row">
                                 <div class="beat-art">
                                     <img src="${coverImg}" alt="Art">
-                                    <div class="beat-play-overlay" onclick="window.playTrack('${streamLink}', '${safeTitle}', '${coverImg}', -1)">
-                                        <i class="fas fa-play" style="color:#fff;"></i>
-                                    </div>
                                 </div>
                                 <div class="beat-info">
                                     <h4>${track.title || 'Untitled'}</h4>
