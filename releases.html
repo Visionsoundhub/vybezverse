@@ -24,14 +24,16 @@
 
     <main id="swup" class="transition-fade">
         <div class="glass-container" style="text-align:center;">
-            <h1 class="section-title">MUSIC CATALOG</h1>
+            <h1 class="section-title" id="releases-title">MUSIC CATALOG</h1>
             <div style="margin-bottom:2rem; display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
-                <button class="nav-btn active" style="border:1px solid #fff;">All Releases</button>
+                <button id="all-releases-btn" class="nav-btn active" style="border:1px solid #fff;">All Releases</button>
+                
                 <button id="why-buy-btn" class="nav-btn" style="border:1px solid #8a2be2; color:#8a2be2 !important;">
-                    <i class="fas fa-heart"></i> ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;
+                    <i class="fas fa-heart"></i> <span id="why-buy-text">ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;</span>
                 </button>
+
                 <button id="open-bundle-modal" class="nav-btn" style="border:1px solid #fff; color:#fff !important;">
-                    <i class="fas fa-box-open"></i> ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;
+                    <i class="fas fa-box-open"></i> <span id="bundle-text">ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;</span>
                 </button>
             </div>
             <div id="releases-list">Loading Tracks...</div>
