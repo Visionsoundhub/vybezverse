@@ -401,3 +401,36 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     4%, 60% { transform: translate(-2px, 0); }
     62% { transform: translate(-22px, 5px) skew(21deg); }
 }
+
+/* --- BEAT HIGHLIGHT ANIMATION (SHARE LINK) --- */
+.beat-highlight {
+    animation: highlightPulse 2s ease-in-out 3;
+    border-color: #8a2be2 !important;
+    box-shadow: 0 0 25px rgba(138, 43, 226, 0.4) !important;
+    background: rgba(138, 43, 226, 0.1) !important;
+}
+
+@keyframes highlightPulse {
+    0% { box-shadow: 0 0 10px rgba(138, 43, 226, 0.2); }
+    50% { box-shadow: 0 0 30px rgba(138, 43, 226, 0.6); border-color: #fff; }
+    100% { box-shadow: 0 0 10px rgba(138, 43, 226, 0.2); }
+}
+
+/* Copy Notification Tooltip */
+.copy-feedback {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #8a2be2;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 30px;
+    font-weight: 700;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    z-index: 10000;
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+.copy-feedback.show { opacity: 1; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
