@@ -118,7 +118,7 @@ collections:
               - {label: "Buy Link (Payhip)", name: "bundleUrl", widget: "string"}
               - {label: "Free Download Link", name: "downloadUrl", widget: "string", required: false}
 
- # --- 7. BEAT STORE ---
+  # --- 7. BEAT STORE ---
   - name: "beats"
     label: "💰 Beat Store"
     files:
@@ -126,25 +126,29 @@ collections:
         label: "Beats Catalog"
         file: "beats.json"
         fields:
-          - {label: "Title", name: "title", widget: "string"}
-          - {label: "Cover Art", name: "cover", widget: "image", required: false}
-          - {label: "Audio Preview (MP3)", name: "audioSrc", widget: "file"}
-          - {label: "Price", name: "price", widget: "string", default: "29.99€"}
-          - {label: "Status", name: "status", widget: "select", options: ["available", "sold"], default: "available"}
-          - {label: "Category", name: "category", widget: "select", options: ["trap", "boombap", "latin", "lofi", "custom", "vault", "ai"]}
-          - {label: "BPM", name: "bpm", widget: "string", required: false}
-          - {label: "Key", name: "key", widget: "string", required: false}
-          - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
-          # --- ΑΛΛΑΓΗ ΕΔΩ: RELATION WIDGET ---
-         - label: "Vibe Tags"
-            name: "tags"
-            widget: "relation"
-            collection: "vibes"
-            file: "vibesConfig"
-            search_fields: ["vibes.*.name"]   # ΠΡΟΣΘΕΣΑ ΤΟ .*
-            value_field: "vibes.*.tags"       # ΠΡΟΣΘΕΣΑ ΤΟ .*
-            display_fields: ["vibes.*.name"]  # ΠΡΟΣΘΕΣΑ ΤΟ .*
-            multiple: true
+          - name: "beatslist"
+            label: "Beats"
+            widget: "list"
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Cover Art", name: "cover", widget: "image", required: false}
+              - {label: "Audio Preview (MP3)", name: "audioSrc", widget: "file"}
+              - {label: "Price", name: "price", widget: "string", default: "29.99€"}
+              - {label: "Status", name: "status", widget: "select", options: ["available", "sold"], default: "available"}
+              - {label: "Category", name: "category", widget: "select", options: ["trap", "boombap", "latin", "lofi", "custom", "vault", "ai"]}
+              - {label: "BPM", name: "bpm", widget: "string", required: false}
+              - {label: "Key", name: "key", widget: "string", required: false}
+              - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
+              # RELATION WIDGET ΓΙΑ ΤΑ VIBES
+              - label: "Vibe Tags"
+                name: "tags"
+                widget: "relation"
+                collection: "vibes"
+                file: "vibesConfig"
+                search_fields: ["vibes.*.name"]
+                value_field: "vibes.*.tags"
+                display_fields: ["vibes.*.name"]
+                multiple: true
 
   # --- 8. PRESS ---
   - name: "press"
@@ -272,6 +276,7 @@ collections:
         file: "store.json"
         fields:
           - {label: "Page Title (H1)", name: "title", widget: "string", default: "STORE"}
+          # MOVED STATUS & COMING SOON TO MERCH COLLECTION BELOW
           - {label: "--- BUNDLE LIST (For Releases Modal) ---", name: "sep_bund", widget: "hidden"}
           - {label: "Bundle Subtitle", name: "subtitle", widget: "string", default: "Το πλήρες πακέτο περιεχομένου για κάθε τραγούδι που αγοράζεις."}
           - name: "bundleItems"
@@ -307,5 +312,3 @@ collections:
                 fields:
                   - {label: "Image", name: "img", widget: "image"}
               - {label: "Buy Link", name: "link", widget: "string"}
-
-
