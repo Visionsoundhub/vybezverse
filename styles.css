@@ -177,6 +177,70 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 .press-image { width: 100%; height: 200px; object-fit: cover; }
 .press-content { padding: 1.5rem; flex-grow: 1; display: flex; flex-direction: column;}
 
+/* --- PRODUCT MODAL LAYOUT (NEW) --- */
+.product-modal-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Left Image, Right Info */
+    gap: 0;
+    height: 100%;
+    width: 100%;
+}
+
+.product-gallery-section {
+    background: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    border-right: 1px solid rgba(255,255,255,0.1);
+}
+
+.main-img-container {
+    width: 100%;
+    height: 300px; /* Fixed height for consistency */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+.main-img-container img {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.prod-thumbnails {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    max-width: 100%;
+    padding: 5px;
+}
+
+.prod-thumb {
+    width: 60px;
+    height: 60px;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+    opacity: 0.6;
+}
+.prod-thumb:hover, .prod-thumb.active {
+    border-color: #8a2be2;
+    opacity: 1;
+}
+.prod-thumb img { width: 100%; height: 100%; object-fit: cover; }
+
+.product-info-section {
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+}
+
 /* --- FILTERS --- */
 .compact-filters-container { display: flex; justify-content: center; gap: 15px; padding: 1rem; max-width: 1000px; margin: 0 auto; flex-wrap: wrap; position: relative; z-index: 50; }
 .custom-select { position: relative; min-width: 200px; font-family: 'Century Gothic', sans-serif; }
@@ -191,7 +255,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 
 .beat-row { 
     display: grid; 
-    grid-template-columns: 140px 1fr auto; 
+    grid-template-columns: 100px 1fr auto; 
     gap: 2rem; 
     align-items: center; 
     background: rgba(255, 255, 255, 0.03); 
@@ -203,8 +267,8 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 }
 
 .beat-art { 
-    width: 140px; 
-    height: 140px; 
+    width: 100px; 
+    height: 100px; 
     background: #222; 
     border-radius: 12px; 
     position: relative; 
@@ -312,7 +376,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     100% { height: 5px; }
 }
 
-/* --- VIBE GLASS BUTTONS --- */
+/* --- VIBE GLASS BUTTONS (WITH FLOAT) --- */
 .floating-vibe {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(5px);
@@ -370,7 +434,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 }
 
 .error-icon::before, .error-icon::after {
-    content: "\f51f"; /* FontAwesome Compact Disc Unicode */
+    content: "\f51f"; 
     font-family: "Font Awesome 5 Free";
     font-weight: 900;
     position: absolute;
@@ -449,7 +513,7 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
 }
 .copy-feedback.show { opacity: 1; animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
 
-/* --- MOBILE OPTIMIZATIONS (FIXED MODAL VISIBILITY) --- */
+/* --- MOBILE OPTIMIZATIONS (UPDATED FOR PROD MODAL) --- */
 @media (max-width: 900px) {
     .main-navigation { padding: 0.8rem 1.5rem; }
     .logo-text { font-size: 1.2rem; }
@@ -468,16 +532,16 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     .hero-section { padding: 1rem 1rem 0.5rem 1rem; }
     .hero-beat-art { display: none !important; }
     
-    /* --- ΔΙΟΡΘΩΣΗ ΕΔΩ --- */
-    /* Κρύβουμε ΜΟΝΟ το Desktop Container (με βάση το ID) */
+    /* Hide Desktop Accordions */
     #info-accordions-container { display: none; }
-    
-    /* Εμφανίζουμε το περιεχόμενο μέσα στο Modal */
     #info-modal-content { display: flex !important; flex-direction: column; gap: 10px; }
-    
-    /* SHOW MOBILE INFO BUTTON */
     #mobile-info-btn { display: inline-flex !important; margin-top: 10px; }
-    /* ------------------- */
+    
+    /* Product Modal Stack on Mobile */
+    .product-modal-content { grid-template-columns: 1fr; }
+    .product-gallery-section { border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 1.5rem; }
+    .main-img-container { height: 200px; }
+    .product-info-section { padding: 1.5rem; }
     
     .compact-filters-container { flex-direction: column; gap: 12px; margin-top: 0; padding-top: 0; } 
     .custom-select { width: 100%; } 
