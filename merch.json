@@ -4,7 +4,15 @@
       "price": "25.00€",
       "name": "ρρρρρ",
       "image": "/assets/uploads/gf.jpg",
-      "link": "ρρρρρρρρρρ"
+      "link": "ρρρρρρρρρρ",
+      "gallery": [
+        {
+          "img": "/assets/uploads/banner.png"
+        },
+        {
+          "img": "/assets/uploads/gf.jpg"
+        }
+      ]
     }
   ]
 }
