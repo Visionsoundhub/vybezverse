@@ -111,6 +111,7 @@ collections:
             widget: "list"
             fields:
               - {label: "Title", name: "title", widget: "string"}
+              - {label: "Short Description", name: "description", widget: "text", required: false}
               - {label: "YouTube Video URL", name: "youtubeUrl", widget: "string"}
               - {label: "Cover Art", name: "cover", widget: "image"}
               - {label: "Stream Link", name: "streamUrl", widget: "string"}
@@ -130,7 +131,7 @@ collections:
             widget: "list"
             fields:
               - {label: "Title", name: "title", widget: "string"}
-              - {label: "Cover Art", name: "cover", widget: "image", required: false} # <--- ΝΕΟ ΠΕΔΙΟ!
+              - {label: "Cover Art", name: "cover", widget: "image", required: false}
               - {label: "Audio Preview (MP3)", name: "audioSrc", widget: "file"}
               - {label: "Price", name: "price", widget: "string", default: "29.99€"}
               - {label: "Status", name: "status", widget: "select", options: ["available", "sold"], default: "available"}
