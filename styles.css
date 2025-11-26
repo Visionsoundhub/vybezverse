@@ -195,15 +195,15 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     100% { box-shadow: 0 0 18px rgba(138, 43, 226, 0.5); border-color: #8a2be2; }
 }
 
-/* --- MODAL (UPDATED: SUPER ROUNDED + GLOW) --- */
+/* --- MODAL (SUPER ROUNDED + GLOW) --- */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(12px); display: none; justify-content: center; align-items: center; z-index: 99999; opacity: 0; transition: opacity 0.3s ease; }
 .modal-overlay.visible { display: flex !important; opacity: 1; }
 
 .modal-box { 
-    background: rgba(20, 20, 25, 0.85); /* Λίγο πιο σκούρο για να φαίνεται η λάμψη */
+    background: rgba(20, 20, 25, 0.85); 
     backdrop-filter: blur(25px); 
-    border: 1px solid rgba(138, 43, 226, 0.5); /* Default Border */
-    box-shadow: 0 0 30px rgba(138, 43, 226, 0.2); /* Default Glow */
+    border: 1px solid rgba(138, 43, 226, 0.5); 
+    box-shadow: 0 0 30px rgba(138, 43, 226, 0.2); 
     padding: 2.5rem; 
     border-radius: 50px; /* SUPER ROUNDED */
     width: 90%; 
@@ -211,18 +211,18 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     text-align: center; 
     position: relative; 
     overflow: hidden; 
-    transition: box-shadow 0.3s ease, border-color 0.3s ease; /* Smooth transition for color changes */
+    transition: box-shadow 0.3s ease, border-color 0.3s ease; 
 }
 
 .modal-close-btn { position: absolute; top: 15px; right: 20px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: #fff; font-size: 1.5rem; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.3s; z-index: 100; }
 
-/* --- WAVEFORM EQUALIZER (UPDATED: CALMER) --- */
+/* --- WAVEFORM EQUALIZER --- */
 .waveform-container {
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 60px; /* Χαμηλότερο container */
+    height: 60px; 
     display: flex;
     align-items: flex-end;
     justify-content: center;
@@ -236,18 +236,18 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     width: 8px;
     background: #8a2be2;
     border-radius: 5px 5px 0 0;
-    animation: equalizer 1.2s infinite ease-in-out; /* Πιο αργό/χαλαρό */
-    opacity: 0.5; /* Λιγότερο έντονο */
+    animation: equalizer 1.2s infinite ease-in-out; 
+    opacity: 0.5; 
     transition: background 0.3s ease, box-shadow 0.3s ease;
 }
 
 @keyframes equalizer {
     0% { height: 5px; }
-    50% { height: 35px; } /* ΜΕΙΩΜΕΝΟ ΥΨΟΣ (Πιο χαλαρό) */
+    50% { height: 35px; } 
     100% { height: 5px; }
 }
 
-/* --- VIBE GLASS BUTTONS --- */
+/* --- VIBE GLASS BUTTONS (WITH FLOAT ANIMATION) --- */
 .floating-vibe {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(5px);
@@ -262,13 +262,22 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     cursor: pointer;
     position: relative;
     z-index: 10;
+    animation: float 6s ease-in-out infinite; /* NEW SUBTLE FLOAT */
 }
 
 .floating-vibe:hover {
-    transform: scale(1.1);
+    /* No scale transform to avoid glitch with float */
     background: rgba(255, 255, 255, 0.1);
     border-color: #fff;
     box-shadow: 0 0 20px currentColor; 
+    animation-play-state: paused; /* Optional: Stop floating when hovering */
+}
+
+/* --- FLOAT ANIMATION KEYFRAMES --- */
+@keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); } /* Gentle up and down */
+    100% { transform: translateY(0px); }
 }
 
 /* --- PLAYER & FOOTER --- */
