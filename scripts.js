@@ -288,13 +288,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
             
-            // STORE PAGE DATA
+            // STORE PAGE DATA (UPDATED)
             const storeSub = document.getElementById('store-subtitle');
+            const storeTitle = document.getElementById('store-section-title'); // NEW
             const bundleList = document.getElementById('bundle-list-content');
-            // Fetch only if we are on the store page (element exists)
-            if (storeSub || bundleList) {
+            
+            if (storeSub || bundleList || storeTitle) {
                  fetch('store.json').then(r => r.json()).then(data => {
                      if(storeSub && data.subtitle) storeSub.textContent = data.subtitle;
+                     if(storeTitle && data.sectionTitle) storeTitle.textContent = data.sectionTitle; // NEW
                      
                      if(bundleList && data.bundleItems) {
                          bundleList.innerHTML = data.bundleItems.map(item => 
