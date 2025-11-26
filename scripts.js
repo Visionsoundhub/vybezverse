@@ -251,7 +251,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 7. BEATS & VIBES (UPDATED FOR GLOW) ---
+        // --- 7. BEATS & VIBES (UPDATED FOR FLOATING DELAY) ---
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
@@ -297,37 +297,34 @@ document.addEventListener('DOMContentLoaded', () => {
                                     b.className='floating-vibe'; 
                                     b.textContent=v.name;
                                     
-                                    // HOVER EFFECT ON MODAL & WAVEFORM
+                                    // ADD RANDOM FLOAT DELAY (NEW)
+                                    b.style.animationDelay = `${Math.random() * 2}s`;
+                                    
+                                    // HOVER EFFECT
                                     b.onmouseenter = () => {
                                         const color = v.color || '#8a2be2';
-                                        // Button
                                         b.style.color = color;
                                         b.style.borderColor = color;
                                         b.style.boxShadow = `0 0 15px ${color}`;
-                                        // Waveform
                                         document.querySelectorAll('.waveform-bar').forEach(bar => {
                                             bar.style.background = color;
                                             bar.style.boxShadow = `0 0 10px ${color}`;
                                         });
-                                        // Modal Box (NEW)
                                         const modalBox = document.querySelector('.modal-box');
                                         if(modalBox) {
                                             modalBox.style.borderColor = color;
-                                            modalBox.style.boxShadow = `0 0 40px ${color}40`; // Transparent glow
+                                            modalBox.style.boxShadow = `0 0 40px ${color}40`; 
                                         }
                                     };
                                     
                                     b.onmouseleave = () => {
-                                        // Reset Button
                                         b.style.color = '#fff';
                                         b.style.borderColor = 'rgba(255,255,255,0.1)';
                                         b.style.boxShadow = 'none';
-                                        // Reset Waveform
                                         document.querySelectorAll('.waveform-bar').forEach(bar => {
                                             bar.style.background = '#8a2be2';
                                             bar.style.boxShadow = 'none';
                                         });
-                                        // Reset Modal Box
                                         const modalBox = document.querySelector('.modal-box');
                                         if(modalBox) {
                                             modalBox.style.borderColor = 'rgba(138, 43, 226, 0.5)';
