@@ -118,7 +118,7 @@ collections:
               - {label: "Buy Link (Payhip)", name: "bundleUrl", widget: "string"}
               - {label: "Free Download Link", name: "downloadUrl", widget: "string", required: false}
 
-  # --- 7. BEAT STORE ---
+ # --- 7. BEAT STORE ---
   - name: "beats"
     label: "💰 Beat Store"
     files:
@@ -126,20 +126,25 @@ collections:
         label: "Beats Catalog"
         file: "beats.json"
         fields:
-          - name: "beatslist"
-            label: "Beats"
-            widget: "list"
-            fields:
-              - {label: "Title", name: "title", widget: "string"}
-              - {label: "Cover Art", name: "cover", widget: "image", required: false}
-              - {label: "Audio Preview (MP3)", name: "audioSrc", widget: "file"}
-              - {label: "Price", name: "price", widget: "string", default: "29.99€"}
-              - {label: "Status", name: "status", widget: "select", options: ["available", "sold"], default: "available"}
-              - {label: "Category", name: "category", widget: "select", options: ["trap", "boombap", "latin", "lofi", "custom", "vault", "ai"]}
-              - {label: "BPM", name: "bpm", widget: "string", required: false}
-              - {label: "Key", name: "key", widget: "string", required: false}
-              - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
-              - {label: "Vibe Tags", name: "tags", widget: "list"}
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Cover Art", name: "cover", widget: "image", required: false}
+          - {label: "Audio Preview (MP3)", name: "audioSrc", widget: "file"}
+          - {label: "Price", name: "price", widget: "string", default: "29.99€"}
+          - {label: "Status", name: "status", widget: "select", options: ["available", "sold"], default: "available"}
+          - {label: "Category", name: "category", widget: "select", options: ["trap", "boombap", "latin", "lofi", "custom", "vault", "ai"]}
+          - {label: "BPM", name: "bpm", widget: "string", required: false}
+          - {label: "Key", name: "key", widget: "string", required: false}
+          - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
+          # --- ΑΛΛΑΓΗ ΕΔΩ: RELATION WIDGET ---
+          - label: "Vibe Tags"
+            name: "tags"
+            widget: "relation"
+            collection: "vibes"
+            file: "vibesConfig"
+            search_fields: ["vibes.name"]
+            value_field: "vibes.tags"
+            display_fields: ["vibes.name"]
+            multiple: true
 
   # --- 8. PRESS ---
   - name: "press"
@@ -302,3 +307,4 @@ collections:
                 fields:
                   - {label: "Image", name: "img", widget: "image"}
               - {label: "Buy Link", name: "link", widget: "string"}
+
