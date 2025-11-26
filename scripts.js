@@ -51,6 +51,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const homeTitle = document.getElementById('home-hero-title');
             if (homeTitle) {
                 const bContainer = document.getElementById('home-banner-container');
+                const dynArea = document.getElementById('dynamic-content-area');
+
                 fetch('home.json').then(r => r.json()).then(data => {
                     if(bContainer) bContainer.style.display = 'block'; 
                     if (data.heroTitle) homeTitle.textContent = data.heroTitle;
@@ -89,6 +91,51 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (annText && data.announcementText) annText.textContent = data.announcementText;
                         }
                     }
+
+                    // --- NEW: DYNAMIC CONTENT STREAM ---
+                    if (dynArea && data.stream && data.stream.length > 0) {
+                        dynArea.innerHTML = ''; // Clear previous
+                        data.stream.forEach(item => {
+                            let html = '';
+                            const boxStyle = 'margin-top:2rem; text-align:center; padding:2rem;';
+                            
+                            if (item.type === 'article') {
+                                const imgHtml = item.image ? `<img src="${item.image}" style="width:100%; max-height:400px; object-fit:cover; border-radius:12px; margin-bottom:1rem;">` : '';
+                                const linkHtml = item.url ? `<div style="margin-top:1.5rem;"><a href="${item.url}" class="btn btn-accent">${item.btnText || 'READ MORE'}</a></div>` : '';
+                                html = `
+                                <div class="glass-container" style="${boxStyle}">
+                                    ${imgHtml}
+                                    <h2 style="margin-bottom:1rem;">${item.headline || ''}</h2>
+                                    <div style="color:#ccc; line-height:1.6;">${item.body ? item.body.replace(/\n/g, '<br>') : ''}</div>
+                                    ${linkHtml}
+                                </div>`;
+                            } 
+                            else if (item.type === 'video') {
+                                const vId = getYoutubeId(item.videoUrl);
+                                if (vId) {
+                                    html = `
+                                    <div class="glass-container" style="${boxStyle}">
+                                        ${item.headline ? `<h2 style="margin-bottom:1rem;">${item.headline}</h2>` : ''}
+                                        <div class="video-wrapper" style="position:relative; padding-bottom:56.25%; height:0; overflow:hidden; border-radius:12px; background:#000; margin-bottom:1rem;">
+                                            <iframe src="https://www.youtube.com/embed/${vId}" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
+                                        </div>
+                                        ${item.body ? `<p style="color:#ccc;">${item.body}</p>` : ''}
+                                    </div>`;
+                                }
+                            }
+                            else if (item.type === 'photo') {
+                                html = `
+                                <div class="glass-container" style="${boxStyle}">
+                                    <img src="${item.image}" style="width:100%; border-radius:12px; box-shadow:0 5px 20px rgba(0,0,0,0.5);">
+                                    ${item.headline ? `<h3 style="margin-top:1.5rem; margin-bottom:0.5rem;">${item.headline}</h3>` : ''}
+                                    ${item.body ? `<p style="color:#aaa;">${item.body}</p>` : ''}
+                                </div>`;
+                            }
+                            
+                            dynArea.innerHTML += html;
+                        });
+                    }
+
                 }).catch(e => { if(bContainer) bContainer.style.display = 'block'; });
             }
         });
@@ -288,15 +335,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
             
-            // STORE PAGE DATA (UPDATED)
+            // STORE PAGE DATA
             const storeSub = document.getElementById('store-subtitle');
-            const storeTitle = document.getElementById('store-section-title'); // NEW
+            const storeTitle = document.getElementById('store-section-title');
             const bundleList = document.getElementById('bundle-list-content');
             
             if (storeSub || bundleList || storeTitle) {
                  fetch('store.json').then(r => r.json()).then(data => {
                      if(storeSub && data.subtitle) storeSub.textContent = data.subtitle;
-                     if(storeTitle && data.sectionTitle) storeTitle.textContent = data.sectionTitle; // NEW
+                     if(storeTitle && data.sectionTitle) storeTitle.textContent = data.sectionTitle;
                      
                      if(bundleList && data.bundleItems) {
                          bundleList.innerHTML = data.bundleItems.map(item => 
