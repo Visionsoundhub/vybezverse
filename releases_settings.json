@@ -1,11 +1,11 @@
 {
+  "getTitle": "ΤΙ ΠΑΙΡΝΕΙΣ;",
+  "getText": "High Quality Audio, Εναλλακτικές Εκδόσεις, Ringtones, Artwork, Στίχους.",
   "pageTitle": "MUSIC CATALOG",
-  "allReleasesText": "All Releases",
+  "supportTitle": "ΣΤΗΡΙΞΕ ΤΟΝ ΚΑΛΛΙΤΕΧΝΗ",
+  "modalTitle": "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΕΙΣ;",
   "whyBuyText": "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;",
   "whatsIncludedText": "ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;",
-  "modalTitle": "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΕΙΣ;",
-  "supportTitle": "ΣΤΗΡΙΞΕ ΤΟΝ ΚΑΛΛΙΤΕΧΝΗ",
-  "supportText": "Οι πλατφόρμες streaming πληρώνουν ελάχιστα. Η αγορά ενός τραγουδιού ισοδυναμεί με χιλιάδες streams.",
-  "getTitle": "ΤΙ ΠΑΙΡΝΕΙΣ;",
-  "getText": "High Quality Audio, Εναλλακτικές Εκδόσεις, Ringtones, Artwork, Στίχους."
+  "allReleasesText": "All Releases",
+  "supportText": "Οι πλατφόρμες streaming πληρώνουν ελάχιστα. Η αγορά ενός τραγουδιού ισοδυναμεί με εκατοντάδες streams."
 }
