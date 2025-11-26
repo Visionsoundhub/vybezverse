@@ -11,49 +11,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- NEURO-SYNC PRELOADER (BULLETPROOF VERSION) ---
+    // --- NEURO-SYNC PRELOADER ---
     const preloader = document.getElementById('neuro-preloader');
     const preloaderText = document.getElementById('neuro-text');
 
-    // Συνάρτηση που κλείνει το Preloader
     const killPreloader = () => {
         if (preloader && !preloader.classList.contains('loaded')) {
-            preloader.classList.add('loaded'); // CSS Fade out
-            setTimeout(() => { 
-                preloader.style.display = 'none'; 
-            }, 800); 
+            preloader.classList.add('loaded'); 
+            setTimeout(() => { preloader.style.display = 'none'; }, 800); 
         }
     };
 
     if (preloader && preloaderText) {
         const messages = ["INITIALIZING...", "SYNCING FREQUENCIES...", "LOADING VIBES...", "ENTERING THE ZONE..."];
         let msgIndex = 0;
-        
-        // Αλλαγή κειμένου (Animation)
         const msgInterval = setInterval(() => {
             msgIndex = (msgIndex + 1) % messages.length;
             preloaderText.textContent = messages[msgIndex];
         }, 1000);
 
-        // ΕΛΕΓΧΟΣ ΑΣΦΑΛΕΙΑΣ (RACE CONDITION FIX)
-        // 1. Αν το site έχει ήδη φορτώσει (Cache/Fast Load), κλείσε αμέσως
         if (document.readyState === 'complete') {
             clearInterval(msgInterval);
             killPreloader();
-        } 
-        // 2. Αλλιώς περίμενε το load event
-        else {
+        } else {
             window.addEventListener('load', () => {
                 clearInterval(msgInterval);
                 killPreloader();
             });
         }
-
-        // 3. SAFETY FAILSAFE: Αν κολλήσει για οποιοδήποτε λόγο, άνοιξε στα 3.5 δευτερόλεπτα με το ζόρι
-        setTimeout(() => {
-            clearInterval(msgInterval);
-            killPreloader();
-        }, 3500);
+        setTimeout(() => { clearInterval(msgInterval); killPreloader(); }, 3500);
     }
 
     initAllScripts(); 
@@ -65,24 +51,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GLOBAL CLICK LISTENER ---
     document.addEventListener('click', (e) => {
-        // CLOSE MODALS
         if (e.target.closest('.modal-close-btn') || e.target.classList.contains('modal-overlay')) {
             const openModals = document.querySelectorAll('.modal-overlay.visible');
             openModals.forEach(m => m.classList.remove('visible'));
         }
-        
-        // SPECIFIC OPEN BUTTONS
         if (e.target.closest('#open-bundle-modal')) { document.getElementById('bundle-modal').classList.add('visible'); }
         if (e.target.closest('#why-buy-btn')) { document.getElementById('why-buy-modal').classList.add('visible'); }
         if (e.target.closest('#mobile-info-btn')) {
-             // Copy desktop content to mobile modal
              const accCont = document.getElementById('info-accordions-container');
              const modalCont = document.getElementById('info-modal-content');
              if(accCont && modalCont && modalCont.innerHTML === '') {
                  modalCont.innerHTML = accCont.innerHTML;
-                 modalCont.querySelectorAll('.accordion-btn').forEach(btn => { 
-                     btn.onclick = () => { btn.parentElement.classList.toggle('active'); }; 
-                 });
+                 modalCont.querySelectorAll('.accordion-btn').forEach(btn => { btn.onclick = () => { btn.parentElement.classList.toggle('active'); }; });
              }
              document.getElementById('info-modal').classList.add('visible'); 
         }
@@ -100,16 +80,13 @@ document.addEventListener('DOMContentLoaded', () => {
             if (homeTitle) {
                 const bContainer = document.getElementById('home-banner-container');
                 const dynArea = document.getElementById('dynamic-content-area');
-
                 fetch('home.json').then(r => r.json()).then(data => {
                     if(bContainer) bContainer.style.display = 'block'; 
                     if (data.heroTitle) homeTitle.textContent = data.heroTitle;
                     const subTitle = document.getElementById('home-hero-subtitle');
                     if (subTitle && data.heroSubtitle) subTitle.textContent = data.heroSubtitle;
-                    
                     const bImg = document.getElementById('home-banner-img');
                     if (bImg && data.heroImage) { bImg.src = data.heroImage; bImg.style.display = 'block'; } 
-                    
                     const dropCont = document.getElementById('home-featured-container');
                     const dropIframe = document.getElementById('drop-iframe');
                     if (dropCont && data.showDrop && data.dropVideo) {
@@ -127,7 +104,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     }
-
                     const annCont = document.getElementById('home-announcement-container');
                     const annIframe = document.getElementById('announcement-iframe');
                     const annText = document.getElementById('announcement-text');
@@ -139,13 +115,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (annText && data.announcementText) annText.textContent = data.announcementText;
                         }
                     }
-
                     if (dynArea && data.stream && data.stream.length > 0) {
                         dynArea.innerHTML = ''; 
                         data.stream.forEach(item => {
                             let html = '';
                             const boxStyle = 'margin-top:2rem; text-align:center; padding:2rem;';
-                            
                             if (item.type === 'article') {
                                 const imgHtml = item.image ? `<img src="${item.image}" style="width:100%; max-height:400px; object-fit:cover; border-radius:12px; margin-bottom:1rem;">` : '';
                                 const linkHtml = item.url ? `<div style="margin-top:1.5rem;"><a href="${item.url}" class="btn btn-accent">${item.btnText || 'READ MORE'}</a></div>` : '';
@@ -184,8 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 const bundleList = document.getElementById('bundle-list-content');
                 const storeSub = document.getElementById('store-subtitle');
-                
-                // FETCH RELEASES PAGE SETTINGS
                 const relTitle = document.getElementById('releases-title');
                 const allBtn = document.getElementById('all-releases-btn');
                 const whyBtn = document.getElementById('why-buy-text');
@@ -252,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 4. BEATS & VIBES ---
+        // --- 4. BEATS & VIBES (UPDATED: SHUFFLE 6 + SWITCH FREQUENCY) ---
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
@@ -292,8 +264,84 @@ document.addEventListener('DOMContentLoaded', () => {
                         }
                     });
                 }
+
+                // --- NEW VIBE SEARCH LOGIC (6 ITEMS + SHUFFLE) ---
                 const vBtn = document.getElementById('vibe-search-btn');
-                if(vBtn) { vBtn.onclick = () => { document.getElementById('vibe-modal').classList.add('visible'); let bubbles = document.getElementById('vibe-bubbles-container'); let waveform = document.querySelector('.modal-box .waveform-container'); if(!waveform) { const box = document.querySelector('#vibe-modal .modal-box'); waveform = document.createElement('div'); waveform.className = 'waveform-container'; for(let i=0; i<30; i++) { const bar = document.createElement('div'); bar.className = 'waveform-bar'; bar.style.animationDelay = `${Math.random()}s`; waveform.appendChild(bar); } box.appendChild(waveform); } if(bubbles.innerHTML === '') { fetch('vibes.json').then(r=>r.json()).then(d => { (d.vibes||[]).forEach(v => { const b = document.createElement('button'); b.className='floating-vibe'; b.textContent=v.name; b.style.animationDelay = `${Math.random() * 2}s`; b.onmouseenter = () => { const color = v.color || '#8a2be2'; b.style.color = color; b.style.borderColor = color; b.style.boxShadow = `0 0 15px ${color}`; document.querySelectorAll('.waveform-bar').forEach(bar => { bar.style.background = color; bar.style.boxShadow = `0 0 10px ${color}`; }); const modalBox = document.querySelector('#vibe-modal .modal-box'); if(modalBox) { modalBox.style.borderColor = color; modalBox.style.boxShadow = `0 0 40px ${color}40`; } }; b.onmouseleave = () => { b.style.color = '#fff'; b.style.borderColor = 'rgba(255,255,255,0.1)'; b.style.boxShadow = 'none'; document.querySelectorAll('.waveform-bar').forEach(bar => { bar.style.background = '#8a2be2'; bar.style.boxShadow = 'none'; }); const modalBox = document.querySelector('#vibe-modal .modal-box'); if(modalBox) { modalBox.style.borderColor = 'rgba(138, 43, 226, 0.5)'; modalBox.style.boxShadow = '0 0 30px rgba(138, 43, 226, 0.2)'; } }; b.onclick = () => { document.getElementById('vibe-modal').classList.remove('visible'); const f = window.currentPlaylist.filter(beat => beat.tags && beat.tags.some(t => v.tags.includes(t))); renderBeats(f); }; bubbles.appendChild(b); }); }); } }; document.getElementById('vibe-modal-close').onclick = () => document.getElementById('vibe-modal').classList.remove('visible'); }
+                let allLoadedVibes = []; // Store all vibes here
+
+                // Function to render random 6 vibes + switch button
+                const renderVibeSubset = () => {
+                    const bubbles = document.getElementById('vibe-bubbles-container');
+                    bubbles.innerHTML = '';
+                    
+                    // Shuffle and pick 6
+                    const shuffled = allLoadedVibes.sort(() => 0.5 - Math.random());
+                    const selected = shuffled.slice(0, 6);
+
+                    // Render 6 Vibes
+                    selected.forEach(v => {
+                        const b = document.createElement('button'); 
+                        b.className='floating-vibe'; 
+                        b.textContent=v.name;
+                        b.style.animationDelay = `${Math.random() * 2}s`;
+                        
+                        b.onmouseenter = () => {
+                            const color = v.color || '#8a2be2';
+                            b.style.color = color; b.style.borderColor = color; b.style.boxShadow = `0 0 15px ${color}`;
+                            document.querySelectorAll('.waveform-bar').forEach(bar => { bar.style.background = color; bar.style.boxShadow = `0 0 10px ${color}`; });
+                            const modalBox = document.querySelector('#vibe-modal .modal-box'); if(modalBox) { modalBox.style.borderColor = color; modalBox.style.boxShadow = `0 0 40px ${color}40`; }
+                        };
+                        b.onmouseleave = () => {
+                            b.style.color = '#fff'; b.style.borderColor = 'rgba(255,255,255,0.1)'; b.style.boxShadow = 'none';
+                            document.querySelectorAll('.waveform-bar').forEach(bar => { bar.style.background = '#8a2be2'; bar.style.boxShadow = 'none'; });
+                            const modalBox = document.querySelector('#vibe-modal .modal-box'); if(modalBox) { modalBox.style.borderColor = 'rgba(138, 43, 226, 0.5)'; modalBox.style.boxShadow = '0 0 30px rgba(138, 43, 226, 0.2)'; }
+                        };
+                        b.onclick = () => { 
+                            document.getElementById('vibe-modal').classList.remove('visible');
+                            const f = window.currentPlaylist.filter(beat => beat.tags && beat.tags.some(t => v.tags.includes(t)));
+                            renderBeats(f);
+                        };
+                        bubbles.appendChild(b);
+                    });
+
+                    // Render Switch Frequency Button
+                    const switchBtn = document.createElement('button');
+                    switchBtn.className = 'floating-vibe';
+                    switchBtn.innerHTML = '<i class="fas fa-random" style="color:#8a2be2; margin-right:8px;"></i> SWITCH FREQUENCY';
+                    switchBtn.style.borderColor = '#8a2be2';
+                    switchBtn.onclick = (e) => {
+                        e.stopPropagation(); // Prevent closing modal
+                        renderVibeSubset(); // Re-roll
+                    };
+                    bubbles.appendChild(switchBtn);
+                };
+
+                if(vBtn) {
+                    vBtn.onclick = () => {
+                        const modal = document.getElementById('vibe-modal');
+                        modal.classList.add('visible');
+                        
+                        // Waveform Init
+                        let waveform = modal.querySelector('.modal-box .waveform-container');
+                        if(!waveform) {
+                            const box = modal.querySelector('.modal-box');
+                            waveform = document.createElement('div'); waveform.className = 'waveform-container';
+                            for(let i=0; i<30; i++) { const bar = document.createElement('div'); bar.className = 'waveform-bar'; bar.style.animationDelay = `${Math.random()}s`; waveform.appendChild(bar); }
+                            box.appendChild(waveform);
+                        }
+
+                        // Load Data & Render
+                        if(allLoadedVibes.length === 0) {
+                            fetch('vibes.json').then(r=>r.json()).then(d => {
+                                allLoadedVibes = d.vibes || [];
+                                renderVibeSubset();
+                            });
+                        } else {
+                            renderVibeSubset(); // Re-render if already loaded
+                        }
+                    };
+                    document.getElementById('vibe-modal-close').onclick = () => document.getElementById('vibe-modal').classList.remove('visible');
+                }
             }
         });
 
