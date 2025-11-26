@@ -2,33 +2,57 @@
   "vibes": [
     {
       "name": "Ερωτευμένος",
-      "color": "#ff1493", 
-      "tags": ["love", "romantic", "smooth"]
+      "color": "#ff1493",
+      "tags": [
+        "love",
+        "romantic",
+        "smooth"
+      ]
     },
     {
       "name": "Μελαγχολικός",
-      "color": "#4b0082",
-      "tags": ["sad", "emotional", "dark"]
+      "color": "#bc74f5",
+      "tags": [
+        "sad",
+        "emotional",
+        "dark"
+      ]
     },
     {
       "name": "Drill / Hard",
       "color": "#ff4500",
-      "tags": ["aggressive", "hard", "drill"]
+      "tags": [
+        "aggressive",
+        "hard",
+        "drill"
+      ]
     },
     {
       "name": "Chill / Lofi",
       "color": "#00ced1",
-      "tags": ["chill", "lofi", "relax"]
+      "tags": [
+        "chill",
+        "lofi",
+        "relax"
+      ]
     },
     {
       "name": "Για πάρτι",
       "color": "#ffff00",
-      "tags": ["party", "upbeat", "afro"]
+      "tags": [
+        "party",
+        "upbeat",
+        "afro"
+      ]
     },
     {
       "name": "Dark",
       "color": "#1a1a1a",
-      "tags": ["mysterious", "dark", "horror"]
+      "tags": [
+        "mysterious",
+        "dark",
+        "horror"
+      ]
     }
   ]
 }
