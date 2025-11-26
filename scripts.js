@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 2. RELEASES (UPDATED: DESC + BUTTONS) ---
+        // --- 2. RELEASES ---
         safeRun(() => {
             const releasesContainer = document.getElementById('releases-list');
             if (releasesContainer) {
@@ -114,7 +114,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             const buyLink = track.bundleUrl || '#';
                             const ytLink = track.youtubeUrl || '#';
                             
-                            // Check for description
                             const descHtml = track.description ? `<div class="beat-desc">${track.description}</div>` : '';
 
                             const downloadBtn = track.downloadUrl 
@@ -230,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 7. BEATS ---
+        // --- 7. BEATS & VIBES ---
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
@@ -272,27 +271,39 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 8. PRESS & PODCASTS ---
+        // --- 8. STORE DATA & PRESS ---
         safeRun(() => {
+            // PRESS
             const press = document.getElementById('press-container');
             if(press) {
                 fetch('press.json').then(r=>r.json()).then(d => {
                     press.innerHTML=''; (d.articles||[]).forEach(i => press.innerHTML += `<div class="press-card"><img src="${i.image}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">READ</a></div></div>`);
                 });
             }
+            // PODCASTS
             const pods = document.getElementById('podcasts-container');
             if(pods) {
                 fetch('podcasts.json').then(r=>r.json()).then(d => {
                     pods.innerHTML=''; (d.episodes||[]).forEach(i => pods.innerHTML += `<div class="press-card"><img src="${i.cover}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">LISTEN</a></div></div>`);
                 });
             }
+            
+            // STORE PAGE DATA
+            const storeSub = document.getElementById('store-subtitle');
+            const bundleList = document.getElementById('bundle-list-content');
+            // Fetch only if we are on the store page (element exists)
+            if (storeSub || bundleList) {
+                 fetch('store.json').then(r => r.json()).then(data => {
+                     if(storeSub && data.subtitle) storeSub.textContent = data.subtitle;
+                     
+                     if(bundleList && data.bundleItems) {
+                         bundleList.innerHTML = data.bundleItems.map(item => 
+                            `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`
+                         ).join('');
+                     }
+                 }).catch(e => console.log("Store json load error"));
+            }
         });
-        
-        const bundleList = document.getElementById('bundle-list-content');
-        if(bundleList && bundleList.innerHTML === '') {
-             const items = [ { text: "Master Quality Track: WAV/MP3 (High Res)", icon: "fas fa-music" }, { text: "Εναλλακτικές Εκδόσεις", icon: "fas fa-random" }, { text: "Ringtone", icon: "fas fa-mobile-alt" }, { text: "Signed Artwork", icon: "fas fa-image" }, { text: "Χειρόγραφοι Στίχοι", icon: "fas fa-pen-nib" }, { text: "BTS Video", icon: "fas fa-video" }, { text: "Οδηγίες Χρήσης", icon: "fas fa-book" } ]; 
-             bundleList.innerHTML = items.map(item => `<li style="margin-bottom:1rem; display:flex; align-items:center; gap:12px; font-size:0.95rem; color:#ccc;"><i class="${item.icon}" style="color:#8a2be2; width:20px; text-align:center;"></i> ${item.text}</li>`).join('');
-        }
     }
 
     function safeRun(fn) { try { fn(); } catch(e) { console.error("Script Error:", e); } }
