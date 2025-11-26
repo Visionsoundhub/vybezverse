@@ -112,13 +112,36 @@ collections:
             fields:
               - {label: "Title", name: "title", widget: "string"}
               - {label: "Short Description", name: "description", widget: "text", required: false}
-              - {label: "Genre", name: "genre", widget: "select", options: ["Rap", "Trap", "Reggaeton", "Amapiano", "Afrobeats", "Rap/Rock", "Swing", "Alternative", "Pop", "Various"], required: true}
+              # ΝΕΑ ΡΥΘΜΙΣΗ: Χρησιμοποιεί Relation widget για να αντλεί τα είδη από τη νέα συλλογή "genres"
+              - label: "Genre"
+                name: "genre"
+                widget: "relation"
+                collection: "genres"
+                file: "genresConfig"
+                search_fields: ["genres.*.name"]
+                value_field: "genres.*.name"
+                display_fields: ["genres.*.name"]
+                multiple: false
               - {label: "Release Type", name: "type", widget: "select", options: ["Single", "EP", "Album"], required: true}
               - {label: "YouTube Video URL", name: "youtubeUrl", widget: "string"}
               - {label: "Cover Art", name: "cover", widget: "image"}
               - {label: "Stream Link", name: "streamUrl", widget: "string"}
               - {label: "Buy Link (Payhip)", name: "bundleUrl", widget: "string"}
               - {label: "Free Download Link", name: "downloadUrl", widget: "string", required: false}
+
+  # --- 6.5. GENRES --- (ΝΕΑ ΣΥΛΛΟΓΗ)
+  - name: "genres"
+    label: "🎛️ Genre Settings"
+    files:
+      - name: "genresConfig"
+        label: "Genre List"
+        file: "genres.json"
+        fields:
+          - name: "genres"
+            label: "Genres"
+            widget: "list"
+            fields:
+              - {label: "Genre Name", name: "name", widget: "string"}
 
   # --- 7. BEAT STORE ---
   - name: "beats"
@@ -136,7 +159,7 @@ collections:
               - {label: "Cover Art", name: "cover", widget: "image", required: false}
               - {label: "Audio Preview (MP3)", name: "audioSrc", widget: "file"}
               - {label: "Price", name: "price", widget: "string", default: "29.99€"}
-              - {label: "Status", name: "status", widget: "select", options: ["available", "sold"], default: "available"}
+              - {label: "Status", name: "status", widget: "select", options: ["available", "sold", "hidden"], default: "available"}
               - {label: "Category", name: "category", widget: "select", options: ["trap", "boombap", "latin", "lofi", "custom", "vault", "ai"]}
               - {label: "BPM", name: "bpm", widget: "string", required: false}
               - {label: "Key", name: "key", widget: "string", required: false}
