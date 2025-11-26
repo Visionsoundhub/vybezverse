@@ -247,6 +247,15 @@ collections:
                   - {label: "Image", name: "image", widget: "image"}
                   - {label: "Text", name: "body", widget: "text", required: false}
       
+      - name: "releases_page"
+        label: "Releases Page Settings"
+        file: "releases_settings.json"
+        fields:
+          - {label: "Page Title", name: "pageTitle", widget: "string", default: "MUSIC CATALOG"}
+          - {label: "Button: All Releases", name: "allReleasesText", widget: "string", default: "All Releases"}
+          - {label: "Button: Why Buy", name: "whyBuyText", widget: "string", default: "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;"}
+          - {label: "Button: What's Included", name: "whatsIncludedText", widget: "string", default: "ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;"}
+
       - name: "store"
         label: "Store Page Settings"
         file: "store.json"
