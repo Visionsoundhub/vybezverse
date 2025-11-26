@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Beat Store | VYBEZMADETHIS</title>
+    
+    <meta property="og:title" content="Beat Store | VYBEZMADETHIS">
+    <meta property="og:description" content="Exclusive Beats, AI Access & Vault Beats. Find your sound.">
+    <meta property="og:image" content="/assets/uploads/banner.png">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -23,9 +28,14 @@
             <h1 class="hero-title">VYBEZMADETHIS</h1>
             <p class="hero-subtitle">exclusive beats</p>
             
-            <button id="vibe-search-btn" class="btn btn-outline" style="margin-top:2rem; padding:0.8rem 2.5rem;">
-                <i class="fas fa-magic" style="color:#8a2be2;"></i> VIBE SEARCH
-            </button>
+            <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:2rem;">
+                <button id="vibe-search-btn" class="btn btn-outline" style="padding:0.8rem 2.5rem;">
+                    <i class="fas fa-magic" style="color:#8a2be2;"></i> VIBE SEARCH
+                </button>
+                <button id="mobile-info-btn" class="btn btn-outline" style="padding:0.8rem 2.5rem; display:none;">
+                    <i class="fas fa-info-circle" style="color:#fff;"></i> LICENSE INFO
+                </button>
+            </div>
 
             <div id="hero-beat-art" class="hero-beat-art">
                 <img id="hero-beat-img" src="" alt="Now Playing">
@@ -88,6 +98,15 @@
                 <div id="vibe-bubbles-container" style="display:flex; flex-wrap:wrap; justify-content:center; min-height: 200px; align-items: center;"></div>
             </div>
         </div>
+
+        <div class="modal-overlay" id="info-modal">
+            <div class="modal-box" style="text-align:left;">
+                <button class="modal-close-btn" id="info-modal-close">&times;</button>
+                <h2 style="text-align:center; margin-bottom:1.5rem;">LICENSING INFO</h2>
+                <div id="info-modal-content" class="info-accordions-container" style="margin:0; padding:0;"></div>
+            </div>
+        </div>
+
     </main>
     
     <div id="sticky-player">
@@ -112,4 +131,3 @@
     <script src="scripts.js"></script>
 </body>
 </html>
-
