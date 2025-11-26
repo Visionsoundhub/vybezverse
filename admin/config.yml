@@ -255,13 +255,18 @@ collections:
           - {label: "Button: All Releases", name: "allReleasesText", widget: "string", default: "All Releases"}
           - {label: "Button: Why Buy", name: "whyBuyText", widget: "string", default: "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;"}
           - {label: "Button: What's Included", name: "whatsIncludedText", widget: "string", default: "ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;"}
+          - {label: "--- WHY BUY MODAL ---", name: "sep_why", widget: "hidden"}
+          - {label: "Modal Title", name: "modalTitle", widget: "string", default: "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΕΙΣ;"}
+          - {label: "Section 1: Title", name: "supportTitle", widget: "string", default: "ΣΤΗΡΙΞΕ ΤΟΝ ΚΑΛΛΙΤΕΧΝΗ"}
+          - {label: "Section 1: Text", name: "supportText", widget: "text", default: "Οι πλατφόρμες streaming πληρώνουν ελάχιστα. Η αγορά ενός τραγουδιού ισοδυναμεί με χιλιάδες streams."}
+          - {label: "Section 2: Title", name: "getTitle", widget: "string", default: "ΤΙ ΠΑΙΡΝΕΙΣ;"}
+          - {label: "Section 2: Text", name: "getText", widget: "text", default: "High Quality Audio, Εναλλακτικές Εκδόσεις, Ringtones, Artwork, Στίχους."}
 
       - name: "store"
         label: "Store Page Settings"
         file: "store.json"
         fields:
           - {label: "Page Title (H1)", name: "title", widget: "string", default: "STORE"}
-          # MOVED STATUS & COMING SOON TO MERCH COLLECTION BELOW
           - {label: "--- BUNDLE LIST (For Releases Modal) ---", name: "sep_bund", widget: "hidden"}
           - {label: "Bundle Subtitle", name: "subtitle", widget: "string", default: "Το πλήρες πακέτο περιεχομένου για κάθε τραγούδι που αγοράζεις."}
           - name: "bundleItems"
