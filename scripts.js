@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 0. GLOBAL INIT ---
+    // --- 0. GLOBAL INIT & VARIABLES ---
     if (!window.globalAudio) { window.globalAudio = new Audio(); }
     const audio = window.globalAudio;
     window.currentPlaylist = window.currentPlaylist || []; 
@@ -9,11 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.currentCover = window.currentCover || null;
     window.loadedProducts = []; 
 
-    // Global Filter State for Releases
+    // --- GLOBAL STATE FOR RELEASES (ACCESSIBLE EVERYWHERE) ---
     let activeReleasesFilters = { genre: 'all', type: 'all' };
     let allReleasesTracks = [];
 
-    // Global Filter State for Beats (CRITICAL FIX: Keeps Beats filters working)
+    // --- GLOBAL STATE FOR BEATS ---
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
     // --- NEURO-SYNC PRELOADER ---
@@ -44,10 +44,79 @@ document.addEventListener('DOMContentLoaded', () => {
                 killPreloader();
             });
         }
-        // Failsafe
         setTimeout(() => { clearInterval(msgInterval); killPreloader(); }, 3500);
     }
 
+    // --- GLOBAL HELPER: RENDER RELEASES ---
+    // Ορίστηκε εδώ για να είναι προσβάσιμη από το Global Click Listener
+    function renderFilteredReleases() {
+        const container = document.getElementById('releases-list');
+        if(!container) return;
+        
+        // Φιλτράρισμα
+        let filteredTracks = allReleasesTracks.filter(track => {
+            const genreMatch = activeReleasesFilters.genre === 'all' || 
+                               (track.genre && track.genre.toLowerCase() === activeReleasesFilters.genre.toLowerCase());
+            const typeMatch = activeReleasesFilters.type === 'all' || 
+                              (track.type && track.type.toLowerCase() === activeReleasesFilters.type.toLowerCase());
+            return genreMatch && typeMatch;
+        });
+        
+        container.innerHTML = '';
+        if (filteredTracks.length === 0) {
+            container.innerHTML = '<p style="text-align:center;">No releases found for selected filters.</p>';
+            return;
+        }
+
+        filteredTracks.forEach(track => {
+            const coverImg = track.cover || 'https://via.placeholder.com/150';
+            const streamLink = track.streamUrl || '#'; 
+            const buyLink = track.bundleUrl || '#'; 
+            const ytLink = track.youtubeUrl || '#';
+            const descHtml = track.description ? `<div class="beat-desc">${track.description}</div>` : '';
+            const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>` : '';
+            const metaText = `Available Now / Type: ${track.type || 'Single'} / Genre: ${track.genre || 'Various'}`;
+
+            container.innerHTML += `
+            <div class="beat-row">
+                <div class="beat-art"><img src="${coverImg}" alt="Art"></div>
+                <div class="beat-info"><h4>${track.title || 'Untitled'}</h4>${descHtml}<div class="beat-meta">${metaText}</div></div>
+                <div class="beat-actions">
+                    <a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i> YOUTUBE</a>
+                    <a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM IT</a>
+                    <a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>
+                    ${downloadBtn}
+                </div>
+            </div>`;
+        });
+    }
+
+    // --- GLOBAL HELPER: RESET UI DROPDOWNS ---
+    function resetReleaseDropdowns() {
+        // Reset Genre Dropdown
+        const genreSelect = document.getElementById('custom-releases-genre');
+        if(genreSelect) {
+            const btn = genreSelect.querySelector('.select-btn');
+            if(btn) btn.innerHTML = '<span>GENRE: ALL</span><i class="fas fa-chevron-down"></i>';
+            genreSelect.classList.remove('active');
+            genreSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+            const allOpt = genreSelect.querySelector('[data-value="all"]');
+            if(allOpt) allOpt.classList.add('selected');
+        }
+
+        // Reset Type Dropdown
+        const typeSelect = document.getElementById('custom-releases-type');
+        if(typeSelect) {
+            const btn = typeSelect.querySelector('.select-btn');
+            if(btn) btn.innerHTML = '<span>TYPE: ALL</span><i class="fas fa-chevron-down"></i>';
+            typeSelect.classList.remove('active');
+            typeSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+            const allOpt = typeSelect.querySelector('[data-value="all"]');
+            if(allOpt) allOpt.classList.add('selected');
+        }
+    }
+
+    // --- INITIALIZE ---
     initAllScripts(); 
 
     if (window.Swup) {
@@ -55,14 +124,19 @@ document.addEventListener('DOMContentLoaded', () => {
         swup.hooks.on('page:view', () => { initAllScripts(); });
     }
 
-    // --- GLOBAL CLICK LISTENER ---
+    // --- GLOBAL CLICK LISTENER (THE BOSS) ---
     document.addEventListener('click', (e) => {
+        // 1. Modals Close
         if (e.target.closest('.modal-close-btn') || e.target.classList.contains('modal-overlay')) {
             const openModals = document.querySelectorAll('.modal-overlay.visible');
             openModals.forEach(m => m.classList.remove('visible'));
         }
+        
+        // 2. Open Specific Modals
         if (e.target.closest('#open-bundle-modal')) { document.getElementById('bundle-modal').classList.add('visible'); }
         if (e.target.closest('#why-buy-btn')) { document.getElementById('why-buy-modal').classList.add('visible'); }
+        
+        // 3. Mobile Info Button
         if (e.target.closest('#mobile-info-btn')) {
              const accCont = document.getElementById('info-accordions-container');
              const modalCont = document.getElementById('info-modal-content');
@@ -71,6 +145,18 @@ document.addEventListener('DOMContentLoaded', () => {
                  modalCont.querySelectorAll('.accordion-btn').forEach(btn => { btn.onclick = () => { btn.parentElement.classList.toggle('active'); }; });
              }
              document.getElementById('info-modal').classList.add('visible'); 
+        }
+
+        // 4. ALL RELEASES BUTTON (FIXED LOGIC)
+        // Αν πατήθηκε το κουμπί 'All Releases' ή κάτι μέσα σε αυτό
+        if (e.target.closest('#all-releases-btn')) {
+            console.log("All Releases Clicked - Resetting...");
+            // Reset Data State
+            activeReleasesFilters = { genre: 'all', type: 'all' };
+            // Reset UI
+            resetReleaseDropdowns();
+            // Re-render
+            renderFilteredReleases();
         }
     });
 
@@ -146,64 +232,24 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 2. RELEASES (FILTERS, DESCRIPTION & LOGIC) ---
+        // --- 2. RELEASES (DATA FETCH ONLY) ---
         safeRun(() => {
             const releasesContainer = document.getElementById('releases-list');
             const relDesc = document.getElementById('releases-description');
-            const allReleasesBtn = document.getElementById('all-releases-btn');
 
             if (releasesContainer) {
                 // 1. Fetch Data
                 fetch('releases.json?t=' + new Date().getTime()).then(r => r.ok ? r.json() : Promise.reject("No releases")).then(data => {
-                    allReleasesTracks = data.tracks || [];
+                    allReleasesTracks = data.tracks || []; // Update Global Variable
                     
                     const uniqueGenres = [...new Set(allReleasesTracks.map(t => t.genre).filter(g => g))];
                     const uniqueTypes = [...new Set(allReleasesTracks.map(t => t.type).filter(t => t))];
                     
                     setupReleaseFilters(uniqueGenres, uniqueTypes);
-                    renderFilteredReleases();
+                    renderFilteredReleases(); // Call the global renderer
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
-                
-                // 2. "All Releases" Button Logic (AGGRESSIVE RESET FIX)
-                if (allReleasesBtn) {
-                    allReleasesBtn.onclick = () => {
-                        // A. Reset State
-                        activeReleasesFilters = { genre: 'all', type: 'all' };
-                        
-                        // B. Force GENRE Reset
-                        const genreSelect = document.getElementById('custom-releases-genre');
-                        if(genreSelect) {
-                            const btn = genreSelect.querySelector('.select-btn');
-                            // Force HTML rewrite to guarantee visual reset
-                            if(btn) btn.innerHTML = '<span>GENRE: ALL</span><i class="fas fa-chevron-down"></i>';
-                            
-                            genreSelect.classList.remove('active');
-                            // Remove bold from all items
-                            genreSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
-                            // Select "All"
-                            const allOpt = genreSelect.querySelector('[data-value="all"]');
-                            if(allOpt) allOpt.classList.add('selected');
-                        }
 
-                        // C. Force TYPE Reset
-                        const typeSelect = document.getElementById('custom-releases-type');
-                        if(typeSelect) {
-                            const btn = typeSelect.querySelector('.select-btn');
-                            // Force HTML rewrite
-                            if(btn) btn.innerHTML = '<span>TYPE: ALL</span><i class="fas fa-chevron-down"></i>';
-                            
-                            typeSelect.classList.remove('active');
-                            typeSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
-                            const allOpt = typeSelect.querySelector('[data-value="all"]');
-                            if(allOpt) allOpt.classList.add('selected');
-                        }
-
-                        // D. Re-render list
-                        renderFilteredReleases();
-                    };
-                }
-
-                // 3. Fetch Texts
+                // 2. Fetch Texts
                 const relTitle = document.getElementById('releases-title');
                 const allBtn = document.getElementById('all-releases-btn');
                 const whyBtn = document.getElementById('why-buy-text');
@@ -237,46 +283,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        
-        // --- HELPER FUNCTIONS FOR RELEASES ---
-        function renderFilteredReleases() {
-            const container = document.getElementById('releases-list');
-            if(!container) return;
-            
-            let filteredTracks = allReleasesTracks.filter(track => {
-                const genreMatch = activeReleasesFilters.genre === 'all' || 
-                                   (track.genre && track.genre.toLowerCase() === activeReleasesFilters.genre.toLowerCase());
-                const typeMatch = activeReleasesFilters.type === 'all' || 
-                                  (track.type && track.type.toLowerCase() === activeReleasesFilters.type.toLowerCase());
-                return genreMatch && typeMatch;
-            });
-            
-            container.innerHTML = '';
-            if (filteredTracks.length === 0) {
-                container.innerHTML = '<p style="text-align:center;">No releases found for selected filters.</p>';
-                return;
-            }
-
-            filteredTracks.forEach(track => {
-                const coverImg = track.cover || 'https://via.placeholder.com/150';
-                const streamLink = track.streamUrl || '#'; const buyLink = track.bundleUrl || '#'; const ytLink = track.youtubeUrl || '#';
-                const descHtml = track.description ? `<div class="beat-desc">${track.description}</div>` : '';
-                const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>` : '';
-                const metaText = `Available Now / Type: ${track.type || 'Single'} / Genre: ${track.genre || 'Various'}`;
-
-                container.innerHTML += `
-                <div class="beat-row">
-                    <div class="beat-art"><img src="${coverImg}" alt="Art"></div>
-                    <div class="beat-info"><h4>${track.title || 'Untitled'}</h4>${descHtml}<div class="beat-meta">${metaText}</div></div>
-                    <div class="beat-actions">
-                        <a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i> YOUTUBE</a>
-                        <a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM IT</a>
-                        <a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>
-                        ${downloadBtn}
-                    </div>
-                </div>`;
-            });
-        }
         
         function setupReleaseFilters(genres, types) {
             const genreList = document.getElementById('genre-options-list');
