@@ -641,3 +641,72 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     .beat-actions { grid-area: actions; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%; margin-top: 5px; }
     .btn { width: 100%; min-width: 0; padding: 0.8rem 0.5rem; font-size: 0.8rem; }
 }
+
+/* --- NEW UI TOUCHES (Releases & Vibe Search) --- */
+
+/* 1. VIBE SEARCH (Όπως το παλιό: Gradient & Glow) */
+#vibe-search-btn {
+    background: linear-gradient(90deg, #7b4ff2, #4c8bf5) !important; /* Μωβ προς Μπλε */
+    border: none !important;
+    border-radius: 50px !important; /* Στρογγυλεμένο */
+    color: #fff !important;
+    padding: 0.8rem 2.5rem !important;
+    box-shadow: 0 0 20px rgba(76, 139, 245, 0.4) !important; /* Η παλιά λάμψη */
+    transition: transform 0.3s ease, box-shadow 0.3s ease !important;
+}
+
+#vibe-search-btn:hover {
+    transform: scale(1.05); /* Ελαφρύ μεγάλωμα */
+    box-shadow: 0 0 35px rgba(76, 139, 245, 0.7) !important; /* Πιο έντονη λάμψη */
+}
+#vibe-search-btn i { color: #fff !important; }
+
+
+/* 2. WHY BUY BUTTON (Διάφανο -> Μωβ στο Hover) */
+#why-buy-btn {
+    background: transparent !important;
+    border: 1px solid #8a2be2 !important;
+    color: #8a2be2 !important;
+    box-shadow: none !important;
+    transition: all 0.3s ease;
+}
+
+#why-buy-btn:hover {
+    background: #8a2be2 !important; /* Γεμίζει μωβ */
+    color: #fff !important; /* Άσπρα γράμματα */
+    box-shadow: 0 0 20px rgba(138, 43, 226, 0.6) !important; /* Μωβ λάμψη */
+}
+#why-buy-btn i { transition: color 0.3s; }
+#why-buy-btn:hover i { color: #fff !important; }
+
+
+/* 3. ALL RELEASES BUTTON (Κενό -> Λευκή Λάμψη στο Hover) */
+#all-releases-btn {
+    background: transparent !important;
+    border: 1px solid rgba(255,255,255,0.3) !important; /* Πιο διακριτικό περίγραμμα αρχικά */
+    color: #fff !important;
+    box-shadow: none !important;
+    transition: all 0.3s ease;
+}
+
+/* Αφαιρούμε το μόνιμο active style αν υπάρχει */
+#all-releases-btn.active {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-color: #fff !important;
+}
+
+#all-releases-btn:hover {
+    background: rgba(255, 255, 255, 0.1) !important; /* Ελαφρύ γέμισμα */
+    border-color: #fff !important;
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.5) !important; /* Λευκή λάμψη */
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+}
+
+
+/* 4. GENRE/TYPE DROPDOWNS (Χρωματιστά Hovers) */
+.custom-select .select-btn:hover {
+    border-color: #00d2ff !important; /* Γαλάζιο στο hover */
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
+    color: #fff;
+}
