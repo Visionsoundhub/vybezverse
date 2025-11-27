@@ -1,34 +1,48 @@
 {
   "genres": [
     {
-      "name": "Rap"
+      "name": "Flow State",
+      "note": "Rap"
     },
     {
-      "name": "Trap"
+      "name": "Overdrive",
+      "note": "Battle / Energy Trap"
     },
     {
-      "name": "Reggaeton"
+      "name": "Ether",
+      "note": "Atmospheric Trap"
     },
     {
-      "name": "Amapiano"
+      "name": "Latin Vibe",
+      "note": "Reggaeton"
     },
     {
-      "name": "Afrobeats"
+      "name": "Deep Pulse",
+      "note": "Amapiano / Afro"
     },
     {
-      "name": "Rap/Rock"
+      "name": "Distortion",
+      "note": "Rap / Rock"
     },
     {
-      "name": "Swing"
+      "name": "Vintage Freq",
+      "note": "Swing"
     },
     {
-      "name": "Alternative"
+      "name": "Off Grid",
+      "note": "Alternative / Glitch"
     },
     {
-      "name": "Pop"
+      "name": "Neon Waves",
+      "note": "Pop"
     },
     {
-      "name": "Various"
+      "name": "Organic",
+      "note": "Folk / Indie / Acoustic"
+    },
+    {
+      "name": "Spectrum",
+      "note": "Various"
     }
   ]
 }
