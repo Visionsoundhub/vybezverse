@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeReleasesFilters = { genre: 'all', type: 'all' };
     let allReleasesTracks = [];
 
-    // Global Filter State for Beats (ΔΙΟΡΘΩΣΗ: Προστέθηκε για να μην κρασάρουν τα φίλτρα των Beats)
+    // Global Filter State for Beats (CRITICAL FIX: Keeps Beats filters working)
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
     // --- NEURO-SYNC PRELOADER ---
@@ -164,28 +164,34 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
                 
-                // 2. "All Releases" Button Logic (ΔΙΟΡΘΩΣΗ: ΠΛΗΡΕΣ VISUAL RESET)
+                // 2. "All Releases" Button Logic (AGGRESSIVE RESET FIX)
                 if (allReleasesBtn) {
                     allReleasesBtn.onclick = () => {
                         // A. Reset State
                         activeReleasesFilters = { genre: 'all', type: 'all' };
                         
-                        // B. Reset Genre Dropdown UI (Forced Visual Update)
+                        // B. Force GENRE Reset
                         const genreSelect = document.getElementById('custom-releases-genre');
                         if(genreSelect) {
-                            const btnSpan = genreSelect.querySelector('.select-btn span');
-                            if(btnSpan) btnSpan.textContent = 'GENRE: ALL'; // Force text reset
+                            const btn = genreSelect.querySelector('.select-btn');
+                            // Force HTML rewrite to guarantee visual reset
+                            if(btn) btn.innerHTML = '<span>GENRE: ALL</span><i class="fas fa-chevron-down"></i>';
+                            
                             genreSelect.classList.remove('active');
+                            // Remove bold from all items
                             genreSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+                            // Select "All"
                             const allOpt = genreSelect.querySelector('[data-value="all"]');
                             if(allOpt) allOpt.classList.add('selected');
                         }
 
-                        // C. Reset Type Dropdown UI (Forced Visual Update)
+                        // C. Force TYPE Reset
                         const typeSelect = document.getElementById('custom-releases-type');
                         if(typeSelect) {
-                            const btnSpan = typeSelect.querySelector('.select-btn span');
-                            if(btnSpan) btnSpan.textContent = 'TYPE: ALL'; // Force text reset
+                            const btn = typeSelect.querySelector('.select-btn');
+                            // Force HTML rewrite
+                            if(btn) btn.innerHTML = '<span>TYPE: ALL</span><i class="fas fa-chevron-down"></i>';
+                            
                             typeSelect.classList.remove('active');
                             typeSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
                             const allOpt = typeSelect.querySelector('[data-value="all"]');
@@ -353,7 +359,7 @@ document.addEventListener('DOMContentLoaded', () => {
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
-                // Reset Beats filters on page load (Optional, but safer)
+                // Reset Beats filters on page load
                 activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
                 fetch('beats.json').then(r => r.json()).then(data => {
@@ -493,7 +499,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const val = e.target.getAttribute('data-value'); 
                     span.textContent = `${d.id.split('-')[1].toUpperCase()}: ${e.target.textContent}`; 
                     
-                    // ΔΙΟΡΘΩΣΗ: Χρήση του global activeFilters
                     if(d.id==='custom-genre') activeFilters.genre=val; 
                     if(d.id==='custom-bpm') activeFilters.bpm=val; 
                     if(d.id==='custom-key') activeFilters.key=val; 
