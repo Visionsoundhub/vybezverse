@@ -53,7 +53,7 @@ collections:
           - {label: "AI Access Title", name: "aiTitle", widget: "string"}
           - {label: "AI Access Text", name: "aiText", widget: "text"}
           - {label: "Vault Beats Title", name: "vaultTitle", widget: "string"}
-          - {label: "Vault Beats Text", name: "vaultText", widget: "text"}
+          - {label: "Vault Beats Text", name: "vaultText", widget: "text"} # <--- ΕΔΩ ΗΤΑΝ ΤΟ ΛΑΘΟΣ (ΠΡΟΣΤΕΘΗΚΕ ΤΟ name)
 
   # --- 3. BIO PAGE ---
   - name: "bio"
@@ -112,7 +112,7 @@ collections:
             fields:
               - {label: "Title", name: "title", widget: "string"}
               - {label: "Short Description", name: "description", widget: "text", required: false}
-              # ΝΕΑ ΡΥΘΜΙΣΗ: Χρησιμοποιεί Relation widget για να αντλεί τα είδη από τη νέα συλλογή "genres"
+              # RELATION WIDGET ΓΙΑ ΤΑ GENRES
               - label: "Genre"
                 name: "genre"
                 widget: "relation"
@@ -126,10 +126,10 @@ collections:
               - {label: "YouTube Video URL", name: "youtubeUrl", widget: "string"}
               - {label: "Cover Art", name: "cover", widget: "image"}
               - {label: "Stream Link", name: "streamUrl", widget: "string"}
-              - {label: "Buy Link (Payhip)", name: "bundleUrl", widget: "string"}
+              - {label: "Buy Link", name: "bundleUrl", widget: "string"}
               - {label: "Free Download Link", name: "downloadUrl", widget: "string", required: false}
 
-  # --- 6.5. GENRES --- (ΝΕΑ ΣΥΛΛΟΓΗ)
+  # --- 6.5. GENRES SETTINGS ---
   - name: "genres"
     label: "🎛️ Genre Settings"
     files:
@@ -159,11 +159,12 @@ collections:
               - {label: "Cover Art", name: "cover", widget: "image", required: false}
               - {label: "Audio Preview (MP3)", name: "audioSrc", widget: "file"}
               - {label: "Price", name: "price", widget: "string", default: "29.99€"}
-              - {label: "Status", name: "status", widget: "select", options: ["available", "sold", "hidden"], default: "available"}
+              - {label: "Status", name: "status", widget: "select", options: ["available", "sold"], default: "available"}
               - {label: "Category", name: "category", widget: "select", options: ["trap", "boombap", "latin", "lofi", "custom", "vault", "ai"]}
               - {label: "BPM", name: "bpm", widget: "string", required: false}
               - {label: "Key", name: "key", widget: "string", required: false}
               - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
+              # RELATION WIDGET ΓΙΑ ΤΑ VIBES
               - label: "Vibe Tags"
                 name: "tags"
                 widget: "relation"
@@ -227,7 +228,7 @@ collections:
               - {label: "Color (Hex)", name: "color", widget: "color", required: false}
               - {label: "Tags", name: "tags", widget: "list"}
 
-  # --- 11. GENERAL PAGES (UPDATED FOR RELEASES SETTINGS) ---
+  # --- 11. GENERAL PAGES ---
   - name: "pages"
     label: "🌐 General Pages"
     files:
