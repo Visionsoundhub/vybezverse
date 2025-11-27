@@ -53,7 +53,7 @@ collections:
           - {label: "AI Access Title", name: "aiTitle", widget: "string"}
           - {label: "AI Access Text", name: "aiText", widget: "text"}
           - {label: "Vault Beats Title", name: "vaultTitle", widget: "string"}
-          - {label: "Vault Beats Text", name: "vaultText", widget: "text"} # <--- ΕΔΩ ΗΤΑΝ ΤΟ ΛΑΘΟΣ (ΠΡΟΣΤΕΘΗΚΕ ΤΟ name)
+          - {label: "Vault Beats Text", name: "vaultText", widget: "text"}
 
   # --- 3. BIO PAGE ---
   - name: "bio"
@@ -112,15 +112,16 @@ collections:
             fields:
               - {label: "Title", name: "title", widget: "string"}
               - {label: "Short Description", name: "description", widget: "text", required: false}
-              # RELATION WIDGET ΓΙΑ ΤΑ GENRES
-              - label: "Genre"
+              # RELATION WIDGET ΓΙΑ ΤΑ FREQUENCIES (GENRES)
+              # Εδώ ορίσαμε να δείχνει "Name (Note)" αλλά να αποθηκεύει μόνο το "Name"
+              - label: "Frequency / Genre"
                 name: "genre"
                 widget: "relation"
                 collection: "genres"
                 file: "genresConfig"
-                search_fields: ["genres.*.name"]
+                search_fields: ["genres.*.name", "genres.*.note"]
                 value_field: "genres.*.name"
-                display_fields: ["genres.*.name"]
+                display_fields: ["genres.*.name", " (", "genres.*.note", ")"]
                 multiple: false
               - {label: "Release Type", name: "type", widget: "select", options: ["Single", "EP", "Album"], required: true}
               - {label: "YouTube Video URL", name: "youtubeUrl", widget: "string"}
@@ -129,19 +130,20 @@ collections:
               - {label: "Buy Link", name: "bundleUrl", widget: "string"}
               - {label: "Free Download Link", name: "downloadUrl", widget: "string", required: false}
 
-  # --- 6.5. GENRES SETTINGS ---
+  # --- 6.5. GENRES (FREQUENCIES) SETTINGS ---
   - name: "genres"
-    label: "🎛️ Genre Settings"
+    label: "🎛️ Frequency Settings"
     files:
       - name: "genresConfig"
-        label: "Genre List"
+        label: "Frequency List"
         file: "genres.json"
         fields:
           - name: "genres"
-            label: "Genres"
+            label: "Frequencies"
             widget: "list"
             fields:
-              - {label: "Genre Name", name: "name", widget: "string"}
+              - {label: "Frequency Name (Site)", name: "name", widget: "string"}
+              - {label: "Admin Note (Panel Only - e.g. 'Trap')", name: "note", widget: "string", required: false}
 
   # --- 7. BEAT STORE ---
   - name: "beats"
@@ -286,7 +288,7 @@ collections:
         file: "releases_settings.json"
         fields:
           - {label: "Page Title", name: "pageTitle", widget: "string", default: "MUSIC CATALOG"}
-          - {label: "Page Description", name: "pageDescription", widget: "text", default: "Δεν είναι απλά Releases. Είναι το ημερολόγιο μιας δημιουργικής υπερφόρτωσης..."}
+          - {label: "Page Description", name: "pageDescription", widget: "text", default: "Δεν είναι απλά Releases..."}
           - {label: "Button: All Releases", name: "allReleasesText", widget: "string", default: "All Releases"}
           - {label: "Button: Why Buy", name: "whyBuyText", widget: "string", default: "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;"}
           - {label: "Button: What's Included", name: "whatsIncludedText", widget: "string", default: "ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;"}
