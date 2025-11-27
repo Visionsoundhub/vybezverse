@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeReleasesFilters = { genre: 'all', type: 'all' };
     let allReleasesTracks = [];
 
-    // --- NEURO-SYNC PRELOADER (BULLETPROOF) ---
+    // --- NEURO-SYNC PRELOADER ---
     const preloader = document.getElementById('neuro-preloader');
     const preloaderText = document.getElementById('neuro-text');
 
@@ -91,7 +91,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     const bImg = document.getElementById('home-banner-img');
                     if (bImg && data.heroImage) { bImg.src = data.heroImage; bImg.style.display = 'block'; } 
                     
-                    // Latest Drop
                     const dropCont = document.getElementById('home-featured-container');
                     const dropIframe = document.getElementById('drop-iframe');
                     if (dropCont && data.showDrop && data.dropVideo) {
@@ -109,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     }
-                    // Announcement
                     const annCont = document.getElementById('home-announcement-container');
                     const annIframe = document.getElementById('announcement-iframe');
                     const annText = document.getElementById('announcement-text');
@@ -121,7 +119,6 @@ document.addEventListener('DOMContentLoaded', () => {
                             if (annText && data.announcementText) annText.textContent = data.announcementText;
                         }
                     }
-                    // Dynamic Stream
                     if (dynArea && data.stream && data.stream.length > 0) {
                         dynArea.innerHTML = ''; 
                         data.stream.forEach(item => {
@@ -157,27 +154,45 @@ document.addEventListener('DOMContentLoaded', () => {
                 fetch('releases.json?t=' + new Date().getTime()).then(r => r.ok ? r.json() : Promise.reject("No releases")).then(data => {
                     allReleasesTracks = data.tracks || [];
                     
-                    // Extract unique values for filters
                     const uniqueGenres = [...new Set(allReleasesTracks.map(t => t.genre).filter(g => g))];
                     const uniqueTypes = [...new Set(allReleasesTracks.map(t => t.type).filter(t => t))];
                     
-                    // Initialize Filters
                     setupReleaseFilters(uniqueGenres, uniqueTypes);
-                    // Render Initial List
                     renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
                 
-                // 2. "All Releases" Button Logic (Master Reset)
+                // 2. "All Releases" Button Logic (INLINE RESET)
                 if (allReleasesBtn) {
                     allReleasesBtn.onclick = () => {
-                        activeReleasesFilters = { genre: 'all', type: 'all' }; // Reset state
-                        resetCustomSelect('custom-releases-genre', 'GENRE: ALL'); // Reset UI
-                        resetCustomSelect('custom-releases-type', 'TYPE: ALL');   // Reset UI
-                        renderFilteredReleases(); // Re-render
+                        // Reset State
+                        activeReleasesFilters = { genre: 'all', type: 'all' };
+                        
+                        // Reset Genre Dropdown UI (Inline Logic)
+                        const genreSelect = document.getElementById('custom-releases-genre');
+                        if(genreSelect) {
+                            genreSelect.querySelector('.select-btn span').textContent = 'GENRE: ALL';
+                            genreSelect.classList.remove('active');
+                            genreSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+                            const allOpt = genreSelect.querySelector('[data-value="all"]');
+                            if(allOpt) allOpt.classList.add('selected');
+                        }
+
+                        // Reset Type Dropdown UI (Inline Logic)
+                        const typeSelect = document.getElementById('custom-releases-type');
+                        if(typeSelect) {
+                            typeSelect.querySelector('.select-btn span').textContent = 'TYPE: ALL';
+                            typeSelect.classList.remove('active');
+                            typeSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+                            const allOpt = typeSelect.querySelector('[data-value="all"]');
+                            if(allOpt) allOpt.classList.add('selected');
+                        }
+
+                        // Re-render list
+                        renderFilteredReleases();
                     };
                 }
 
-                // 3. Fetch Texts (Title, Desc, Buttons)
+                // 3. Fetch Texts
                 const relTitle = document.getElementById('releases-title');
                 const allBtn = document.getElementById('all-releases-btn');
                 const whyBtn = document.getElementById('why-buy-text');
@@ -194,7 +209,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(allBtn && s.allReleasesText) allBtn.textContent = s.allReleasesText;
                     if(whyBtn && s.whyBuyText) whyBtn.textContent = s.whyBuyText;
                     if(bundBtn && s.whatsIncludedText) bundBtn.textContent = s.whatsIncludedText;
-                    // Modal Content
                     if(modalT && s.modalTitle) modalT.textContent = s.modalTitle;
                     if(supT && s.supportTitle) supT.textContent = s.supportTitle;
                     if(supTxt && s.supportText) supTxt.textContent = s.supportText;
@@ -202,7 +216,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     if(getTxt && s.getText) getTxt.textContent = s.getText;
                 }).catch(() => {});
 
-                // 4. Fetch Bundle List
                 const bundleList = document.getElementById('bundle-list-content');
                 const storeSub = document.getElementById('store-subtitle');
                 if(bundleList) {
@@ -214,7 +227,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // --- RELEASE HELPER FUNCTIONS ---
+        // --- HELPER FUNCTIONS FOR RELEASES ---
         function renderFilteredReleases() {
             const container = document.getElementById('releases-list');
             if(!container) return;
@@ -258,7 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const genreList = document.getElementById('genre-options-list');
             const typeList = document.getElementById('type-options-list');
             
-            // Build Lists
             if(genreList) {
                 genreList.innerHTML = '<li data-value="all" class="selected">All Genres</li>';
                 genres.forEach(g => { genreList.innerHTML += `<li data-value="${g}">${g}</li>`; });
@@ -268,7 +280,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 types.forEach(t => { typeList.innerHTML += `<li data-value="${t}">${t}</li>`; });
             }
             
-            // Attach Logic
             const filterContainers = [
                 { id: 'custom-releases-genre', type: 'genre' },
                 { id: 'custom-releases-type', type: 'type' }
@@ -281,18 +292,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const options = container.querySelector('.select-options');
                     const span = btn.querySelector('span');
 
-                    // Toggle Dropdown
                     btn.onclick = (e) => { e.stopPropagation(); document.querySelectorAll('.custom-select').forEach(x=>x!==container && x.classList.remove('active')); container.classList.toggle('active'); };
                     
-                    // Handle Selection
                     options.onclick = (e) => {
                         if(e.target.tagName === 'LI') {
                             const val = e.target.getAttribute('data-value');
                             span.textContent = `${fc.type.toUpperCase()}: ${e.target.textContent}`;
-                            
-                            activeReleasesFilters[fc.type] = val; // Update State
-                            renderFilteredReleases(); // Update View
-                            
+                            activeReleasesFilters[fc.type] = val;
+                            renderFilteredReleases();
                             container.classList.remove('active');
                             options.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
                             e.target.classList.add('selected');
@@ -301,18 +308,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             });
         }
-        
-        function resetCustomSelect(id, defaultText) {
-            const container = document.getElementById(id);
-            if (container) {
-                container.querySelector('.select-btn span').textContent = defaultText;
-                container.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
-                const allOption = container.querySelector('[data-value="all"]');
-                if (allOption) allOption.classList.add('selected');
-                container.classList.remove('active');
-            }
-        }
-
 
         // --- 3. STORE ---
         safeRun(() => {
