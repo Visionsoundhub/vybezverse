@@ -1,12 +1,12 @@
 {
-  "pageTitle": "MUSIC CATALOG",
-  "pageDescription": "Δεν είναι απλά Releases. Είναι το ημερολόγιο μιας δημιουργικής υπερφόρτωσης (Overload). Κάθε τραγούδι είναι μια διαφορετική συχνότητα, ένα διαφορετικό mood. Χρησιμοποίησε τα φίλτρα για να συντονιστείς σε αυτό που χρειάζεσαι τώρα: Χαλάρωση, Ένταση ή Τσαχπινιά.",
-  "allReleasesText": "All Releases",
-  "whyBuyText": "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;",
-  "whatsIncludedText": "ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;",
-  "modalTitle": "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΕΙΣ;",
-  "supportTitle": "ΣΤΗΡΙΞΕ ΤΟΝ ΚΑΛΛΙΤΕΧΝΗ",
-  "supportText": "Οι πλατφόρμες streaming πληρώνουν ελάχιστα. Η αγορά ενός τραγουδιού ισοδυναμεί με χιλιάδες streams.",
   "getTitle": "ΤΙ ΠΑΙΡΝΕΙΣ;",
-  "getText": "High Quality Audio, Εναλλακτικές Εκδόσεις, Ringtones, Artwork, Στίχους."
+  "getText": "High Quality Audio, Εναλλακτικές Εκδόσεις, Ringtones, Artwork, Στίχους.",
+  "pageTitle": "MUSIC CATALOG",
+  "supportTitle": "ΣΤΗΡΙΞΕ ΤΟΝ ΚΑΛΛΙΤΕΧΝΗ",
+  "modalTitle": "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΕΙΣ;",
+  "whyBuyText": "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;",
+  "pageDescription": "Music Catalog ή απλά Creative Chaos; Κάθε κομμάτι είναι μια διαφορετική συχνότητα. Χρησιμοποίησε τα φίλτρα & Συντονίσου στη συχνότητα που ψάχνεις",
+  "whatsIncludedText": "ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;",
+  "allReleasesText": "All Releases",
+  "supportText": "Οι πλατφόρμες streaming πληρώνουν ελάχιστα. Η αγορά ενός τραγουδιού ισοδυναμεί με χιλιάδες streams."
 }
