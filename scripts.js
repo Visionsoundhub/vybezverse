@@ -13,7 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     let activeReleasesFilters = { genre: 'all', type: 'all' };
     let allReleasesTracks = [];
 
-    // --- NEURO-SYNC PRELOADER (BULLETPROOF) ---
+    // Global Filter State for Beats (ΔΙΟΡΘΩΣΗ: Προστέθηκε για να μην κρασάρουν τα φίλτρα των Beats)
+    let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
+
+    // --- NEURO-SYNC PRELOADER ---
     const preloader = document.getElementById('neuro-preloader');
     const preloaderText = document.getElementById('neuro-text');
 
@@ -41,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 killPreloader();
             });
         }
+        // Failsafe
         setTimeout(() => { clearInterval(msgInterval); killPreloader(); }, 3500);
     }
 
@@ -160,37 +164,35 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
                 
-                // 2. "All Releases" Button Logic (HARD RESET)
+                // 2. "All Releases" Button Logic (ΔΙΟΡΘΩΣΗ: ΠΛΗΡΕΣ VISUAL RESET)
                 if (allReleasesBtn) {
                     allReleasesBtn.onclick = () => {
-                        // Reset Logic
+                        // A. Reset State
                         activeReleasesFilters = { genre: 'all', type: 'all' };
                         
-                        // Force Reset Genre Dropdown UI
-                        const genreDrop = document.getElementById('custom-releases-genre');
-                        if(genreDrop) {
-                            genreDrop.querySelector('.select-btn span').textContent = 'GENRE: ALL';
-                            genreDrop.classList.remove('active');
-                            const options = genreDrop.querySelectorAll('li');
-                            options.forEach(li => li.classList.remove('selected'));
-                            // Find 'all' option and select it
-                            const allOpt = Array.from(options).find(li => li.getAttribute('data-value') === 'all');
+                        // B. Reset Genre Dropdown UI (Forced Visual Update)
+                        const genreSelect = document.getElementById('custom-releases-genre');
+                        if(genreSelect) {
+                            const btnSpan = genreSelect.querySelector('.select-btn span');
+                            if(btnSpan) btnSpan.textContent = 'GENRE: ALL'; // Force text reset
+                            genreSelect.classList.remove('active');
+                            genreSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+                            const allOpt = genreSelect.querySelector('[data-value="all"]');
                             if(allOpt) allOpt.classList.add('selected');
                         }
 
-                        // Force Reset Type Dropdown UI
-                        const typeDrop = document.getElementById('custom-releases-type');
-                        if(typeDrop) {
-                            typeDrop.querySelector('.select-btn span').textContent = 'TYPE: ALL';
-                            typeDrop.classList.remove('active');
-                            const options = typeDrop.querySelectorAll('li');
-                            options.forEach(li => li.classList.remove('selected'));
-                            // Find 'all' option and select it
-                            const allOpt = Array.from(options).find(li => li.getAttribute('data-value') === 'all');
+                        // C. Reset Type Dropdown UI (Forced Visual Update)
+                        const typeSelect = document.getElementById('custom-releases-type');
+                        if(typeSelect) {
+                            const btnSpan = typeSelect.querySelector('.select-btn span');
+                            if(btnSpan) btnSpan.textContent = 'TYPE: ALL'; // Force text reset
+                            typeSelect.classList.remove('active');
+                            typeSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+                            const allOpt = typeSelect.querySelector('[data-value="all"]');
                             if(allOpt) allOpt.classList.add('selected');
                         }
 
-                        // Re-render
+                        // D. Re-render list
                         renderFilteredReleases();
                     };
                 }
@@ -351,6 +353,9 @@ document.addEventListener('DOMContentLoaded', () => {
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
+                // Reset Beats filters on page load (Optional, but safer)
+                activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
+
                 fetch('beats.json').then(r => r.json()).then(data => {
                     let allBeats = Array.isArray(data) ? data : (data.beatslist || []);
                     window.currentPlaylist = allBeats;
@@ -470,5 +475,51 @@ document.addEventListener('DOMContentLoaded', () => {
     function restoreHeroArt() { const hero = document.getElementById('hero-beat-art'); const img = document.getElementById('hero-beat-img'); if(hero && img && window.currentCover) { img.src = window.currentCover; hero.classList.add('visible'); } }
     function updateUIState() { const pBtn = document.getElementById('player-play-btn'); if(pBtn) pBtn.innerHTML = window.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>'; document.querySelectorAll('.beat-play-overlay i').forEach(i => i.className = 'fas fa-play'); const active = document.getElementById(`beat-icon-${window.currentIndex}`); if(active) active.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play'; }
     function checkPlayerVisibility() { const stick = document.getElementById('sticky-player'); if(!stick) return; const isBeats = window.location.pathname.includes('beats.html'); if(isBeats || window.isPlaying || (audio.src && audio.src !== '')) stick.classList.add('player-visible'); else stick.classList.remove('player-visible'); }
-    function setupCustomDropdowns(allBeats) { const drops = document.querySelectorAll('.custom-select'); drops.forEach(d => { const btn = d.querySelector('.select-btn'); const list = d.querySelector('.select-options'); const span = btn.querySelector('span'); btn.onclick = (e) => { e.stopPropagation(); drops.forEach(x=>x!==d && x.classList.remove('active')); d.classList.toggle('active'); }; list.onclick = (e) => { if(e.target.tagName === 'LI') { const val = e.target.getAttribute('data-value'); span.textContent = `${d.id.split('-')[1].toUpperCase()}: ${e.target.textContent}`; if(d.id==='custom-genre') activeFilters.genre=val; if(d.id==='custom-bpm') activeFilters.bpm=val; if(d.id==='custom-key') activeFilters.key=val; const filtered = allBeats.filter(b => { const g = activeFilters.genre==='all' || (b.category && b.category.toLowerCase()===activeFilters.genre.toLowerCase()); const bKey = b.key || b.Key; const k = activeFilters.key==='all' || (bKey === activeFilters.key); let bpm = true; if(activeFilters.bpm!=='all' && b.bpm) { const [min,max] = activeFilters.bpm.split('-').map(Number); bpm = Number(b.bpm)>=min && Number(b.bpm)<=max; } return g && k && bpm; }); window.currentPlaylist = filtered; renderBeats(filtered); d.classList.remove('active'); } } }); document.onclick = (e) => { if(!e.target.closest('.custom-select')) drops.forEach(d=>d.classList.remove('active')); }; }
-    function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key
+    function setupCustomDropdowns(allBeats) { 
+        const drops = document.querySelectorAll('.custom-select'); 
+        drops.forEach(d => { 
+            const btn = d.querySelector('.select-btn'); 
+            const list = d.querySelector('.select-options'); 
+            const span = btn.querySelector('span'); 
+            
+            btn.onclick = (e) => { 
+                e.stopPropagation(); 
+                drops.forEach(x=>x!==d && x.classList.remove('active')); 
+                d.classList.toggle('active'); 
+            }; 
+            
+            list.onclick = (e) => { 
+                if(e.target.tagName === 'LI') { 
+                    const val = e.target.getAttribute('data-value'); 
+                    span.textContent = `${d.id.split('-')[1].toUpperCase()}: ${e.target.textContent}`; 
+                    
+                    // ΔΙΟΡΘΩΣΗ: Χρήση του global activeFilters
+                    if(d.id==='custom-genre') activeFilters.genre=val; 
+                    if(d.id==='custom-bpm') activeFilters.bpm=val; 
+                    if(d.id==='custom-key') activeFilters.key=val; 
+                    
+                    const filtered = allBeats.filter(b => { 
+                        const g = activeFilters.genre==='all' || (b.category && b.category.toLowerCase()===activeFilters.genre.toLowerCase()); 
+                        const bKey = b.key || b.Key; 
+                        const k = activeFilters.key==='all' || (bKey === activeFilters.key); 
+                        let bpm = true; 
+                        if(activeFilters.bpm!=='all' && b.bpm) { 
+                            const [min,max] = activeFilters.bpm.split('-').map(Number); 
+                            bpm = Number(b.bpm)>=min && Number(b.bpm)<=max; 
+                        } 
+                        return g && k && bpm; 
+                    }); 
+                    
+                    window.currentPlaylist = filtered; 
+                    renderBeats(filtered); 
+                    d.classList.remove('active'); 
+                } 
+            } 
+        }); 
+        
+        document.onclick = (e) => { if(!e.target.closest('.custom-select')) drops.forEach(d=>d.classList.remove('active')); }; 
+    }
+    
+    function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats found matching your criteria.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button><a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a></div></div>`; }); }
+    function updateMenuState() { const path = window.location.pathname.split('/').pop() || 'index.html'; document.querySelectorAll('.nav-btn').forEach(l => { if(l.getAttribute('href').includes(path)) l.classList.add('active'); else l.classList.remove('active'); }); }
+});
