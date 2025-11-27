@@ -48,7 +48,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- GLOBAL HELPER: RENDER RELEASES ---
-    // Ορίστηκε εδώ για να είναι προσβάσιμη από το Global Click Listener
     function renderFilteredReleases() {
         const container = document.getElementById('releases-list');
         if(!container) return;
@@ -75,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const ytLink = track.youtubeUrl || '#';
             const descHtml = track.description ? `<div class="beat-desc">${track.description}</div>` : '';
             const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>` : '';
-            const metaText = `Available Now / Type: ${track.type || 'Single'} / Genre: ${track.genre || 'Various'}`;
+            const metaText = `Available Now / Type: ${track.type || 'Single'} / Frequency: ${track.genre || 'Unknown'}`;
 
             container.innerHTML += `
             <div class="beat-row">
@@ -93,11 +92,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // --- GLOBAL HELPER: RESET UI DROPDOWNS ---
     function resetReleaseDropdowns() {
-        // Reset Genre Dropdown
+        // Reset Frequency Dropdown (former Genre)
         const genreSelect = document.getElementById('custom-releases-genre');
         if(genreSelect) {
             const btn = genreSelect.querySelector('.select-btn');
-            if(btn) btn.innerHTML = '<span>GENRE: ALL</span><i class="fas fa-chevron-down"></i>';
+            // ΑΛΛΑΓΗ ΕΔΩ: Reset σε FREQUENCY: ALL
+            if(btn) btn.innerHTML = '<span>FREQUENCY: ALL</span><i class="fas fa-chevron-down"></i>';
             genreSelect.classList.remove('active');
             genreSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
             const allOpt = genreSelect.querySelector('[data-value="all"]');
@@ -147,15 +147,11 @@ document.addEventListener('DOMContentLoaded', () => {
              document.getElementById('info-modal').classList.add('visible'); 
         }
 
-        // 4. ALL RELEASES BUTTON (FIXED LOGIC)
-        // Αν πατήθηκε το κουμπί 'All Releases' ή κάτι μέσα σε αυτό
+        // 4. ALL RELEASES BUTTON
         if (e.target.closest('#all-releases-btn')) {
             console.log("All Releases Clicked - Resetting...");
-            // Reset Data State
             activeReleasesFilters = { genre: 'all', type: 'all' };
-            // Reset UI
             resetReleaseDropdowns();
-            // Re-render
             renderFilteredReleases();
         }
     });
@@ -238,18 +234,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const relDesc = document.getElementById('releases-description');
 
             if (releasesContainer) {
-                // 1. Fetch Data
                 fetch('releases.json?t=' + new Date().getTime()).then(r => r.ok ? r.json() : Promise.reject("No releases")).then(data => {
-                    allReleasesTracks = data.tracks || []; // Update Global Variable
+                    allReleasesTracks = data.tracks || [];
                     
                     const uniqueGenres = [...new Set(allReleasesTracks.map(t => t.genre).filter(g => g))];
                     const uniqueTypes = [...new Set(allReleasesTracks.map(t => t.type).filter(t => t))];
                     
                     setupReleaseFilters(uniqueGenres, uniqueTypes);
-                    renderFilteredReleases(); // Call the global renderer
+                    renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
 
-                // 2. Fetch Texts
                 const relTitle = document.getElementById('releases-title');
                 const allBtn = document.getElementById('all-releases-btn');
                 const whyBtn = document.getElementById('why-buy-text');
@@ -289,7 +283,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const typeList = document.getElementById('type-options-list');
             
             if(genreList) {
-                genreList.innerHTML = '<li data-value="all" class="selected">All Genres</li>';
+                // ΑΛΛΑΓΗ ΕΔΩ: All Frequencies
+                genreList.innerHTML = '<li data-value="all" class="selected">All Frequencies</li>';
                 genres.forEach(g => { genreList.innerHTML += `<li data-value="${g}">${g}</li>`; });
             }
             if(typeList) {
@@ -314,7 +309,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     options.onclick = (e) => {
                         if(e.target.tagName === 'LI') {
                             const val = e.target.getAttribute('data-value');
-                            span.textContent = `${fc.type.toUpperCase()}: ${e.target.textContent}`;
+                            
+                            // ΑΛΛΑΓΗ ΕΔΩ: Έλεγχος αν είναι genre για να γράψει FREQUENCY
+                            if (fc.type === 'genre') {
+                                span.textContent = `FREQUENCY: ${e.target.textContent}`;
+                            } else {
+                                span.textContent = `${fc.type.toUpperCase()}: ${e.target.textContent}`;
+                            }
+                            
                             activeReleasesFilters[fc.type] = val;
                             renderFilteredReleases();
                             container.classList.remove('active');
@@ -365,7 +367,6 @@ document.addEventListener('DOMContentLoaded', () => {
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
-                // Reset Beats filters on page load
                 activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
                 fetch('beats.json').then(r => r.json()).then(data => {
