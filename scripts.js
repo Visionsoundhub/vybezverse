@@ -9,9 +9,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.currentCover = window.currentCover || null;
     window.loadedProducts = []; 
 
-    // --- GLOBAL STATE ---
+    // --- GLOBAL STATE FOR RELEASES (ACCESSIBLE EVERYWHERE) ---
     let activeReleasesFilters = { genre: 'all', type: 'all' };
     let allReleasesTracks = [];
+
+    // --- GLOBAL STATE FOR BEATS ---
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
     // --- NEURO-SYNC PRELOADER ---
@@ -45,11 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { clearInterval(msgInterval); killPreloader(); }, 3500);
     }
 
-    // --- HELPER FUNCTIONS ---
+    // --- GLOBAL HELPER: RENDER RELEASES ---
     function renderFilteredReleases() {
         const container = document.getElementById('releases-list');
         if(!container) return;
         
+        // Φιλτράρισμα
         let filteredTracks = allReleasesTracks.filter(track => {
             const genreMatch = activeReleasesFilters.genre === 'all' || 
                                (track.genre && track.genre.toLowerCase() === activeReleasesFilters.genre.toLowerCase());
@@ -87,16 +90,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // --- GLOBAL HELPER: RESET UI DROPDOWNS ---
     function resetReleaseDropdowns() {
+        // Reset Frequency Dropdown (former Genre)
         const genreSelect = document.getElementById('custom-releases-genre');
         if(genreSelect) {
             const btn = genreSelect.querySelector('.select-btn');
+            // ΑΛΛΑΓΗ ΕΔΩ: Reset σε FREQUENCY: ALL
             if(btn) btn.innerHTML = '<span>FREQUENCY: ALL</span><i class="fas fa-chevron-down"></i>';
             genreSelect.classList.remove('active');
             genreSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
             const allOpt = genreSelect.querySelector('[data-value="all"]');
             if(allOpt) allOpt.classList.add('selected');
         }
+
+        // Reset Type Dropdown
         const typeSelect = document.getElementById('custom-releases-type');
         if(typeSelect) {
             const btn = typeSelect.querySelector('.select-btn');
@@ -116,19 +124,19 @@ document.addEventListener('DOMContentLoaded', () => {
         swup.hooks.on('page:view', () => { initAllScripts(); });
     }
 
-    // --- GLOBAL CLICK LISTENER ---
+    // --- GLOBAL CLICK LISTENER (THE BOSS) ---
     document.addEventListener('click', (e) => {
-        // Close Modals
+        // 1. Modals Close
         if (e.target.closest('.modal-close-btn') || e.target.classList.contains('modal-overlay')) {
             const openModals = document.querySelectorAll('.modal-overlay.visible');
             openModals.forEach(m => m.classList.remove('visible'));
         }
-        // Specific Modals
+        
+        // 2. Open Specific Modals
         if (e.target.closest('#open-bundle-modal')) { document.getElementById('bundle-modal').classList.add('visible'); }
         if (e.target.closest('#why-buy-btn')) { document.getElementById('why-buy-modal').classList.add('visible'); }
-        if (e.target.closest('#newsletter-trigger')) { document.getElementById('newsletter-modal').classList.add('visible'); }
         
-        // Mobile Info
+        // 3. Mobile Info Button
         if (e.target.closest('#mobile-info-btn')) {
              const accCont = document.getElementById('info-accordions-container');
              const modalCont = document.getElementById('info-modal-content');
@@ -139,8 +147,9 @@ document.addEventListener('DOMContentLoaded', () => {
              document.getElementById('info-modal').classList.add('visible'); 
         }
 
-        // All Releases Reset
+        // 4. ALL RELEASES BUTTON
         if (e.target.closest('#all-releases-btn')) {
+            console.log("All Releases Clicked - Resetting...");
             activeReleasesFilters = { genre: 'all', type: 'all' };
             resetReleaseDropdowns();
             renderFilteredReleases();
@@ -153,72 +162,7 @@ document.addEventListener('DOMContentLoaded', () => {
         safeRun(checkPlayerVisibility);
         safeRun(restoreHeroArt);
 
-        // --- DYNAMIC FOOTER & NEWSLETTER LOGIC ---
-        const foot = document.getElementById('dynamic-footer'); 
-        if (foot) { 
-            fetch('footer.json').then(r => r.json()).then(d => { 
-                const icons = (p) => [{icon: d[`${p}FbIcon`], link:d[`${p}Fb`]},{icon: d[`${p}IgIcon`], link:d[`${p}Ig`]},{icon: d[`${p}TtIcon`], link:d[`${p}Tt`]},{icon: d[`${p}YtIcon`], link:d[`${p}Yt`]}].map(n => n.link && n.icon ? `<a href="${n.link}" target="_blank" class="social-link"><img src="${n.icon}"></a>` : '').join(''); 
-                
-                // Determine User Source (Spy Logic)
-                const path = window.location.pathname;
-                let userSource = "Explorer (General)";
-                if (path.includes('beats')) userSource = "Producer / Buyer (Beats)";
-                else if (path.includes('releases')) userSource = "Fan / Listener (Releases)";
-                else if (path.includes('store')) userSource = "Merch Interested";
-
-                // Footer HTML
-                foot.innerHTML = `
-                <footer class="site-footer">
-                    <div class="footer-content">
-                        <div class="footer-section">
-                            <button id="newsletter-trigger">${d.newsletterBtn || 'JOIN THE LIST'}</button>
-                            <h4 class="footer-title">${d.prodTitle}</h4>
-                            <div class="social-icons">${icons('prod')}</div>
-                        </div>
-                        <div class="footer-divider"></div>
-                        <div class="footer-section">
-                            <h4 class="footer-title">${d.artistTitle}</h4>
-                            <div class="social-icons">${icons('artist')}</div>
-                        </div>
-                    </div>
-                </footer>
-                
-                <div class="modal-overlay" id="newsletter-modal">
-                    <div class="modal-box">
-                        <button class="modal-close-btn">&times;</button>
-                        <h2 style="margin-bottom:0.5rem; color:#fff;">${d.newsletterTitle || 'STAY IN THE ZONE'}</h2>
-                        <p style="color:#ccc; font-size:0.9rem;">${d.newsletterText || 'New drops & exclusive offers.'}</p>
-                        
-                        <form name="newsletter" method="POST" data-netlify="true" class="newsletter-form">
-                            <input type="hidden" name="form-name" value="newsletter">
-                            <input type="hidden" name="source" value="${userSource}">
-                            
-                            <input type="email" name="email" placeholder="Enter your email..." required class="newsletter-input">
-                            
-                            <div class="interest-group">
-                                <label class="interest-label">ΤΙ ΣΕ ΕΝΔΙΑΦΕΡΕΙ;</label>
-                                <label class="custom-radio">
-                                    <input type="radio" name="interest" value="Beats / Production">
-                                    <span>Beats / Production</span>
-                                </label>
-                                <label class="custom-radio">
-                                    <input type="radio" name="interest" value="New Music / Releases">
-                                    <span>New Music / Releases</span>
-                                </label>
-                                <label class="custom-radio">
-                                    <input type="radio" name="interest" value="Everything" checked>
-                                    <span>Όλα (The Full Vibe)</span>
-                                </label>
-                            </div>
-
-                            <button type="submit" class="btn btn-glow" style="width:100%; margin-top:10px;">SUBSCRIBE</button>
-                        </form>
-                    </div>
-                </div>`;
-            }); 
-        }
-
-        // --- HOME PAGE ---
+        // --- 1. HOME PAGE ---
         safeRun(() => {
             const homeTitle = document.getElementById('home-hero-title');
             if (homeTitle) {
@@ -284,14 +228,18 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- RELEASES & OTHER PAGES ---
+        // --- 2. RELEASES (DATA FETCH ONLY) ---
         safeRun(() => {
             const releasesContainer = document.getElementById('releases-list');
+            const relDesc = document.getElementById('releases-description');
+
             if (releasesContainer) {
                 fetch('releases.json?t=' + new Date().getTime()).then(r => r.ok ? r.json() : Promise.reject("No releases")).then(data => {
                     allReleasesTracks = data.tracks || [];
+                    
                     const uniqueGenres = [...new Set(allReleasesTracks.map(t => t.genre).filter(g => g))];
                     const uniqueTypes = [...new Set(allReleasesTracks.map(t => t.type).filter(t => t))];
+                    
                     setupReleaseFilters(uniqueGenres, uniqueTypes);
                     renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
@@ -305,7 +253,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 const supTxt = document.getElementById('support-text');
                 const getT = document.getElementById('get-title');
                 const getTxt = document.getElementById('get-text');
-                const relDesc = document.getElementById('releases-description');
 
                 fetch('releases_settings.json').then(r=>r.json()).then(s => {
                     if(relTitle && s.pageTitle) relTitle.textContent = s.pageTitle;
@@ -334,7 +281,9 @@ document.addEventListener('DOMContentLoaded', () => {
         function setupReleaseFilters(genres, types) {
             const genreList = document.getElementById('genre-options-list');
             const typeList = document.getElementById('type-options-list');
+            
             if(genreList) {
+                // ΑΛΛΑΓΗ ΕΔΩ: All Frequencies
                 genreList.innerHTML = '<li data-value="all" class="selected">All Frequencies</li>';
                 genres.forEach(g => { genreList.innerHTML += `<li data-value="${g}">${g}</li>`; });
             }
@@ -343,7 +292,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 types.forEach(t => { typeList.innerHTML += `<li data-value="${t}">${t}</li>`; });
             }
             
-            const filterContainers = [ { id: 'custom-releases-genre', type: 'genre' }, { id: 'custom-releases-type', type: 'type' } ];
+            const filterContainers = [
+                { id: 'custom-releases-genre', type: 'genre' },
+                { id: 'custom-releases-type', type: 'type' }
+            ];
             
             filterContainers.forEach(fc => {
                 const container = document.getElementById(fc.id);
@@ -351,11 +303,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     const btn = container.querySelector('.select-btn');
                     const options = container.querySelector('.select-options');
                     const span = btn.querySelector('span');
+
                     btn.onclick = (e) => { e.stopPropagation(); document.querySelectorAll('.custom-select').forEach(x=>x!==container && x.classList.remove('active')); container.classList.toggle('active'); };
+                    
                     options.onclick = (e) => {
                         if(e.target.tagName === 'LI') {
                             const val = e.target.getAttribute('data-value');
-                            if (fc.type === 'genre') { span.textContent = `FREQUENCY: ${e.target.textContent}`; } else { span.textContent = `${fc.type.toUpperCase()}: ${e.target.textContent}`; }
+                            
+                            // ΑΛΛΑΓΗ ΕΔΩ: Έλεγχος αν είναι genre για να γράψει FREQUENCY
+                            if (fc.type === 'genre') {
+                                span.textContent = `FREQUENCY: ${e.target.textContent}`;
+                            } else {
+                                span.textContent = `${fc.type.toUpperCase()}: ${e.target.textContent}`;
+                            }
+                            
                             activeReleasesFilters[fc.type] = val;
                             renderFilteredReleases();
                             container.classList.remove('active');
@@ -407,6 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
                 activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
+
                 fetch('beats.json').then(r => r.json()).then(data => {
                     let allBeats = Array.isArray(data) ? data : (data.beatslist || []);
                     window.currentPlaylist = allBeats;
@@ -479,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        // --- OTHER PAGES (UNCHANGED) ---
+        // --- 5. OTHER PAGES ---
         safeRun(() => {
             const bioContainer = document.getElementById('bio-container'); if (bioContainer) { fetch('bio.json').then(r => r.ok ? r.json() : Promise.reject()).then(data => { const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...'; if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title; bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${data.image}" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`; }).catch(() => {}); }
             const galleryGrid = document.getElementById('gallery-grid'); if(galleryGrid && !document.getElementById('merch-grid')) { const gModal = document.getElementById('gallery-modal'); const gImg = document.getElementById('gallery-modal-img'); const gCap = document.getElementById('gallery-caption'); const gClose = document.getElementById('close-gallery-modal'); fetch('gallery.json').then(r => r.json()).then(data => { galleryGrid.innerHTML = ''; (data.images || []).forEach(img => { const div = document.createElement('div'); div.className = 'gallery-item'; div.innerHTML = `<img src="${img.src}" alt="${img.caption || ''}">`; div.onclick = () => { gImg.src = img.src; gCap.innerText = img.caption || ''; gModal.classList.add('visible'); }; galleryGrid.appendChild(div); }); }).catch(() => {}); if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target===gModal) gModal.classList.remove('visible'); }; } }
