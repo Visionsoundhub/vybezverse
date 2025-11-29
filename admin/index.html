@@ -7,6 +7,12 @@
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   </head>
   <body>
+    <form name="newsletter" netlify netlify-honeypot="bot-field" hidden>
+        <input type="text" name="email" />
+        <input type="text" name="interest" />
+        <input type="text" name="source" />
+    </form>
+
     <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
   </body>
 </html>
