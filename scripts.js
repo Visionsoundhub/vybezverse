@@ -41,7 +41,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- 2. POP-UP SYSTEM ---
+    // --- 2. PAYHIP CART INTEGRATION (NEW) ---
+    function injectPayhip() {
+        // Ελέγχουμε αν υπάρχει ήδη για να μην το βάλουμε 2 φορές
+        if (!document.querySelector('script[src="https://payhip.com/payhip.js"]')) {
+            const script = document.createElement('script');
+            script.type = 'text/javascript';
+            script.src = 'https://payhip.com/payhip.js';
+            document.body.appendChild(script);
+        }
+    }
+
+    // --- 3. POP-UP SYSTEM ---
     function renderPopup() {
         const path = window.location.pathname;
         let jsonFile = '';
@@ -98,18 +109,15 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(e => console.log('Popup info:', e));
     }
 
-    // --- 3. NEWSLETTER FUNCTION (ΔΙΟΡΘΩΜΕΝΗ ΓΙΑ LIVE UPDATE) ---
+    // --- 4. NEWSLETTER FUNCTION ---
     function renderNewsletter() {
         const footer = document.getElementById('dynamic-footer');
         const existingSection = document.getElementById('newsletter-section');
         const currentPath = window.location.pathname || 'home';
 
-        // ΑΝ Η ΦΟΡΜΑ ΥΠΑΡΧΕΙ ΗΔΗ, ΑΠΛΑ ΕΝΗΜΕΡΩΣΕ ΤΟ SOURCE PAGE ΚΑΙ ΜΗΝ ΤΗΝ ΞΑΝΑΦΤΙΑΞΕΙΣ
         if (existingSection) {
             const sourceInput = existingSection.querySelector('input[name="source_page"]');
-            if (sourceInput) {
-                sourceInput.value = currentPath; // Ενημέρωση της τρέχουσας σελίδας
-            }
+            if (sourceInput) sourceInput.value = currentPath;
             return; 
         }
 
@@ -185,9 +193,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => console.log('Newsletter Error (Safe to ignore):', err));
     }
 
-    // --- 4. INIT CALL ---
+    // --- 5. INIT CALL (THE BRAIN) ---
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
+        safeRun(injectPayhip); // Φόρτωσε το Payhip
         safeRun(updateMenuState);
         safeRun(checkPlayerVisibility);
         safeRun(restoreHeroArt);
