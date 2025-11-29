@@ -36,6 +36,10 @@ collections:
           - {label: "PRODUCER - YouTube Icon", name: "prodYtIcon", widget: "image", required: false}
           - {label: "Email Contact", name: "email", widget: "string", required: false}
           - {label: "Copyright Text", name: "copyright", widget: "string", default: "© 2025 Vybezone. All rights reserved."}
+          - {label: "--- NEWSLETTER POPUP ---", name: "sep_news", widget: "hidden"}
+          - {label: "Footer Button Text", name: "newsletterBtn", widget: "string", default: "JOIN THE LIST"}
+          - {label: "Popup Title", name: "newsletterTitle", widget: "string", default: "STAY IN THE ZONE"}
+          - {label: "Popup Subtitle", name: "newsletterText", widget: "text", default: "New drops & exclusive offers."}
 
   # --- 2. GLOBAL SETTINGS ---
   - name: "settings"
@@ -113,7 +117,6 @@ collections:
               - {label: "Title", name: "title", widget: "string"}
               - {label: "Short Description", name: "description", widget: "text", required: false}
               # RELATION WIDGET ΓΙΑ ΤΑ FREQUENCIES (GENRES)
-              # Εδώ ορίσαμε να δείχνει "Name (Note)" αλλά να αποθηκεύει μόνο το "Name"
               - label: "Frequency / Genre"
                 name: "genre"
                 widget: "relation"
