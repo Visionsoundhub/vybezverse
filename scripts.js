@@ -219,7 +219,8 @@ document.addEventListener('DOMContentLoaded', () => {
                             if(dropBtns) {
                                 let btnsHtml = '';
                                 if(data.dropStream) btnsHtml += `<a href="${data.dropStream}" target="_blank" class="btn btn-outline">STREAM IT</a>`;
-                                if(data.dropBuy) btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
+                                // CHANGED: Added payhip-buy-button class
+                                if(data.dropBuy) btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
                                 if(data.dropFree) btnsHtml += `<a href="${data.dropFree}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>`;
                                 dropBtns.innerHTML = btnsHtml;
                             }
@@ -547,7 +548,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="beat-actions">
                     <a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i> YOUTUBE</a>
                     <a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM IT</a>
-                    <a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>
+                    <a href="${buyLink}" target="_blank" class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>
                     ${downloadBtn}
                 </div>
             </div>`;
@@ -583,7 +584,12 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('prod-title').textContent = prod.name;
         document.getElementById('prod-price').textContent = prod.price;
         document.getElementById('prod-desc').innerHTML = prod.description ? prod.description.replace(/\n/g, '<br>') : '';
-        document.getElementById('prod-buy-btn').href = prod.link || '#';
+        
+        const buyBtn = document.getElementById('prod-buy-btn');
+        buyBtn.href = prod.link || '#';
+        // CHANGED: Added payhip-buy-button class explicitly
+        buyBtn.classList.add('payhip-buy-button');
+
         const mainImg = document.getElementById('prod-main-img');
         mainImg.src = prod.image;
         const thumbsCont = document.getElementById('prod-thumbnails');
@@ -654,7 +660,9 @@ document.addEventListener('DOMContentLoaded', () => {
         document.onclick = (e) => { if(!e.target.closest('.custom-select')) drops.forEach(d=>d.classList.remove('active')); }; 
     }
     
-    function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats found matching your criteria.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button><a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a></div></div>`; }); }
+    function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats found matching your criteria.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; 
+    // CHANGED: Added payhip-buy-button class to checkoutUrl
+    cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button><a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent payhip-buy-button">${b.price} | BUY</a></div></div>`; }); }
     
     // --- EDITED FOR SAFETY (FIX FOR NULL HREF) ---
     function updateMenuState() {
