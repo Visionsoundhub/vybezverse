@@ -41,9 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- 2. PAYHIP CART INTEGRATION (NEW) ---
+    // --- 2. PAYHIP CART INTEGRATION ---
     function injectPayhip() {
-        // Ελέγχουμε αν υπάρχει ήδη για να μην το βάλουμε 2 φορές
         if (!document.querySelector('script[src="https://payhip.com/payhip.js"]')) {
             const script = document.createElement('script');
             script.type = 'text/javascript';
@@ -193,10 +192,10 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => console.log('Newsletter Error (Safe to ignore):', err));
     }
 
-    // --- 5. INIT CALL (THE BRAIN) ---
+    // --- 5. INIT CALL ---
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
-        safeRun(injectPayhip); // Φόρτωσε το Payhip
+        safeRun(injectPayhip); 
         safeRun(updateMenuState);
         safeRun(checkPlayerVisibility);
         safeRun(restoreHeroArt);
@@ -663,9 +662,43 @@ document.addEventListener('DOMContentLoaded', () => {
         document.onclick = (e) => { if(!e.target.closest('.custom-select')) drops.forEach(d=>d.classList.remove('active')); }; 
     }
     
-    function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats found matching your criteria.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button><a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a></div></div>`; }); }
+    // --- EDITED FOR PAYHIP ---
+    function renderBeats(beats) { 
+        const cont = document.getElementById('beat-store-list'); 
+        if(!cont) return; 
+        cont.innerHTML = ''; 
+        if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats found matching your criteria.</p>'; return; } 
+        
+        beats.forEach((b, i) => { 
+            const safeTitle = b.title.replace(/'/g, "\\'"); 
+            const slug = slugify(b.title); 
+            const img = b.cover || 'https://via.placeholder.com/100'; 
+            
+            // CHECK IF PAYHIP LINK
+            const isPayhip = b.checkoutUrl && b.checkoutUrl.includes('payhip.com');
+            const targetAttr = isPayhip ? '' : 'target="_blank"'; // Payhip = Same Tab (Popup), Others = New Tab
+            const payhipClass = isPayhip ? 'payhip-buy-button' : ''; // Helper class just in case
+
+            cont.innerHTML += `
+            <div class="beat-row" id="beat-row-${slug}">
+                <div class="beat-art">
+                    <img src="${img}">
+                    <div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})">
+                        <i id="beat-icon-${i}" class="fas fa-play"></i>
+                    </div>
+                </div>
+                <div class="beat-info">
+                    <h4>${b.title}</h4>
+                    <div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div>
+                </div>
+                <div class="beat-actions">
+                    <button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button>
+                    <a href="${b.checkoutUrl}" ${targetAttr} class="btn btn-accent ${payhipClass}">${b.price} | BUY</a>
+                </div>
+            </div>`; 
+        }); 
+    }
     
-    // --- EDITED FOR SAFETY (FIX FOR NULL HREF) ---
     function updateMenuState() {
         const path = window.location.pathname.split('/').pop() || 'index.html';
         document.querySelectorAll('.nav-btn').forEach(l => {
