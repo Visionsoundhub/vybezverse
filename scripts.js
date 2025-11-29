@@ -1,22 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 0. GLOBAL INIT & VARIABLES ---
-    if (!window.globalAudio) { window.globalAudio = new Audio(); }
-    const audio = window.globalAudio;
-    window.currentPlaylist = window.currentPlaylist || []; 
-    window.currentIndex = window.currentIndex || -1;
-    window.isPlaying = window.isPlaying || false;
-    window.currentCover = window.currentCover || null;
-    window.loadedProducts = []; 
-
-    // --- GLOBAL STATE FOR RELEASES (ACCESSIBLE EVERYWHERE) ---
-    let activeReleasesFilters = { genre: 'all', type: 'all' };
-    let allReleasesTracks = [];
-
-    // --- GLOBAL STATE FOR BEATS ---
-    let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
-
-    // --- NEURO-SYNC PRELOADER ---
+    // --- 0. SAFETY FIRST: PRELOADER ---
+    // Αυτό το κομμάτι τρέχει πρώτο για να είμαστε σίγουροι ότι το site θα ανοίξει.
     const preloader = document.getElementById('neuro-preloader');
     const preloaderText = document.getElementById('neuro-text');
 
@@ -27,6 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Αν κολλήσει για οποιονδήποτε λόγο, να ανοίξει στα 4 δευτερόλεπτα βίαια.
+    setTimeout(killPreloader, 4000);
+
     if (preloader && preloaderText) {
         const messages = ["INITIALIZING...", "SYNCING FREQUENCIES...", "LOADING VIBES...", "ENTERING THE ZONE..."];
         let msgIndex = 0;
@@ -35,95 +23,37 @@ document.addEventListener('DOMContentLoaded', () => {
             preloaderText.textContent = messages[msgIndex];
         }, 1000);
 
-        if (document.readyState === 'complete') {
+        window.addEventListener('load', () => {
             clearInterval(msgInterval);
             killPreloader();
-        } else {
-            window.addEventListener('load', () => {
-                clearInterval(msgInterval);
-                killPreloader();
-            });
-        }
-        setTimeout(() => { clearInterval(msgInterval); killPreloader(); }, 3500);
-    }
-
-    // --- GLOBAL HELPER: RENDER RELEASES ---
-    function renderFilteredReleases() {
-        const container = document.getElementById('releases-list');
-        if(!container) return;
-        
-        // Φιλτράρισμα
-        let filteredTracks = allReleasesTracks.filter(track => {
-            const genreMatch = activeReleasesFilters.genre === 'all' || 
-                               (track.genre && track.genre.toLowerCase() === activeReleasesFilters.genre.toLowerCase());
-            const typeMatch = activeReleasesFilters.type === 'all' || 
-                              (track.type && track.type.toLowerCase() === activeReleasesFilters.type.toLowerCase());
-            return genreMatch && typeMatch;
-        });
-        
-        container.innerHTML = '';
-        if (filteredTracks.length === 0) {
-            container.innerHTML = '<p style="text-align:center;">No releases found for selected filters.</p>';
-            return;
-        }
-
-        filteredTracks.forEach(track => {
-            const coverImg = track.cover || 'https://via.placeholder.com/150';
-            const streamLink = track.streamUrl || '#'; 
-            const buyLink = track.bundleUrl || '#'; 
-            const ytLink = track.youtubeUrl || '#';
-            const descHtml = track.description ? `<div class="beat-desc">${track.description}</div>` : '';
-            const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>` : '';
-            const metaText = `Available Now / Type: ${track.type || 'Single'} / Frequency: ${track.genre || 'Unknown'}`;
-
-            container.innerHTML += `
-            <div class="beat-row">
-                <div class="beat-art"><img src="${coverImg}" alt="Art"></div>
-                <div class="beat-info"><h4>${track.title || 'Untitled'}</h4>${descHtml}<div class="beat-meta">${metaText}</div></div>
-                <div class="beat-actions">
-                    <a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i> YOUTUBE</a>
-                    <a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM IT</a>
-                    <a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>
-                    ${downloadBtn}
-                </div>
-            </div>`;
         });
     }
 
-    // --- GLOBAL HELPER: RESET UI DROPDOWNS ---
-    function resetReleaseDropdowns() {
-        // Reset Frequency Dropdown (former Genre)
-        const genreSelect = document.getElementById('custom-releases-genre');
-        if(genreSelect) {
-            const btn = genreSelect.querySelector('.select-btn');
-            // ΑΛΛΑΓΗ ΕΔΩ: Reset σε FREQUENCY: ALL
-            if(btn) btn.innerHTML = '<span>FREQUENCY: ALL</span><i class="fas fa-chevron-down"></i>';
-            genreSelect.classList.remove('active');
-            genreSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
-            const allOpt = genreSelect.querySelector('[data-value="all"]');
-            if(allOpt) allOpt.classList.add('selected');
-        }
+    // --- 1. GLOBAL VARIABLES ---
+    if (!window.globalAudio) { window.globalAudio = new Audio(); }
+    const audio = window.globalAudio;
+    window.currentPlaylist = window.currentPlaylist || []; 
+    window.currentIndex = window.currentIndex || -1;
+    window.isPlaying = window.isPlaying || false;
+    window.currentCover = window.currentCover || null;
+    window.loadedProducts = []; 
 
-        // Reset Type Dropdown
-        const typeSelect = document.getElementById('custom-releases-type');
-        if(typeSelect) {
-            const btn = typeSelect.querySelector('.select-btn');
-            if(btn) btn.innerHTML = '<span>TYPE: ALL</span><i class="fas fa-chevron-down"></i>';
-            typeSelect.classList.remove('active');
-            typeSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
-            const allOpt = typeSelect.querySelector('[data-value="all"]');
-            if(allOpt) allOpt.classList.add('selected');
-        }
-    }
+    // Global Filters
+    let activeReleasesFilters = { genre: 'all', type: 'all' };
+    let allReleasesTracks = [];
+    let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- NEWSLETTER & SPYING LOGIC ---
+    // --- 2. NEWSLETTER FUNCTION ---
     function renderNewsletter() {
         const footer = document.getElementById('dynamic-footer');
-        // Αν υπάρχει ήδη newsletter ή δεν υπάρχει footer, σταματάμε
+        // Αν υπάρχει ήδη ή δεν βρέθηκε footer, επιστροφή
         if (document.getElementById('newsletter-section') || !footer) return;
 
         fetch('newsletter.json?t=' + new Date().getTime())
-            .then(r => r.json())
+            .then(r => {
+                if (!r.ok) throw new Error("Newsletter config not found");
+                return r.json();
+            })
             .then(data => {
                 const section = document.createElement('section');
                 section.id = 'newsletter-section';
@@ -133,115 +63,79 @@ document.addEventListener('DOMContentLoaded', () => {
                 section.style.position = 'relative';
                 section.style.zIndex = '500';
 
-                // SPYING: Βρίσκουμε το τρέχον URL
                 const currentPath = window.location.pathname || 'home';
 
                 section.innerHTML = `
-                    <h2 style="margin-bottom:0.5rem; letter-spacing:2px; color:#fff;">${data.title}</h2>
-                    <p style="color:#aaa; margin-bottom:1.5rem;">${data.subtitle}</p>
+                    <h2 style="margin-bottom:0.5rem; letter-spacing:2px; color:#fff;">${data.title || 'NEWSLETTER'}</h2>
+                    <p style="color:#aaa; margin-bottom:1.5rem;">${data.subtitle || 'Stay Tuned.'}</p>
                     
                     <form name="newsletter_vibe" method="POST" data-netlify="true" id="vibe-form" style="max-width:500px; margin:0 auto;">
                         <input type="hidden" name="form-name" value="newsletter_vibe" />
-                        <input type="hidden" name="source_page" value="${currentPath}" /> <div class="freq-selector">
+                        <input type="hidden" name="source_page" value="${currentPath}" />
+                        
+                        <div class="freq-selector">
                             <label class="radio-label">
                                 <input type="radio" name="interest" value="beats">
                                 <span class="radio-custom"></span>
-                                ${data.optBeats}
+                                ${data.optBeats || 'Beats'}
                             </label>
                             <label class="radio-label">
                                 <input type="radio" name="interest" value="releases">
                                 <span class="radio-custom"></span>
-                                ${data.optReleases}
+                                ${data.optReleases || 'Releases'}
                             </label>
                             <label class="radio-label">
                                 <input type="radio" name="interest" value="all" checked>
                                 <span class="radio-custom"></span>
-                                ${data.optAll}
+                                ${data.optAll || 'All'}
                             </label>
                         </div>
 
                         <div style="display:flex; gap:10px; margin-top:1.5rem;">
-                            <input type="email" name="email" placeholder="${data.placeholder}" required 
+                            <input type="email" name="email" placeholder="${data.placeholder || 'Email...'}" required 
                                 style="flex-grow:1; padding:0.8rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:#fff; font-family:'Inter', sans-serif;">
                             
-                            <button type="submit" class="btn btn-accent">${data.btnText}</button>
+                            <button type="submit" class="btn btn-accent">${data.btnText || 'SUBSCRIBE'}</button>
                         </div>
                     </form>
                     <div id="form-feedback" style="margin-top:1rem; color:#8a2be2; font-weight:bold; display:none;">SIGNAL RECEIVED. YOU ARE TUNED IN. 📶</div>
                 `;
 
-                // Το βάζουμε ΠΡΙΝ το footer
-                footer.parentNode.insertBefore(section, footer);
+                if(footer.parentNode) {
+                    footer.parentNode.insertBefore(section, footer);
+                }
 
-                // Χειρισμός Submit χωρίς ανανέωση σελίδας (AJAX)
                 const form = document.getElementById('vibe-form');
-                form.addEventListener('submit', (e) => {
-                    e.preventDefault();
-                    const formData = new FormData(form);
-                    fetch('/', {
-                        method: 'POST',
-                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-                        body: new URLSearchParams(formData).toString()
-                    })
-                    .then(() => {
-                        form.style.display = 'none';
-                        document.getElementById('form-feedback').style.display = 'block';
-                    })
-                    .catch((error) => alert(error));
-                });
+                if(form) {
+                    form.addEventListener('submit', (e) => {
+                        e.preventDefault();
+                        const formData = new FormData(form);
+                        fetch('/', {
+                            method: 'POST',
+                            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                            body: new URLSearchParams(formData).toString()
+                        })
+                        .then(() => {
+                            form.style.display = 'none';
+                            const feed = document.getElementById('form-feedback');
+                            if(feed) feed.style.display = 'block';
+                        })
+                        .catch((error) => console.error(error));
+                    });
+                }
             })
-            .catch(err => console.log('Newsletter Error:', err));
+            .catch(err => console.log('Newsletter Error (Safe to ignore):', err));
     }
 
-
-    // --- INITIALIZE ---
-    initAllScripts(); 
-
-    if (window.Swup) {
-        const swup = new window.Swup();
-        swup.hooks.on('page:view', () => { initAllScripts(); });
-    }
-
-    // --- GLOBAL CLICK LISTENER (THE BOSS) ---
-    document.addEventListener('click', (e) => {
-        // 1. Modals Close
-        if (e.target.closest('.modal-close-btn') || e.target.classList.contains('modal-overlay')) {
-            const openModals = document.querySelectorAll('.modal-overlay.visible');
-            openModals.forEach(m => m.classList.remove('visible'));
-        }
-        
-        // 2. Open Specific Modals
-        if (e.target.closest('#open-bundle-modal')) { document.getElementById('bundle-modal').classList.add('visible'); }
-        if (e.target.closest('#why-buy-btn')) { document.getElementById('why-buy-modal').classList.add('visible'); }
-        
-        // 3. Mobile Info Button
-        if (e.target.closest('#mobile-info-btn')) {
-             const accCont = document.getElementById('info-accordions-container');
-             const modalCont = document.getElementById('info-modal-content');
-             if(accCont && modalCont && modalCont.innerHTML === '') {
-                 modalCont.innerHTML = accCont.innerHTML;
-                 modalCont.querySelectorAll('.accordion-btn').forEach(btn => { btn.onclick = () => { btn.parentElement.classList.toggle('active'); }; });
-             }
-             document.getElementById('info-modal').classList.add('visible'); 
-        }
-
-        // 4. ALL RELEASES BUTTON
-        if (e.target.closest('#all-releases-btn')) {
-            console.log("All Releases Clicked - Resetting...");
-            activeReleasesFilters = { genre: 'all', type: 'all' };
-            resetReleaseDropdowns();
-            renderFilteredReleases();
-        }
-    });
-
+    // --- 3. MAIN LOGIC WRAPPER (INIT) ---
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
         safeRun(updateMenuState);
         safeRun(checkPlayerVisibility);
         safeRun(restoreHeroArt);
-        safeRun(renderNewsletter); // Added Newsletter Call here
+        safeRun(renderNewsletter); 
 
-        // --- 1. HOME PAGE ---
+        // HOME
         safeRun(() => {
             const homeTitle = document.getElementById('home-hero-title');
             if (homeTitle) {
@@ -307,7 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 2. RELEASES (DATA FETCH ONLY) ---
+        // RELEASES
         safeRun(() => {
             const releasesContainer = document.getElementById('releases-list');
             const relDesc = document.getElementById('releases-description');
@@ -315,10 +209,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (releasesContainer) {
                 fetch('releases.json?t=' + new Date().getTime()).then(r => r.ok ? r.json() : Promise.reject("No releases")).then(data => {
                     allReleasesTracks = data.tracks || [];
-                    
                     const uniqueGenres = [...new Set(allReleasesTracks.map(t => t.genre).filter(g => g))];
                     const uniqueTypes = [...new Set(allReleasesTracks.map(t => t.type).filter(t => t))];
-                    
                     setupReleaseFilters(uniqueGenres, uniqueTypes);
                     renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
@@ -357,57 +249,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        function setupReleaseFilters(genres, types) {
-            const genreList = document.getElementById('genre-options-list');
-            const typeList = document.getElementById('type-options-list');
-            
-            if(genreList) {
-                // ΑΛΛΑΓΗ ΕΔΩ: All Frequencies
-                genreList.innerHTML = '<li data-value="all" class="selected">All Frequencies</li>';
-                genres.forEach(g => { genreList.innerHTML += `<li data-value="${g}">${g}</li>`; });
-            }
-            if(typeList) {
-                typeList.innerHTML = '<li data-value="all" class="selected">All Types</li>';
-                types.forEach(t => { typeList.innerHTML += `<li data-value="${t}">${t}</li>`; });
-            }
-            
-            const filterContainers = [
-                { id: 'custom-releases-genre', type: 'genre' },
-                { id: 'custom-releases-type', type: 'type' }
-            ];
-            
-            filterContainers.forEach(fc => {
-                const container = document.getElementById(fc.id);
-                if (container) {
-                    const btn = container.querySelector('.select-btn');
-                    const options = container.querySelector('.select-options');
-                    const span = btn.querySelector('span');
-
-                    btn.onclick = (e) => { e.stopPropagation(); document.querySelectorAll('.custom-select').forEach(x=>x!==container && x.classList.remove('active')); container.classList.toggle('active'); };
-                    
-                    options.onclick = (e) => {
-                        if(e.target.tagName === 'LI') {
-                            const val = e.target.getAttribute('data-value');
-                            
-                            // ΑΛΛΑΓΗ ΕΔΩ: Έλεγχος αν είναι genre για να γράψει FREQUENCY
-                            if (fc.type === 'genre') {
-                                span.textContent = `FREQUENCY: ${e.target.textContent}`;
-                            } else {
-                                span.textContent = `${fc.type.toUpperCase()}: ${e.target.textContent}`;
-                            }
-                            
-                            activeReleasesFilters[fc.type] = val;
-                            renderFilteredReleases();
-                            container.classList.remove('active');
-                            options.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
-                            e.target.classList.add('selected');
-                        }
-                    };
-                }
-            });
-        }
-
-        // --- 3. STORE ---
+        // STORE
         safeRun(() => {
             const merchGrid = document.getElementById('merch-grid');
             const comingSoon = document.getElementById('merch-coming-soon');
@@ -442,7 +284,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // --- 4. BEATS & VIBES ---
+        // BEATS & VIBES
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
@@ -520,6 +362,243 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
         });
-        // --- 5. OTHER PAGES ---
+        
+        // OTHER PAGES
         safeRun(() => {
-            const bioContainer = document.getElementById('bio-container'); if (bioContainer) { fetch('bio.json').then(r => r.ok ? r.json() : Promise.reject()).then(data => { const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...'; if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title
+            const bioContainer = document.getElementById('bio-container'); if (bioContainer) { fetch('bio.json').then(r => r.ok ? r.json() : Promise.reject()).then(data => { const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...'; if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title; bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${data.image}" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`; }).catch(() => {}); }
+            const galleryGrid = document.getElementById('gallery-grid'); if(galleryGrid && !document.getElementById('merch-grid')) { const gModal = document.getElementById('gallery-modal'); const gImg = document.getElementById('gallery-modal-img'); const gCap = document.getElementById('gallery-caption'); const gClose = document.getElementById('close-gallery-modal'); fetch('gallery.json').then(r => r.json()).then(data => { galleryGrid.innerHTML = ''; (data.images || []).forEach(img => { const div = document.createElement('div'); div.className = 'gallery-item'; div.innerHTML = `<img src="${img.src}" alt="${img.caption || ''}">`; div.onclick = () => { gImg.src = img.src; gCap.innerText = img.caption || ''; gModal.classList.add('visible'); }; galleryGrid.appendChild(div); }); }).catch(() => {}); if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target===gModal) gModal.classList.remove('visible'); }; } }
+            const burger = document.querySelector('.hamburger'); const nav = document.querySelector('.nav-links'); if(burger) { const clone = burger.cloneNode(true); burger.parentNode.replaceChild(clone, burger); clone.onclick = () => { clone.classList.toggle('active'); nav.classList.toggle('active'); }; document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => { clone.classList.remove('active'); nav.classList.remove('active'); }); }
+            const menuCont = document.querySelector('.nav-links'); if (menuCont && menuCont.innerHTML === '') { fetch('menu.json').then(r => r.json()).then(d => { let html = ''; (d.links || []).forEach(l => html += `<a href="${l.url}" class="nav-btn" target="${l.newTab?'_blank':'_self'}">${l.text}</a>`); menuCont.innerHTML = html; updateMenuState(); }); }
+            const press = document.getElementById('press-container'); if(press) { fetch('press.json').then(r=>r.json()).then(d => { press.innerHTML=''; (d.articles||[]).forEach(i => press.innerHTML += `<div class="press-card"><img src="${i.image}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">READ</a></div></div>`); }); }
+            const foot = document.getElementById('dynamic-footer'); if (foot) { fetch('footer.json').then(r => r.json()).then(d => { const icons = (p) => [{icon: d[`${p}FbIcon`], link:d[`${p}Fb`]},{icon: d[`${p}IgIcon`], link:d[`${p}Ig`]},{icon: d[`${p}TtIcon`], link:d[`${p}Tt`]},{icon: d[`${p}YtIcon`], link:d[`${p}Yt`]}].map(n => n.link && n.icon ? `<a href="${n.link}" target="_blank" class="social-link"><img src="${n.icon}"></a>` : '').join(''); foot.innerHTML = `<footer class="site-footer"><div class="footer-content"><div class="footer-section"><h4 class="footer-title">${d.prodTitle}</h4><div class="social-icons">${icons('prod')}</div></div><div class="footer-divider"></div><div class="footer-section"><h4 class="footer-title">${d.artistTitle}</h4><div class="social-icons">${icons('artist')}</div></div></div></footer>`; }); }
+        });
+    }
+
+    // --- 4. INIT CALL ---
+    safeRun(initAllScripts); 
+
+    if (window.Swup) {
+        const swup = new window.Swup();
+        swup.hooks.on('page:view', () => { safeRun(initAllScripts); });
+    }
+
+    // --- 5. GLOBAL CLICK LISTENERS ---
+    document.addEventListener('click', (e) => {
+        if (e.target.closest('.modal-close-btn') || e.target.classList.contains('modal-overlay')) {
+            document.querySelectorAll('.modal-overlay.visible').forEach(m => m.classList.remove('visible'));
+        }
+        if (e.target.closest('#open-bundle-modal')) { 
+            const m = document.getElementById('bundle-modal'); if(m) m.classList.add('visible'); 
+        }
+        if (e.target.closest('#why-buy-btn')) { 
+            const m = document.getElementById('why-buy-modal'); if(m) m.classList.add('visible'); 
+        }
+        if (e.target.closest('#mobile-info-btn')) {
+             const accCont = document.getElementById('info-accordions-container');
+             const modalCont = document.getElementById('info-modal-content');
+             const modal = document.getElementById('info-modal');
+             if(accCont && modalCont && modalCont.innerHTML === '') {
+                 modalCont.innerHTML = accCont.innerHTML;
+                 modalCont.querySelectorAll('.accordion-btn').forEach(btn => { btn.onclick = () => { btn.parentElement.classList.toggle('active'); }; });
+             }
+             if(modal) modal.classList.add('visible'); 
+        }
+        if (e.target.closest('#all-releases-btn')) {
+            activeReleasesFilters = { genre: 'all', type: 'all' };
+            resetReleaseDropdowns();
+            renderFilteredReleases();
+        }
+    });
+
+    // --- 6. HELPERS & GLOBAL EXPORTS ---
+    function setupReleaseFilters(genres, types) {
+        const genreList = document.getElementById('genre-options-list');
+        const typeList = document.getElementById('type-options-list');
+        
+        if(genreList) {
+            genreList.innerHTML = '<li data-value="all" class="selected">All Frequencies</li>';
+            genres.forEach(g => { genreList.innerHTML += `<li data-value="${g}">${g}</li>`; });
+        }
+        if(typeList) {
+            typeList.innerHTML = '<li data-value="all" class="selected">All Types</li>';
+            types.forEach(t => { typeList.innerHTML += `<li data-value="${t}">${t}</li>`; });
+        }
+        
+        const filterContainers = [
+            { id: 'custom-releases-genre', type: 'genre' },
+            { id: 'custom-releases-type', type: 'type' }
+        ];
+        
+        filterContainers.forEach(fc => {
+            const container = document.getElementById(fc.id);
+            if (container) {
+                const btn = container.querySelector('.select-btn');
+                const options = container.querySelector('.select-options');
+                const span = btn.querySelector('span');
+
+                btn.onclick = (e) => { e.stopPropagation(); document.querySelectorAll('.custom-select').forEach(x=>x!==container && x.classList.remove('active')); container.classList.toggle('active'); };
+                
+                options.onclick = (e) => {
+                    if(e.target.tagName === 'LI') {
+                        const val = e.target.getAttribute('data-value');
+                        if (fc.type === 'genre') {
+                            span.textContent = `FREQUENCY: ${e.target.textContent}`;
+                        } else {
+                            span.textContent = `${fc.type.toUpperCase()}: ${e.target.textContent}`;
+                        }
+                        activeReleasesFilters[fc.type] = val;
+                        renderFilteredReleases();
+                        container.classList.remove('active');
+                        options.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                    }
+                };
+            }
+        });
+    }
+
+    function renderFilteredReleases() {
+        const container = document.getElementById('releases-list');
+        if(!container) return;
+        
+        let filteredTracks = allReleasesTracks.filter(track => {
+            const genreMatch = activeReleasesFilters.genre === 'all' || 
+                               (track.genre && track.genre.toLowerCase() === activeReleasesFilters.genre.toLowerCase());
+            const typeMatch = activeReleasesFilters.type === 'all' || 
+                              (track.type && track.type.toLowerCase() === activeReleasesFilters.type.toLowerCase());
+            return genreMatch && typeMatch;
+        });
+        
+        container.innerHTML = '';
+        if (filteredTracks.length === 0) {
+            container.innerHTML = '<p style="text-align:center;">No releases found for selected filters.</p>';
+            return;
+        }
+
+        filteredTracks.forEach(track => {
+            const coverImg = track.cover || 'https://via.placeholder.com/150';
+            const streamLink = track.streamUrl || '#'; 
+            const buyLink = track.bundleUrl || '#'; 
+            const ytLink = track.youtubeUrl || '#';
+            const descHtml = track.description ? `<div class="beat-desc">${track.description}</div>` : '';
+            const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>` : '';
+            const metaText = `Available Now / Type: ${track.type || 'Single'} / Frequency: ${track.genre || 'Unknown'}`;
+
+            container.innerHTML += `
+            <div class="beat-row">
+                <div class="beat-art"><img src="${coverImg}" alt="Art"></div>
+                <div class="beat-info"><h4>${track.title || 'Untitled'}</h4>${descHtml}<div class="beat-meta">${metaText}</div></div>
+                <div class="beat-actions">
+                    <a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i> YOUTUBE</a>
+                    <a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM IT</a>
+                    <a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>
+                    ${downloadBtn}
+                </div>
+            </div>`;
+        });
+    }
+
+    function resetReleaseDropdowns() {
+        const genreSelect = document.getElementById('custom-releases-genre');
+        if(genreSelect) {
+            const btn = genreSelect.querySelector('.select-btn');
+            if(btn) btn.innerHTML = '<span>FREQUENCY: ALL</span><i class="fas fa-chevron-down"></i>';
+            genreSelect.classList.remove('active');
+            genreSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+            const allOpt = genreSelect.querySelector('[data-value="all"]');
+            if(allOpt) allOpt.classList.add('selected');
+        }
+
+        const typeSelect = document.getElementById('custom-releases-type');
+        if(typeSelect) {
+            const btn = typeSelect.querySelector('.select-btn');
+            if(btn) btn.innerHTML = '<span>TYPE: ALL</span><i class="fas fa-chevron-down"></i>';
+            typeSelect.classList.remove('active');
+            typeSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+            const allOpt = typeSelect.querySelector('[data-value="all"]');
+            if(allOpt) allOpt.classList.add('selected');
+        }
+    }
+
+    // Attach global functions to window
+    window.openProductModal = function(index) {
+        if(!window.loadedProducts || !window.loadedProducts[index]) return;
+        const prod = window.loadedProducts[index];
+        const modal = document.getElementById('product-modal');
+        document.getElementById('prod-title').textContent = prod.name;
+        document.getElementById('prod-price').textContent = prod.price;
+        document.getElementById('prod-desc').innerHTML = prod.description ? prod.description.replace(/\n/g, '<br>') : '';
+        document.getElementById('prod-buy-btn').href = prod.link || '#';
+        const mainImg = document.getElementById('prod-main-img');
+        mainImg.src = prod.image;
+        const thumbsCont = document.getElementById('prod-thumbnails');
+        thumbsCont.innerHTML = '';
+        if (prod.gallery && prod.gallery.length > 0) {
+            let allImages = [prod.image, ...prod.gallery.map(g => g.img)];
+            allImages.forEach(imgSrc => {
+                const thumb = document.createElement('div'); thumb.className = 'prod-thumb'; thumb.innerHTML = `<img src="${imgSrc}">`;
+                thumb.onclick = () => { mainImg.src = imgSrc; document.querySelectorAll('.prod-thumb').forEach(t => t.classList.remove('active')); thumb.classList.add('active'); };
+                thumbsCont.appendChild(thumb);
+            });
+            thumbsCont.firstElementChild.classList.add('active');
+        }
+        modal.classList.add('visible');
+    };
+
+    window.shareBeat = function(title) { const slug = slugify(title); const shareUrl = `${window.location.origin}${window.location.pathname}?beat=${slug}`; navigator.clipboard.writeText(shareUrl).then(() => { let feedback = document.getElementById('copy-feedback'); if(!feedback) { feedback = document.createElement('div'); feedback.id = 'copy-feedback'; feedback.className = 'copy-feedback'; feedback.innerText = 'LINK COPIED! 📋'; document.body.appendChild(feedback); } feedback.classList.add('show'); setTimeout(() => feedback.classList.remove('show'), 2000); }); };
+    window.playTrack = function(url, title, cover, index) { if (audio.src === window.location.origin + url || audio.src === url) { if(audio.paused) { audio.play(); window.isPlaying=true; } else { audio.pause(); window.isPlaying=false; } } else { window.currentIndex = index; audio.src = url; const titleEl = document.getElementById('player-track-title'); if(titleEl) titleEl.textContent = title; if(cover) { window.currentCover = cover; restoreHeroArt(); } audio.play(); window.isPlaying = true; } updateUIState(); checkPlayerVisibility(); };
+
+    function safeRun(fn) { try { fn(); } catch(e) { console.error("Script Error:", e); } }
+    function getYoutubeId(url) { if(!url) return null; const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
+    function slugify(text) { return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, ''); }
+    function playTrackByIndex(idx) { if(idx >= 0 && idx < window.currentPlaylist.length) { const t = window.currentPlaylist[idx]; const cov = t.cover || 'https://via.placeholder.com/100'; window.playTrack(t.audioSrc, t.title, cov, idx); } }
+    function restoreHeroArt() { const hero = document.getElementById('hero-beat-art'); const img = document.getElementById('hero-beat-img'); if(hero && img && window.currentCover) { img.src = window.currentCover; hero.classList.add('visible'); } }
+    function updateUIState() { const pBtn = document.getElementById('player-play-btn'); if(pBtn) pBtn.innerHTML = window.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>'; document.querySelectorAll('.beat-play-overlay i').forEach(i => i.className = 'fas fa-play'); const active = document.getElementById(`beat-icon-${window.currentIndex}`); if(active) active.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play'; }
+    function checkPlayerVisibility() { const stick = document.getElementById('sticky-player'); if(!stick) return; const isBeats = window.location.pathname.includes('beats.html'); if(isBeats || window.isPlaying || (audio.src && audio.src !== '')) stick.classList.add('player-visible'); else stick.classList.remove('player-visible'); }
+    function setupCustomDropdowns(allBeats) { 
+        const drops = document.querySelectorAll('.custom-select'); 
+        drops.forEach(d => { 
+            const btn = d.querySelector('.select-btn'); 
+            const list = d.querySelector('.select-options'); 
+            const span = btn.querySelector('span'); 
+            
+            btn.onclick = (e) => { 
+                e.stopPropagation(); 
+                drops.forEach(x=>x!==d && x.classList.remove('active')); 
+                d.classList.toggle('active'); 
+            }; 
+            
+            list.onclick = (e) => { 
+                if(e.target.tagName === 'LI') { 
+                    const val = e.target.getAttribute('data-value'); 
+                    span.textContent = `${d.id.split('-')[1].toUpperCase()}: ${e.target.textContent}`; 
+                    
+                    if(d.id==='custom-genre') activeFilters.genre=val; 
+                    if(d.id==='custom-bpm') activeFilters.bpm=val; 
+                    if(d.id==='custom-key') activeFilters.key=val; 
+                    
+                    const filtered = allBeats.filter(b => { 
+                        const g = activeFilters.genre==='all' || (b.category && b.category.toLowerCase()===activeFilters.genre.toLowerCase()); 
+                        const bKey = b.key || b.Key; 
+                        const k = activeFilters.key==='all' || (bKey === activeFilters.key); 
+                        let bpm = true; 
+                        if(activeFilters.bpm!=='all' && b.bpm) { 
+                            const [min,max] = activeFilters.bpm.split('-').map(Number); 
+                            bpm = Number(b.bpm)>=min && Number(b.bpm)<=max; 
+                        } 
+                        return g && k && bpm; 
+                    }); 
+                    
+                    window.currentPlaylist = filtered; 
+                    renderBeats(filtered); 
+                    d.classList.remove('active'); 
+                } 
+            } 
+        }); 
+        
+        document.onclick = (e) => { if(!e.target.closest('.custom-select')) drops.forEach(d=>d.classList.remove('active')); }; 
+    }
+    
+    function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats found matching your criteria.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button><a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a></div></div>`; }); }
+    function updateMenuState() { const path = window.location.pathname.split('/').pop() || 'index.html'; document.querySelectorAll('.nav-btn').forEach(l => { if(l.getAttribute('href').includes(path)) l.classList.add('active'); else l.classList.remove('active'); }); }
+});
