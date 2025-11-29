@@ -55,6 +55,22 @@ collections:
           - {label: "Vault Beats Title", name: "vaultTitle", widget: "string"}
           - {label: "Vault Beats Text", name: "vaultText", widget: "text"}
 
+  # --- NEWSLETTER SETTINGS ---
+  - name: "newsletter"
+    label: "📩 Newsletter Freq"
+    files:
+      - name: "newsletter_config"
+        label: "Newsletter Content"
+        file: "newsletter.json"
+        fields:
+          - {label: "Title", name: "title", widget: "string", default: "STAY ON FREQUENCY"}
+          - {label: "Subtitle", name: "subtitle", widget: "string", default: "Συντονίσου. Μην χάσεις κανένα drop."}
+          - {label: "Placeholder Text", name: "placeholder", widget: "string", default: "Your email frequency..."}
+          - {label: "Button Text", name: "btnText", widget: "string", default: "TUNE IN"}
+          - {label: "Option 1 (Beats)", name: "optBeats", widget: "string", default: "Beats / Production"}
+          - {label: "Option 2 (Releases)", name: "optReleases", widget: "string", default: "New Music / Releases"}
+          - {label: "Option 3 (All)", name: "optAll", widget: "string", default: "Full Spectrum (All)"}
+
   # --- 3. BIO PAGE ---
   - name: "bio"
     label: "👤 Bio Page"
@@ -113,7 +129,6 @@ collections:
               - {label: "Title", name: "title", widget: "string"}
               - {label: "Short Description", name: "description", widget: "text", required: false}
               # RELATION WIDGET ΓΙΑ ΤΑ FREQUENCIES (GENRES)
-              # Εδώ ορίσαμε να δείχνει "Name (Note)" αλλά να αποθηκεύει μόνο το "Name"
               - label: "Frequency / Genre"
                 name: "genre"
                 widget: "relation"
