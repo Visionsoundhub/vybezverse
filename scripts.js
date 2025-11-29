@@ -73,25 +73,19 @@ document.addEventListener('DOMContentLoaded', () => {
                         <input type="hidden" name="form-name" value="newsletter_vibe" />
                         <input type="hidden" name="source_page" value="${currentPath}" />
                         
-                        <div class="freq-selector">
-                            <label class="radio-label">
-                                <input type="radio" name="interest" value="beats">
-                                <span class="radio-custom"></span>
-                                ${data.optBeats || 'Beats'}
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="interest" value="releases">
-                                <span class="radio-custom"></span>
-                                ${data.optReleases || 'Releases'}
-                            </label>
-                            <label class="radio-label">
-                                <input type="radio" name="interest" value="all" checked>
-                                <span class="radio-custom"></span>
-                                ${data.optAll || 'All'}
-                            </label>
+                        <div style="text-align:left; width:100%; margin-bottom:1rem;">
+                            <label style="color:#8a2be2; font-size:0.75rem; font-weight:bold; margin-left:5px; display:block; margin-bottom:5px; letter-spacing:1px;">SELECT FREQUENCY:</label>
+                            <div style="position:relative;">
+                                <select name="interest" required style="width:100%; padding:1rem; background:rgba(0,0,0,0.6); border:1px solid rgba(138, 43, 226, 0.5); color:#fff; border-radius:12px; font-family:'Century Gothic', sans-serif; appearance:none; cursor:pointer; outline:none; box-shadow:0 0 10px rgba(138,43,226,0.1); font-size:0.95rem;">
+                                    <option value="all" selected>📡 ${data.optAll || 'Full Spectrum (All)'}</option>
+                                    <option value="beats">🎹 ${data.optBeats || 'Beats'}</option>
+                                    <option value="releases">🔥 ${data.optReleases || 'Releases'}</option>
+                                </select>
+                                <i class="fas fa-chevron-down" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); color:#8a2be2; pointer-events:none;"></i>
+                            </div>
                         </div>
 
-                        <div style="display:flex; gap:10px; margin-top:1.5rem;">
+                        <div style="display:flex; gap:10px; margin-top:1rem;">
                             <input type="email" name="email" placeholder="${data.placeholder || 'Email...'}" required 
                                 style="flex-grow:1; padding:0.8rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:#fff; font-family:'Inter', sans-serif;">
                             
