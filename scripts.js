@@ -41,22 +41,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- CRITICAL: DYNAMIC PAYHIP INJECTOR ---
+    // --- CRITICAL: DYNAMIC PAYHIP INJECTOR WITH CACHE BUSTING ---
     function injectPayhipScript() {
-        // 1. Βρίσκουμε αν υπάρχει ήδη
-        const oldScript = document.querySelector('script[src="https://payhip.com/payhip.js"]');
-        if (oldScript) {
-            oldScript.remove(); // Το αφαιρούμε για να γίνει reset
-        }
+        // 1. Αφαιρούμε ΟΛΑ τα παλιά Payhip scripts για να μην υπάρχουν διπλότυπα
+        const oldScripts = document.querySelectorAll('script[src*="payhip.js"]');
+        oldScripts.forEach(s => s.remove());
 
-        // 2. Το ξαναβάζουμε καθαρό
+        // 2. Δημιουργούμε το νέο script με TIMESTAMP
+        // Το "?v=" + Date.now() ξεγελάει τον browser να νομίζει ότι είναι νέο αρχείο,
+        // οπότε το Payhip αναγκάζεται να ξανατρέξει και να βρει τα κουμπιά!
+        const timestamp = new Date().getTime();
         const script = document.createElement('script');
         script.type = 'text/javascript';
-        script.src = 'https://payhip.com/payhip.js';
+        script.src = `https://payhip.com/payhip.js?v=${timestamp}`;
         
-        // Σημαντικό: Το βάζουμε στο body
         document.body.appendChild(script);
-        console.log("Payhip script injected successfully.");
+        console.log("Payhip script forced reload with timestamp:", timestamp);
     }
 
     // --- 2. POP-UP SYSTEM ---
