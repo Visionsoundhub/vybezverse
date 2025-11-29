@@ -41,8 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- 2. PAYHIP CART INTEGRATION (FORCE MODE) ---
-    // Φορτώνουμε το script
+    // --- 2. PAYHIP CART INTEGRATION ---
     function injectPayhip() {
         if (!document.querySelector('script[src="https://payhip.com/payhip.js"]')) {
             const script = document.createElement('script');
@@ -51,18 +50,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.body.appendChild(script);
         }
     }
-
-    // Αυτή η συνάρτηση ανοίγει το Popup βίαια
-    window.openPayhip = function(e, url) {
-        // Αν το Payhip έχει φορτώσει, άνοιξε το Popup
-        if (typeof Payhip !== 'undefined') {
-            e.preventDefault(); // Σταμάτα το άνοιγμα νέας καρτέλας
-            Payhip.Checkout.open(url); // Άνοιξε το Overlay
-            return false;
-        }
-        // Αν για κάποιο λόγο δεν φόρτωσε το script, άσε το link να δουλέψει κανονικά (fallback)
-        return true; 
-    };
 
     // --- 3. POP-UP SYSTEM ---
     function renderPopup() {
@@ -215,10 +202,7 @@ document.addEventListener('DOMContentLoaded', () => {
         safeRun(renderNewsletter);
         safeRun(renderPopup);
 
-        // ... (HOME, RELEASES, STORE, κτλ παραμένουν ίδια) ...
-        // ΣΗΜΕΙΩΣΗ: Αντέγραψε τα υπόλοιπα sections (Home, Releases etc) όπως ήταν
-        // ή απλά δες παρακάτω την πλήρη έκδοση για να μην χαθείς.
-        
+        // HOME
         safeRun(() => {
             const homeTitle = document.getElementById('home-hero-title');
             if (homeTitle) {
@@ -284,6 +268,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
+        // RELEASES
         safeRun(() => {
             const releasesContainer = document.getElementById('releases-list');
             const relDesc = document.getElementById('releases-description');
@@ -331,6 +316,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
+        // STORE
         safeRun(() => {
             const merchGrid = document.getElementById('merch-grid');
             const comingSoon = document.getElementById('merch-coming-soon');
@@ -444,6 +430,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
+        // OTHER PAGES
         safeRun(() => {
             const bioContainer = document.getElementById('bio-container'); if (bioContainer) { fetch('bio.json').then(r => r.ok ? r.json() : Promise.reject()).then(data => { const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...'; if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title; bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${data.image}" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`; }).catch(() => {}); }
             const galleryGrid = document.getElementById('gallery-grid'); if(galleryGrid && !document.getElementById('merch-grid')) { const gModal = document.getElementById('gallery-modal'); const gImg = document.getElementById('gallery-modal-img'); const gCap = document.getElementById('gallery-caption'); const gClose = document.getElementById('close-gallery-modal'); fetch('gallery.json').then(r => r.json()).then(data => { galleryGrid.innerHTML = ''; (data.images || []).forEach(img => { const div = document.createElement('div'); div.className = 'gallery-item'; div.innerHTML = `<img src="${img.src}" alt="${img.caption || ''}">`; div.onclick = () => { gImg.src = img.src; gCap.innerText = img.caption || ''; gModal.classList.add('visible'); }; galleryGrid.appendChild(div); }); }).catch(() => {}); if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target===gModal) gModal.classList.remove('visible'); }; } }
@@ -461,16 +448,20 @@ document.addEventListener('DOMContentLoaded', () => {
         swup.hooks.on('page:view', () => { safeRun(initAllScripts); });
     }
 
+    // --- GLOBAL CLICK LISTENER ---
     document.addEventListener('click', (e) => {
+        // 1. Modals Close
         if (e.target.closest('.modal-close-btn') || e.target.classList.contains('modal-overlay')) {
             document.querySelectorAll('.modal-overlay.visible').forEach(m => m.classList.remove('visible'));
         }
+        // 2. Open Bundle/Why Modals
         if (e.target.closest('#open-bundle-modal')) { 
             const m = document.getElementById('bundle-modal'); if(m) m.classList.add('visible'); 
         }
         if (e.target.closest('#why-buy-btn')) { 
             const m = document.getElementById('why-buy-modal'); if(m) m.classList.add('visible'); 
         }
+        // 3. Mobile Info
         if (e.target.closest('#mobile-info-btn')) {
              const accCont = document.getElementById('info-accordions-container');
              const modalCont = document.getElementById('info-modal-content');
@@ -481,13 +472,30 @@ document.addEventListener('DOMContentLoaded', () => {
              }
              if(modal) modal.classList.add('visible'); 
         }
+        // 4. All Releases Reset
         if (e.target.closest('#all-releases-btn')) {
             activeReleasesFilters = { genre: 'all', type: 'all' };
             resetReleaseDropdowns();
             renderFilteredReleases();
         }
+        
+        // --- 5. PAYHIP DELEGATION (HERE IS THE FIX) ---
+        const payhipBtn = e.target.closest('.payhip-buy-btn');
+        if (payhipBtn) {
+            e.preventDefault(); // Stop default navigation
+            const url = payhipBtn.getAttribute('data-href');
+            
+            // Check if Payhip is loaded
+            if (typeof Payhip !== 'undefined') {
+                Payhip.Checkout.open(url);
+            } else {
+                // Fallback if script blocked
+                window.open(url, '_blank');
+            }
+        }
     });
 
+    // --- HELPERS ---
     function setupReleaseFilters(genres, types) {
         const genreList = document.getElementById('genre-options-list');
         const typeList = document.getElementById('type-options-list');
@@ -675,7 +683,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.onclick = (e) => { if(!e.target.closest('.custom-select')) drops.forEach(d=>d.classList.remove('active')); }; 
     }
     
-    // --- EDITED FOR PAYHIP ---
+    // --- UPDATED RENDER BEATS (Clean HTML, no inline onclick) ---
     function renderBeats(beats) { 
         const cont = document.getElementById('beat-store-list'); 
         if(!cont) return; 
@@ -689,10 +697,8 @@ document.addEventListener('DOMContentLoaded', () => {
             
             // CHECK IF PAYHIP LINK
             const isPayhip = b.checkoutUrl && b.checkoutUrl.includes('payhip.com');
-            const onclickAttr = isPayhip ? `onclick="return window.openPayhip(event, '${b.checkoutUrl}')"` : '';
-            const targetAttr = isPayhip ? '' : 'target="_blank"'; // Payhip = Same Tab (Popup), Others = New Tab
-            const payhipClass = isPayhip ? 'payhip-buy-button' : ''; // Helper class just in case
-
+            const payhipClass = isPayhip ? 'payhip-buy-btn' : ''; 
+            
             cont.innerHTML += `
             <div class="beat-row" id="beat-row-${slug}">
                 <div class="beat-art">
@@ -707,7 +713,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 <div class="beat-actions">
                     <button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button>
-                    <a href="${b.checkoutUrl}" ${targetAttr} class="btn btn-accent ${payhipClass}" ${onclickAttr}>${b.price} | BUY</a>
+                    <a href="${b.checkoutUrl}" class="btn btn-accent ${payhipClass}" data-href="${b.checkoutUrl}" target="_blank">${b.price} | BUY</a>
                 </div>
             </div>`; 
         }); 
