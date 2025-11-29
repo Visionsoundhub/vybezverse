@@ -710,3 +710,105 @@ a.nav-logo { text-decoration: none !important; display: flex; align-items: cente
     box-shadow: 0 0 10px rgba(0, 210, 255, 0.3);
     color: #fff;
 }
+
+/* --- NEWSLETTER POPUP & FOOTER BTN --- */
+#newsletter-trigger {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 6px 18px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-weight: 700;
+    transition: 0.3s;
+    font-family: 'Century Gothic', sans-serif;
+    letter-spacing: 1px;
+    margin-right: 15px; /* Απόσταση από τα υπόλοιπα */
+}
+
+#newsletter-trigger:hover {
+    background: #8a2be2;
+    border-color: #8a2be2;
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+    color: #fff;
+}
+
+/* Modal Form Styles */
+.newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 1.5rem;
+    text-align: left;
+}
+
+.newsletter-input {
+    padding: 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    background: rgba(255,255,255,0.05);
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+    width: 100%;
+}
+
+.newsletter-input:focus {
+    border-color: #8a2be2;
+    background: rgba(0,0,0,0.8);
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.2);
+}
+
+.interest-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.interest-label {
+    font-size: 0.9rem;
+    color: #888;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
+/* Custom Radio/Checkbox Styling */
+.custom-radio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    padding: 10px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.03);
+    transition: 0.2s;
+}
+
+.custom-radio:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+.custom-radio input {
+    accent-color: #8a2be2; /* Το μωβ χρώμα στο κυκλάκι */
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+}
+
+.custom-radio span {
+    font-size: 0.95rem;
+    color: #ccc;
+}
+
+@media (max-width: 900px) {
+    #newsletter-trigger {
+        font-size: 0.65rem;
+        padding: 5px 12px;
+        margin-right: 5px;
+    }
+}
