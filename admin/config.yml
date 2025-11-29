@@ -71,6 +71,32 @@ collections:
           - {label: "Option 2 (Releases)", name: "optReleases", widget: "string", default: "New Music / Releases"}
           - {label: "Option 3 (All)", name: "optAll", widget: "string", default: "Full Spectrum (All)"}
 
+  # --- POP-UP MANAGER ---
+  - name: "popups"
+    label: "🔔 Pop-up Manager"
+    files:
+      - name: "popup_main"
+        label: "Main Pop-up (Home & Releases)"
+        file: "popup_main.json"
+        fields:
+          - {label: "Enable Pop-up?", name: "active", widget: "boolean", default: false}
+          - {label: "Title", name: "title", widget: "string", default: "SPECIAL OFFER"}
+          - {label: "Message", name: "text", widget: "text", default: "Μην χάσεις το νέο drop!"}
+          - {label: "Image (Optional)", name: "image", widget: "image", required: false}
+          - {label: "Button Text", name: "btnText", widget: "string", default: "LISTEN NOW"}
+          - {label: "Button Link", name: "btnLink", widget: "string", default: "#"}
+
+      - name: "popup_beats"
+        label: "Beats Pop-up (Beats Page Only)"
+        file: "popup_beats.json"
+        fields:
+          - {label: "Enable Pop-up?", name: "active", widget: "boolean", default: false}
+          - {label: "Title", name: "title", widget: "string", default: "NEED A BEAT?"}
+          - {label: "Message", name: "text", widget: "text", default: "Bulk Deals Available Now."}
+          - {label: "Image (Optional)", name: "image", widget: "image", required: false}
+          - {label: "Button Text", name: "btnText", widget: "string", default: "SHOP DEALS"}
+          - {label: "Button Link", name: "btnLink", widget: "string", default: "#"}
+
   # --- 3. BIO PAGE ---
   - name: "bio"
     label: "👤 Bio Page"
