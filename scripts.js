@@ -116,6 +116,84 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    // --- NEWSLETTER & SPYING LOGIC ---
+    function renderNewsletter() {
+        const footer = document.getElementById('dynamic-footer');
+        // Αν υπάρχει ήδη newsletter ή δεν υπάρχει footer, σταματάμε
+        if (document.getElementById('newsletter-section') || !footer) return;
+
+        fetch('newsletter.json?t=' + new Date().getTime())
+            .then(r => r.json())
+            .then(data => {
+                const section = document.createElement('section');
+                section.id = 'newsletter-section';
+                section.className = 'glass-container';
+                section.style.marginTop = '4rem';
+                section.style.textAlign = 'center';
+                section.style.position = 'relative';
+                section.style.zIndex = '500';
+
+                // SPYING: Βρίσκουμε το τρέχον URL
+                const currentPath = window.location.pathname || 'home';
+
+                section.innerHTML = `
+                    <h2 style="margin-bottom:0.5rem; letter-spacing:2px; color:#fff;">${data.title}</h2>
+                    <p style="color:#aaa; margin-bottom:1.5rem;">${data.subtitle}</p>
+                    
+                    <form name="newsletter_vibe" method="POST" data-netlify="true" id="vibe-form" style="max-width:500px; margin:0 auto;">
+                        <input type="hidden" name="form-name" value="newsletter_vibe" />
+                        <input type="hidden" name="source_page" value="${currentPath}" /> <div class="freq-selector">
+                            <label class="radio-label">
+                                <input type="radio" name="interest" value="beats">
+                                <span class="radio-custom"></span>
+                                ${data.optBeats}
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="interest" value="releases">
+                                <span class="radio-custom"></span>
+                                ${data.optReleases}
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="interest" value="all" checked>
+                                <span class="radio-custom"></span>
+                                ${data.optAll}
+                            </label>
+                        </div>
+
+                        <div style="display:flex; gap:10px; margin-top:1.5rem;">
+                            <input type="email" name="email" placeholder="${data.placeholder}" required 
+                                style="flex-grow:1; padding:0.8rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:#fff; font-family:'Inter', sans-serif;">
+                            
+                            <button type="submit" class="btn btn-accent">${data.btnText}</button>
+                        </div>
+                    </form>
+                    <div id="form-feedback" style="margin-top:1rem; color:#8a2be2; font-weight:bold; display:none;">SIGNAL RECEIVED. YOU ARE TUNED IN. 📶</div>
+                `;
+
+                // Το βάζουμε ΠΡΙΝ το footer
+                footer.parentNode.insertBefore(section, footer);
+
+                // Χειρισμός Submit χωρίς ανανέωση σελίδας (AJAX)
+                const form = document.getElementById('vibe-form');
+                form.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(form);
+                    fetch('/', {
+                        method: 'POST',
+                        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                        body: new URLSearchParams(formData).toString()
+                    })
+                    .then(() => {
+                        form.style.display = 'none';
+                        document.getElementById('form-feedback').style.display = 'block';
+                    })
+                    .catch((error) => alert(error));
+                });
+            })
+            .catch(err => console.log('Newsletter Error:', err));
+    }
+
+
     // --- INITIALIZE ---
     initAllScripts(); 
 
@@ -161,6 +239,7 @@ document.addEventListener('DOMContentLoaded', () => {
         safeRun(updateMenuState);
         safeRun(checkPlayerVisibility);
         safeRun(restoreHeroArt);
+        safeRun(renderNewsletter); // Added Newsletter Call here
 
         // --- 1. HOME PAGE ---
         safeRun(() => {
@@ -443,95 +522,4 @@ document.addEventListener('DOMContentLoaded', () => {
         });
         // --- 5. OTHER PAGES ---
         safeRun(() => {
-            const bioContainer = document.getElementById('bio-container'); if (bioContainer) { fetch('bio.json').then(r => r.ok ? r.json() : Promise.reject()).then(data => { const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...'; if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title; bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${data.image}" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`; }).catch(() => {}); }
-            const galleryGrid = document.getElementById('gallery-grid'); if(galleryGrid && !document.getElementById('merch-grid')) { const gModal = document.getElementById('gallery-modal'); const gImg = document.getElementById('gallery-modal-img'); const gCap = document.getElementById('gallery-caption'); const gClose = document.getElementById('close-gallery-modal'); fetch('gallery.json').then(r => r.json()).then(data => { galleryGrid.innerHTML = ''; (data.images || []).forEach(img => { const div = document.createElement('div'); div.className = 'gallery-item'; div.innerHTML = `<img src="${img.src}" alt="${img.caption || ''}">`; div.onclick = () => { gImg.src = img.src; gCap.innerText = img.caption || ''; gModal.classList.add('visible'); }; galleryGrid.appendChild(div); }); }).catch(() => {}); if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target===gModal) gModal.classList.remove('visible'); }; } }
-            const burger = document.querySelector('.hamburger'); const nav = document.querySelector('.nav-links'); if(burger) { const clone = burger.cloneNode(true); burger.parentNode.replaceChild(clone, burger); clone.onclick = () => { clone.classList.toggle('active'); nav.classList.toggle('active'); }; document.querySelectorAll('.nav-btn').forEach(b => b.onclick = () => { clone.classList.remove('active'); nav.classList.remove('active'); }); }
-            const menuCont = document.querySelector('.nav-links'); if (menuCont && menuCont.innerHTML === '') { fetch('menu.json').then(r => r.json()).then(d => { let html = ''; (d.links || []).forEach(l => html += `<a href="${l.url}" class="nav-btn" target="${l.newTab?'_blank':'_self'}">${l.text}</a>`); menuCont.innerHTML = html; updateMenuState(); }); }
-            const press = document.getElementById('press-container'); if(press) { fetch('press.json').then(r=>r.json()).then(d => { press.innerHTML=''; (d.articles||[]).forEach(i => press.innerHTML += `<div class="press-card"><img src="${i.image}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">READ</a></div></div>`); }); }
-            const pods = document.getElementById('podcasts-container'); if(pods) { fetch('podcasts.json').then(r=>r.json()).then(d => { pods.innerHTML=''; (d.episodes||[]).forEach(i => pods.innerHTML += `<div class="press-card"><img src="${i.cover}" class="press-image"><div class="press-content"><h3>${i.title}</h3><a href="${i.link}" target="_blank" class="btn btn-outline">LISTEN</a></div></div>`); }); }
-            const foot = document.getElementById('dynamic-footer'); if (foot) { fetch('footer.json').then(r => r.json()).then(d => { const icons = (p) => [{icon: d[`${p}FbIcon`], link:d[`${p}Fb`]},{icon: d[`${p}IgIcon`], link:d[`${p}Ig`]},{icon: d[`${p}TtIcon`], link:d[`${p}Tt`]},{icon: d[`${p}YtIcon`], link:d[`${p}Yt`]}].map(n => n.link && n.icon ? `<a href="${n.link}" target="_blank" class="social-link"><img src="${n.icon}"></a>` : '').join(''); foot.innerHTML = `<footer class="site-footer"><div class="footer-content"><div class="footer-section"><h4 class="footer-title">${d.prodTitle}</h4><div class="social-icons">${icons('prod')}</div></div><div class="footer-divider"></div><div class="footer-section"><h4 class="footer-title">${d.artistTitle}</h4><div class="social-icons">${icons('artist')}</div></div></div></footer>`; }); }
-        });
-    }
-
-    // --- PRODUCT MODAL FUNCTION ---
-    window.openProductModal = function(index) {
-        if(!window.loadedProducts || !window.loadedProducts[index]) return;
-        const prod = window.loadedProducts[index];
-        const modal = document.getElementById('product-modal');
-        document.getElementById('prod-title').textContent = prod.name;
-        document.getElementById('prod-price').textContent = prod.price;
-        document.getElementById('prod-desc').innerHTML = prod.description ? prod.description.replace(/\n/g, '<br>') : '';
-        document.getElementById('prod-buy-btn').href = prod.link || '#';
-        const mainImg = document.getElementById('prod-main-img');
-        mainImg.src = prod.image;
-        const thumbsCont = document.getElementById('prod-thumbnails');
-        thumbsCont.innerHTML = '';
-        if (prod.gallery && prod.gallery.length > 0) {
-            let allImages = [prod.image, ...prod.gallery.map(g => g.img)];
-            allImages.forEach(imgSrc => {
-                const thumb = document.createElement('div'); thumb.className = 'prod-thumb'; thumb.innerHTML = `<img src="${imgSrc}">`;
-                thumb.onclick = () => { mainImg.src = imgSrc; document.querySelectorAll('.prod-thumb').forEach(t => t.classList.remove('active')); thumb.classList.add('active'); };
-                thumbsCont.appendChild(thumb);
-            });
-            thumbsCont.firstElementChild.classList.add('active');
-        }
-        modal.classList.add('visible');
-    };
-
-    // --- HELPERS ---
-    function safeRun(fn) { try { fn(); } catch(e) { console.error("Script Error:", e); } }
-    function getYoutubeId(url) { if(!url) return null; const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
-    function slugify(text) { return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, ''); }
-    window.shareBeat = function(title) { const slug = slugify(title); const shareUrl = `${window.location.origin}${window.location.pathname}?beat=${slug}`; navigator.clipboard.writeText(shareUrl).then(() => { let feedback = document.getElementById('copy-feedback'); if(!feedback) { feedback = document.createElement('div'); feedback.id = 'copy-feedback'; feedback.className = 'copy-feedback'; feedback.innerText = 'LINK COPIED! 📋'; document.body.appendChild(feedback); } feedback.classList.add('show'); setTimeout(() => feedback.classList.remove('show'), 2000); }); };
-    window.playTrack = function(url, title, cover, index) { if (audio.src === window.location.origin + url || audio.src === url) { if(audio.paused) { audio.play(); window.isPlaying=true; } else { audio.pause(); window.isPlaying=false; } } else { window.currentIndex = index; audio.src = url; const titleEl = document.getElementById('player-track-title'); if(titleEl) titleEl.textContent = title; if(cover) { window.currentCover = cover; restoreHeroArt(); } audio.play(); window.isPlaying = true; } updateUIState(); checkPlayerVisibility(); };
-    function playTrackByIndex(idx) { if(idx >= 0 && idx < window.currentPlaylist.length) { const t = window.currentPlaylist[idx]; const cov = t.cover || 'https://via.placeholder.com/100'; window.playTrack(t.audioSrc, t.title, cov, idx); } }
-    function restoreHeroArt() { const hero = document.getElementById('hero-beat-art'); const img = document.getElementById('hero-beat-img'); if(hero && img && window.currentCover) { img.src = window.currentCover; hero.classList.add('visible'); } }
-    function updateUIState() { const pBtn = document.getElementById('player-play-btn'); if(pBtn) pBtn.innerHTML = window.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>'; document.querySelectorAll('.beat-play-overlay i').forEach(i => i.className = 'fas fa-play'); const active = document.getElementById(`beat-icon-${window.currentIndex}`); if(active) active.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play'; }
-    function checkPlayerVisibility() { const stick = document.getElementById('sticky-player'); if(!stick) return; const isBeats = window.location.pathname.includes('beats.html'); if(isBeats || window.isPlaying || (audio.src && audio.src !== '')) stick.classList.add('player-visible'); else stick.classList.remove('player-visible'); }
-    function setupCustomDropdowns(allBeats) { 
-        const drops = document.querySelectorAll('.custom-select'); 
-        drops.forEach(d => { 
-            const btn = d.querySelector('.select-btn'); 
-            const list = d.querySelector('.select-options'); 
-            const span = btn.querySelector('span'); 
-            
-            btn.onclick = (e) => { 
-                e.stopPropagation(); 
-                drops.forEach(x=>x!==d && x.classList.remove('active')); 
-                d.classList.toggle('active'); 
-            }; 
-            
-            list.onclick = (e) => { 
-                if(e.target.tagName === 'LI') { 
-                    const val = e.target.getAttribute('data-value'); 
-                    span.textContent = `${d.id.split('-')[1].toUpperCase()}: ${e.target.textContent}`; 
-                    
-                    if(d.id==='custom-genre') activeFilters.genre=val; 
-                    if(d.id==='custom-bpm') activeFilters.bpm=val; 
-                    if(d.id==='custom-key') activeFilters.key=val; 
-                    
-                    const filtered = allBeats.filter(b => { 
-                        const g = activeFilters.genre==='all' || (b.category && b.category.toLowerCase()===activeFilters.genre.toLowerCase()); 
-                        const bKey = b.key || b.Key; 
-                        const k = activeFilters.key==='all' || (bKey === activeFilters.key); 
-                        let bpm = true; 
-                        if(activeFilters.bpm!=='all' && b.bpm) { 
-                            const [min,max] = activeFilters.bpm.split('-').map(Number); 
-                            bpm = Number(b.bpm)>=min && Number(b.bpm)<=max; 
-                        } 
-                        return g && k && bpm; 
-                    }); 
-                    
-                    window.currentPlaylist = filtered; 
-                    renderBeats(filtered); 
-                    d.classList.remove('active'); 
-                } 
-            } 
-        }); 
-        
-        document.onclick = (e) => { if(!e.target.closest('.custom-select')) drops.forEach(d=>d.classList.remove('active')); }; 
-    }
-    
-    function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats found matching your criteria.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button><a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a></div></div>`; }); }
-    function updateMenuState() { const path = window.location.pathname.split('/').pop() || 'index.html'; document.querySelectorAll('.nav-btn').forEach(l => { if(l.getAttribute('href').includes(path)) l.classList.add('active'); else l.classList.remove('active'); }); }
-});
+            const bioContainer = document.getElementById('bio-container'); if (bioContainer) { fetch('bio.json').then(r => r.ok ? r.json() : Promise.reject()).then(data => { const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...'; if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title
