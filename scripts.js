@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     
     // --- 0. SAFETY FIRST: PRELOADER ---
-    // Αυτό το κομμάτι τρέχει πρώτο για να είμαστε σίγουροι ότι το site θα ανοίξει.
     const preloader = document.getElementById('neuro-preloader');
     const preloaderText = document.getElementById('neuro-text');
 
@@ -12,7 +11,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Αν κολλήσει για οποιονδήποτε λόγο, να ανοίξει στα 4 δευτερόλεπτα βίαια.
     setTimeout(killPreloader, 4000);
 
     if (preloader && preloaderText) {
@@ -647,5 +645,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats found matching your criteria.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button><a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a></div></div>`; }); }
-    function updateMenuState() { const path = window.location.pathname.split('/').pop() || 'index.html'; document.querySelectorAll('.nav-btn').forEach(l => { if(l.getAttribute('href').includes(path)) l.classList.add('active'); else l.classList.remove('active'); }); }
+    
+    // --- EDITED FOR SAFETY (FIX FOR NULL HREF) ---
+    function updateMenuState() {
+        const path = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-btn').forEach(l => {
+            const href = l.getAttribute('href'); // Get href safely
+            if (href) { // Only check if href exists
+                if(href.includes(path)) l.classList.add('active');
+                else l.classList.remove('active');
+            }
+        });
+    }
 });
