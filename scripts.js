@@ -43,10 +43,66 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- 2. NEWSLETTER FUNCTION ---
+    // --- 2. POP-UP SYSTEM ---
+    function renderPopup() {
+        const path = window.location.pathname;
+        let jsonFile = '';
+        let storageKey = '';
+
+        if (path.includes('beats.html')) {
+            jsonFile = 'popup_beats.json';
+            storageKey = 'popup_beats_seen';
+        } else if (path.includes('index.html') || path.includes('releases.html') || path === '/' || path.endsWith('/')) {
+            jsonFile = 'popup_main.json';
+            storageKey = 'popup_main_seen';
+        } else {
+            return;
+        }
+
+        if (sessionStorage.getItem(storageKey) === 'true') return;
+
+        fetch(jsonFile + '?t=' + new Date().getTime())
+            .then(r => r.json())
+            .then(data => {
+                if (!data.active) return;
+
+                const overlay = document.createElement('div');
+                overlay.className = 'modal-overlay visible'; 
+                overlay.style.zIndex = '100000'; 
+                overlay.id = 'promo-popup';
+
+                const imgHtml = data.image ? `<img src="${data.image}" style="width:100%; max-height:200px; object-fit:cover; border-radius:12px; margin-bottom:1rem; border:1px solid rgba(255,255,255,0.1);">` : '';
+
+                overlay.innerHTML = `
+                    <div class="modal-box" style="max-width:400px; text-align:center; border: 1px solid #8a2be2; box-shadow: 0 0 50px rgba(138,43,226,0.4);">
+                        <button class="modal-close-btn" id="close-promo-popup">&times;</button>
+                        ${imgHtml}
+                        <h2 style="color:#fff; margin-bottom:0.5rem; text-transform:uppercase;">${data.title}</h2>
+                        <p style="color:#ccc; margin-bottom:1.5rem; line-height:1.5;">${data.text}</p>
+                        <a href="${data.btnLink}" class="btn btn-accent" style="width:100%; justify-content:center; font-size:1.1rem; padding:1rem;">${data.btnText}</a>
+                    </div>
+                `;
+
+                document.body.appendChild(overlay);
+
+                document.getElementById('close-promo-popup').onclick = () => {
+                    overlay.remove();
+                    sessionStorage.setItem(storageKey, 'true');
+                };
+                
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                        sessionStorage.setItem(storageKey, 'true');
+                    }
+                };
+            })
+            .catch(e => console.log('Popup info:', e));
+    }
+
+    // --- 3. NEWSLETTER FUNCTION ---
     function renderNewsletter() {
         const footer = document.getElementById('dynamic-footer');
-        // Αν υπάρχει ήδη ή δεν βρέθηκε footer, επιστροφή
         if (document.getElementById('newsletter-section') || !footer) return;
 
         fetch('newsletter.json?t=' + new Date().getTime())
@@ -121,13 +177,14 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(err => console.log('Newsletter Error (Safe to ignore):', err));
     }
 
-    // --- 3. MAIN LOGIC WRAPPER (INIT) ---
+    // --- 4. INIT CALL ---
     function initAllScripts() {
         console.log("Scripts Initialized..."); 
         safeRun(updateMenuState);
         safeRun(checkPlayerVisibility);
         safeRun(restoreHeroArt);
-        safeRun(renderNewsletter); 
+        safeRun(renderNewsletter);
+        safeRun(renderPopup);
 
         // HOME
         safeRun(() => {
@@ -368,7 +425,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // --- 4. INIT CALL ---
     safeRun(initAllScripts); 
 
     if (window.Swup) {
@@ -376,7 +432,6 @@ document.addEventListener('DOMContentLoaded', () => {
         swup.hooks.on('page:view', () => { safeRun(initAllScripts); });
     }
 
-    // --- 5. GLOBAL CLICK LISTENERS ---
     document.addEventListener('click', (e) => {
         if (e.target.closest('.modal-close-btn') || e.target.classList.contains('modal-overlay')) {
             document.querySelectorAll('.modal-overlay.visible').forEach(m => m.classList.remove('visible'));
@@ -404,7 +459,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // --- 6. HELPERS & GLOBAL EXPORTS ---
     function setupReleaseFilters(genres, types) {
         const genreList = document.getElementById('genre-options-list');
         const typeList = document.getElementById('type-options-list');
@@ -514,7 +568,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Attach global functions to window
     window.openProductModal = function(index) {
         if(!window.loadedProducts || !window.loadedProducts[index]) return;
         const prod = window.loadedProducts[index];
