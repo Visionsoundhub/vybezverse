@@ -98,10 +98,22 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(e => console.log('Popup info:', e));
     }
 
-    // --- 3. NEWSLETTER FUNCTION ---
+    // --- 3. NEWSLETTER FUNCTION (ΔΙΟΡΘΩΜΕΝΗ ΓΙΑ LIVE UPDATE) ---
     function renderNewsletter() {
         const footer = document.getElementById('dynamic-footer');
-        if (document.getElementById('newsletter-section') || !footer) return;
+        const existingSection = document.getElementById('newsletter-section');
+        const currentPath = window.location.pathname || 'home';
+
+        // ΑΝ Η ΦΟΡΜΑ ΥΠΑΡΧΕΙ ΗΔΗ, ΑΠΛΑ ΕΝΗΜΕΡΩΣΕ ΤΟ SOURCE PAGE ΚΑΙ ΜΗΝ ΤΗΝ ΞΑΝΑΦΤΙΑΞΕΙΣ
+        if (existingSection) {
+            const sourceInput = existingSection.querySelector('input[name="source_page"]');
+            if (sourceInput) {
+                sourceInput.value = currentPath; // Ενημέρωση της τρέχουσας σελίδας
+            }
+            return; 
+        }
+
+        if (!footer) return;
 
         fetch('newsletter.json?t=' + new Date().getTime())
             .then(r => {
@@ -116,8 +128,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 section.style.textAlign = 'center';
                 section.style.position = 'relative';
                 section.style.zIndex = '500';
-
-                const currentPath = window.location.pathname || 'home';
 
                 section.innerHTML = `
                     <h2 style="margin-bottom:0.5rem; letter-spacing:2px; color:#fff;">${data.title || 'NEWSLETTER'}</h2>
@@ -650,8 +660,8 @@ document.addEventListener('DOMContentLoaded', () => {
     function updateMenuState() {
         const path = window.location.pathname.split('/').pop() || 'index.html';
         document.querySelectorAll('.nav-btn').forEach(l => {
-            const href = l.getAttribute('href'); // Get href safely
-            if (href) { // Only check if href exists
+            const href = l.getAttribute('href'); 
+            if (href) { 
                 if(href.includes(path)) l.classList.add('active');
                 else l.classList.remove('active');
             }
