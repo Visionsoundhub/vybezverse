@@ -41,7 +41,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- PAYHIP MANUAL OVERRIDE (CART MODE) ---
+    // --- PAYHIP: RESTORE WORKING VERSION ---
+    // Φορτώνουμε το script
     function loadPayhipBase() {
         if (!document.querySelector('script[src*="payhip.js"]')) {
             const script = document.createElement('script');
@@ -60,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return match ? match[1] : null;
     }
 
-    // Ο "Φύλακας" - CART VERSION
+    // Ο "Φύλακας" - ΕΠΙΣΤΡΟΦΗ ΣΤΟ CHECKOUT.OPEN (Αυτό δούλεψε)
     document.addEventListener('click', function(e) {
         const btn = e.target.closest('.payhip-buy-button');
         
@@ -70,12 +71,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const productLink = btn.href; 
             
-            if (typeof Payhip !== 'undefined' && Payhip.Cart) {
-                console.log("Adding to Payhip Cart:", productLink);
-                // Η ΜΕΓΑΛΗ ΑΛΛΑΓΗ: Cart.add αντι για Checkout.open
-                Payhip.Cart.add(productLink);
+            // Χρησιμοποιούμε το Checkout.open που ξέρουμε ότι δουλεύει
+            if (typeof Payhip !== 'undefined' && Payhip.Checkout) {
+                console.log("Opening Payhip Popup:", productLink);
+                Payhip.Checkout.open(productLink); 
             } else {
-                // Fallback αν δεν φόρτωσε
                 window.open(productLink, '_blank');
             }
         }
@@ -224,6 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if(data.dropBuy) {
                                     const prodId = getPayhipID(data.dropBuy);
                                     if(prodId) {
+                                        // data-no-swup prevents Swup from hijacking the link
                                         btnsHtml += `<a href="${data.dropBuy}" data-product="${prodId}" data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
                                     } else {
                                         btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
@@ -285,7 +286,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
                 
-                // ... (settings fetches) ...
                 const relTitle = document.getElementById('releases-title');
                 const allBtn = document.getElementById('all-releases-btn');
                 const whyBtn = document.getElementById('why-buy-text');
