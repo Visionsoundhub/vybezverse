@@ -41,18 +41,22 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- PAYHIP AUTO-FIXER ---
-    // Αυτή η συνάρτηση παίρνει το link και βγάζει το ID για να δουλέψει το Popup
+    // --- PAYHIP AUTO-FIXER (REGEX VERSION) ---
+    // Αυτό διορθώνει το πρόβλημα. Βρίσκει καθαρά το ID (π.χ. fSD16)
+    // ακόμα κι αν το link έχει ?ref=... ή άλλα σύμβολα.
     function getPayhipID(url) {
-        if (!url || !url.includes('/b/')) return '';
-        const parts = url.split('/b/');
-        return parts.length > 1 ? parts[1] : '';
+        if (!url) return null;
+        // Ψάχνει για το /b/ ακολουθούμενο από γράμματα/αριθμούς
+        const match = url.match(/\/b\/([a-zA-Z0-9]+)/);
+        return match ? match[1] : null;
     }
 
     function injectPayhipScript() {
+        // Καθαρίζουμε παλιά scripts
         const oldScripts = document.querySelectorAll('script[src*="payhip.js"]');
         oldScripts.forEach(s => s.remove());
 
+        // Βάζουμε το νέο με Timestamp για να ξυπνήσει
         const timestamp = new Date().getTime();
         const script = document.createElement('script');
         script.type = 'text/javascript';
@@ -203,8 +207,15 @@ document.addEventListener('DOMContentLoaded', () => {
                                 // AUTO-PAYHIP FIX FOR HOME
                                 if(data.dropBuy) {
                                     const prodId = getPayhipID(data.dropBuy);
-                                    const dataAttr = prodId ? `data-product="${prodId}"` : '';
-                                    btnsHtml += `<a href="${data.dropBuy}" ${dataAttr} class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
+                                    let btnClass = "btn btn-glow";
+                                    let dataAttr = "";
+                                    
+                                    if(prodId) {
+                                        dataAttr = `data-product="${prodId}"`;
+                                        btnClass += " payhip-buy-button";
+                                    }
+                                    
+                                    btnsHtml += `<a href="${data.dropBuy}" ${dataAttr} class="${btnClass}">ΑΓΟΡΑΣΕ ΤΟ</a>`;
                                 }
 
                                 if(data.dropFree) btnsHtml += `<a href="${data.dropFree}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>`;
@@ -213,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     }
-                    // ... (Announcement & Stream code remains same) ...
+                    // ... (Rest of Home code) ...
                     const annCont = document.getElementById('home-announcement-container');
                     const annIframe = document.getElementById('announcement-iframe');
                     const annText = document.getElementById('announcement-text');
@@ -263,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
                 
-                // ... (Settings fetch code remains same) ...
+                // ... (Settings and other fetches) ...
                 const relTitle = document.getElementById('releases-title');
                 const allBtn = document.getElementById('all-releases-btn');
                 const whyBtn = document.getElementById('why-buy-text');
@@ -412,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // OTHER PAGES (Bio, Gallery etc) ... (remains same) ...
+        // OTHER PAGES (Bio, Gallery etc)...
         safeRun(() => {
             const bioContainer = document.getElementById('bio-container'); if (bioContainer) { fetch('bio.json').then(r => r.ok ? r.json() : Promise.reject()).then(data => { const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...'; if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title; bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${data.image}" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`; }).catch(() => {}); }
             const galleryGrid = document.getElementById('gallery-grid'); if(galleryGrid && !document.getElementById('merch-grid')) { const gModal = document.getElementById('gallery-modal'); const gImg = document.getElementById('gallery-modal-img'); const gCap = document.getElementById('gallery-caption'); const gClose = document.getElementById('close-gallery-modal'); fetch('gallery.json').then(r => r.json()).then(data => { galleryGrid.innerHTML = ''; (data.images || []).forEach(img => { const div = document.createElement('div'); div.className = 'gallery-item'; div.innerHTML = `<img src="${img.src}" alt="${img.caption || ''}">`; div.onclick = () => { gImg.src = img.src; gCap.innerText = img.caption || ''; gModal.classList.add('visible'); }; galleryGrid.appendChild(div); }); }).catch(() => {}); if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target===gModal) gModal.classList.remove('visible'); }; } }
@@ -430,7 +441,7 @@ document.addEventListener('DOMContentLoaded', () => {
         swup.hooks.on('page:view', () => { safeRun(initAllScripts); });
     }
 
-    // ... (Click listeners remain same) ...
+    // ... (Click Listeners) ...
     document.addEventListener('click', (e) => {
         if (e.target.closest('.modal-close-btn') || e.target.classList.contains('modal-overlay')) {
             document.querySelectorAll('.modal-overlay.visible').forEach(m => m.classList.remove('visible'));
@@ -655,10 +666,12 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats found matching your criteria.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; 
     
-    // AUTO-PAYHIP FIX FOR BEATS
+    // AUTO-PAYHIP FIX FOR BEATS (Final Regex Version)
     let buyBtnHtml = `<a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a>`;
     const prodId = getPayhipID(b.checkoutUrl);
+    
     if(prodId) {
+        // Τώρα βάζουμε το ID καθαρό
         buyBtnHtml = `<a href="${b.checkoutUrl}" data-product="${prodId}" class="btn btn-accent payhip-buy-button">${b.price} | BUY</a>`;
     }
 
