@@ -41,8 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- PAYHIP MANUAL OVERRIDE (THE FINAL FIX) ---
-    // Φορτώνουμε το script του Payhip ΜΙΑ φορά.
+    // --- PAYHIP MANUAL OVERRIDE (CART MODE) ---
     function loadPayhipBase() {
         if (!document.querySelector('script[src*="payhip.js"]')) {
             const script = document.createElement('script');
@@ -54,40 +53,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadPayhipBase();
 
-    // Helper: Βγάζει το ID (π.χ. fSD16)
+    // Helper: Βγάζει το ID
     function getPayhipID(url) {
         if (!url) return null;
         const match = url.match(/\/b\/([a-zA-Z0-9]+)/);
         return match ? match[1] : null;
     }
 
-    // Ο "Φύλακας": Πιάνει το κλικ
+    // Ο "Φύλακας" - CART VERSION
     document.addEventListener('click', function(e) {
-        // Ελέγχουμε αν πατήθηκε κουμπί Payhip
         const btn = e.target.closest('.payhip-buy-button');
         
         if (btn) {
-            // STOP EVERYTHING: Μην κάνεις redirect!
-            e.preventDefault();
+            e.preventDefault(); 
             e.stopPropagation();
 
-            const fullUrl = btn.href;
-            const productId = getPayhipID(fullUrl); // Παίρνουμε ΜΟΝΟ τον κωδικό (fSD16)
+            const productLink = btn.href; 
             
-            // Έλεγχος αν υπάρχει το Payhip library
-            if (typeof Payhip !== 'undefined' && Payhip.Checkout) {
-                console.log("Opening Payhip for ID:", productId);
-                
-                // Η ΔΙΟΡΘΩΣΗ: Δίνουμε 'product' αντί για 'link'
-                if (productId) {
-                    Payhip.Checkout.open({ product: productId });
-                } else {
-                    Payhip.Checkout.open({ link: fullUrl }); // Fallback
-                }
-
+            if (typeof Payhip !== 'undefined' && Payhip.Cart) {
+                console.log("Adding to Payhip Cart:", productLink);
+                // Η ΜΕΓΑΛΗ ΑΛΛΑΓΗ: Cart.add αντι για Checkout.open
+                Payhip.Cart.add(productLink);
             } else {
-                // Fallback αν δεν έχει φορτώσει ακόμα το script
-                window.open(fullUrl, '_blank');
+                // Fallback αν δεν φόρτωσε
+                window.open(productLink, '_blank');
             }
         }
     }, true); 
@@ -235,7 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if(data.dropBuy) {
                                     const prodId = getPayhipID(data.dropBuy);
                                     if(prodId) {
-                                        // data-no-swup prevents Swup from hijacking the link
                                         btnsHtml += `<a href="${data.dropBuy}" data-product="${prodId}" data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
                                     } else {
                                         btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
