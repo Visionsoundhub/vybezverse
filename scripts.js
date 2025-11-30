@@ -454,3 +454,232 @@ document.addEventListener('DOMContentLoaded', () => {
              if(modal) modal.classList.add('visible'); 
         }
         if (e.target.closest('#all-releases-btn')) {
+            activeReleasesFilters = { genre: 'all', type: 'all' };
+            resetReleaseDropdowns();
+            renderFilteredReleases();
+        }
+    });
+
+    function setupReleaseFilters(genres, types) {
+        const genreList = document.getElementById('genre-options-list');
+        const typeList = document.getElementById('type-options-list');
+        
+        if(genreList) {
+            genreList.innerHTML = '<li data-value="all" class="selected">All Frequencies</li>';
+            genres.forEach(g => { genreList.innerHTML += `<li data-value="${g}">${g}</li>`; });
+        }
+        if(typeList) {
+            typeList.innerHTML = '<li data-value="all" class="selected">All Types</li>';
+            types.forEach(t => { typeList.innerHTML += `<li data-value="${t}">${t}</li>`; });
+        }
+        
+        const filterContainers = [
+            { id: 'custom-releases-genre', type: 'genre' },
+            { id: 'custom-releases-type', type: 'type' }
+        ];
+        
+        filterContainers.forEach(fc => {
+            const container = document.getElementById(fc.id);
+            if (container) {
+                const btn = container.querySelector('.select-btn');
+                const options = container.querySelector('.select-options');
+                const span = btn.querySelector('span');
+                btn.onclick = (e) => { e.stopPropagation(); document.querySelectorAll('.custom-select').forEach(x=>x!==container && x.classList.remove('active')); container.classList.toggle('active'); };
+                options.onclick = (e) => {
+                    if(e.target.tagName === 'LI') {
+                        const val = e.target.getAttribute('data-value');
+                        if (fc.type === 'genre') {
+                            span.textContent = `FREQUENCY: ${e.target.textContent}`;
+                        } else {
+                            span.textContent = `${fc.type.toUpperCase()}: ${e.target.textContent}`;
+                        }
+                        activeReleasesFilters[fc.type] = val;
+                        renderFilteredReleases();
+                        container.classList.remove('active');
+                        options.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+                        e.target.classList.add('selected');
+                    }
+                };
+            }
+        });
+    }
+
+    function renderFilteredReleases() {
+        const container = document.getElementById('releases-list');
+        if(!container) return;
+        let filteredTracks = allReleasesTracks.filter(track => {
+            const genreMatch = activeReleasesFilters.genre === 'all' || 
+                               (track.genre && track.genre.toLowerCase() === activeReleasesFilters.genre.toLowerCase());
+            const typeMatch = activeReleasesFilters.type === 'all' || 
+                              (track.type && track.type.toLowerCase() === activeReleasesFilters.type.toLowerCase());
+            return genreMatch && typeMatch;
+        });
+        container.innerHTML = '';
+        if (filteredTracks.length === 0) {
+            container.innerHTML = '<p style="text-align:center;">No releases found for selected filters.</p>';
+            return;
+        }
+
+        filteredTracks.forEach(track => {
+            const coverImg = track.cover || 'https://via.placeholder.com/150';
+            const streamLink = track.streamUrl || '#'; 
+            const buyLink = track.bundleUrl || '#'; 
+            const ytLink = track.youtubeUrl || '#';
+            const descHtml = track.description ? `<div class="beat-desc">${track.description}</div>` : '';
+            const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>` : '';
+            const metaText = `Available Now / Type: ${track.type || 'Single'} / Frequency: ${track.genre || 'Unknown'}`;
+            
+            // AUTO-PAYHIP FIX FOR RELEASES
+            let buyBtnHtml = `<a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
+            const prodId = getPayhipID(buyLink);
+            if(prodId) {
+                // IMPORTANT: NO TARGET="_BLANK"
+                buyBtnHtml = `<a href="${buyLink}" data-product="${prodId}" data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
+            }
+
+            container.innerHTML += `
+            <div class="beat-row">
+                <div class="beat-art"><img src="${coverImg}" alt="Art"></div>
+                <div class="beat-info"><h4>${track.title || 'Untitled'}</h4>${descHtml}<div class="beat-meta">${metaText}</div></div>
+                <div class="beat-actions">
+                    <a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i> YOUTUBE</a>
+                    <a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM IT</a>
+                    ${buyBtnHtml}
+                    ${downloadBtn}
+                </div>
+            </div>`;
+        });
+    }
+
+    function resetReleaseDropdowns() {
+        const genreSelect = document.getElementById('custom-releases-genre');
+        if(genreSelect) {
+            const btn = genreSelect.querySelector('.select-btn');
+            if(btn) btn.innerHTML = '<span>FREQUENCY: ALL</span><i class="fas fa-chevron-down"></i>';
+            genreSelect.classList.remove('active');
+            genreSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+            const allOpt = genreSelect.querySelector('[data-value="all"]');
+            if(allOpt) allOpt.classList.add('selected');
+        }
+
+        const typeSelect = document.getElementById('custom-releases-type');
+        if(typeSelect) {
+            const btn = typeSelect.querySelector('.select-btn');
+            if(btn) btn.innerHTML = '<span>TYPE: ALL</span><i class="fas fa-chevron-down"></i>';
+            typeSelect.classList.remove('active');
+            typeSelect.querySelectorAll('li').forEach(li => li.classList.remove('selected'));
+            const allOpt = typeSelect.querySelector('[data-value="all"]');
+            if(allOpt) allOpt.classList.add('selected');
+        }
+    }
+
+    window.openProductModal = function(index) {
+        if(!window.loadedProducts || !window.loadedProducts[index]) return;
+        const prod = window.loadedProducts[index];
+        const modal = document.getElementById('product-modal');
+        document.getElementById('prod-title').textContent = prod.name;
+        document.getElementById('prod-price').textContent = prod.price;
+        document.getElementById('prod-desc').innerHTML = prod.description ? prod.description.replace(/\n/g, '<br>') : '';
+        
+        const buyBtn = document.getElementById('prod-buy-btn');
+        buyBtn.href = prod.link || '#';
+        
+        // AUTO-PAYHIP FIX FOR STORE
+        const prodId = getPayhipID(prod.link);
+        if(prodId) {
+            buyBtn.setAttribute('data-product', prodId);
+            buyBtn.classList.add('payhip-buy-button');
+            buyBtn.setAttribute('data-no-swup', ''); 
+            buyBtn.removeAttribute('target'); 
+        } else {
+            buyBtn.removeAttribute('data-product');
+            buyBtn.classList.remove('payhip-buy-button');
+            buyBtn.removeAttribute('data-no-swup');
+            buyBtn.setAttribute('target', '_blank');
+        }
+
+        const mainImg = document.getElementById('prod-main-img');
+        mainImg.src = prod.image;
+        const thumbsCont = document.getElementById('prod-thumbnails');
+        thumbsCont.innerHTML = '';
+        if (prod.gallery && prod.gallery.length > 0) {
+            let allImages = [prod.image, ...prod.gallery.map(g => g.img)];
+            allImages.forEach(imgSrc => {
+                const thumb = document.createElement('div'); thumb.className = 'prod-thumb'; thumb.innerHTML = `<img src="${imgSrc}">`;
+                thumb.onclick = () => { mainImg.src = imgSrc; document.querySelectorAll('.prod-thumb').forEach(t => t.classList.remove('active')); thumb.classList.add('active'); };
+                thumbsCont.appendChild(thumb);
+            });
+            thumbsCont.firstElementChild.classList.add('active');
+        }
+        modal.classList.add('visible');
+    };
+
+    window.shareBeat = function(title) { const slug = slugify(title); const shareUrl = `${window.location.origin}${window.location.pathname}?beat=${slug}`; navigator.clipboard.writeText(shareUrl).then(() => { let feedback = document.getElementById('copy-feedback'); if(!feedback) { feedback = document.createElement('div'); feedback.id = 'copy-feedback'; feedback.className = 'copy-feedback'; feedback.innerText = 'LINK COPIED! 📋'; document.body.appendChild(feedback); } feedback.classList.add('show'); setTimeout(() => feedback.classList.remove('show'), 2000); }); };
+    window.playTrack = function(url, title, cover, index) { if (audio.src === window.location.origin + url || audio.src === url) { if(audio.paused) { audio.play(); window.isPlaying=true; } else { audio.pause(); window.isPlaying=false; } } else { window.currentIndex = index; audio.src = url; const titleEl = document.getElementById('player-track-title'); if(titleEl) titleEl.textContent = title; if(cover) { window.currentCover = cover; restoreHeroArt(); } audio.play(); window.isPlaying = true; } updateUIState(); checkPlayerVisibility(); };
+
+    function safeRun(fn) { try { fn(); } catch(e) { console.error("Script Error:", e); } }
+    function getYoutubeId(url) { if(!url) return null; const m = url.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/); return (m && m[2].length === 11) ? m[2] : null; }
+    function slugify(text) { return text.toString().toLowerCase().replace(/\s+/g, '-').replace(/[^\w\-]+/g, '').replace(/\-\-+/g, '-').replace(/^-+/, '').replace(/-+$/, ''); }
+    function playTrackByIndex(idx) { if(idx >= 0 && idx < window.currentPlaylist.length) { const t = window.currentPlaylist[idx]; const cov = t.cover || 'https://via.placeholder.com/100'; window.playTrack(t.audioSrc, t.title, cov, idx); } }
+    function restoreHeroArt() { const hero = document.getElementById('hero-beat-art'); const img = document.getElementById('hero-beat-img'); if(hero && img && window.currentCover) { img.src = window.currentCover; hero.classList.add('visible'); } }
+    function updateUIState() { const pBtn = document.getElementById('player-play-btn'); if(pBtn) pBtn.innerHTML = window.isPlaying ? '<i class="fas fa-pause"></i>' : '<i class="fas fa-play"></i>'; document.querySelectorAll('.beat-play-overlay i').forEach(i => i.className = 'fas fa-play'); const active = document.getElementById(`beat-icon-${window.currentIndex}`); if(active) active.className = window.isPlaying ? 'fas fa-pause' : 'fas fa-play'; }
+    function checkPlayerVisibility() { const stick = document.getElementById('sticky-player'); if(!stick) return; const isBeats = window.location.pathname.includes('beats.html'); if(isBeats || window.isPlaying || (audio.src && audio.src !== '')) stick.classList.add('player-visible'); else stick.classList.remove('player-visible'); }
+    function setupCustomDropdowns(allBeats) { 
+        const drops = document.querySelectorAll('.custom-select'); 
+        drops.forEach(d => { 
+            const btn = d.querySelector('.select-btn'); 
+            const list = d.querySelector('.select-options'); 
+            const span = btn.querySelector('span'); 
+            btn.onclick = (e) => { e.stopPropagation(); drops.forEach(x=>x!==d && x.classList.remove('active')); d.classList.toggle('active'); }; 
+            list.onclick = (e) => { 
+                if(e.target.tagName === 'LI') { 
+                    const val = e.target.getAttribute('data-value'); 
+                    span.textContent = `${d.id.split('-')[1].toUpperCase()}: ${e.target.textContent}`; 
+                    if(d.id==='custom-genre') activeFilters.genre=val; 
+                    if(d.id==='custom-bpm') activeFilters.bpm=val; 
+                    if(d.id==='custom-key') activeFilters.key=val; 
+                    const filtered = allBeats.filter(b => { 
+                        const g = activeFilters.genre==='all' || (b.category && b.category.toLowerCase()===activeFilters.genre.toLowerCase()); 
+                        const bKey = b.key || b.Key; 
+                        const k = activeFilters.key==='all' || (bKey === activeFilters.key); 
+                        let bpm = true; 
+                        if(activeFilters.bpm!=='all' && b.bpm) { 
+                            const [min,max] = activeFilters.bpm.split('-').map(Number); 
+                            bpm = Number(b.bpm)>=min && Number(b.bpm)<=max; 
+                        } 
+                        return g && k && bpm; 
+                    }); 
+                    window.currentPlaylist = filtered; 
+                    renderBeats(filtered); 
+                    d.classList.remove('active'); 
+                } 
+            } 
+        }); 
+        document.onclick = (e) => { if(!e.target.closest('.custom-select')) drops.forEach(d=>d.classList.remove('active')); }; 
+    }
+    
+    function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats found matching your criteria.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; 
+    
+    // AUTO-PAYHIP FIX FOR BEATS (Final Regex Version)
+    let buyBtnHtml = `<a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a>`;
+    const prodId = getPayhipID(b.checkoutUrl);
+    
+    if(prodId) {
+        // IMPORTANT: NO TARGET="_BLANK" and Added data-no-swup
+        buyBtnHtml = `<a href="${b.checkoutUrl}" data-product="${prodId}" data-no-swup class="btn btn-accent payhip-buy-button">${b.price} | BUY</a>`;
+    }
+
+    cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button>${buyBtnHtml}</div></div>`; }); 
+    }
+    
+    function updateMenuState() {
+        const path = window.location.pathname.split('/').pop() || 'index.html';
+        document.querySelectorAll('.nav-btn').forEach(l => {
+            const href = l.getAttribute('href'); 
+            if (href) { 
+                if(href.includes(path)) l.classList.add('active');
+                else l.classList.remove('active');
+            }
+        });
+    }
+});
