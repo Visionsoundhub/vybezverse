@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 0. PRELOADER ---
+    // --- 0. SAFETY FIRST: PRELOADER ---
     const preloader = document.getElementById('neuro-preloader');
     const preloaderText = document.getElementById('neuro-text');
 
@@ -41,26 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- SIMPLE REDIRECT LOGIC (NO POPUP) ---
-    // Αυτός ο κώδικας πιάνει το κλικ και σε στέλνει στο Payhip
-    document.addEventListener('click', function(e) {
-        // Ελέγχουμε αν πατήθηκε κουμπί με την κλάση payhip-buy-button
-        const btn = e.target.closest('.payhip-buy-button');
-        
-        if (btn) {
-            // Σταματάμε το Swup και την κανονική ροή
-            e.preventDefault();
-            e.stopPropagation();
-
-            const productLink = btn.href;
-            console.log("Redirecting to Payhip:", productLink);
-            
-            // Απλή μετάβαση στη σελίδα του Payhip (100% λειτουργικό)
-            window.location.href = productLink;
-        }
-    }, true); 
-
-    // --- 2. POP-UP SYSTEM (PROMO ONLY) ---
+    // --- 2. POP-UP SYSTEM ---
     function renderPopup() {
         const path = window.location.pathname;
         let jsonFile = '';
@@ -82,11 +63,14 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(r => r.json())
             .then(data => {
                 if (!data.active) return;
+
                 const overlay = document.createElement('div');
                 overlay.className = 'modal-overlay visible'; 
                 overlay.style.zIndex = '100000'; 
                 overlay.id = 'promo-popup';
+
                 const imgHtml = data.image ? `<img src="${data.image}" style="width:100%; max-height:200px; object-fit:cover; border-radius:12px; margin-bottom:1rem; border:1px solid rgba(255,255,255,0.1);">` : '';
+
                 overlay.innerHTML = `
                     <div class="modal-box" style="max-width:400px; text-align:center; border: 1px solid #8a2be2; box-shadow: 0 0 50px rgba(138,43,226,0.4);">
                         <button class="modal-close-btn" id="close-promo-popup">&times;</button>
@@ -96,26 +80,46 @@ document.addEventListener('DOMContentLoaded', () => {
                         <a href="${data.btnLink}" class="btn btn-accent" style="width:100%; justify-content:center; font-size:1.1rem; padding:1rem;">${data.btnText}</a>
                     </div>
                 `;
+
                 document.body.appendChild(overlay);
-                document.getElementById('close-promo-popup').onclick = () => { overlay.remove(); sessionStorage.setItem(storageKey, 'true'); };
-                overlay.onclick = (e) => { if (e.target === overlay) { overlay.remove(); sessionStorage.setItem(storageKey, 'true'); } };
+
+                document.getElementById('close-promo-popup').onclick = () => {
+                    overlay.remove();
+                    sessionStorage.setItem(storageKey, 'true');
+                };
+                
+                overlay.onclick = (e) => {
+                    if (e.target === overlay) {
+                        overlay.remove();
+                        sessionStorage.setItem(storageKey, 'true');
+                    }
+                };
             })
             .catch(e => console.log('Popup info:', e));
     }
 
-    // --- 3. NEWSLETTER ---
+    // --- 3. NEWSLETTER FUNCTION (ΔΙΟΡΘΩΜΕΝΗ ΓΙΑ LIVE UPDATE) ---
     function renderNewsletter() {
         const footer = document.getElementById('dynamic-footer');
         const existingSection = document.getElementById('newsletter-section');
         const currentPath = window.location.pathname || 'home';
+
+        // ΑΝ Η ΦΟΡΜΑ ΥΠΑΡΧΕΙ ΗΔΗ, ΑΠΛΑ ΕΝΗΜΕΡΩΣΕ ΤΟ SOURCE PAGE ΚΑΙ ΜΗΝ ΤΗΝ ΞΑΝΑΦΤΙΑΞΕΙΣ
         if (existingSection) {
             const sourceInput = existingSection.querySelector('input[name="source_page"]');
-            if (sourceInput) sourceInput.value = currentPath; 
+            if (sourceInput) {
+                sourceInput.value = currentPath; // Ενημέρωση της τρέχουσας σελίδας
+            }
             return; 
         }
+
         if (!footer) return;
+
         fetch('newsletter.json?t=' + new Date().getTime())
-            .then(r => { if (!r.ok) throw new Error("Newsletter config not found"); return r.json(); })
+            .then(r => {
+                if (!r.ok) throw new Error("Newsletter config not found");
+                return r.json();
+            })
             .then(data => {
                 const section = document.createElement('section');
                 section.id = 'newsletter-section';
@@ -124,12 +128,15 @@ document.addEventListener('DOMContentLoaded', () => {
                 section.style.textAlign = 'center';
                 section.style.position = 'relative';
                 section.style.zIndex = '500';
+
                 section.innerHTML = `
                     <h2 style="margin-bottom:0.5rem; letter-spacing:2px; color:#fff;">${data.title || 'NEWSLETTER'}</h2>
                     <p style="color:#aaa; margin-bottom:1.5rem;">${data.subtitle || 'Stay Tuned.'}</p>
+                    
                     <form name="newsletter_vibe" method="POST" data-netlify="true" id="vibe-form" style="max-width:500px; margin:0 auto;">
                         <input type="hidden" name="form-name" value="newsletter_vibe" />
                         <input type="hidden" name="source_page" value="${currentPath}" />
+                        
                         <div style="text-align:left; width:100%; margin-bottom:1rem;">
                             <label style="color:#8a2be2; font-size:0.75rem; font-weight:bold; margin-left:5px; display:block; margin-bottom:5px; letter-spacing:1px;">SELECT FREQUENCY:</label>
                             <div style="position:relative;">
@@ -141,22 +148,36 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <i class="fas fa-chevron-down" style="position:absolute; right:15px; top:50%; transform:translateY(-50%); color:#8a2be2; pointer-events:none;"></i>
                             </div>
                         </div>
+
                         <div style="display:flex; gap:10px; margin-top:1rem;">
                             <input type="email" name="email" placeholder="${data.placeholder || 'Email...'}" required 
                                 style="flex-grow:1; padding:0.8rem; border-radius:8px; border:1px solid rgba(255,255,255,0.2); background:rgba(0,0,0,0.5); color:#fff; font-family:'Inter', sans-serif;">
+                            
                             <button type="submit" class="btn btn-accent">${data.btnText || 'SUBSCRIBE'}</button>
                         </div>
                     </form>
                     <div id="form-feedback" style="margin-top:1rem; color:#8a2be2; font-weight:bold; display:none;">SIGNAL RECEIVED. YOU ARE TUNED IN. 📶</div>
                 `;
-                if(footer.parentNode) footer.parentNode.insertBefore(section, footer);
+
+                if(footer.parentNode) {
+                    footer.parentNode.insertBefore(section, footer);
+                }
+
                 const form = document.getElementById('vibe-form');
                 if(form) {
                     form.addEventListener('submit', (e) => {
                         e.preventDefault();
                         const formData = new FormData(form);
-                        fetch('/', { method: 'POST', headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: new URLSearchParams(formData).toString() })
-                        .then(() => { form.style.display = 'none'; const feed = document.getElementById('form-feedback'); if(feed) feed.style.display = 'block'; })
+                        fetch('/', {
+                            method: 'POST',
+                            headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                            body: new URLSearchParams(formData).toString()
+                        })
+                        .then(() => {
+                            form.style.display = 'none';
+                            const feed = document.getElementById('form-feedback');
+                            if(feed) feed.style.display = 'block';
+                        })
                         .catch((error) => console.error(error));
                     });
                 }
@@ -198,18 +219,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             if(dropBtns) {
                                 let btnsHtml = '';
                                 if(data.dropStream) btnsHtml += `<a href="${data.dropStream}" target="_blank" class="btn btn-outline">STREAM IT</a>`;
-                                
-                                // Home Button
-                                if(data.dropBuy) {
-                                    btnsHtml += `<a href="${data.dropBuy}" class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
-                                }
-
+                                if(data.dropBuy) btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
                                 if(data.dropFree) btnsHtml += `<a href="${data.dropFree}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>`;
                                 dropBtns.innerHTML = btnsHtml;
                             }
                         }
                     }
-                    // ... (rest of home logic) ...
                     const annCont = document.getElementById('home-announcement-container');
                     const annIframe = document.getElementById('announcement-iframe');
                     const annText = document.getElementById('announcement-text');
@@ -258,7 +273,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     setupReleaseFilters(uniqueGenres, uniqueTypes);
                     renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
-                
+
                 const relTitle = document.getElementById('releases-title');
                 const allBtn = document.getElementById('all-releases-btn');
                 const whyBtn = document.getElementById('why-buy-text');
@@ -407,7 +422,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // OTHER PAGES (Bio, Gallery etc) ... (same logic)
+        // OTHER PAGES
         safeRun(() => {
             const bioContainer = document.getElementById('bio-container'); if (bioContainer) { fetch('bio.json').then(r => r.ok ? r.json() : Promise.reject()).then(data => { const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...'; if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title; bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${data.image}" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`; }).catch(() => {}); }
             const galleryGrid = document.getElementById('gallery-grid'); if(galleryGrid && !document.getElementById('merch-grid')) { const gModal = document.getElementById('gallery-modal'); const gImg = document.getElementById('gallery-modal-img'); const gCap = document.getElementById('gallery-caption'); const gClose = document.getElementById('close-gallery-modal'); fetch('gallery.json').then(r => r.json()).then(data => { galleryGrid.innerHTML = ''; (data.images || []).forEach(img => { const div = document.createElement('div'); div.className = 'gallery-item'; div.innerHTML = `<img src="${img.src}" alt="${img.caption || ''}">`; div.onclick = () => { gImg.src = img.src; gCap.innerText = img.caption || ''; gModal.classList.add('visible'); }; galleryGrid.appendChild(div); }); }).catch(() => {}); if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target===gModal) gModal.classList.remove('visible'); }; } }
@@ -476,7 +491,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 const btn = container.querySelector('.select-btn');
                 const options = container.querySelector('.select-options');
                 const span = btn.querySelector('span');
+
                 btn.onclick = (e) => { e.stopPropagation(); document.querySelectorAll('.custom-select').forEach(x=>x!==container && x.classList.remove('active')); container.classList.toggle('active'); };
+                
                 options.onclick = (e) => {
                     if(e.target.tagName === 'LI') {
                         const val = e.target.getAttribute('data-value');
@@ -499,6 +516,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function renderFilteredReleases() {
         const container = document.getElementById('releases-list');
         if(!container) return;
+        
         let filteredTracks = allReleasesTracks.filter(track => {
             const genreMatch = activeReleasesFilters.genre === 'all' || 
                                (track.genre && track.genre.toLowerCase() === activeReleasesFilters.genre.toLowerCase());
@@ -506,6 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
                               (track.type && track.type.toLowerCase() === activeReleasesFilters.type.toLowerCase());
             return genreMatch && typeMatch;
         });
+        
         container.innerHTML = '';
         if (filteredTracks.length === 0) {
             container.innerHTML = '<p style="text-align:center;">No releases found for selected filters.</p>';
@@ -520,14 +539,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const descHtml = track.description ? `<div class="beat-desc">${track.description}</div>` : '';
             const downloadBtn = track.downloadUrl ? `<a href="${track.downloadUrl}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>` : '';
             const metaText = `Available Now / Type: ${track.type || 'Single'} / Frequency: ${track.genre || 'Unknown'}`;
-            
-            // AUTO-PAYHIP FIX FOR RELEASES
-            let buyBtnHtml = `<a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
-            const prodId = getPayhipID(buyLink);
-            if(prodId) {
-                // IMPORTANT: class payhip-buy-button + link to be intercepted
-                buyBtnHtml = `<a href="${buyLink}" data-product="${prodId}" class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
-            }
 
             container.innerHTML += `
             <div class="beat-row">
@@ -536,7 +547,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <div class="beat-actions">
                     <a href="${ytLink}" target="_blank" class="btn btn-accent play-round"><i class="fab fa-youtube"></i> YOUTUBE</a>
                     <a href="${streamLink}" target="_blank" class="btn btn-outline">STREAM IT</a>
-                    ${buyBtnHtml}
+                    <a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>
                     ${downloadBtn}
                 </div>
             </div>`;
@@ -572,20 +583,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('prod-title').textContent = prod.name;
         document.getElementById('prod-price').textContent = prod.price;
         document.getElementById('prod-desc').innerHTML = prod.description ? prod.description.replace(/\n/g, '<br>') : '';
-        
-        const buyBtn = document.getElementById('prod-buy-btn');
-        buyBtn.href = prod.link || '#';
-        
-        // AUTO-PAYHIP FIX FOR STORE
-        const prodId = getPayhipID(prod.link);
-        if(prodId) {
-            buyBtn.setAttribute('data-product', prodId);
-            buyBtn.classList.add('payhip-buy-button');
-        } else {
-            buyBtn.removeAttribute('data-product');
-            buyBtn.classList.remove('payhip-buy-button');
-        }
-
+        document.getElementById('prod-buy-btn').href = prod.link || '#';
         const mainImg = document.getElementById('prod-main-img');
         mainImg.src = prod.image;
         const thumbsCont = document.getElementById('prod-thumbnails');
@@ -618,14 +616,22 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = d.querySelector('.select-btn'); 
             const list = d.querySelector('.select-options'); 
             const span = btn.querySelector('span'); 
-            btn.onclick = (e) => { e.stopPropagation(); drops.forEach(x=>x!==d && x.classList.remove('active')); d.classList.toggle('active'); }; 
+            
+            btn.onclick = (e) => { 
+                e.stopPropagation(); 
+                drops.forEach(x=>x!==d && x.classList.remove('active')); 
+                d.classList.toggle('active'); 
+            }; 
+            
             list.onclick = (e) => { 
                 if(e.target.tagName === 'LI') { 
                     const val = e.target.getAttribute('data-value'); 
                     span.textContent = `${d.id.split('-')[1].toUpperCase()}: ${e.target.textContent}`; 
+                    
                     if(d.id==='custom-genre') activeFilters.genre=val; 
                     if(d.id==='custom-bpm') activeFilters.bpm=val; 
                     if(d.id==='custom-key') activeFilters.key=val; 
+                    
                     const filtered = allBeats.filter(b => { 
                         const g = activeFilters.genre==='all' || (b.category && b.category.toLowerCase()===activeFilters.genre.toLowerCase()); 
                         const bKey = b.key || b.Key; 
@@ -637,29 +643,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         } 
                         return g && k && bpm; 
                     }); 
+                    
                     window.currentPlaylist = filtered; 
                     renderBeats(filtered); 
                     d.classList.remove('active'); 
                 } 
             } 
         }); 
+        
         document.onclick = (e) => { if(!e.target.closest('.custom-select')) drops.forEach(d=>d.classList.remove('active')); }; 
     }
     
-    function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats found matching your criteria.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; 
+    function renderBeats(beats) { const cont = document.getElementById('beat-store-list'); if(!cont) return; cont.innerHTML = ''; if(beats.length===0) { cont.innerHTML='<p style="text-align:center;">No beats found matching your criteria.</p>'; return; } beats.forEach((b, i) => { const safeTitle = b.title.replace(/'/g, "\\'"); const slug = slugify(b.title); const img = b.cover || 'https://via.placeholder.com/100'; cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button><a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a></div></div>`; }); }
     
-    // AUTO-PAYHIP FIX FOR BEATS (Final Regex Version)
-    let buyBtnHtml = `<a href="${b.checkoutUrl}" target="_blank" class="btn btn-accent">${b.price} | BUY</a>`;
-    const prodId = getPayhipID(b.checkoutUrl);
-    
-    if(prodId) {
-        // IMPORTANT: class payhip-buy-button + link to be intercepted
-        buyBtnHtml = `<a href="${b.checkoutUrl}" data-product="${prodId}" class="btn btn-accent payhip-buy-button">${b.price} | BUY</a>`;
-    }
-
-    cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button>${buyBtnHtml}</div></div>`; }); 
-    }
-    
+    // --- EDITED FOR SAFETY (FIX FOR NULL HREF) ---
     function updateMenuState() {
         const path = window.location.pathname.split('/').pop() || 'index.html';
         document.querySelectorAll('.nav-btn').forEach(l => {
