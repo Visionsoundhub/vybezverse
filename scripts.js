@@ -41,8 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- PAYHIP MANUAL OVERRIDE (THE FIX) ---
-    // 1. Φορτώνουμε το script του Payhip ΜΙΑ φορά στην αρχή.
+    // --- PAYHIP MANUAL OVERRIDE (FIXED DATA PASSING) ---
     function loadPayhipBase() {
         if (!document.querySelector('script[src*="payhip.js"]')) {
             const script = document.createElement('script');
@@ -54,33 +53,27 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     loadPayhipBase();
 
-    // 2. Ο "Φύλακας": Πιάνει το κλικ ΠΡΙΝ φύγει ο browser
+    // Ο "Φύλακας" - Διορθωμένος
     document.addEventListener('click', function(e) {
-        // Ελέγχουμε αν πατήθηκε κουμπί Payhip
         const btn = e.target.closest('.payhip-buy-button');
         
         if (btn) {
-            // STOP EVERYTHING: Μην κάνεις redirect!
-            e.preventDefault();
+            e.preventDefault(); // Stop redirect
             e.stopPropagation();
 
-            const productLink = btn.href;
+            const productLink = btn.href; // Αυτό είναι το https://payhip.com/b/XXXX
             
-            // Έλεγχος αν υπάρχει το Payhip library
             if (typeof Payhip !== 'undefined' && Payhip.Checkout) {
-                console.log("Opening Payhip Popup manually...");
-                Payhip.Checkout.open({
-                    link: productLink
-                });
+                console.log("Opening Payhip Popup for:", productLink);
+                // Η ΑΛΛΑΓΗ ΕΙΝΑΙ ΕΔΩ: Περνάμε το link απευθείας, όχι μέσα σε { }
+                Payhip.Checkout.open(productLink); 
             } else {
-                // Fallback αν δεν έχει φορτώσει ακόμα το script
-                console.warn("Payhip script not ready yet, loading fallback...");
                 window.open(productLink, '_blank');
             }
         }
-    }, true); // Use Capture phase to be faster than Swup
+    }, true); 
 
-    // Helper: Βγάζει το ID (χρήσιμο για το data attribute)
+    // Helper: Βγάζει το ID
     function getPayhipID(url) {
         if (!url) return null;
         const match = url.match(/\/b\/([a-zA-Z0-9]+)/);
@@ -559,7 +552,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let buyBtnHtml = `<a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
             const prodId = getPayhipID(buyLink);
             if(prodId) {
-                // IMPORTANT: class payhip-buy-button + link to be intercepted
+                // IMPORTANT: NO TARGET="_BLANK"
                 buyBtnHtml = `<a href="${buyLink}" data-product="${prodId}" data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
             }
 
