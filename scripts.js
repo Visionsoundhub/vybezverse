@@ -41,26 +41,19 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- PAYHIP CART LOGIC ---
-    // 1. Φορτώνουμε το Payhip
+    // --- PAYHIP LOGIC (DIRECT PURCHASE) ---
+    // 1. Φόρτωμα βιβλιοθήκης
     (function loadPayhip() {
         if (!document.querySelector('script[src*="payhip.js"]')) {
             const script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = 'https://payhip.com/payhip.js';
             document.body.appendChild(script);
-            console.log("Payhip Library Injected.");
+            console.log("Payhip Loaded.");
         }
     })();
 
-    // 2. Helper για το ID
-    function getPayhipID(url) {
-        if (!url) return null;
-        const match = url.match(/\/b\/([a-zA-Z0-9]+)/);
-        return match ? match[1] : null;
-    }
-
-    // 3. Ο Φύλακας του Κλικ (Cart Edition)
+    // 2. Ο Φύλακας που δούλεψε
     document.addEventListener('click', function(e) {
         const btn = e.target.closest('.payhip-buy-button');
         
@@ -70,23 +63,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const productLink = btn.href; 
             
-            // ΠΡΟΣΠΑΘΕΙΑ 1: Προσθήκη στο ΚΑΛΑΘΙ
-            if (typeof Payhip !== 'undefined' && Payhip.Cart) {
-                console.log("Adding to Cart:", productLink);
-                Payhip.Cart.add(productLink); 
-            } 
-            // ΠΡΟΣΠΑΘΕΙΑ 2: Αν δεν υπάρχει Cart, άνοιξε Checkout (Backup)
-            else if (typeof Payhip !== 'undefined' && Payhip.Checkout) {
-                console.log("Cart not ready, opening Checkout:", productLink);
-                Payhip.Checkout.open(productLink);
-            }
-            // ΠΡΟΣΠΑΘΕΙΑ 3: Αν όλα αποτύχουν, Redirect (για να μην χαθεί το κλικ)
-            else {
-                console.warn("Payhip loading... redirecting fallback.");
+            // Ανοίγει απευθείας το Checkout (Αυτό που πέτυχε)
+            if (typeof Payhip !== 'undefined' && Payhip.Checkout) {
+                Payhip.Checkout.open(productLink); 
+            } else {
                 window.open(productLink, '_blank');
             }
         }
     }, true); 
+
+    // Helper: Βγάζει το ID
+    function getPayhipID(url) {
+        if (!url) return null;
+        const match = url.match(/\/b\/([a-zA-Z0-9]+)/);
+        return match ? match[1] : null;
+    }
 
     // --- 2. POP-UP SYSTEM ---
     function renderPopup() {
@@ -227,11 +218,10 @@ document.addEventListener('DOMContentLoaded', () => {
                                 let btnsHtml = '';
                                 if(data.dropStream) btnsHtml += `<a href="${data.dropStream}" target="_blank" class="btn btn-outline">STREAM IT</a>`;
                                 
-                                // AUTO-PAYHIP FIX FOR HOME
+                                // AUTO-PAYHIP
                                 if(data.dropBuy) {
                                     const prodId = getPayhipID(data.dropBuy);
                                     if(prodId) {
-                                        // NO TARGET BLANK, ADD PAYHIP CLASS
                                         btnsHtml += `<a href="${data.dropBuy}" data-product="${prodId}" data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
                                     } else {
                                         btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
@@ -243,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     }
-                    // ... (rest of home logic) ...
+                    // ... (Home continues) ...
                     const annCont = document.getElementById('home-announcement-container');
                     const annIframe = document.getElementById('announcement-iframe');
                     const annText = document.getElementById('announcement-text');
