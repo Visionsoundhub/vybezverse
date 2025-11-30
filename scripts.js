@@ -41,39 +41,53 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- PAYHIP LOGIC (DIRECT PURCHASE - WORKING VERSION) ---
+    // --- PAYHIP MANUAL OVERRIDE (THE FINAL FIX) ---
+    // Φορτώνουμε το script του Payhip ΜΙΑ φορά.
     function loadPayhipBase() {
         if (!document.querySelector('script[src*="payhip.js"]')) {
             const script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = 'https://payhip.com/payhip.js';
             document.body.appendChild(script);
-            console.log("Payhip Loaded.");
+            console.log("Payhip Base Loaded.");
         }
     }
     loadPayhipBase();
 
+    // Helper: Βγάζει το ID (π.χ. fSD16)
     function getPayhipID(url) {
         if (!url) return null;
         const match = url.match(/\/b\/([a-zA-Z0-9]+)/);
         return match ? match[1] : null;
     }
 
-    // Ο Φύλακας που δούλεψε
+    // Ο "Φύλακας": Πιάνει το κλικ
     document.addEventListener('click', function(e) {
+        // Ελέγχουμε αν πατήθηκε κουμπί Payhip
         const btn = e.target.closest('.payhip-buy-button');
         
         if (btn) {
-            e.preventDefault(); 
+            // STOP EVERYTHING: Μην κάνεις redirect!
+            e.preventDefault();
             e.stopPropagation();
 
-            const productLink = btn.href; 
+            const fullUrl = btn.href;
+            const productId = getPayhipID(fullUrl); // Παίρνουμε ΜΟΝΟ τον κωδικό (fSD16)
             
-            // Ανοίγει απευθείας το Checkout (Αυτό που πέτυχε)
+            // Έλεγχος αν υπάρχει το Payhip library
             if (typeof Payhip !== 'undefined' && Payhip.Checkout) {
-                Payhip.Checkout.open(productLink); 
+                console.log("Opening Payhip for ID:", productId);
+                
+                // Η ΔΙΟΡΘΩΣΗ: Δίνουμε 'product' αντί για 'link'
+                if (productId) {
+                    Payhip.Checkout.open({ product: productId });
+                } else {
+                    Payhip.Checkout.open({ link: fullUrl }); // Fallback
+                }
+
             } else {
-                window.open(productLink, '_blank');
+                // Fallback αν δεν έχει φορτώσει ακόμα το script
+                window.open(fullUrl, '_blank');
             }
         }
     }, true); 
@@ -221,6 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if(data.dropBuy) {
                                     const prodId = getPayhipID(data.dropBuy);
                                     if(prodId) {
+                                        // data-no-swup prevents Swup from hijacking the link
                                         btnsHtml += `<a href="${data.dropBuy}" data-product="${prodId}" data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
                                     } else {
                                         btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
@@ -282,6 +297,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
                 
+                // ... (settings fetches) ...
                 const relTitle = document.getElementById('releases-title');
                 const allBtn = document.getElementById('all-releases-btn');
                 const whyBtn = document.getElementById('why-buy-text');
@@ -548,7 +564,7 @@ document.addEventListener('DOMContentLoaded', () => {
             let buyBtnHtml = `<a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
             const prodId = getPayhipID(buyLink);
             if(prodId) {
-                // IMPORTANT: class payhip-buy-button + link to be intercepted
+                // IMPORTANT: NO TARGET="_BLANK"
                 buyBtnHtml = `<a href="${buyLink}" data-product="${prodId}" data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
             }
 
