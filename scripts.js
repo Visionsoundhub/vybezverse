@@ -41,43 +41,24 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- PAYHIP MANUAL OVERRIDE (FIXED DATA PASSING) ---
-    function loadPayhipBase() {
-        if (!document.querySelector('script[src*="payhip.js"]')) {
-            const script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = 'https://payhip.com/payhip.js';
-            document.body.appendChild(script);
-            console.log("Payhip Base Loaded.");
-        }
-    }
-    loadPayhipBase();
-
-    // Ο "Φύλακας" - Διορθωμένος
-    document.addEventListener('click', function(e) {
-        const btn = e.target.closest('.payhip-buy-button');
-        
-        if (btn) {
-            e.preventDefault(); // Stop redirect
-            e.stopPropagation();
-
-            const productLink = btn.href; // Αυτό είναι το https://payhip.com/b/XXXX
-            
-            if (typeof Payhip !== 'undefined' && Payhip.Checkout) {
-                console.log("Opening Payhip Popup for:", productLink);
-                // Η ΑΛΛΑΓΗ ΕΙΝΑΙ ΕΔΩ: Περνάμε το link απευθείας, όχι μέσα σε { }
-                Payhip.Checkout.open(productLink); 
-            } else {
-                window.open(productLink, '_blank');
-            }
-        }
-    }, true); 
-
-    // Helper: Βγάζει το ID
+    // --- PAYHIP HELPER ---
     function getPayhipID(url) {
         if (!url) return null;
         const match = url.match(/\/b\/([a-zA-Z0-9]+)/);
         return match ? match[1] : null;
+    }
+
+    // Φόρτωμα του Payhip Script ΚΑΘΑΡΑ (χωρίς timestamp tricks)
+    function ensurePayhipLoaded() {
+        // Αν υπάρχει ήδη, δεν κάνουμε τίποτα, το αφήνουμε να δουλέψει
+        if (document.querySelector('script[src^="https://payhip.com/payhip.js"]')) {
+            return;
+        }
+        const script = document.createElement('script');
+        script.type = 'text/javascript';
+        script.src = 'https://payhip.com/payhip.js';
+        document.body.appendChild(script);
+        console.log("Payhip Script Loaded.");
     }
 
     // --- 2. POP-UP SYSTEM ---
@@ -192,6 +173,9 @@ document.addEventListener('DOMContentLoaded', () => {
         safeRun(restoreHeroArt);
         safeRun(renderNewsletter);
         safeRun(renderPopup);
+        
+        // Φορτώνουμε το Payhip
+        ensurePayhipLoaded();
 
         // HOME
         safeRun(() => {
@@ -223,7 +207,8 @@ document.addEventListener('DOMContentLoaded', () => {
                                 if(data.dropBuy) {
                                     const prodId = getPayhipID(data.dropBuy);
                                     if(prodId) {
-                                        // Adding 'payhip-buy-button' AND 'data-no-swup'
+                                        // data-no-swup prevents Swup from hijacking the link
+                                        // We let Payhip script handle the click naturally
                                         btnsHtml += `<a href="${data.dropBuy}" data-product="${prodId}" data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
                                     } else {
                                         btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
@@ -235,7 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     }
-                    // ... (rest of home code)...
+                    // ... (rest of home logic) ...
                     const annCont = document.getElementById('home-announcement-container');
                     const annIframe = document.getElementById('announcement-iframe');
                     const annText = document.getElementById('announcement-text');
