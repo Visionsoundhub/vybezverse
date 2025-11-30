@@ -41,28 +41,31 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- PAYHIP AUTO-FIXER (REGEX VERSION) ---
-    // Αυτό διορθώνει το πρόβλημα. Βρίσκει καθαρά το ID (π.χ. fSD16)
-    // ακόμα κι αν το link έχει ?ref=... ή άλλα σύμβολα.
+    // --- PAYHIP NUCLEAR FIX (SWUP + RESET) ---
     function getPayhipID(url) {
         if (!url) return null;
-        // Ψάχνει για το /b/ ακολουθούμενο από γράμματα/αριθμούς
+        // Βρίσκει το ID (π.χ. fSD16) ακόμα και αν έχει παραμέτρους
         const match = url.match(/\/b\/([a-zA-Z0-9]+)/);
         return match ? match[1] : null;
     }
 
     function injectPayhipScript() {
-        // Καθαρίζουμε παλιά scripts
+        // 1. Διαγράφουμε τη μνήμη του Payhip αν υπάρχει
+        if (window.Payhip) {
+            delete window.Payhip;
+        }
+
+        // 2. Αφαιρούμε παλιά scripts
         const oldScripts = document.querySelectorAll('script[src*="payhip.js"]');
         oldScripts.forEach(s => s.remove());
 
-        // Βάζουμε το νέο με Timestamp για να ξυπνήσει
+        // 3. Βάζουμε το νέο script
         const timestamp = new Date().getTime();
         const script = document.createElement('script');
         script.type = 'text/javascript';
         script.src = `https://payhip.com/payhip.js?v=${timestamp}`;
         document.body.appendChild(script);
-        console.log("Payhip System Reloaded.");
+        console.log("Payhip System: Hard Reset & Reloaded.");
     }
 
     // --- 2. POP-UP SYSTEM ---
@@ -207,15 +210,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 // AUTO-PAYHIP FIX FOR HOME
                                 if(data.dropBuy) {
                                     const prodId = getPayhipID(data.dropBuy);
-                                    let btnClass = "btn btn-glow";
-                                    let dataAttr = "";
-                                    
-                                    if(prodId) {
-                                        dataAttr = `data-product="${prodId}"`;
-                                        btnClass += " payhip-buy-button";
-                                    }
-                                    
-                                    btnsHtml += `<a href="${data.dropBuy}" ${dataAttr} class="${btnClass}">ΑΓΟΡΑΣΕ ΤΟ</a>`;
+                                    let dataAttr = prodId ? `data-product="${prodId}"` : '';
+                                    // IMPORTANT: data-no-swup stops the page from changing
+                                    btnsHtml += `<a href="${data.dropBuy}" ${dataAttr} data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
                                 }
 
                                 if(data.dropFree) btnsHtml += `<a href="${data.dropFree}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>`;
@@ -224,7 +221,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     }
-                    // ... (Rest of Home code) ...
+                    // ... (Announcement & Stream code remains same) ...
                     const annCont = document.getElementById('home-announcement-container');
                     const annIframe = document.getElementById('announcement-iframe');
                     const annText = document.getElementById('announcement-text');
@@ -274,7 +271,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
                 
-                // ... (Settings and other fetches) ...
                 const relTitle = document.getElementById('releases-title');
                 const allBtn = document.getElementById('all-releases-btn');
                 const whyBtn = document.getElementById('why-buy-text');
@@ -542,7 +538,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let buyBtnHtml = `<a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
             const prodId = getPayhipID(buyLink);
             if(prodId) {
-                buyBtnHtml = `<a href="${buyLink}" data-product="${prodId}" class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
+                // data-no-swup prevents Swup from hijacking the link
+                buyBtnHtml = `<a href="${buyLink}" data-product="${prodId}" data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
             }
 
             container.innerHTML += `
@@ -598,9 +595,11 @@ document.addEventListener('DOMContentLoaded', () => {
         if(prodId) {
             buyBtn.setAttribute('data-product', prodId);
             buyBtn.classList.add('payhip-buy-button');
+            buyBtn.setAttribute('data-no-swup', ''); // Stop Swup
         } else {
             buyBtn.removeAttribute('data-product');
             buyBtn.classList.remove('payhip-buy-button');
+            buyBtn.removeAttribute('data-no-swup');
         }
 
         const mainImg = document.getElementById('prod-main-img');
@@ -671,8 +670,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const prodId = getPayhipID(b.checkoutUrl);
     
     if(prodId) {
-        // Τώρα βάζουμε το ID καθαρό
-        buyBtnHtml = `<a href="${b.checkoutUrl}" data-product="${prodId}" class="btn btn-accent payhip-buy-button">${b.price} | BUY</a>`;
+        // data-no-swup tells the page transition library to IGNORE this click
+        buyBtnHtml = `<a href="${b.checkoutUrl}" data-product="${prodId}" data-no-swup class="btn btn-accent payhip-buy-button">${b.price} | BUY</a>`;
     }
 
     cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button>${buyBtnHtml}</div></div>`; }); 
