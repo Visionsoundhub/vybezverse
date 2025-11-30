@@ -41,58 +41,26 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- PAYHIP MANUAL OVERRIDE (THE FINAL FIX) ---
-    // Φορτώνουμε το script του Payhip ΜΙΑ φορά.
-    function loadPayhipBase() {
-        if (!document.querySelector('script[src*="payhip.js"]')) {
-            const script = document.createElement('script');
-            script.type = 'text/javascript';
-            script.src = 'https://payhip.com/payhip.js';
-            document.body.appendChild(script);
-            console.log("Payhip Base Loaded.");
-        }
-    }
-    loadPayhipBase();
-
-    // Helper: Βγάζει το ID (π.χ. fSD16)
-    function getPayhipID(url) {
-        if (!url) return null;
-        const match = url.match(/\/b\/([a-zA-Z0-9]+)/);
-        return match ? match[1] : null;
-    }
-
-    // Ο "Φύλακας": Πιάνει το κλικ
+    // --- SIMPLE REDIRECT LOGIC (NO POPUP) ---
+    // Αυτός ο κώδικας πιάνει το κλικ και σε στέλνει στο Payhip
     document.addEventListener('click', function(e) {
-        // Ελέγχουμε αν πατήθηκε κουμπί Payhip
+        // Ελέγχουμε αν πατήθηκε κουμπί με την κλάση payhip-buy-button
         const btn = e.target.closest('.payhip-buy-button');
         
         if (btn) {
-            // STOP EVERYTHING: Μην κάνεις redirect!
+            // Σταματάμε το Swup και την κανονική ροή
             e.preventDefault();
             e.stopPropagation();
 
-            const fullUrl = btn.href;
-            const productId = getPayhipID(fullUrl); // Παίρνουμε ΜΟΝΟ τον κωδικό (fSD16)
+            const productLink = btn.href;
+            console.log("Redirecting to Payhip:", productLink);
             
-            // Έλεγχος αν υπάρχει το Payhip library
-            if (typeof Payhip !== 'undefined' && Payhip.Checkout) {
-                console.log("Opening Payhip for ID:", productId);
-                
-                // Η ΔΙΟΡΘΩΣΗ: Δίνουμε 'product' αντί για 'link'
-                if (productId) {
-                    Payhip.Checkout.open({ product: productId });
-                } else {
-                    Payhip.Checkout.open({ link: fullUrl }); // Fallback
-                }
-
-            } else {
-                // Fallback αν δεν έχει φορτώσει ακόμα το script
-                window.open(fullUrl, '_blank');
-            }
+            // Απλή μετάβαση στη σελίδα του Payhip (100% λειτουργικό)
+            window.location.href = productLink;
         }
     }, true); 
 
-    // --- 2. POP-UP SYSTEM ---
+    // --- 2. POP-UP SYSTEM (PROMO ONLY) ---
     function renderPopup() {
         const path = window.location.pathname;
         let jsonFile = '';
@@ -231,15 +199,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 let btnsHtml = '';
                                 if(data.dropStream) btnsHtml += `<a href="${data.dropStream}" target="_blank" class="btn btn-outline">STREAM IT</a>`;
                                 
-                                // AUTO-PAYHIP FIX FOR HOME
+                                // Home Button
                                 if(data.dropBuy) {
-                                    const prodId = getPayhipID(data.dropBuy);
-                                    if(prodId) {
-                                        // data-no-swup prevents Swup from hijacking the link
-                                        btnsHtml += `<a href="${data.dropBuy}" data-product="${prodId}" data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
-                                    } else {
-                                        btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
-                                    }
+                                    btnsHtml += `<a href="${data.dropBuy}" class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
                                 }
 
                                 if(data.dropFree) btnsHtml += `<a href="${data.dropFree}" target="_blank" class="btn btn-outline"><i class="fas fa-download"></i> FREE</a>`;
@@ -297,7 +259,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     renderFilteredReleases();
                 }).catch(err => { releasesContainer.innerHTML = '<p style="text-align:center;">Loading Error. Check console.</p>'; });
                 
-                // ... (settings fetches) ...
                 const relTitle = document.getElementById('releases-title');
                 const allBtn = document.getElementById('all-releases-btn');
                 const whyBtn = document.getElementById('why-buy-text');
@@ -564,8 +525,8 @@ document.addEventListener('DOMContentLoaded', () => {
             let buyBtnHtml = `<a href="${buyLink}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
             const prodId = getPayhipID(buyLink);
             if(prodId) {
-                // IMPORTANT: NO TARGET="_BLANK"
-                buyBtnHtml = `<a href="${buyLink}" data-product="${prodId}" data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
+                // IMPORTANT: class payhip-buy-button + link to be intercepted
+                buyBtnHtml = `<a href="${buyLink}" data-product="${prodId}" class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
             }
 
             container.innerHTML += `
@@ -620,13 +581,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if(prodId) {
             buyBtn.setAttribute('data-product', prodId);
             buyBtn.classList.add('payhip-buy-button');
-            buyBtn.setAttribute('data-no-swup', ''); 
-            buyBtn.removeAttribute('target'); 
         } else {
             buyBtn.removeAttribute('data-product');
             buyBtn.classList.remove('payhip-buy-button');
-            buyBtn.removeAttribute('data-no-swup');
-            buyBtn.setAttribute('target', '_blank');
         }
 
         const mainImg = document.getElementById('prod-main-img');
@@ -696,8 +653,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const prodId = getPayhipID(b.checkoutUrl);
     
     if(prodId) {
-        // IMPORTANT: NO TARGET="_BLANK" and Added data-no-swup
-        buyBtnHtml = `<a href="${b.checkoutUrl}" data-product="${prodId}" data-no-swup class="btn btn-accent payhip-buy-button">${b.price} | BUY</a>`;
+        // IMPORTANT: class payhip-buy-button + link to be intercepted
+        buyBtnHtml = `<a href="${b.checkoutUrl}" data-product="${prodId}" class="btn btn-accent payhip-buy-button">${b.price} | BUY</a>`;
     }
 
     cont.innerHTML += `<div class="beat-row" id="beat-row-${slug}"><div class="beat-art"><img src="${img}"><div class="beat-play-overlay" onclick="window.playTrack('${b.audioSrc}', '${safeTitle}', '${img}', ${i})"><i id="beat-icon-${i}" class="fas fa-play"></i></div></div><div class="beat-info"><h4>${b.title}</h4><div class="beat-meta">${b.bpm} BPM • ${b.key||b.Key||''} • ${b.category}</div></div><div class="beat-actions"><button class="btn btn-outline" onclick="window.shareBeat('${safeTitle}')" title="Share Beat"><i class="fas fa-share-alt"></i></button>${buyBtnHtml}</div></div>`; }); 
