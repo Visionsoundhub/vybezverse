@@ -41,43 +41,56 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- PAYHIP LOGIC (DIRECT PURCHASE) ---
-    // 1. Φόρτωμα βιβλιοθήκης
+    // --- PAYHIP FAIL-SAFE SYSTEM ---
+    // 1. Φορτώνουμε το script
     (function loadPayhip() {
         if (!document.querySelector('script[src*="payhip.js"]')) {
             const script = document.createElement('script');
             script.type = 'text/javascript';
             script.src = 'https://payhip.com/payhip.js';
             document.body.appendChild(script);
-            console.log("Payhip Loaded.");
+            console.log("Payhip Library Injected.");
         }
     })();
 
-    // 2. Ο Φύλακας που δούλεψε
-    document.addEventListener('click', function(e) {
-        const btn = e.target.closest('.payhip-buy-button');
-        
-        if (btn) {
-            e.preventDefault(); 
-            e.stopPropagation();
-
-            const productLink = btn.href; 
-            
-            // Ανοίγει απευθείας το Checkout (Αυτό που πέτυχε)
-            if (typeof Payhip !== 'undefined' && Payhip.Checkout) {
-                Payhip.Checkout.open(productLink); 
-            } else {
-                window.open(productLink, '_blank');
-            }
-        }
-    }, true); 
-
-    // Helper: Βγάζει το ID
+    // 2. Helper για ID
     function getPayhipID(url) {
         if (!url) return null;
         const match = url.match(/\/b\/([a-zA-Z0-9]+)/);
         return match ? match[1] : null;
     }
+
+    // 3. Ο ΑΠΟΛΥΤΟΣ ΦΥΛΑΚΑΣ (Try Popup -> Fallback Redirect)
+    document.addEventListener('click', function(e) {
+        const btn = e.target.closest('.payhip-buy-button');
+        
+        if (btn) {
+            // Σταματάμε το Swup
+            e.preventDefault();
+            e.stopPropagation();
+
+            const productLink = btn.href;
+            let popupOpened = false;
+
+            // Προσπάθεια ανοίγματος Popup
+            try {
+                if (typeof Payhip !== 'undefined' && Payhip.Checkout) {
+                    Payhip.Checkout.open(productLink);
+                    popupOpened = true;
+                    console.log("Popup Attempted");
+                }
+            } catch (err) {
+                console.error("Payhip Error:", err);
+            }
+
+            // Αν δεν άνοιξε το Popup ή δεν υπάρχει το Payhip, κάνε Redirect ΤΩΡΑ.
+            // Χρησιμοποιούμε μικρό timeout για να δούμε αν "έπιασε" το popup
+            if (!popupOpened) {
+                console.warn("Popup failed/missing. Redirecting fallback...");
+                window.location.href = productLink;
+            }
+        }
+    }, true); 
 
     // --- 2. POP-UP SYSTEM ---
     function renderPopup() {
@@ -218,10 +231,11 @@ document.addEventListener('DOMContentLoaded', () => {
                                 let btnsHtml = '';
                                 if(data.dropStream) btnsHtml += `<a href="${data.dropStream}" target="_blank" class="btn btn-outline">STREAM IT</a>`;
                                 
-                                // AUTO-PAYHIP
+                                // AUTO-PAYHIP FIX FOR HOME
                                 if(data.dropBuy) {
                                     const prodId = getPayhipID(data.dropBuy);
                                     if(prodId) {
+                                        // data-no-swup prevents Swup from hijacking the link
                                         btnsHtml += `<a href="${data.dropBuy}" data-product="${prodId}" data-no-swup class="btn btn-glow payhip-buy-button">ΑΓΟΡΑΣΕ ΤΟ</a>`;
                                     } else {
                                         btnsHtml += `<a href="${data.dropBuy}" target="_blank" class="btn btn-glow">ΑΓΟΡΑΣΕ ΤΟ</a>`;
@@ -233,7 +247,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             }
                         }
                     }
-                    // ... (Home continues) ...
+                    // ... (rest of home logic) ...
                     const annCont = document.getElementById('home-announcement-container');
                     const annIframe = document.getElementById('announcement-iframe');
                     const annText = document.getElementById('announcement-text');
