@@ -2,7 +2,7 @@
   "beatslist": [
     {
       "price": "79.99€",
-      "checkoutUrl": "#",
+      "checkoutUrl": "https://payhip.com/builder/public",
       "audioSrc": "/assets/uploads/solo-lio-rising-93bpm.mp3",
       "status": "available",
       "cover": "/assets/uploads/banner.png",
