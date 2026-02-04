@@ -41,7 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let allReleasesTracks = [];
     let activeFilters = { genre: 'all', bpm: 'all', key: 'all' };
 
-    // --- 2. POP-UP SYSTEM (FIXED) ---
+    // --- 2. POP-UP SYSTEM (FIXED: CLOSE ON ACTION BUTTON) ---
     function renderPopup() {
         const path = window.location.pathname;
         let jsonFile = '';
@@ -72,26 +72,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const imgHtml = data.image ? `<img src="${data.image}" style="width:100%; max-height:200px; object-fit:cover; border-radius:12px; margin-bottom:1rem; border:1px solid rgba(255,255,255,0.1);">` : '';
 
+                // ΠΡΟΣΘΕΣΑ ID ΣΤΟ ΚΟΥΜΠΙ "popup-action-btn"
                 overlay.innerHTML = `
                     <div class="modal-box" style="max-width:400px; text-align:center; border: 1px solid #8a2be2; box-shadow: 0 0 50px rgba(138,43,226,0.4);">
                         <button class="modal-close-btn" id="close-promo-popup">&times;</button>
                         ${imgHtml}
                         <h2 style="color:#fff; margin-bottom:0.5rem; text-transform:uppercase;">${data.title}</h2>
                         <p style="color:#ccc; margin-bottom:1.5rem; line-height:1.5;">${data.text}</p>
-                        <a href="${data.btnLink}" class="btn btn-accent" style="width:100%; justify-content:center; font-size:1.1rem; padding:1rem;">${data.btnText}</a>
+                        <a href="${data.btnLink}" id="popup-action-btn" class="btn btn-accent" style="width:100%; justify-content:center; font-size:1.1rem; padding:1rem;">${data.btnText}</a>
                     </div>
                 `;
 
                 document.body.appendChild(overlay);
 
-                // Κλείσιμο και αποθήκευση στο session
+                // Συνάρτηση κλεισίματος
                 const closeFunc = () => {
                     overlay.remove();
                     sessionStorage.setItem(storageKey, 'true');
                 };
 
+                // Κλείσιμο με το Χ
                 document.getElementById('close-promo-popup').onclick = closeFunc;
+                
+                // Κλείσιμο πατώντας έξω
                 overlay.onclick = (e) => { if (e.target === overlay) closeFunc(); };
+
+                // --- Η ΔΙΟΡΘΩΣΗ: Κλείσιμο όταν πατάς το κουμπί Action ---
+                const actionBtn = document.getElementById('popup-action-btn');
+                if (actionBtn) {
+                    actionBtn.onclick = () => {
+                        closeFunc(); // Κλείνει το popup πριν αλλάξει σελίδα
+                        // Το href του <a> θα αναλάβει την πλοήγηση
+                    };
+                }
             })
             .catch(e => console.log('Popup info:', e));
     }
@@ -338,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // BEATS & VIBES (ΤΡΟΠΟΠΟΙΗΜΕΝΟ ΓΙΑ ΝΑ ΕΛΕΓΧΕΙ ΤΟ STORE ACTIVE)
+        // BEATS & VIBES
         safeRun(() => {
             const beatCont = document.getElementById('beat-store-list');
             if (beatCont) {
@@ -346,7 +359,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 fetch('beats.json').then(r => r.json()).then(data => {
                     
-                    // --- ΕΛΕΓΧΟΣ ΔΙΑΚΟΠΤΗ (ΝΕΟ) ---
                     if (data.storeActive === false) {
                         const msg = data.comingSoonText || "BEAT STORE COMING SOON";
                         beatCont.innerHTML = `
@@ -355,10 +367,9 @@ document.addEventListener('DOMContentLoaded', () => {
                                 <p style="color:#888;">Συντονίσου για το επόμενο drop.</p>
                                 <a href="index.html" class="btn btn-outline" style="margin-top:2rem;">RETURN HOME</a>
                             </div>`;
-                        return; // Σταματάει εδώ αν είναι κλειστό
+                        return;
                     }
 
-                    // Αν είναι ανοιχτό, συνεχίζει κανονικά
                     let allBeats = Array.isArray(data) ? data : (data.beatslist || []);
                     window.currentPlaylist = allBeats;
                     const keyList = document.getElementById('key-options-list');
@@ -431,7 +442,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
         
-        // OTHER PAGES (ΜΕΝΟΥ, FOOTER, GALLERY)
+        // OTHER PAGES
         safeRun(() => {
             const bioContainer = document.getElementById('bio-container'); if (bioContainer) { fetch('bio.json').then(r => r.ok ? r.json() : Promise.reject()).then(data => { const content = data.content ? data.content.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br>') : '...'; if(data.title && document.getElementById('bio-title')) document.getElementById('bio-title').textContent = data.title; bioContainer.innerHTML = `<div class="bio-image-wrapper"><img src="${data.image}" class="bio-img"></div><div class="bio-text"><p>${content}</p></div>`; }).catch(() => {}); }
             const galleryGrid = document.getElementById('gallery-grid'); if(galleryGrid && !document.getElementById('merch-grid')) { const gModal = document.getElementById('gallery-modal'); const gImg = document.getElementById('gallery-modal-img'); const gCap = document.getElementById('gallery-caption'); const gClose = document.getElementById('close-gallery-modal'); fetch('gallery.json').then(r => r.json()).then(data => { galleryGrid.innerHTML = ''; (data.images || []).forEach(img => { const div = document.createElement('div'); div.className = 'gallery-item'; div.innerHTML = `<img src="${img.src}" alt="${img.caption || ''}">`; div.onclick = () => { gImg.src = img.src; gCap.innerText = img.caption || ''; gModal.classList.add('visible'); }; galleryGrid.appendChild(div); }); }).catch(() => {}); if(gClose) { gClose.onclick = () => gModal.classList.remove('visible'); gModal.onclick = (e) => { if(e.target===gModal) gModal.classList.remove('visible'); }; } }
