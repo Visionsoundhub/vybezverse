@@ -55,7 +55,7 @@ collections:
           - {label: "Vault Beats Title", name: "vaultTitle", widget: "string"}
           - {label: "Vault Beats Text", name: "vaultText", widget: "text"}
 
-  # --- 3. NEWSLETTER SETTINGS ---
+  # --- NEWSLETTER SETTINGS ---
   - name: "newsletter"
     label: "📩 Newsletter Freq"
     files:
@@ -71,7 +71,7 @@ collections:
           - {label: "Option 2 (Releases)", name: "optReleases", widget: "string", default: "New Music / Releases"}
           - {label: "Option 3 (All)", name: "optAll", widget: "string", default: "Full Spectrum (All)"}
 
-  # --- 4. POP-UP MANAGER ---
+  # --- POP-UP MANAGER ---
   - name: "popups"
     label: "🔔 Pop-up Manager"
     files:
@@ -97,7 +97,7 @@ collections:
           - {label: "Button Text", name: "btnText", widget: "string", default: "SHOP DEALS"}
           - {label: "Button Link", name: "btnLink", widget: "string", default: "#"}
 
-  # --- 5. BIO PAGE ---
+  # --- 3. BIO PAGE ---
   - name: "bio"
     label: "👤 Bio Page"
     files:
@@ -107,9 +107,9 @@ collections:
         fields:
           - {label: "Page Title", name: "title", widget: "string", default: "WHO IS BLACK VYBEZ?"}
           - {label: "Main Image", name: "image", widget: "image"}
-          - {label: "Bio Text", name: "content", widget: "markdown"}
+          - {label: "Bio Text", name: "content", widget: "text"}
 
-  # --- 6. GALLERY ---
+  # --- 4. GALLERY ---
   - name: "gallery"
     label: "📸 Gallery"
     files:
@@ -124,7 +124,7 @@ collections:
               - {label: "Image", name: "src", widget: "image"}
               - {label: "Caption/Alt Text", name: "caption", widget: "string", required: false}
 
-  # --- 7. MENU ---
+  # --- 5. MENU ---
   - name: "navigation"
     label: "🧭 Menu Manager"
     files:
@@ -140,7 +140,7 @@ collections:
               - {label: "Link / URL", name: "url", widget: "string"}
               - {label: "Open in New Tab?", name: "newTab", widget: "boolean", default: false}
 
-  # --- 8. RELEASES ---
+  # --- 6. RELEASES ---
   - name: "releases"
     label: "🎹 Releases"
     files:
@@ -154,14 +154,16 @@ collections:
             fields:
               - {label: "Title", name: "title", widget: "string"}
               - {label: "Short Description", name: "description", widget: "text", required: false}
+              # RELATION WIDGET ΓΙΑ ΤΑ FREQUENCIES (GENRES)
               - label: "Frequency / Genre"
                 name: "genre"
                 widget: "relation"
                 collection: "genres"
                 file: "genresConfig"
-                search_fields: ["genres.*.name"]
+                search_fields: ["genres.*.name", "genres.*.note"]
                 value_field: "genres.*.name"
-                display_fields: ["genres.*.name"]
+                display_fields: ["genres.*.name", " (", "genres.*.note", ")"]
+                multiple: false
               - {label: "Release Type", name: "type", widget: "select", options: ["Single", "EP", "Album"], required: true}
               - {label: "YouTube Video URL", name: "youtubeUrl", widget: "string"}
               - {label: "Cover Art", name: "cover", widget: "image"}
@@ -169,40 +171,111 @@ collections:
               - {label: "Buy Link", name: "bundleUrl", widget: "string"}
               - {label: "Free Download Link", name: "downloadUrl", widget: "string", required: false}
 
-  # --- 9. BEAT STORE (ΜΕ ΔΙΑΚΟΠΤΗ ON/OFF) ---
+  # --- 6.5. GENRES (FREQUENCIES) SETTINGS ---
+  - name: "genres"
+    label: "🎛️ Frequency Settings"
+    files:
+      - name: "genresConfig"
+        label: "Frequency List"
+        file: "genres.json"
+        fields:
+          - name: "genres"
+            label: "Frequencies"
+            widget: "list"
+            fields:
+              - {label: "Frequency Name (Site)", name: "name", widget: "string"}
+              - {label: "Admin Note (Panel Only - e.g. 'Trap')", name: "note", widget: "string", required: false}
+
+  # --- 7. BEAT STORE (EDITED WITH TOGGLE) ---
   - name: "beats"
     label: "💰 Beat Store"
     files:
       - name: "beatslist"
-        label: "Beats Catalog & Status"
+        label: "Beats Catalog"
         file: "beats.json"
         fields:
+          # --- ΟΙ ΝΕΕΣ ΠΡΟΣΘΗΚΕΣ ΓΙΑ ΤΟ ON/OFF ---
           - {label: "Store Status (ON = Open, OFF = Closed)", name: "storeActive", widget: "boolean", default: true}
           - {label: "Coming Soon Message", name: "comingSoonText", widget: "string", default: "BEAT STORE COMING SOON"}
+          # ---------------------------------------
           - name: "beatslist"
-            label: "Beats List"
+            label: "Beats"
             widget: "list"
             fields:
               - {label: "Title", name: "title", widget: "string"}
               - {label: "Cover Art", name: "cover", widget: "image", required: false}
               - {label: "Audio Preview (MP3)", name: "audioSrc", widget: "file"}
-              - {label: "Price", name: "price", widget: "string", default: "79.99€"}
+              - {label: "Price", name: "price", widget: "string", default: "29.99€"}
               - {label: "Status", name: "status", widget: "select", options: ["available", "sold"], default: "available"}
               - {label: "Category", name: "category", widget: "select", options: ["trap", "boombap", "latin", "lofi", "custom", "vault", "ai"]}
               - {label: "BPM", name: "bpm", widget: "string", required: false}
               - {label: "Key", name: "key", widget: "string", required: false}
               - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
+              # RELATION WIDGET ΓΙΑ ΤΑ VIBES
               - label: "Vibe Tags"
                 name: "tags"
                 widget: "relation"
                 collection: "vibes"
                 file: "vibesConfig"
                 search_fields: ["vibes.*.name"]
-                value_field: "vibes.*.name"
+                value_field: "vibes.*.tags"
                 display_fields: ["vibes.*.name"]
                 multiple: true
 
-  # --- 10. PAGES & MODALS ---
+  # --- 8. PRESS ---
+  - name: "press"
+    label: "📰 Press & News"
+    files:
+      - name: "pressdata"
+        label: "Articles"
+        file: "press.json"
+        fields:
+          - name: "articles"
+            label: "News Items"
+            widget: "list"
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Date", name: "date", widget: "string"}
+              - {label: "Source", name: "source", widget: "string"}
+              - {label: "Image", name: "image", widget: "image"}
+              - {label: "Summary", name: "summary", widget: "text"}
+              - {label: "Link", name: "link", widget: "string"}
+
+  # --- 9. PODCASTS ---
+  - name: "podcasts"
+    label: "🎙️ Podcasts"
+    files:
+      - name: "podcast_list"
+        label: "Episodes"
+        file: "podcasts.json"
+        fields:
+          - name: "episodes"
+            label: "Episodes"
+            widget: "list"
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Cover", name: "cover", widget: "image"}
+              - {label: "Description", name: "description", widget: "text"}
+              - {label: "Link", name: "link", widget: "string"}
+              - {label: "Date", name: "date", widget: "date"}
+
+  # --- 10. VIBES ---
+  - name: "vibes"
+    label: "✨ Vibe Settings"
+    files:
+      - name: "vibesConfig"
+        label: "Vibes Definition"
+        file: "vibes.json"
+        fields:
+          - name: "vibes"
+            label: "Vibes List"
+            widget: "list"
+            fields:
+              - {label: "Name", name: "name", widget: "string"}
+              - {label: "Color (Hex)", name: "color", widget: "color", required: false}
+              - {label: "Tags", name: "tags", widget: "list"}
+
+  # --- 11. GENERAL PAGES ---
   - name: "pages"
     label: "🌐 General Pages"
     files:
@@ -211,13 +284,16 @@ collections:
         file: "home.json"
         fields:
           - {label: "Main Banner", name: "heroImage", widget: "image", required: false}
-          - {label: "Title", name: "heroTitle", widget: "string", default: "VYBEZONE"}
-          - {label: "Subtitle", name: "heroSubtitle", widget: "string"}
+          - {label: "Title", name: "heroTitle", widget: "string", default: "VYBEZONE", required: false}
+          - {label: "Subtitle", name: "heroSubtitle", widget: "string", required: false}
+          - {label: "--- ANNOUNCEMENT SECTION ---", name: "sep_ann", widget: "hidden"}
           - {label: "Enable Announcement?", name: "showAnnouncement", widget: "boolean", default: false} 
-          - {label: "Announcement Video URL", name: "announcementVideo", widget: "string", required: false}
+          - {label: "Announcement Video (YouTube URL)", name: "announcementVideo", widget: "string", required: false}
           - {label: "Announcement Text", name: "announcementText", widget: "text", required: false}
+          - {label: "--- LATEST DROP SECTION ---", name: "sep_drop", widget: "hidden"}
           - {label: "Enable Latest Drop?", name: "showDrop", widget: "boolean", default: false}
-          - {label: "Drop Video URL", name: "dropVideo", widget: "string", required: false}
+          - {label: "Drop Title", name: "dropTitle", widget: "string", required: false}
+          - {label: "Drop Video (YouTube URL)", name: "dropVideo", widget: "string", required: false}
           - {label: "Stream Link", name: "dropStream", widget: "string", required: false}
           - {label: "Buy Link", name: "dropBuy", widget: "string", required: false}
           - {label: "Free Link", name: "dropFree", widget: "string", required: false}
@@ -251,124 +327,60 @@ collections:
                   - {label: "Caption/Title", name: "headline", widget: "string", required: false}
                   - {label: "Image", name: "image", widget: "image"}
                   - {label: "Text", name: "body", widget: "text", required: false}
-
+      
       - name: "releases_page"
         label: "Releases Page Settings"
         file: "releases_settings.json"
         fields:
-          - {label: "Page Title", name: "pageTitle", widget: "string"}
-          - {label: "Page Description", name: "pageDescription", widget: "text"}
-          - {label: "Button: All Releases", name: "allReleasesText", widget: "string"}
-          - {label: "Button: Why Buy", name: "whyBuyText", widget: "string"}
-          - {label: "Button: What's Included", name: "whatsIncludedText", widget: "string"}
-          - {label: "Modal Title", name: "modalTitle", widget: "string"}
-          - {label: "Section 1: Title", name: "supportTitle", widget: "string"}
-          - {label: "Section 1: Text", name: "supportText", widget: "text"}
-          - {label: "Section 2: Title", name: "getTitle", widget: "string"}
-          - {label: "Section 2: Text", name: "getText", widget: "text"}
+          - {label: "Page Title", name: "pageTitle", widget: "string", default: "MUSIC CATALOG"}
+          - {label: "Page Description", name: "pageDescription", widget: "text", default: "Δεν είναι απλά Releases..."}
+          - {label: "Button: All Releases", name: "allReleasesText", widget: "string", default: "All Releases"}
+          - {label: "Button: Why Buy", name: "whyBuyText", widget: "string", default: "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;"}
+          - {label: "Button: What's Included", name: "whatsIncludedText", widget: "string", default: "ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;"}
+          - {label: "--- WHY BUY MODAL ---", name: "sep_why", widget: "hidden"}
+          - {label: "Modal Title", name: "modalTitle", widget: "string", default: "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΕΙΣ;"}
+          - {label: "Section 1: Title", name: "supportTitle", widget: "string", default: "ΣΤΗΡΙΞΕ ΤΟΝ ΚΑΛΛΙΤΕΧΝΗ"}
+          - {label: "Section 1: Text", name: "supportText", widget: "text", default: "Οι πλατφόρμες streaming πληρώνουν ελάχιστα. Η αγορά ενός τραγουδιού ισοδυναμεί με χιλιάδες streams."}
+          - {label: "Section 2: Title", name: "getTitle", widget: "string", default: "ΤΙ ΠΑΙΡΝΕΙΣ;"}
+          - {label: "Section 2: Text", name: "getText", widget: "text", default: "High Quality Audio, Εναλλακτικές Εκδόσεις, Ringtones, Artwork, Στίχους."}
 
-  # --- 11. STORE (BUNDLES & MERCH) ---
-  - name: "store_config"
-    label: "🛒 Store & Bundles"
-    files:
-      - name: "store_main"
-        label: "Bundle Info & Global Merch"
+      - name: "store"
+        label: "Store Page Settings"
         file: "store.json"
         fields:
-          - {label: "Main Title", name: "title", widget: "string"}
-          - {label: "Section Title", name: "sectionTitle", widget: "string"}
-          - {label: "Subtitle", name: "subtitle", widget: "string"}
-          - {label: "Merch Active?", name: "merchActive", widget: "boolean", default: true}
-          - {label: "Coming Soon Message", name: "comingSoonText", widget: "string"}
+          - {label: "Page Title (H1)", name: "title", widget: "string", default: "STORE"}
+          - {label: "--- BUNDLE LIST (For Releases Modal) ---", name: "sep_bund", widget: "hidden"}
+          - {label: "Bundle Subtitle", name: "subtitle", widget: "string", default: "Το πλήρες πακέτο περιεχομένου για κάθε τραγούδι που αγοράζεις."}
           - name: "bundleItems"
-            label: "Bundle Contents (Icons & Text)"
+            label: "Bundle List Items"
             widget: "list"
             fields:
-              - {label: "Text", name: "text", widget: "string"}
-              - {label: "FontAwesome Icon Class", name: "icon", widget: "string"}
+              - {label: "Item Text", name: "text", widget: "string"}
+              - {label: "FontAwesome Icon Class (e.g. fas fa-music)", name: "icon", widget: "string"}
 
-  # --- 12. MERCH PRODUCTS ---
+  # --- 12. MERCH STORE (CONSOLIDATED) ---
   - name: "merch"
-    label: "👕 Merch Products"
+    label: "👕 Merch Store"
     files:
       - name: "merch_catalog"
-        label: "Product Catalog"
+        label: "Store Settings & Products"
         file: "merch.json"
         fields:
+          - {label: "Store Status (ON = Show Products, OFF = Coming Soon)", name: "storeStatus", widget: "boolean", default: false}
+          - {label: "Coming Soon Text", name: "comingSoonText", widget: "string", default: "MERCH DROP 2025. COMING SOON."}
           - name: "products"
             label: "Product List"
             widget: "list"
             fields:
-              - {label: "Status", name: "status", widget: "select", options: ["available", "sold_out", "hidden"]}
-              - {label: "Name", name: "name", widget: "string"}
-              - {label: "Price", name: "price", widget: "string"}
-              - {label: "Image", name: "image", widget: "image"}
-              - {label: "Description", name: "description", widget: "text"}
-              - {label: "Buy Link", name: "link", widget: "string"}
+              - {label: "Product Status", name: "status", widget: "select", options: ["available", "sold_out", "hidden"], default: "available"}
+              - {label: "Product Name", name: "name", widget: "string"}
+              - {label: "Price", name: "price", widget: "string", default: "25.00€"}
+              - {label: "Main Image", name: "image", widget: "image"}
+              - {label: "Description", name: "description", widget: "text", required: false}
               - name: "gallery"
                 label: "Additional Images (Gallery)"
                 widget: "list"
                 required: false
                 fields:
                   - {label: "Image", name: "img", widget: "image"}
-
-  # --- 13. AUX DATA ---
-  - name: "genres"
-    label: "🎛️ Frequencies"
-    files:
-      - name: "genresConfig"
-        label: "Frequency List"
-        file: "genres.json"
-        fields:
-          - name: "genres"
-            widget: "list"
-            fields:
-              - {label: "Name", name: "name", widget: "string"}
-              - {label: "Note", name: "note", widget: "string"}
-
-  - name: "vibes"
-    label: "✨ Vibes"
-    files:
-      - name: "vibesConfig"
-        label: "Vibes List"
-        file: "vibes.json"
-        fields:
-          - name: "vibes"
-            widget: "list"
-            fields:
-              - {label: "Name", name: "name", widget: "string"}
-              - {label: "Color", name: "color", widget: "color"}
-              - {label: "Tags", name: "tags", widget: "list"}
-
-  - name: "press"
-    label: "📰 Press"
-    files:
-      - name: "pressdata"
-        label: "Press Articles"
-        file: "press.json"
-        fields:
-          - name: "articles"
-            widget: "list"
-            fields:
-              - {label: "Title", name: "title", widget: "string"}
-              - {label: "Date", name: "date", widget: "string"}
-              - {label: "Source", name: "source", widget: "string"}
-              - {label: "Summary", name: "summary", widget: "text"}
-              - {label: "Image", name: "image", widget: "image"}
-              - {label: "Link", name: "link", widget: "string"}
-
-  - name: "podcasts"
-    label: "🎙️ Podcasts"
-    files:
-      - name: "podcast_list"
-        label: "Podcast Episodes"
-        file: "podcasts.json"
-        fields:
-          - name: "episodes"
-            widget: "list"
-            fields:
-              - {label: "Title", name: "title", widget: "string"}
-              - {label: "Cover", name: "cover", widget: "image"}
-              - {label: "Description", name: "description", widget: "text"}
-              - {label: "Link", name: "link", widget: "string"}
-              - {label: "Date", name: "date", widget: "date"}
+              - {label: "Buy Link", name: "link", widget: "string"}
