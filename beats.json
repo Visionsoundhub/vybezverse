@@ -15,5 +15,7 @@
       "bpm": "90",
       "key": "Fminor"
     }
-  ]
+  ],
+  "storeActive": false,
+  "comingSoonText": "Σύντομα Διαθέσιμο"
 }
