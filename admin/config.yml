@@ -221,6 +221,36 @@ collections:
           - {label: "Stream Link", name: "dropStream", widget: "string", required: false}
           - {label: "Buy Link", name: "dropBuy", widget: "string", required: false}
           - {label: "Free Link", name: "dropFree", widget: "string", required: false}
+          - {label: "--- DYNAMIC STREAM ---", name: "sep_dyn", widget: "hidden"}
+          - label: "Dynamic Content Stream"
+            name: "stream"
+            widget: "list"
+            types:
+              - label: "📝 Article / Text"
+                name: "article"
+                widget: "object"
+                fields:
+                  - {label: "Headline", name: "headline", widget: "string"}
+                  - {label: "Body Text", name: "body", widget: "markdown"}
+                  - {label: "Image", name: "image", widget: "image", required: false}
+                  - {label: "Link URL", name: "url", widget: "string", required: false}
+                  - {label: "Link Text", name: "btnText", widget: "string", default: "READ MORE"}
+
+              - label: "🎬 Video"
+                name: "video"
+                widget: "object"
+                fields:
+                  - {label: "Title", name: "headline", widget: "string", required: false}
+                  - {label: "YouTube URL", name: "videoUrl", widget: "string"}
+                  - {label: "Description", name: "body", widget: "text", required: false}
+
+              - label: "📸 Photo Card"
+                name: "photo"
+                widget: "object"
+                fields:
+                  - {label: "Caption/Title", name: "headline", widget: "string", required: false}
+                  - {label: "Image", name: "image", widget: "image"}
+                  - {label: "Text", name: "body", widget: "text", required: false}
 
       - name: "releases_page"
         label: "Releases Page Settings"
@@ -275,12 +305,19 @@ collections:
               - {label: "Image", name: "image", widget: "image"}
               - {label: "Description", name: "description", widget: "text"}
               - {label: "Buy Link", name: "link", widget: "string"}
+              - name: "gallery"
+                label: "Additional Images (Gallery)"
+                widget: "list"
+                required: false
+                fields:
+                  - {label: "Image", name: "img", widget: "image"}
 
   # --- 13. AUX DATA ---
   - name: "genres"
     label: "🎛️ Frequencies"
     files:
       - name: "genresConfig"
+        label: "Frequency List"
         file: "genres.json"
         fields:
           - name: "genres"
@@ -293,6 +330,7 @@ collections:
     label: "✨ Vibes"
     files:
       - name: "vibesConfig"
+        label: "Vibes List"
         file: "vibes.json"
         fields:
           - name: "vibes"
@@ -306,6 +344,7 @@ collections:
     label: "📰 Press"
     files:
       - name: "pressdata"
+        label: "Press Articles"
         file: "press.json"
         fields:
           - name: "articles"
@@ -322,6 +361,7 @@ collections:
     label: "🎙️ Podcasts"
     files:
       - name: "podcast_list"
+        label: "Podcast Episodes"
         file: "podcasts.json"
         fields:
           - name: "episodes"
