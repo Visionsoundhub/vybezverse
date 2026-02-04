@@ -1,4 +1,5 @@
 {
+  "stream": [],
   "heroImage": "/assets/uploads/banner.png",
   "showAnnouncement": false,
   "dropTitle": "Jazz Bar των τεράτων",
@@ -8,8 +9,7 @@
   "heroSubtitle": "No limits in music. Just pure vibes",
   "announcementText": "",
   "announcementVideo": "",
-  "dropBuy": "https://www.youtube.com/watch?v=KNvq3idRHe8&list=RDKNvq3idRHe8&start_radio=1",
-  "dropFree": "https://www.youtube.com/watch?v=KNvq3idRHe8&list=RDKNvq3idRHe8&start_radio=1",
-  "heroTitle": "VYBEZONE",
-  "stream": []
+  "dropBuy": "https://payhip.com/b/D0xpc",
+  "dropFree": "https://drive.google.com/file/d/1ytVh2KgFzv7j8YjNr0Wz-7QKY3YUf6bv/view?usp=sharing",
+  "heroTitle": "VYBEZONE"
 }
