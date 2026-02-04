@@ -2,12 +2,12 @@
   "tracks": [
     {
       "genre": "Vintage Freq",
-      "downloadUrl": "#",
+      "downloadUrl": "https://drive.google.com/file/d/1ytVh2KgFzv7j8YjNr0Wz-7QKY3YUf6bv/view?usp=sharing",
       "youtubeUrl": "https://www.youtube.com/watch?v=KNvq3idRHe8&list=RDKNvq3idRHe8&start_radio=1",
       "bundleUrl": "https://payhip.com",
       "streamUrl": "https://www.youtube.com/watch?v=KNvq3idRHe8&list=RDKNvq3idRHe8&start_radio=1",
       "audio": "assets/audio/demo_track.mp3",
-      "cover": "/assets/uploads/gf.jpg",
+      "cover": "/assets/uploads/jazz-bar-των-τεράτων-high-resolution.jpg",
       "title": "Jazz Bar των τεράτων",
       "type": "Single"
     },
