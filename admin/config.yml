@@ -1,4 +1,61 @@
-# --- LINKTREE / BIO LINKS PAGE ---
+backend:
+  name: git-gateway
+  branch: main
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+collections:
+  # --- 1. FOOTER SETTINGS ---
+  - name: "footer"
+    label: "🦶 Footer Settings"
+    files:
+      - name: "footer_config"
+        label: "Footer Content & Socials"
+        file: "footer.json"
+        fields:
+          - {label: "Artist Side Title (Left)", name: "artistTitle", widget: "string", default: "BLACK VYBEZ"}
+          - {label: "Producer Side Title (Right)", name: "prodTitle", widget: "string", default: "VYBEZMADETHIS"}
+          - {label: "--- ARTIST (Black Vybez) ---", name: "sep1", widget: "hidden"}
+          - {label: "ARTIST - Facebook Link", name: "artistFb", widget: "string", required: false}
+          - {label: "ARTIST - Facebook Icon", name: "artistFbIcon", widget: "image", required: false}
+          - {label: "ARTIST - Instagram Link", name: "artistIg", widget: "string", required: false}
+          - {label: "ARTIST - Instagram Icon", name: "artistIgIcon", widget: "image", required: false}
+          - {label: "ARTIST - TikTok Link", name: "artistTt", widget: "string", required: false}
+          - {label: "ARTIST - TikTok Icon", name: "artistTtIcon", widget: "image", required: false}
+          - {label: "ARTIST - YouTube Link", name: "artistYt", widget: "string", required: false}
+          - {label: "ARTIST - YouTube Icon", name: "artistYtIcon", widget: "image", required: false}
+          - {label: "--- PRODUCER (VybezMadeThis) ---", name: "sep2", widget: "hidden"}
+          - {label: "PRODUCER - Facebook Link", name: "prodFb", widget: "string", required: false}
+          - {label: "PRODUCER - Facebook Icon", name: "prodFbIcon", widget: "image", required: false}
+          - {label: "PRODUCER - Instagram Link", name: "prodIg", widget: "string", required: false}
+          - {label: "PRODUCER - Instagram Icon", name: "prodIgIcon", widget: "image", required: false}
+          - {label: "PRODUCER - TikTok Link", name: "prodTt", widget: "string", required: false}
+          - {label: "PRODUCER - TikTok Icon", name: "prodTtIcon", widget: "image", required: false}
+          - {label: "PRODUCER - YouTube Link", name: "prodYt", widget: "string", required: false}
+          - {label: "PRODUCER - YouTube Icon", name: "prodYtIcon", widget: "image", required: false}
+          - {label: "Email Contact", name: "email", widget: "string", required: false}
+          - {label: "Copyright Text", name: "copyright", widget: "string", default: "© 2025 Vybezone. All rights reserved."}
+
+  # --- 2. GLOBAL SETTINGS ---
+  - name: "settings"
+    label: "⚙️ Global & Info"
+    files:
+      - name: "global"
+        label: "Site Config"
+        file: "settings.json"
+        fields:
+          - {label: "Logo Type", name: "logoType", widget: "select", options: ["text", "image"], default: "text"}
+          - {label: "Logo Text", name: "logoText", widget: "string", default: "BLACK VYBEZ", required: false}
+          - {label: "Logo Image", name: "logoImage", widget: "image", required: false}
+          - {label: "Exclusive Title", name: "exclusiveTitle", widget: "string"}
+          - {label: "Exclusive Text", name: "exclusiveText", widget: "text"}
+          - {label: "AI Access Title", name: "aiTitle", widget: "string"}
+          - {label: "AI Access Text", name: "aiText", widget: "text"}
+          - {label: "Vault Beats Title", name: "vaultTitle", widget: "string"}
+          - {label: "Vault Beats Text", name: "vaultText", widget: "text"}
+
+  # --- LINKTREE / BIO LINKS PAGE (NEW & IMPROVED) ---
   - name: "biolinks"
     label: "🔗 BIO LINKS (Linktree)"
     files:
@@ -36,3 +93,102 @@
           - {label: "Instagram URL", name: "instagram", widget: "string", required: false}
           - {label: "TikTok URL", name: "tiktok", widget: "string", required: false}
           - {label: "YouTube URL", name: "youtube", widget: "string", required: false}
+
+  # --- POP-UP MANAGER ---
+  - name: "popups"
+    label: "🔔 Pop-up Manager"
+    files:
+      - name: "popup_main"
+        label: "Main Pop-up"
+        file: "popup_main.json"
+        fields:
+          - {label: "Enable Pop-up?", name: "active", widget: "boolean", default: false}
+          - {label: "Title", name: "title", widget: "string"}
+          - {label: "Message", name: "text", widget: "text"}
+          - {label: "Image", name: "image", widget: "image", required: false}
+          - {label: "Button Text", name: "btnText", widget: "string"}
+          - {label: "Button Link", name: "btnLink", widget: "string"}
+
+  # --- RELEASES CATALOG ---
+  - name: "releases"
+    label: "🎹 Releases"
+    files:
+      - name: "catalog"
+        label: "Music Catalog"
+        file: "releases.json"
+        fields:
+          - name: "tracks"
+            label: "Track List"
+            widget: "list"
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Description", name: "description", widget: "text", required: false}
+              - {label: "YouTube URL", name: "youtubeUrl", widget: "string"}
+              - {label: "Cover Art", name: "cover", widget: "image"}
+              - {label: "Stream Link", name: "streamUrl", widget: "string"}
+              - {label: "Buy Link", name: "bundleUrl", widget: "string"}
+
+  # --- BEAT STORE ---
+  - name: "beats"
+    label: "💰 Beat Store"
+    files:
+      - name: "beatslist"
+        label: "Beats Catalog"
+        file: "beats.json"
+        fields:
+          - {label: "Store Status", name: "storeActive", widget: "boolean", default: true}
+          - name: "beatslist"
+            label: "Beats"
+            widget: "list"
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Audio Preview", name: "audioSrc", widget: "file"}
+              - {label: "Price", name: "price", widget: "string", default: "29.99€"}
+              - {label: "Checkout URL", name: "checkoutUrl", widget: "string"}
+
+  # --- MERCH STORE ---
+  - name: "merch"
+    label: "👕 Merch Store"
+    files:
+      - name: "merch_catalog"
+        label: "Store Settings"
+        file: "merch.json"
+        fields:
+          - {label: "Store Status", name: "storeStatus", widget: "boolean", default: false}
+          - name: "products"
+            label: "Products"
+            widget: "list"
+            fields:
+              - {label: "Name", name: "name", widget: "string"}
+              - {label: "Price", name: "price", widget: "string"}
+              - {label: "Image", name: "image", widget: "image"}
+              - {label: "Link", name: "link", widget: "string"}
+
+  # --- GALLERY & OTHER ---
+  - name: "gallery"
+    label: "📸 Gallery"
+    files:
+      - name: "gallery_images"
+        label: "Photos"
+        file: "gallery.json"
+        fields:
+          - name: "images"
+            label: "Collection"
+            widget: "list"
+            fields:
+              - {label: "Image", name: "src", widget: "image"}
+              - {label: "Caption", name: "caption", widget: "string", required: false}
+
+  - name: "podcasts"
+    label: "🎙️ Podcasts"
+    files:
+      - name: "podcast_list"
+        label: "Episodes"
+        file: "podcasts.json"
+        fields:
+          - name: "episodes"
+            label: "Episodes"
+            widget: "list"
+            fields:
+              - {label: "Title", name: "title", widget: "string"}
+              - {label: "Link", name: "link", widget: "string"}
