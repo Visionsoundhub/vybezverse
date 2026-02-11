@@ -6,12 +6,17 @@
       "text": "Official Website",
       "url": "https://blackvybez.gr/",
       "icon": "fa-solid fa-globe"
+    },
+    {
+      "highlight": false,
+      "text": "Merch Store",
+      "url": "https://blackvybez.gr/store.html",
+      "icon": "fa-solid fa-shirt"
     }
   ],
   "youtube": "https://www.youtube.com/channel/UCClp2vD0V0ECuDIDCZR_Rhw",
   "showLatest": true,
   "tagline": "No limits in music. Just pure vibes.",
-  "releaseCover": "/assets/uploads/jazz-bar-των-τεράτων-high-resolution.jpg",
   "latestTitle": "Jazz Bar Ton Teraton",
   "profileImage": "/assets/uploads/banner.png",
   "instagram": "https://www.instagram.com/blackvybez_/",
