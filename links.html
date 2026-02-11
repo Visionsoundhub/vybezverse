@@ -6,71 +6,123 @@
     <title>Links | BLACK VYBEZ</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        :root { --primary: #8a2be2; --glass: rgba(255, 255, 255, 0.08); --border: rgba(255, 255, 255, 0.15); }
+        :root { 
+            --primary: #8a2be2; 
+            --glass: rgba(255, 255, 255, 0.08); 
+            --border: rgba(255, 255, 255, 0.15); 
+        }
+        
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
         body {
             background: linear-gradient(-45deg, #050505, #1a0033, #0d001a, #000);
-            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
-            color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px;
+            background-size: 400% 400%; 
+            animation: gradientBG 15s ease infinite;
+            color: white; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            padding: 40px 20px;
         }
+
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
         .container { width: 100%; max-width: 450px; text-align: center; }
         
-        .profile-img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 15px; object-fit: cover; }
+        .profile-img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 15px; object-fit: cover; box-shadow: 0 0 20px rgba(138,43,226,0.5); }
         .tagline { color: #ccc; font-size: 0.9rem; margin-bottom: 30px; }
 
-        /* New Drop Card */
+        /* Track Card Design */
         .release-card { 
-            background: rgba(0,0,0,0.7); border: 1px solid var(--border); border-radius: 24px; 
-            padding: 15px; margin-bottom: 25px; cursor: pointer; transition: 0.4s; overflow: hidden;
+            background: rgba(0,0,0,0.7); 
+            border: 1px solid var(--border); 
+            border-radius: 24px; 
+            padding: 15px; 
+            margin-bottom: 25px; 
+            cursor: pointer; 
+            transition: 0.4s; 
+            overflow: hidden;
+            position: relative;
         }
         .release-card:hover { border-color: var(--primary); transform: scale(1.02); }
         
         .new-drop-badge {
-            background: var(--primary); color: white; padding: 6px 16px; border-radius: 20px;
-            font-size: 0.75rem; font-weight: 900; display: inline-block; margin-bottom: 15px;
-            box-shadow: 0 0 15px var(--primary); text-transform: uppercase;
+            background: var(--primary); 
+            color: white; 
+            padding: 6px 16px; 
+            border-radius: 20px;
+            font-size: 0.75rem; 
+            font-weight: 900; 
+            display: inline-block; 
+            margin-bottom: 15px;
+            box-shadow: 0 0 15px var(--primary); 
+            text-transform: uppercase;
         }
         
         .cover-art { width: 100%; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .release-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 10px; }
+        .release-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 5px; }
 
-        /* Expandable Area */
-        #drop-drawer { max-height: 0; opacity: 0; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        .release-card.active #drop-drawer { max-height: 600px; opacity: 1; margin-top: 20px; }
+        /* Expandable Drawer */
+        #drop-drawer { 
+            max-height: 0; 
+            opacity: 0; 
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            visibility: hidden;
+        }
+        .release-card.active #drop-drawer { 
+            max-height: 600px; 
+            opacity: 1; 
+            margin-top: 20px; 
+            visibility: visible;
+        }
 
         .action-btn { 
             width: 100%; padding: 14px; border-radius: 12px; text-decoration: none; 
             font-weight: 700; display: flex; align-items: center; justify-content: space-between; 
             margin-bottom: 10px; color: white; background: var(--glass); border: 1px solid var(--border);
-            transition: 0.3s; font-size: 0.85rem;
+            transition: 0.3s; font-size: 0.85rem; text-transform: uppercase;
         }
         .action-btn:hover { background: rgba(138,43,226,0.2); border-color: var(--primary); }
-        .btn-buy { background: var(--primary); border: none; }
+        .btn-buy { background: var(--primary); border: none; box-shadow: 0 0 15px rgba(138,43,226,0.3); }
 
-        /* Standard Links */
+        /* Custom Links List */
         .link-item { 
-            background: var(--glass); border: 1px solid var(--border); padding: 14px; 
-            border-radius: 12px; text-decoration: none; color: white; display: flex; 
-            align-items: center; justify-content: center; font-weight: 600; margin-bottom: 12px; 
+            background: var(--glass); 
+            border: 1px solid var(--border); 
+            padding: 14px 20px; 
+            border-radius: 12px; 
+            text-decoration: none; 
+            color: white; 
+            display: flex; 
+            align-items: center; 
+            font-weight: 600; 
+            margin-bottom: 12px; 
+            transition: 0.3s;
         }
+        .link-item:hover { background: rgba(138,43,226,0.15); border-color: var(--primary); transform: translateY(-2px); }
+        .link-item.highlight { border-color: var(--primary); background: rgba(138,43,226,0.1); }
         
-        .socials { display: flex; justify-content: center; gap: 20px; margin-top: 30px; }
-        .social-icon { color: #fff; font-size: 1.5rem; opacity: 0.6; transition: 0.3s; }
-        .social-icon:hover { opacity: 1; color: var(--primary); }
+        .link-text { flex-grow: 1; text-align: center; margin-right: 24px; }
+        .link-media { width: 24px; height: 24px; border-radius: 4px; object-fit: cover; margin-right: 12px; }
+        .link-icon { font-size: 1.2rem; margin-right: 12px; width: 24px; text-align: center; }
+
+        .socials { display: flex; justify-content: center; gap: 25px; margin-top: 30px; }
+        .social-icon { color: #fff; font-size: 1.6rem; opacity: 0.6; transition: 0.3s; }
+        .social-icon:hover { opacity: 1; color: var(--primary); transform: scale(1.1); }
     </style>
 </head>
 <body>
     <div class="container" id="content" style="display:none;">
         <img id="p-img" src="" class="profile-img">
-        <h2 id="p-name" style="margin-bottom:5px"></h2>
+        <h2 id="p-name"></h2>
         <p id="p-tag" class="tagline"></p>
 
         <div id="rel-section" class="release-card" onclick="this.classList.toggle('active')" style="display:none;">
             <div class="new-drop-badge">🔥 NEW DROP</div>
             <img id="rel-cover" src="" class="cover-art">
             <h3 id="rel-title" class="release-title"></h3>
-            <p style="font-size: 0.8rem; opacity: 0.6;">ΚΛΙΚ ΓΙΑ ΕΠΙΛΟΓΕΣ</p>
+            <p id="click-hint" style="font-size: 0.75rem; opacity: 0.5;">ΚΛΙΚ ΓΙΑ ΕΠΙΛΟΓΕΣ</p>
             
             <div id="drop-drawer">
                 <div id="action-list"></div>
@@ -78,15 +130,20 @@
         </div>
 
         <div id="links-list"></div>
+
         <div class="socials" id="social-box"></div>
+        
+        <p style="margin-top:50px; font-size:0.6rem; opacity:0.3; letter-spacing: 1px;">POWERED BY VYBEZONE</p>
     </div>
 
     <script>
         fetch('links.json').then(r => r.json()).then(data => {
+            // Setup Profile
             document.getElementById('p-img').src = data.profileImage;
             document.getElementById('p-name').innerText = data.profileName;
             document.getElementById('p-tag').innerText = data.tagline;
 
+            // Setup Release Card
             if(data.showLatest) {
                 document.getElementById('rel-section').style.display = 'block';
                 document.getElementById('rel-title').innerText = data.latestTitle;
@@ -102,19 +159,37 @@
                 document.getElementById('action-list').innerHTML = acts;
             }
 
+            // Setup Custom Buttons (Icons or Images)
             const lBox = document.getElementById('links-list');
-            data.buttons.forEach(b => {
-                const a = document.createElement('a'); a.href = b.url; a.className = 'link-item'; a.target = '_blank';
-                a.innerHTML = `${b.icon ? '<i class="'+b.icon+'" style="margin-right:10px"></i>' : ''} ${b.text}`;
-                lBox.appendChild(a);
-            });
+            if(data.buttons) {
+                data.buttons.forEach(b => {
+                    const a = document.createElement('a'); 
+                    a.href = b.url; 
+                    a.className = `link-item ${b.highlight ? 'highlight' : ''}`; 
+                    a.target = '_blank';
+                    
+                    let mediaHtml = '';
+                    if (b.buttonImage) {
+                        mediaHtml = `<img src="${b.buttonImage}" class="link-media">`;
+                    } else if (b.icon) {
+                        mediaHtml = `<i class="${b.icon} link-icon"></i>`;
+                    }
 
+                    a.innerHTML = `${mediaHtml} <span class="link-text">${b.text}</span>`;
+                    lBox.appendChild(a);
+                });
+            }
+
+            // Setup Socials
             const sBox = document.getElementById('social-box');
             if(data.instagram) sBox.innerHTML += `<a href="${data.instagram}" target="_blank" class="social-icon"><i class="fab fa-instagram"></i></a>`;
             if(data.tiktok) sBox.innerHTML += `<a href="${data.tiktok}" target="_blank" class="social-icon"><i class="fab fa-tiktok"></i></a>`;
             if(data.youtube) sBox.innerHTML += `<a href="${data.youtube}" target="_blank" class="social-icon"><i class="fab fa-youtube"></i></a>`;
 
             document.getElementById('content').style.display = 'block';
+        }).catch(err => {
+            console.error("Error loading links:", err);
+            document.body.innerHTML = "<div style='padding:50px; text-align:center;'>ERROR LOADING VYBEZ. ΠΡΕΠΕΙ ΝΑ ΠΑΤΗΣΕΙΣ PUBLISH ΣΤΟ PANEL.</div>";
         });
     </script>
 </body>
