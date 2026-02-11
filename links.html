@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Links | BLACK VYBEZ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --primary: #8a2be2;
+            --dark: #000;
+            --glass: rgba(255, 255, 255, 0.08);
+            --border: rgba(255, 255, 255, 0.15);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+
+        body {
+            background: linear-gradient(-45deg, #050505, #1a0033, #2e004d, #000000);
+            background-size: 400% 400%;
+            animation: gradientBG 12s ease infinite;
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            text-align: center;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+
+        /* Profile Section */
+        .profile-img {
+            width: 110px;
+            height: 110px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            object-fit: cover;
+            box-shadow: 0 0 25px rgba(138, 43, 226, 0.6);
+            margin-bottom: 15px;
+        }
+
+        h1 { font-size: 1.5rem; letter-spacing: 2px; margin-bottom: 5px; text-shadow: 0 0 10px rgba(138,43,226,0.8); }
+        .tagline { color: #ccc; font-size: 0.95rem; margin-bottom: 30px; }
+
+        /* Links Styles */
+        .link-card {
+            background: var(--glass);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            padding: 16px;
+            margin-bottom: 16px;
+            border-radius: 14px;
+            text-decoration: none;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .link-card:hover {
+            transform: translateY(-3px) scale(1.02);
+            background: rgba(138, 43, 226, 0.25);
+            border-color: var(--primary);
+            box-shadow: 0 5px 20px rgba(138, 43, 226, 0.3);
+        }
+
+        .link-card i { margin-right: 10px; font-size: 1.2rem; }
+
+        /* Highlighted Button */
+        .highlight {
+            border: 1px solid var(--primary);
+            background: rgba(138, 43, 226, 0.15);
+            box-shadow: 0 0 15px rgba(138, 43, 226, 0.2);
+        }
+
+        /* Latest Release Section */
+        .latest-release-container {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 25px;
+            position: relative;
+        }
+        
+        .latest-badge {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--primary);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .split-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .split-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+        }
+
+        .btn-stream { background: #1DB954; color: black; } /* Spotify Green */
+        .btn-video { background: #FF0000; color: white; }   /* YouTube Red */
+        .btn-full { width: 100%; background: var(--primary); color: white; }
+
+        .split-btn:hover { filter: brightness(1.2); transform: scale(1.05); }
+
+        /* Socials */
+        .socials {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .social-icon {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.8rem;
+            transition: 0.3s;
+        }
+        .social-icon:hover { color: var(--primary); transform: scale(1.2); }
+
+        @keyframes fadeIn { to { opacity: 1; } }
+        
+        /* Preloader Fallback */
+        .loader { margin-top: 50px; font-size: 1.2rem; color: var(--primary); animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { opacity: 0.5; } 100% { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+    <div id="loader" class="loader">LOADING VYBEZ...</div>
+
+    <div class="container" id="content" style="display: none;">
+        <img id="profile-img" src="" alt="Profile" class="profile-img">
+        <h1 id="profile-name"></h1>
+        <p id="tagline" class="tagline"></p>
+
+        <div id="latest-container" class="latest-release-container" style="display: none;">
+            <div class="latest-badge">NEW DROP</div>
+            <h3 id="latest-title" style="margin-bottom: 5px;"></h3>
+            <div id="latest-actions"></div>
+        </div>
+
+        <div id="links-list"></div>
+
+        <div class="socials" id="socials-list"></div>
+        
+        <p style="margin-top: 40px; font-size: 0.7rem; opacity: 0.5;">POWERED BY VYBEZONE</p>
+    </div>
+
+    <script>
+        // Φόρτωση δεδομένων από το JSON του Panel
+        fetch('links.json')
+            .then(response => {
+                if (!response.ok) throw new Error("No data found");
+                return response.json();
+            })
+            .then(data => {
+                // 1. Setup Profile
+                document.getElementById('profile-img').src = data.profileImage || 'assets/uploads/banner.png'; // Fallback image
+                document.getElementById('profile-name').textContent = data.profileName || 'BLACK VYBEZ';
+                document.getElementById('tagline').textContent = data.tagline || '';
+
+                // 2. Setup Latest Release (The "Smart" Logic)
+                if (data.showLatest) {
+                    const container = document.getElementById('latest-container');
+                    const actionsDiv = document.getElementById('latest-actions');
+                    
+                    container.style.display = 'block';
+                    document.getElementById('latest-title').textContent = data.latestTitle || 'NEW RELEASE';
+
+                    let buttonsHtml = '';
+
+                    // Check logic: Stream AND Video? Or just Stream?
+                    if (data.videoLink && data.streamLink) {
+                        // ΔΥΟ ΚΟΥΜΠΙΑ (Split)
+                        buttonsHtml = `
+                            <div class="split-buttons">
+                                <a href="${data.streamLink}" target="_blank" class="split-btn btn-stream">
+                                    <i class="fab fa-spotify" style="margin-right:5px"></i> STREAM
+                                </a>
+                                <a href="${data.videoLink}" target="_blank" class="split-btn btn-video">
+                                    <i class="fab fa-youtube" style="margin-right:5px"></i> VIDEO
+                                </a>
+                            </div>`;
+                    } else if (data.streamLink) {
+                        // ΕΝΑ ΚΟΥΜΠΙ (Full)
+                        buttonsHtml = `
+                            <div class="split-buttons">
+                                <a href="${data.streamLink}" target="_blank" class="split-btn btn-full">
+                                    <i class="fas fa-play" style="margin-right:5px"></i> LISTEN NOW
+                                </a>
+                            </div>`;
+                    } else if (data.videoLink) {
+                         // ΕΝΑ ΚΟΥΜΠΙ VIDEO (Full)
+                         buttonsHtml = `
+                            <div class="split-buttons">
+                                <a href="${data.videoLink}" target="_blank" class="split-btn btn-full" style="background:#FF0000;">
+                                    <i class="fab fa-youtube" style="margin-right:5px"></i> WATCH VIDEO
+                                </a>
+                            </div>`;
+                    }
+
+                    actionsDiv.innerHTML = buttonsHtml;
+                }
+
+                // 3. Setup Custom Buttons
+                const linksList = document.getElementById('links-list');
+                if (data.buttons) {
+                    data.buttons.forEach((btn, index) => {
+                        const a = document.createElement('a');
+                        a.href = btn.url;
+                        a.className = `link-card ${btn.highlight ? 'highlight' : ''}`;
+                        a.target = "_blank";
+                        // Add animation delay for "waterfall" effect
+                        a.style.animation = `fadeIn 0.5s ease-out forwards ${index * 0.1}s`;
+                        
+                        let iconHtml = btn.icon ? `<i class="${btn.icon}"></i>` : '';
+                        a.innerHTML = `${iconHtml} ${btn.text}`;
+                        
+                        linksList.appendChild(a);
+                    });
+                }
+
+                // 4. Setup Socials
+                const socialsList = document.getElementById('socials-list');
+                const socials = [
+                    { link: data.instagram, icon: 'fab fa-instagram' },
+                    { link: data.tiktok, icon: 'fab fa-tiktok' },
+                    { link: data.youtube, icon: 'fab fa-youtube' },
+                    { link: data.spotify, icon: 'fab fa-spotify' }
+                ];
+
+                socials.forEach(s => {
+                    if (s.link) {
+                        const a = document.createElement('a');
+                        a.href = s.link;
+                        a.target = "_blank";
+                        a.className = "social-icon";
+                        a.innerHTML = `<i class="${s.icon}"></i>`;
+                        socialsList.appendChild(a);
+                    }
+                });
+
+                // Show Content / Hide Loader
+                document.getElementById('loader').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+            })
+            .catch(err => {
+                console.error('Error loading links:', err);
+                document.getElementById('loader').textContent = "ERROR LOADING PROFILE";
+            });
+    </script>
+</body>
+</html>
