@@ -97,9 +97,43 @@ collections:
           - {label: "Button Text", name: "btnText", widget: "string", default: "SHOP DEALS"}
           - {label: "Button Link", name: "btnLink", widget: "string", default: "#"}
 
-  # --- 3. BIO PAGE ---
+  # --- LINKTREE / BIO LINKS PAGE ---
+  - name: "biolinks"
+    label: "🔗 BIO LINKS (Linktree)"
+    files:
+      - name: "links_data"
+        label: "Links Page Settings"
+        file: "links.json"
+        fields:
+          - {label: "Profile Image", name: "profileImage", widget: "image"}
+          - {label: "Profile Name", name: "profileName", widget: "string", default: "BLACK VYBEZ"}
+          - {label: "Bio / Tagline", name: "tagline", widget: "string", default: "No limits in music. Just pure vibes."}
+          
+          - {label: "--- LATEST RELEASE (Special) ---", name: "sep_latest", widget: "hidden"}
+          - {label: "Show Latest Release?", name: "showLatest", widget: "boolean", default: true}
+          - {label: "Release Title", name: "latestTitle", widget: "string", default: "🔥 NEW DROP"}
+          - {label: "Stream Link (Spotify/Apple)", name: "streamLink", widget: "string", required: false}
+          - {label: "Video Link (YouTube)", name: "videoLink", widget: "string", required: false, hint: "Αν βάλεις ΚΑΙ βίντεο, θα εμφανιστούν 2 κουμπιά."}
+
+          - {label: "--- BUTTONS LIST ---", name: "sep_btns", widget: "hidden"}
+          - name: "buttons"
+            label: "Custom Links"
+            widget: "list"
+            fields:
+              - {label: "Button Text", name: "text", widget: "string"}
+              - {label: "URL", name: "url", widget: "string"}
+              - {label: "Icon Class (Optional)", name: "icon", widget: "string", hint: "px. fas fa-shopping-cart (FontAwesome)"}
+              - {label: "Highlight?", name: "highlight", widget: "boolean", default: false, hint: "Κάνει το κουμπί να ξεχωρίζει"}
+
+          - {label: "--- SOCIAL ICONS ---", name: "sep_socials", widget: "hidden"}
+          - {label: "Instagram URL", name: "instagram", widget: "string", required: false}
+          - {label: "TikTok URL", name: "tiktok", widget: "string", required: false}
+          - {label: "YouTube URL", name: "youtube", widget: "string", required: false}
+          - {label: "Spotify URL", name: "spotify", widget: "string", required: false}
+
+  # --- 3. BIO PAGE (WEBSITE) ---
   - name: "bio"
-    label: "👤 Bio Page"
+    label: "👤 Bio Page (Site)"
     files:
       - name: "bio_content"
         label: "Biography Data"
@@ -154,7 +188,6 @@ collections:
             fields:
               - {label: "Title", name: "title", widget: "string"}
               - {label: "Short Description", name: "description", widget: "text", required: false}
-              # RELATION WIDGET ΓΙΑ ΤΑ FREQUENCIES (GENRES)
               - label: "Frequency / Genre"
                 name: "genre"
                 widget: "relation"
@@ -186,7 +219,7 @@ collections:
               - {label: "Frequency Name (Site)", name: "name", widget: "string"}
               - {label: "Admin Note (Panel Only - e.g. 'Trap')", name: "note", widget: "string", required: false}
 
-  # --- 7. BEAT STORE (EDITED WITH TOGGLE) ---
+  # --- 7. BEAT STORE ---
   - name: "beats"
     label: "💰 Beat Store"
     files:
@@ -194,10 +227,8 @@ collections:
         label: "Beats Catalog"
         file: "beats.json"
         fields:
-          # --- ΟΙ ΝΕΕΣ ΠΡΟΣΘΗΚΕΣ ΓΙΑ ΤΟ ON/OFF ---
           - {label: "Store Status (ON = Open, OFF = Closed)", name: "storeActive", widget: "boolean", default: true}
           - {label: "Coming Soon Message", name: "comingSoonText", widget: "string", default: "BEAT STORE COMING SOON"}
-          # ---------------------------------------
           - name: "beatslist"
             label: "Beats"
             widget: "list"
@@ -211,7 +242,6 @@ collections:
               - {label: "BPM", name: "bpm", widget: "string", required: false}
               - {label: "Key", name: "key", widget: "string", required: false}
               - {label: "Purchase Link", name: "checkoutUrl", widget: "string"}
-              # RELATION WIDGET ΓΙΑ ΤΑ VIBES
               - label: "Vibe Tags"
                 name: "tags"
                 widget: "relation"
@@ -311,7 +341,6 @@ collections:
                   - {label: "Image", name: "image", widget: "image", required: false}
                   - {label: "Link URL", name: "url", widget: "string", required: false}
                   - {label: "Link Text", name: "btnText", widget: "string", default: "READ MORE"}
-
               - label: "🎬 Video"
                 name: "video"
                 widget: "object"
@@ -319,7 +348,6 @@ collections:
                   - {label: "Title", name: "headline", widget: "string", required: false}
                   - {label: "YouTube URL", name: "videoUrl", widget: "string"}
                   - {label: "Description", name: "body", widget: "text", required: false}
-
               - label: "📸 Photo Card"
                 name: "photo"
                 widget: "object"
@@ -337,28 +365,26 @@ collections:
           - {label: "Button: All Releases", name: "allReleasesText", widget: "string", default: "All Releases"}
           - {label: "Button: Why Buy", name: "whyBuyText", widget: "string", default: "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΩ;"}
           - {label: "Button: What's Included", name: "whatsIncludedText", widget: "string", default: "ΤΙ ΠΕΡΙΛΑΜΒΑΝΕΙ;"}
-          - {label: "--- WHY BUY MODAL ---", name: "sep_why", widget: "hidden"}
           - {label: "Modal Title", name: "modalTitle", widget: "string", default: "ΓΙΑΤΙ ΝΑ ΑΓΟΡΑΣΕΙΣ;"}
           - {label: "Section 1: Title", name: "supportTitle", widget: "string", default: "ΣΤΗΡΙΞΕ ΤΟΝ ΚΑΛΛΙΤΕΧΝΗ"}
-          - {label: "Section 1: Text", name: "supportText", widget: "text", default: "Οι πλατφόρμες streaming πληρώνουν ελάχιστα. Η αγορά ενός τραγουδιού ισοδυναμεί με χιλιάδες streams."}
+          - {label: "Section 1: Text", name: "supportText", widget: "text", default: "Οι πλατφόρμες streaming πληρώνουν ελάχιστα..."}
           - {label: "Section 2: Title", name: "getTitle", widget: "string", default: "ΤΙ ΠΑΙΡΝΕΙΣ;"}
-          - {label: "Section 2: Text", name: "getText", widget: "text", default: "High Quality Audio, Εναλλακτικές Εκδόσεις, Ringtones, Artwork, Στίχους."}
+          - {label: "Section 2: Text", name: "getText", widget: "text", default: "High Quality Audio, Εναλλακτικές Εκδόσεις..."}
 
       - name: "store"
         label: "Store Page Settings"
         file: "store.json"
         fields:
           - {label: "Page Title (H1)", name: "title", widget: "string", default: "STORE"}
-          - {label: "--- BUNDLE LIST (For Releases Modal) ---", name: "sep_bund", widget: "hidden"}
-          - {label: "Bundle Subtitle", name: "subtitle", widget: "string", default: "Το πλήρες πακέτο περιεχομένου για κάθε τραγούδι που αγοράζεις."}
+          - {label: "Bundle Subtitle", name: "subtitle", widget: "string", default: "Το πλήρες πακέτο περιεχομένου..."}
           - name: "bundleItems"
             label: "Bundle List Items"
             widget: "list"
             fields:
               - {label: "Item Text", name: "text", widget: "string"}
-              - {label: "FontAwesome Icon Class (e.g. fas fa-music)", name: "icon", widget: "string"}
+              - {label: "Icon Class", name: "icon", widget: "string"}
 
-  # --- 12. MERCH STORE (CONSOLIDATED) ---
+  # --- 12. MERCH STORE ---
   - name: "merch"
     label: "👕 Merch Store"
     files:
@@ -366,19 +392,19 @@ collections:
         label: "Store Settings & Products"
         file: "merch.json"
         fields:
-          - {label: "Store Status (ON = Show Products, OFF = Coming Soon)", name: "storeStatus", widget: "boolean", default: false}
-          - {label: "Coming Soon Text", name: "comingSoonText", widget: "string", default: "MERCH DROP 2025. COMING SOON."}
+          - {label: "Store Status (ON/OFF)", name: "storeStatus", widget: "boolean", default: false}
+          - {label: "Coming Soon Text", name: "comingSoonText", widget: "string", default: "MERCH DROP 2025."}
           - name: "products"
             label: "Product List"
             widget: "list"
             fields:
-              - {label: "Product Status", name: "status", widget: "select", options: ["available", "sold_out", "hidden"], default: "available"}
+              - {label: "Product Status", name: "status", widget: "select", options: ["available", "sold_out", "hidden"]}
               - {label: "Product Name", name: "name", widget: "string"}
               - {label: "Price", name: "price", widget: "string", default: "25.00€"}
               - {label: "Main Image", name: "image", widget: "image"}
               - {label: "Description", name: "description", widget: "text", required: false}
               - name: "gallery"
-                label: "Additional Images (Gallery)"
+                label: "Additional Images",
                 widget: "list"
                 required: false
                 fields:
