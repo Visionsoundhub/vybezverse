@@ -1,12 +1,4 @@
-backend:
-  name: git-gateway
-  branch: main
-
-media_folder: "assets/uploads"
-public_folder: "/assets/uploads"
-
-collections:
-  # --- LINKTREE / BIO LINKS PAGE ---
+# --- LINKTREE / BIO LINKS PAGE ---
   - name: "biolinks"
     label: "🔗 BIO LINKS (Linktree)"
     files:
@@ -21,13 +13,14 @@ collections:
           - {label: "--- LATEST RELEASE SECTION ---", name: "sep_latest", widget: "hidden"}
           - {label: "Show Latest Release?", name: "showLatest", widget: "boolean", default: true}
           - {label: "Release Title", name: "latestTitle", widget: "string", default: "🔥 NEW DROP"}
+          - {label: "Release Cover Art", name: "releaseCover", widget: "image"}
+          
+          - {label: "--- ACTION LINKS ---", name: "sep_action", widget: "hidden"}
           - {label: "🛍️ Buy Link (Bundle)", name: "buyLink", widget: "string", required: false}
           - {label: "📺 Video Link (YouTube)", name: "videoLink", widget: "string", required: false}
-          
-          - {label: "--- STREAMING OPTIONS ---", name: "sep_stream", widget: "hidden"}
           - {label: "🍎 Apple Music Link", name: "appleLink", widget: "string", required: false}
+          - {label: "🎵 YouTube Music Link", name: "ytMusicLink", widget: "string", required: false}
           - {label: "🌊 Tidal Link", name: "tidalLink", widget: "string", required: false}
-          - {label: "🎵 Other Stream Link", name: "otherLink", widget: "string", required: false}
 
           - {label: "--- ADDITIONAL BUTTONS ---", name: "sep_btns", widget: "hidden"}
           - name: "buttons"
@@ -36,7 +29,7 @@ collections:
             fields:
               - {label: "Button Text", name: "text", widget: "string"}
               - {label: "URL", name: "url", widget: "string"}
-              - {label: "Icon Class", name: "icon", widget: "string", hint: "e.g. fas fa-shopping-cart"}
+              - {label: "Icon Class", name: "icon", widget: "string", required: false, hint: "π.χ. fas fa-link"}
               - {label: "Highlight?", name: "highlight", widget: "boolean", default: false}
 
           - {label: "--- SOCIAL ICONS ---", name: "sep_socials", widget: "hidden"}
