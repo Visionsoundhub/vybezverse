@@ -55,7 +55,7 @@ collections:
           - {label: "Vault Beats Title", name: "vaultTitle", widget: "string"}
           - {label: "Vault Beats Text", name: "vaultText", widget: "text"}
 
-  # --- LINKTREE / BIO LINKS PAGE (NEW & IMPROVED) ---
+  # --- LINKTREE / BIO LINKS PAGE (FINAL VERSION) ---
   - name: "biolinks"
     label: "🔗 BIO LINKS (Linktree)"
     files:
@@ -86,7 +86,8 @@ collections:
             fields:
               - {label: "Button Text", name: "text", widget: "string"}
               - {label: "URL", name: "url", widget: "string"}
-              - {label: "Icon Class", name: "icon", widget: "string", required: false, hint: "π.χ. fas fa-link"}
+              - {label: "Icon Class (Optional)", name: "icon", widget: "string", required: false, hint: "π.χ. fas fa-podcast"}
+              - {label: "OR Button Image (Optional)", name: "buttonImage", widget: "image", required: false, hint: "Ανέβασε φωτό (π.χ. podcast cover) αντί για εικονίδιο"}
               - {label: "Highlight?", name: "highlight", widget: "boolean", default: false}
 
           - {label: "--- SOCIAL ICONS ---", name: "sep_socials", widget: "hidden"}
