@@ -3,8 +3,8 @@
   "buttons": [
     {
       "highlight": false,
-      "text": "🌐 Official Website",
-      "url": "blackvybez.gr",
+      "text": "Official Website",
+      "url": "https://blackvybez.gr/",
       "icon": "fa-solid fa-globe"
     }
   ],
