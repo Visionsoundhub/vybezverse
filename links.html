@@ -10,35 +10,53 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body {
             background: linear-gradient(-45deg, #050505, #1a0033, #0d001a, #000);
-            background-size: 400% 400%;
-            animation: gradientBG 15s ease infinite;
+            background-size: 400% 400%; animation: gradientBG 15s ease infinite;
             color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 40px 20px;
         }
         @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         .container { width: 100%; max-width: 450px; text-align: center; }
-        .profile-img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); box-shadow: 0 0 20px rgba(138,43,226,0.5); margin-bottom: 15px; object-fit: cover; }
+        
+        .profile-img { width: 100px; height: 100px; border-radius: 50%; border: 3px solid var(--primary); margin-bottom: 15px; object-fit: cover; }
         .tagline { color: #ccc; font-size: 0.9rem; margin-bottom: 30px; }
-        
-        /* Release Card */
-        .release-card { background: rgba(0,0,0,0.6); border: 1px solid var(--primary); border-radius: 20px; padding: 20px; margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .release-title { font-weight: 800; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px; font-size: 1.1rem; }
-        
-        .btn-main { width: 100%; padding: 16px; border-radius: 12px; text-decoration: none; font-weight: 700; display: flex; align-items: center; justify-content: center; margin-bottom: 10px; transition: 0.3s; border: none; cursor: pointer; color: white; text-transform: uppercase; font-size: 0.9rem; }
-        .btn-buy { background: var(--primary); box-shadow: 0 0 15px rgba(138,43,226,0.4); }
-        .btn-outline { background: var(--glass); border: 1px solid var(--border); }
-        
-        /* Streaming Drawer */
-        #stream-drawer { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; background: rgba(255,255,255,0.03); border-radius: 10px; }
-        .stream-option { display: flex; align-items: center; justify-content: space-between; padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.05); text-decoration: none; color: #eee; font-size: 0.85rem; }
-        .stream-option:last-child { border: none; }
-        .stream-option i { font-size: 1.1rem; color: var(--primary); }
 
-        /* General Links */
-        .link-item { background: var(--glass); border: 1px solid var(--border); padding: 14px; border-radius: 12px; text-decoration: none; color: white; display: flex; align-items: center; justify-content: center; font-weight: 600; margin-bottom: 12px; transition: 0.3s; }
-        .link-item:hover { background: rgba(138,43,226,0.15); border-color: var(--primary); transform: translateY(-2px); }
+        /* New Drop Card */
+        .release-card { 
+            background: rgba(0,0,0,0.7); border: 1px solid var(--border); border-radius: 24px; 
+            padding: 15px; margin-bottom: 25px; cursor: pointer; transition: 0.4s; overflow: hidden;
+        }
+        .release-card:hover { border-color: var(--primary); transform: scale(1.02); }
+        
+        .new-drop-badge {
+            background: var(--primary); color: white; padding: 6px 16px; border-radius: 20px;
+            font-size: 0.75rem; font-weight: 900; display: inline-block; margin-bottom: 15px;
+            box-shadow: 0 0 15px var(--primary); text-transform: uppercase;
+        }
+        
+        .cover-art { width: 100%; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .release-title { font-size: 1.3rem; font-weight: 800; margin-bottom: 10px; }
+
+        /* Expandable Area */
+        #drop-drawer { max-height: 0; opacity: 0; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .release-card.active #drop-drawer { max-height: 600px; opacity: 1; margin-top: 20px; }
+
+        .action-btn { 
+            width: 100%; padding: 14px; border-radius: 12px; text-decoration: none; 
+            font-weight: 700; display: flex; align-items: center; justify-content: space-between; 
+            margin-bottom: 10px; color: white; background: var(--glass); border: 1px solid var(--border);
+            transition: 0.3s; font-size: 0.85rem;
+        }
+        .action-btn:hover { background: rgba(138,43,226,0.2); border-color: var(--primary); }
+        .btn-buy { background: var(--primary); border: none; }
+
+        /* Standard Links */
+        .link-item { 
+            background: var(--glass); border: 1px solid var(--border); padding: 14px; 
+            border-radius: 12px; text-decoration: none; color: white; display: flex; 
+            align-items: center; justify-content: center; font-weight: 600; margin-bottom: 12px; 
+        }
         
         .socials { display: flex; justify-content: center; gap: 20px; margin-top: 30px; }
-        .social-icon { color: #fff; font-size: 1.5rem; opacity: 0.7; transition: 0.3s; }
+        .social-icon { color: #fff; font-size: 1.5rem; opacity: 0.6; transition: 0.3s; }
         .social-icon:hover { opacity: 1; color: var(--primary); }
     </style>
 </head>
@@ -48,17 +66,19 @@
         <h2 id="p-name" style="margin-bottom:5px"></h2>
         <p id="p-tag" class="tagline"></p>
 
-        <div id="rel-section" class="release-card" style="display:none;">
-            <p id="rel-title" class="release-title"></p>
-            <a id="buy-btn" href="" target="_blank" class="btn-main btn-buy" style="display:none;">🛍️ ΑΓΟΡΑΣΕ ΤΟ (BUNDLE)</a>
-            <button id="stream-toggle" class="btn-main btn-outline">🎧 STREAM MUSIC <i class="fas fa-chevron-down" style="margin-left:10px"></i></button>
-            <div id="stream-drawer"></div>
-            <a id="vid-btn" href="" target="_blank" class="btn-main btn-outline" style="margin-top:10px; display:none;">📺 WATCH VIDEO</a>
+        <div id="rel-section" class="release-card" onclick="this.classList.toggle('active')" style="display:none;">
+            <div class="new-drop-badge">🔥 NEW DROP</div>
+            <img id="rel-cover" src="" class="cover-art">
+            <h3 id="rel-title" class="release-title"></h3>
+            <p style="font-size: 0.8rem; opacity: 0.6;">ΚΛΙΚ ΓΙΑ ΕΠΙΛΟΓΕΣ</p>
+            
+            <div id="drop-drawer">
+                <div id="action-list"></div>
+            </div>
         </div>
 
         <div id="links-list"></div>
         <div class="socials" id="social-box"></div>
-        <p style="margin-top:40px; font-size:0.6rem; opacity:0.4;">POWERED BY VYBEZONE</p>
     </div>
 
     <script>
@@ -70,19 +90,16 @@
             if(data.showLatest) {
                 document.getElementById('rel-section').style.display = 'block';
                 document.getElementById('rel-title').innerText = data.latestTitle;
-                if(data.buyLink) { const b = document.getElementById('buy-btn'); b.href = data.buyLink; b.style.display = 'flex'; }
-                if(data.videoLink) { const v = document.getElementById('vid-btn'); v.href = data.videoLink; v.style.display = 'flex'; }
+                document.getElementById('rel-cover').src = data.releaseCover;
                 
-                let sHtml = '';
-                if(data.appleLink) sHtml += `<a href="${data.appleLink}" target="_blank" class="stream-option">Apple Music <i class="fab fa-apple"></i></a>`;
-                if(data.tidalLink) sHtml += `<a href="${data.tidalLink}" target="_blank" class="stream-option">Tidal <i class="fas fa-water"></i></a>`;
-                if(data.otherLink) sHtml += `<a href="${data.otherLink}" target="_blank" class="stream-option">Other Platform <i class="fas fa-headphones"></i></a>`;
-                document.getElementById('stream-drawer').innerHTML = sHtml;
+                let acts = '';
+                if(data.buyLink) acts += `<a href="${data.buyLink}" target="_blank" class="action-btn btn-buy">🛍️ ΑΓΟΡΑΣΕ ΤΟ (BUNDLE) <i class="fas fa-chevron-right"></i></a>`;
+                if(data.appleLink) acts += `<a href="${data.appleLink}" target="_blank" class="action-btn">APPLE MUSIC <i class="fab fa-apple"></i></a>`;
+                if(data.ytMusicLink) acts += `<a href="${data.ytMusicLink}" target="_blank" class="action-btn">YOUTUBE MUSIC <i class="fab fa-youtube"></i></a>`;
+                if(data.tidalLink) acts += `<a href="${data.tidalLink}" target="_blank" class="action-btn">TIDAL <i class="fas fa-water"></i></a>`;
+                if(data.videoLink) acts += `<a href="${data.videoLink}" target="_blank" class="action-btn">WATCH VIDEO <i class="fas fa-play"></i></a>`;
                 
-                document.getElementById('stream-toggle').onclick = function() {
-                    const d = document.getElementById('stream-drawer');
-                    d.style.maxHeight = d.style.maxHeight === "300px" ? "0" : "300px";
-                };
+                document.getElementById('action-list').innerHTML = acts;
             }
 
             const lBox = document.getElementById('links-list');
