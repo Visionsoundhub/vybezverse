@@ -404,7 +404,7 @@ collections:
               - {label: "Main Image", name: "image", widget: "image"}
               - {label: "Description", name: "description", widget: "text", required: false}
               - name: "gallery"
-                label: "Additional Images",
+                label: "Additional Images"
                 widget: "list"
                 required: false
                 fields:
