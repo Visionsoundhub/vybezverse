@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import releasesData from '../data/releases.json';
-import { Music, Youtube, Download, Package } from 'lucide-react';
+import { Music, PlayCircle, Download, Package } from 'lucide-react';
 import './Releases.css';
 
 const Releases = () => {
@@ -44,7 +44,7 @@ const Releases = () => {
                 )}
                 {track.youtubeUrl && (
                   <a href={track.youtubeUrl} target="_blank" rel="noreferrer" className="action-btn">
-                    <Youtube size={18} /> YouTube
+                    <PlayCircle size={18} /> YouTube
                   </a>
                 )}
                 {track.bundleUrl && (
