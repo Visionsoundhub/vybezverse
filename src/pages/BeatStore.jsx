@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AudioContext } from '../context/AudioContext';
 import beatsData from '../data/beats.json';
 import vibesData from '../data/vibes.json';
+import settingsData from '../data/settings.json';
 import { Play, Pause, Search, X, ChevronDown, ChevronUp, Crown, Bot, Box, Heart, ThumbsDown } from 'lucide-react';
 import './BeatStore.css';
 
@@ -153,7 +154,7 @@ const BeatStore = () => {
       <div className="categories-accordion">
         <div className="accordion-item glass">
           <div className="accordion-header" onClick={() => toggleAccordion('exclusive')}>
-            <div className="acc-title"><Crown size={18} color="#bc74f5" /> EXCLUSIVE BEATS</div>
+            <div className="acc-title"><Crown size={18} color="#bc74f5" /> {settingsData.exclusiveTitle || 'EXCLUSIVE BEATS'}</div>
             {expandedSection === 'exclusive' ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
           </div>
           <AnimatePresence>
@@ -164,7 +165,7 @@ const BeatStore = () => {
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
               >
-                Αποκτήστε τον πλήρη και αποκλειστικό έλεγχο του beat σας. Με κάθε αγορά, το συγκεκριμένο beat αφαιρείται οριστικά από το κατάστημα και είναι πλέον αποκλειστικά δικό σας. Με αυτόν τον τρόπο, εξασφαλίζετε ότι κανείς άλλος δεν θα μπορεί να το χρησιμοποιήσει στο μέλλον. Σημείωση: Τα beats της κατηγορίας "AI Access" εξαιρούνται από την πολιτική αποκλειστικότητας (exclusive rights).
+                <p>{settingsData.exclusiveText}</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -172,7 +173,7 @@ const BeatStore = () => {
 
         <div className="accordion-item glass">
           <div className="accordion-header" onClick={() => toggleAccordion('ai')}>
-            <div className="acc-title"><Bot size={18} color="#bc74f5" /> AI ACCESS</div>
+            <div className="acc-title"><Bot size={18} color="#bc74f5" /> {settingsData.aiTitle || 'AI ACCESS'}</div>
             {expandedSection === 'ai' ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
           </div>
           <AnimatePresence>
@@ -183,7 +184,7 @@ const BeatStore = () => {
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
               >
-                Αυτή η κατηγορία περιλαμβάνει beats τα οποία εμπεριέχουν ποσοστό τεχνητής νοημοσύνης (AI) στη δημιουργία τους. Λόγω αυτής της φύσης, τα "AI Access" beats δεν διατίθενται για αποκλειστική αγορά. Μπορείτε να τα αποκτήσετε μόνο μέσω leasing (μίσθωσης), με πλήρη δικαιώματα χρήσης, αλλά το beat παραμένει διαθέσιμο και για άλλους χρήστες.
+                <p>{settingsData.aiText}</p>
               </motion.div>
             )}
           </AnimatePresence>
@@ -191,7 +192,7 @@ const BeatStore = () => {
 
         <div className="accordion-item glass">
           <div className="accordion-header" onClick={() => toggleAccordion('vault')}>
-            <div className="acc-title"><Box size={18} color="#bc74f5" /> VAULT BEATS</div>
+            <div className="acc-title"><Box size={18} color="#bc74f5" /> {settingsData.vaultTitle || 'VAULT BEATS'}</div>
             {expandedSection === 'vault' ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
           </div>
           <AnimatePresence>
@@ -202,7 +203,7 @@ const BeatStore = () => {
                 animate={{ height: 'auto', opacity: 1 }}
                 exit={{ height: 0, opacity: 0 }}
               >
-                Τα "Vault Beats" αποτελούν μία συλλογή beats σε βελτιωμένη, πιο οικονομική τιμή. Πρόκειται για παλαιότερες παραγωγές για τις οποίες δεν υπάρχει πλέον διαθέσιμο το αρχικό project και, ως εκ τούτου, δεν μπορούν να επεξεργαστούν περαιτέρω. Σημαντικό: Τα beats αυτής της κατηγορίας δεν περιλαμβάνουν τα αρχεία stems. Αποκτάτε το αρχείο beat στην καλύτερη δυνατή ποιότητα.
+                <p>{settingsData.vaultText}</p>
               </motion.div>
             )}
           </AnimatePresence>

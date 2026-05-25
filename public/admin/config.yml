@@ -1,0 +1,171 @@
+backend:
+  name: github
+  repo: Visionsoundhub/vybezverse
+  branch: main
+
+media_folder: "public/assets/uploads"
+public_folder: "/assets/uploads"
+
+collections:
+  - name: "settings"
+    label: "⚙️ Global & Info"
+    files:
+      - name: "global"
+        label: "Site Config"
+        file: "src/data/settings.json"
+        fields:
+          - { label: "Exclusive Title", name: "exclusiveTitle", widget: "string" }
+          - { label: "Exclusive Text", name: "exclusiveText", widget: "text" }
+          - { label: "AI Access Title", name: "aiTitle", widget: "string" }
+          - { label: "AI Access Text", name: "aiText", widget: "text" }
+          - { label: "Vault Beats Title", name: "vaultTitle", widget: "string" }
+          - { label: "Vault Beats Text", name: "vaultText", widget: "text" }
+
+  - name: "home"
+    label: "🏠 Home Page"
+    files:
+      - name: "home_config"
+        label: "Home Content"
+        file: "src/data/home.json"
+        fields:
+          - { label: "Hero Title Line 1", name: "heroLine1", widget: "string", default: "BLACK VYBEZ" }
+          - { label: "Hero Title Line 2", name: "heroLine2", widget: "string", default: "VYBEZMADETHIS" }
+          - { label: "Hero Subtitle", name: "heroSubtitle", widget: "string" }
+          - { label: "Hero Description", name: "heroDesc", widget: "text" }
+          - { label: "Featured Release Description", name: "featuredDesc", widget: "text" }
+          - { label: "Newsletter Title", name: "newsletterTitle", widget: "string" }
+          - { label: "Newsletter Text", name: "newsletterText", widget: "text" }
+
+  - name: "releases"
+    label: "🎹 Releases"
+    files:
+      - name: "catalog"
+        label: "Music Catalog"
+        file: "src/data/releases.json"
+        fields:
+          - name: "tracks"
+            label: "Track List"
+            widget: "list"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Description", name: "description", widget: "text", required: false }
+              - { label: "Genre", name: "genre", widget: "string", required: false }
+              - { label: "Type", name: "type", widget: "string", required: false }
+              - { label: "YouTube URL", name: "youtubeUrl", widget: "string", required: false }
+              - { label: "Cover Art", name: "cover", widget: "image" }
+              - { label: "Stream Link", name: "streamUrl", widget: "string" }
+              - { label: "Buy Link", name: "bundleUrl", widget: "string", required: false }
+
+  - name: "beats"
+    label: "💰 Beat Store"
+    files:
+      - name: "beatslist"
+        label: "Beats Catalog"
+        file: "src/data/beats.json"
+        fields:
+          - { label: "Store Status", name: "storeActive", widget: "boolean", default: true }
+          - name: "beatslist"
+            label: "Beats"
+            widget: "list"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Cover Art", name: "cover", widget: "image" }
+              - { label: "Audio Preview (MP3)", name: "audioSrc", widget: "file" }
+              - { label: "Category", name: "category", widget: "string", required: false }
+              - { label: "BPM", name: "bpm", widget: "number", required: false }
+              - { label: "Key", name: "key", widget: "string", required: false }
+              - { label: "Price", name: "price", widget: "string", default: "29.99€" }
+              - { label: "Checkout URL", name: "checkoutUrl", widget: "string" }
+              - label: "Tags"
+                name: "tags"
+                widget: "list"
+                field: { label: "Tag", name: "tag", widget: "string" }
+
+  - name: "bio"
+    label: "👤 Bio / About"
+    files:
+      - name: "bio_data"
+        label: "Biography"
+        file: "src/data/bio.json"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Profile Image", name: "image", widget: "image" }
+          - { label: "Content (use **bold**)", name: "content", widget: "text" }
+
+  - name: "biolinks"
+    label: "🔗 BIO LINKS (Linktree)"
+    files:
+      - name: "links_data"
+        label: "Links Page Settings"
+        file: "src/data/links.json"
+        fields:
+          - { label: "Profile Image", name: "profileImage", widget: "image" }
+          - { label: "Profile Name", name: "profileName", widget: "string" }
+          - { label: "Bio / Tagline", name: "tagline", widget: "string" }
+          - { label: "Show Latest Release?", name: "showLatest", widget: "boolean", default: true }
+          - { label: "Release Title", name: "latestTitle", widget: "string" }
+          - { label: "Release Cover Art", name: "releaseCover", widget: "image" }
+          - { label: "Buy Link", name: "buyLink", widget: "string", required: false }
+          - { label: "Video Link", name: "videoLink", widget: "string", required: false }
+          - { label: "Apple Music Link", name: "appleLink", widget: "string", required: false }
+          - { label: "Stream Link", name: "streamLink", widget: "string", required: false }
+          - name: "buttons"
+            label: "Custom Links"
+            widget: "list"
+            fields:
+              - { label: "Button Text", name: "text", widget: "string" }
+              - { label: "URL", name: "url", widget: "string" }
+              - { label: "Icon Class", name: "icon", widget: "string", required: false }
+              - { label: "Highlight?", name: "highlight", widget: "boolean", default: false }
+          - { label: "Instagram URL", name: "instagram", widget: "string", required: false }
+          - { label: "TikTok URL", name: "tiktok", widget: "string", required: false }
+          - { label: "YouTube URL", name: "youtube", widget: "string", required: false }
+
+  - name: "gallery"
+    label: "📸 Gallery"
+    files:
+      - name: "gallery_images"
+        label: "Photos"
+        file: "src/data/gallery.json"
+        fields:
+          - name: "images"
+            label: "Collection"
+            widget: "list"
+            fields:
+              - { label: "Image", name: "src", widget: "image" }
+              - { label: "Caption", name: "caption", widget: "string", required: false }
+
+  - name: "podcasts"
+    label: "🎙️ Podcasts"
+    files:
+      - name: "podcast_list"
+        label: "Episodes"
+        file: "src/data/podcasts.json"
+        fields:
+          - name: "episodes"
+            label: "Episodes"
+            widget: "list"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Cover Image", name: "cover", widget: "image", required: false }
+              - { label: "Description", name: "description", widget: "text", required: false }
+              - { label: "Link", name: "link", widget: "string" }
+              - { label: "Date", name: "date", widget: "string", required: false }
+
+  - name: "press"
+    label: "📰 Press / Media"
+    files:
+      - name: "press_articles"
+        label: "Articles"
+        file: "src/data/press.json"
+        fields:
+          - name: "articles"
+            label: "Articles"
+            widget: "list"
+            fields:
+              - { label: "Title", name: "title", widget: "string" }
+              - { label: "Date", name: "date", widget: "string" }
+              - { label: "Source", name: "source", widget: "string" }
+              - { label: "Image", name: "image", widget: "image", required: false }
+              - { label: "Summary", name: "summary", widget: "text" }
+              - { label: "Link", name: "link", widget: "string" }

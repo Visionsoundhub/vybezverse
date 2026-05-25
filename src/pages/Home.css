@@ -26,6 +26,31 @@
   pointer-events: none;
 }
 
+/* Floating particles */
+.hero-particles {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  top: var(--y);
+  left: var(--x);
+  width: var(--size);
+  height: var(--size);
+  border-radius: 50%;
+  background: rgba(188, 116, 245, 0.5);
+  animation: float-particle 6s ease-in-out infinite;
+  animation-delay: var(--delay);
+}
+
+@keyframes float-particle {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.3; }
+  50% { transform: translateY(-30px) scale(1.5); opacity: 0.8; }
+}
+
 .hero-content {
   position: relative;
   z-index: 2;
@@ -36,29 +61,52 @@
 }
 
 .hero-text {
-  max-width: 800px;
+  max-width: 900px;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.glitch-text {
-  font-size: clamp(3rem, 8vw, 6rem);
-  font-weight: 900;
-  letter-spacing: 4px;
-  margin-bottom: 10px;
-  background: linear-gradient(to right, #fff, #bc74f5);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  position: relative;
+/* THE BIG ANIMATED TITLE BLOCK */
+.hero-title-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 30px;
 }
 
-.hero-subtitle {
-  font-size: clamp(1.2rem, 3vw, 2rem);
-  letter-spacing: 8px;
-  color: #ff1493;
-  margin-bottom: 30px;
-  font-weight: 800;
+.hero-name {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 900;
+  letter-spacing: 4px;
+  line-height: 1.1;
+}
+
+.hero-name-left {
+  background: linear-gradient(to right, #ff1493, #ff69b4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-name-right {
+  background: linear-gradient(to right, #9b59b6, #bc74f5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.hero-x {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 300;
+  color: rgba(255, 255, 255, 0.3);
+  line-height: 1;
+  margin: 5px 0;
+  animation: pulse-x 2s ease-in-out infinite;
+}
+
+@keyframes pulse-x {
+  0%, 100% { opacity: 0.3; text-shadow: 0 0 0px transparent; }
+  50% { opacity: 1; text-shadow: 0 0 20px rgba(188, 116, 245, 0.6), 0 0 40px rgba(255, 20, 147, 0.3); }
 }
 
 .hero-desc {
@@ -369,6 +417,9 @@
 }
 
 @media (max-width: 900px) {
+  .hero-name {
+    font-size: clamp(2rem, 6vw, 3.5rem);
+  }
   .featured-card {
     flex-direction: column;
     text-align: center;

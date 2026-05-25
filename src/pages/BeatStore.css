@@ -144,8 +144,8 @@
 }
 
 .filter-select select {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
+  background: #1a1025;
+  border: 1px solid rgba(188, 116, 245, 0.3);
   color: white;
   padding: 10px 15px;
   border-radius: 8px;
@@ -154,10 +154,25 @@
   cursor: pointer;
   outline: none;
   transition: border-color 0.3s;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23bc74f5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  background-size: 16px;
+  padding-right: 35px;
+}
+
+.filter-select select option {
+  background: #1a1025;
+  color: white;
+  padding: 10px;
 }
 
 .filter-select select:focus {
   border-color: #bc74f5;
+  box-shadow: 0 0 10px rgba(188, 116, 245, 0.3);
 }
 
 /* Accordion Categories */
@@ -199,9 +214,10 @@
 
 .accordion-content {
   padding: 0 25px 25px 25px;
-  color: #ccc;
+  color: #e0e0e0;
   font-size: 0.95rem;
   line-height: 1.6;
+  overflow: hidden;
 }
 
 /* Active Vibe Indicator */

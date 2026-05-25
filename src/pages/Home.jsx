@@ -27,20 +27,64 @@ const Home = () => {
       {/* HERO SECTION - Dual Identity */}
       <section className="hero-section">
         <div className="hero-bg-glow"></div>
+        <div className="hero-particles">
+          {[...Array(20)].map((_, i) => (
+            <div key={i} className="particle" style={{
+              '--delay': `${Math.random() * 5}s`,
+              '--x': `${Math.random() * 100}%`,
+              '--y': `${Math.random() * 100}%`,
+              '--size': `${Math.random() * 4 + 1}px`,
+            }}></div>
+          ))}
+        </div>
         <div className="container hero-content">
-          <motion.div 
-            className="hero-text"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8 }}
-          >
-            <h1 className="glitch-text" data-text="VYBEZMADETHIS">VYBEZMADETHIS</h1>
-            <h2 className="hero-subtitle">ARTIST &times; PRODUCER</h2>
-            <p className="hero-desc">
-              Δεν φτιάχνω απλά beats, δημιουργώ κόσμους. Από αποκλειστικές παραγωγές για artists μέχρι τα δικά μου προσωπικά tracks, καλωσήρθες στο σύμπαν μου.
-            </p>
+          <div className="hero-text">
             
-            <div className="hero-buttons">
+            {/* THE BIG ANIMATED TITLE */}
+            <div className="hero-title-block">
+              <motion.h1 
+                className="hero-name hero-name-left"
+                initial={{ x: -120, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
+              >
+                {homeData.heroLine1 || 'BLACK VYBEZ'}
+              </motion.h1>
+              
+              <motion.span 
+                className="hero-x"
+                initial={{ scale: 0, rotate: -180, opacity: 0 }}
+                animate={{ scale: 1, rotate: 0, opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.5, type: 'spring', stiffness: 200 }}
+              >
+                ×
+              </motion.span>
+              
+              <motion.h1 
+                className="hero-name hero-name-right"
+                initial={{ x: 120, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
+              >
+                {homeData.heroLine2 || 'VYBEZMADETHIS'}
+              </motion.h1>
+            </div>
+
+            <motion.p 
+              className="hero-desc"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1 }}
+            >
+              {homeData.heroDesc || 'Δεν φτιάχνω απλά beats, δημιουργώ κόσμους.'}
+            </motion.p>
+            
+            <motion.div 
+              className="hero-buttons"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: 1.2 }}
+            >
               <Link to="/releases" className="btn-dual artist-btn">
                 <Mic2 size={20} />
                 <span>MY MUSIC</span>
@@ -49,8 +93,8 @@ const Home = () => {
                 <Headphones size={20} />
                 <span>BEATSTORE</span>
               </Link>
-            </div>
-          </motion.div>
+            </motion.div>
+          </div>
         </div>
       </section>
 
@@ -76,7 +120,7 @@ const Home = () => {
               <h3>{featuredRelease.title}</h3>
               <p className="featured-genre">{featuredRelease.genre} | {featuredRelease.type}</p>
               <p className="featured-desc">
-                Το πλήρες πακέτο περιλαμβάνει High Quality MP3, οδηγίες για iPhone ringtone, και **χειρόγραφους στίχους με υπογραφή**.
+                {homeData.featuredDesc || 'Το πλήρες πακέτο περιλαμβάνει High Quality MP3, οδηγίες για iPhone ringtone, και χειρόγραφους στίχους με υπογραφή.'}
               </p>
               
               <div className="featured-actions">
@@ -102,8 +146,8 @@ const Home = () => {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
           >
-            <h2><Sparkles color="#bc74f5" /> JOIN THE VYBEZ FAMILY</h2>
-            <p>Γράψου στο VIP Newsletter μου. Μάθε πρώτος για νέες κυκλοφορίες, πάρε αποκλειστικά discounts στα beats και free υλικό.</p>
+            <h2><Sparkles color="#bc74f5" /> {homeData.newsletterTitle || 'JOIN THE VYBEZ FAMILY'}</h2>
+            <p>{homeData.newsletterText || 'Γράψου στο VIP Newsletter μου.'}</p>
           </motion.div>
           
           <motion.div 

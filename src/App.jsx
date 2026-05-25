@@ -8,6 +8,10 @@ import BeatStore from './pages/BeatStore';
 import Releases from './pages/Releases';
 import Store from './pages/Store';
 import Gallery from './pages/Gallery';
+import Bio from './pages/Bio';
+import Links from './pages/Links';
+import Podcasts from './pages/Podcasts';
+import Press from './pages/Press';
 import './App.css';
 
 function App() {
@@ -22,6 +26,10 @@ function App() {
             <Route path="/releases" element={<Releases />} />
             <Route path="/store" element={<Store />} />
             <Route path="/gallery" element={<Gallery />} />
+            <Route path="/bio" element={<Bio />} />
+            <Route path="/links" element={<Links />} />
+            <Route path="/podcasts" element={<Podcasts />} />
+            <Route path="/press" element={<Press />} />
           </Routes>
         </main>
         <AudioPlayer />
