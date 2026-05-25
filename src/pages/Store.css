@@ -1,0 +1,84 @@
+.store-page {
+  padding-top: 60px;
+  padding-bottom: 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.store-content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.store-bundle-card {
+  padding: 50px;
+  border-radius: 24px;
+  border: 1px solid rgba(188, 116, 245, 0.3);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 30px rgba(188, 116, 245, 0.05);
+}
+
+.bundle-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.bundle-header h2 {
+  font-size: 2.5rem;
+  color: #bc74f5;
+  margin-bottom: 10px;
+  letter-spacing: 2px;
+}
+
+.bundle-header p {
+  color: #aaa;
+  font-size: 1.1rem;
+}
+
+.bundle-list {
+  list-style: none;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.bundle-list li {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  font-size: 1.1rem;
+  color: #eee;
+  padding: 15px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+
+.merch-card {
+  padding: 60px;
+  border-radius: 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  border: 1px solid rgba(255, 20, 147, 0.3);
+}
+
+.merch-card h2 {
+  font-size: 2rem;
+  letter-spacing: 3px;
+}
+
+.neon-text-pink {
+  color: #ff1493;
+  font-weight: 800;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+  text-shadow: 0 0 10px rgba(255, 20, 147, 0.5);
+}
