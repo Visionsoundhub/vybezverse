@@ -3,15 +3,19 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { AudioContext } from '../context/AudioContext';
 import beatsData from '../data/beats.json';
 import vibesData from '../data/vibes.json';
-import { Play, Pause, Search, X, ChevronDown, ChevronUp, Crown, Bot, Box } from 'lucide-react';
+import { Play, Pause, Search, X, ChevronDown, ChevronUp, Crown, Bot, Box, Heart, ThumbsDown } from 'lucide-react';
 import './BeatStore.css';
 
 const BeatStore = () => {
   const [beats, setBeats] = useState([]);
   const [vibes, setVibes] = useState([]);
   const [activeVibe, setActiveVibe] = useState('all');
-  const [isVibeModalOpen, setIsVibeModalOpen] = useState(false);
   
+  // Tinder Swipe States
+  const [isVibeModalOpen, setIsVibeModalOpen] = useState(false);
+  const [shuffledBeats, setShuffledBeats] = useState([]);
+  const [swipeIndex, setSwipeIndex] = useState(0);
+
   // Accordion state
   const [expandedSection, setExpandedSection] = useState(null);
 
@@ -20,23 +24,51 @@ const BeatStore = () => {
   const [selectedBPM, setSelectedBPM] = useState('ALL');
   const [selectedKey, setSelectedKey] = useState('ALL');
 
-  const { currentTrack, isPlaying, playTrack } = useContext(AudioContext);
+  const { currentTrack, isPlaying, playTrack, pauseTrack } = useContext(AudioContext);
 
   useEffect(() => {
     setBeats(beatsData.beatslist || []);
     setVibes(vibesData.vibes || []);
   }, []);
 
+  // When Vibe Search (Tinder mode) opens, shuffle beats
+  useEffect(() => {
+    if (isVibeModalOpen && beats.length > 0) {
+      const shuffled = [...beats].sort(() => 0.5 - Math.random());
+      setShuffledBeats(shuffled);
+      setSwipeIndex(0);
+      playTrack(shuffled[0]);
+    }
+  }, [isVibeModalOpen, beats]);
+
   const toggleAccordion = (section) => {
     setExpandedSection(expandedSection === section ? null : section);
   };
 
-  const handleVibeSelect = (vibeName) => {
-    setActiveVibe(vibeName);
+  const nextSwipeCard = (action) => {
+    const currentBeat = shuffledBeats[swipeIndex];
+    
+    if (action === 'like' && currentBeat?.checkoutUrl) {
+      window.open(currentBeat.checkoutUrl, '_blank');
+    }
+
+    const nextIdx = swipeIndex + 1;
+    if (nextIdx < shuffledBeats.length) {
+      setSwipeIndex(nextIdx);
+      playTrack(shuffledBeats[nextIdx]);
+    } else {
+      setIsVibeModalOpen(false);
+      pauseTrack();
+    }
   };
 
-  const applyVibeSearch = () => {
-    setIsVibeModalOpen(false);
+  const handleDragEnd = (e, { offset, velocity }) => {
+    const swipeThreshold = 100;
+    if (offset.x < -swipeThreshold) {
+      nextSwipeCard('skip');
+    } else if (offset.x > swipeThreshold) {
+      nextSwipeCard('like');
+    }
   };
 
   // Derive unique Genres, BPMs, Keys for dropdowns
@@ -61,7 +93,7 @@ const BeatStore = () => {
   return (
     <div className="beatstore-page beatstore-wide">
       
-      {/* Massive Hero Banner (Mockup style) */}
+      {/* Massive Hero Banner */}
       <motion.div 
         className="beatstore-banner"
         initial={{ opacity: 0, y: 20 }}
@@ -70,9 +102,8 @@ const BeatStore = () => {
         <div className="banner-bg"></div>
         <div className="banner-content">
           <div className="banner-text-right">
-            <h1>PREMIUM BEATS.<br/>UNLEASH YOUR SOUND.</h1>
-            <p>High-Quality instrumentals for Artists,<br/>Content Creators & Filmmakers.</p>
-            <button className="btn btn-shop-now">SHOP NOW</button>
+            <h1>PRODUCER HUB.<br/>FIND YOUR SOUND.</h1>
+            <p>Αποκλειστικά Instrumentals, Beats & AI Tools.</p>
           </div>
         </div>
       </motion.div>
@@ -84,8 +115,8 @@ const BeatStore = () => {
           onClick={() => setIsVibeModalOpen(true)}
         >
           <div className="btn-vibe-content">
-            <span className="vibe-icon">✦</span> 
-            VIBE SEARCH
+            <Heart className="vibe-icon-tinder" size={20} /> 
+            VIBE SEARCH (SWIPE)
           </div>
         </button>
 
@@ -178,7 +209,7 @@ const BeatStore = () => {
         </div>
       </div>
 
-      {/* Beats Grid (Mockup Style - Large Cards) */}
+      {/* Beats Grid */}
       <motion.div className="mockup-grid" layout>
         <AnimatePresence>
           {filteredBeats.map((beat, idx) => {
@@ -240,70 +271,51 @@ const BeatStore = () => {
         )}
       </motion.div>
 
-      {/* Spectacular Vibe Search Fullscreen Modal */}
+      {/* TINDER FOR BEATS MODAL */}
       <AnimatePresence>
-        {isVibeModalOpen && (
-          <div className="vibe-modal-overlay">
-            <motion.div 
-              className="vibe-modal glass"
-              initial={{ opacity: 0, scale: 0.9, y: 30 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 30 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            >
-              <button className="modal-close" onClick={() => setIsVibeModalOpen(false)}>
-                <X size={28} />
-              </button>
+        {isVibeModalOpen && shuffledBeats.length > 0 && (
+          <div className="tinder-modal-overlay">
+            <button className="modal-close" onClick={() => { setIsVibeModalOpen(false); pauseTrack(); }}>
+              <X size={32} />
+            </button>
+            
+            <div className="tinder-container">
+              <h2 className="tinder-title">DISCOVER BEATS</h2>
+              <p className="tinder-subtitle">Swipe Left to Skip. Swipe Right to Buy.</p>
 
-              <div className="modal-content-inner">
-                <h2 className="modal-title-huge">CHOOSE YOUR VIBE</h2>
-                <p className="modal-subtitle">Feel the frequency before you hear the sound.</p>
-
-                <div className="vibe-modal-pills">
-                  <button 
-                    className={`modal-vibe-pill ${activeVibe === 'all' ? 'active' : ''}`}
-                    onClick={() => handleVibeSelect('all')}
+              <div className="tinder-card-area">
+                <AnimatePresence>
+                  <motion.div
+                    key={swipeIndex}
+                    className="tinder-card"
+                    drag="x"
+                    dragConstraints={{ left: 0, right: 0 }}
+                    onDragEnd={handleDragEnd}
+                    initial={{ scale: 0.8, opacity: 0, rotate: -10 }}
+                    animate={{ scale: 1, opacity: 1, rotate: 0 }}
+                    exit={{ x: 300, opacity: 0, rotate: 20 }}
+                    transition={{ type: 'spring', damping: 20, stiffness: 200 }}
                   >
-                    <span>Όλα τα vibes</span>
-                  </button>
-                  {vibes.map((v) => (
-                    <button 
-                      key={v.name}
-                      className={`modal-vibe-pill ${activeVibe === v.name ? 'active' : ''}`}
-                      onClick={() => handleVibeSelect(v.name)}
-                      style={{'--vibe-color': v.color}}
-                    >
-                      <div className="pill-bg"></div>
-                      <span>{v.name}</span>
-                    </button>
-                  ))}
-                </div>
+                    <img src={shuffledBeats[swipeIndex]?.cover} alt="Beat cover" draggable="false" />
+                    <div className="tinder-card-info">
+                      <h3>{shuffledBeats[swipeIndex]?.title}</h3>
+                      <p>{shuffledBeats[swipeIndex]?.category} | {shuffledBeats[swipeIndex]?.bpm} BPM</p>
+                    </div>
 
-                <div className="modal-actions">
-                  <button className="btn btn-switch-frequency" onClick={applyVibeSearch}>
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
-                    SWITCH FREQUENCY
-                  </button>
-                </div>
+                    {/* Like / Skip badges that show on drag (optional, requires complex drag state, kept simple here) */}
+                  </motion.div>
+                </AnimatePresence>
               </div>
 
-              {/* Animated Audio Visualizer Bar */}
-              <div className="modal-visualizer">
-                {[...Array(40)].map((_, i) => (
-                  <motion.div 
-                    key={i} 
-                    className="viz-bar"
-                    animate={{ height: ["10%", "100%", "20%", "80%", "10%"] }}
-                    transition={{ 
-                      repeat: Infinity, 
-                      duration: 1.5 + Math.random(), 
-                      ease: "linear",
-                      delay: Math.random() 
-                    }}
-                  />
-                ))}
+              <div className="tinder-controls">
+                <button className="btn-tinder skip" onClick={() => nextSwipeCard('skip')}>
+                  <ThumbsDown size={32} />
+                </button>
+                <button className="btn-tinder like" onClick={() => nextSwipeCard('like')}>
+                  <Heart size={32} />
+                </button>
               </div>
-            </motion.div>
+            </div>
           </div>
         )}
       </AnimatePresence>
