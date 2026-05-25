@@ -1,0 +1,48 @@
+{
+  "genres": [
+    {
+      "name": "Flow State",
+      "note": "Rap"
+    },
+    {
+      "name": "Overdrive",
+      "note": "Battle / Energy Trap"
+    },
+    {
+      "name": "Ether",
+      "note": "Atmospheric Trap"
+    },
+    {
+      "name": "Latin Vibe",
+      "note": "Reggaeton"
+    },
+    {
+      "name": "Deep Pulse",
+      "note": "Amapiano / Afro"
+    },
+    {
+      "name": "Distortion",
+      "note": "Rap / Rock"
+    },
+    {
+      "name": "Vintage Freq",
+      "note": "Swing"
+    },
+    {
+      "name": "Off Grid",
+      "note": "Alternative / Glitch"
+    },
+    {
+      "name": "Neon Waves",
+      "note": "Pop"
+    },
+    {
+      "name": "Organic",
+      "note": "Folk / Indie / Acoustic"
+    },
+    {
+      "name": "Spectrum",
+      "note": "Various"
+    }
+  ]
+}

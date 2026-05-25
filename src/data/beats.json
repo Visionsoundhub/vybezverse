@@ -1,0 +1,21 @@
+{
+  "beatslist": [
+    {
+      "price": "79.99€",
+      "checkoutUrl": "https://payhip.com/builder/public",
+      "audioSrc": "/assets/uploads/solo-lio-rising-93bpm.mp3",
+      "status": "available",
+      "cover": "/assets/uploads/banner.png",
+      "title": "Late Hours",
+      "tags": [
+        "love",
+        "party"
+      ],
+      "category": "latin",
+      "bpm": "90",
+      "key": "Fminor"
+    }
+  ],
+  "storeActive": false,
+  "comingSoonText": "Σύντομα Διαθέσιμο!"
+}
