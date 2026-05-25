@@ -57,6 +57,17 @@ collections:
               - { label: "Cover Art", name: "cover", widget: "image" }
               - { label: "Stream Link", name: "streamUrl", widget: "string" }
               - { label: "Buy Link", name: "bundleUrl", widget: "string", required: false }
+              - { label: "Download URL (Free DL)", name: "downloadUrl", widget: "string", required: false }
+      - name: "releases_settings"
+        label: "Releases Settings"
+        file: "src/data/releases_settings.json"
+        fields:
+          - { label: "Page Title", name: "pageTitle", widget: "string" }
+          - { label: "Page Description", name: "pageDescription", widget: "text" }
+          - { label: "Support Title", name: "supportTitle", widget: "string" }
+          - { label: "Support Text", name: "supportText", widget: "text" }
+          - { label: "Get Info Title", name: "getTitle", widget: "string" }
+          - { label: "Get Info Text", name: "getText", widget: "string" }
 
   - name: "beats"
     label: "💰 Beat Store"
