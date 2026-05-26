@@ -80,6 +80,16 @@
   z-index: 200;
 }
 
+.dropdown-menu::before {
+  content: '';
+  position: absolute;
+  top: -15px;
+  left: 0;
+  right: 0;
+  height: 15px;
+  background: transparent;
+}
+
 .dropdown-item {
   padding: 12px 25px;
   font-size: 0.85rem;
