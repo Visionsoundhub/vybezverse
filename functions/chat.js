@@ -51,7 +51,7 @@ export async function onRequestPost(context) {
         }
 
         // Subscribe to MailerLite
-        await fetch('https://connect.mailerlite.com/api/subscribers', {
+        const mlRes = await fetch('https://connect.mailerlite.com/api/subscribers', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -60,9 +60,30 @@ export async function onRequestPost(context) {
           },
           body: JSON.stringify(mailerlitePayload),
         });
+
+        if (!mlRes.ok) {
+          const mlErr = await mlRes.json();
+          console.error('MailerLite API returned error:', mlErr);
+          const detailMsg = mlErr.message || JSON.stringify(mlErr.errors || mlErr);
+          return new Response(
+            JSON.stringify({
+              response: `Το email σου αναγνωρίστηκε, αλλά το MailerLite επέστρεψε σφάλμα: "${detailMsg}". \n\nΒεβαιώσου ότι έχεις βάλει το σωστό **Group ID** (τον αριθμό της ομάδας) και όχι το όνομα της ομάδας στις ρυθμίσεις του Cloudflare!`,
+              emailCaptured: false
+            }),
+            { status: 200, headers: { 'Content-Type': 'application/json' } }
+          );
+        }
+
         console.log(`Successfully subscribed ${email} to MailerLite via Chatbot.`);
       } catch (err) {
         console.error('Failed to subscribe email via chatbot:', err);
+        return new Response(
+          JSON.stringify({
+            response: `Σφάλμα κατά την επικοινωνία με το MailerLite: ${err.message}.`,
+            emailCaptured: false
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
       }
 
       // Return a quick success response
