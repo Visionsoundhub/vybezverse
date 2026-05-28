@@ -9,13 +9,33 @@ import './Home.css';
 const Home = () => {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const handleSubscribe = (e) => {
+  const handleSubscribe = async (e) => {
     e.preventDefault();
-    if (email) {
-      setSubscribed(true);
-      setEmail('');
-      // Here you would connect to your Mailchimp / Sendgrid API
+    if (!email) return;
+
+    try {
+      setErrorMessage('');
+      const response = await fetch('/subscribe', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        setSubscribed(true);
+        setEmail('');
+      } else {
+        setErrorMessage(data.error || 'Υπήρξε ένα σφάλμα. Δοκιμάστε ξανά.');
+      }
+    } catch (err) {
+      console.error('Subscription error:', err);
+      setErrorMessage('Σφάλμα σύνδεσης. Δοκιμάστε ξανά αργότερα.');
     }
   };
 
@@ -176,6 +196,11 @@ const Home = () => {
                 <button type="submit" className="btn-subscribe">
                   SUBSCRIBE <ArrowRight size={18} />
                 </button>
+                {errorMessage && (
+                  <div className="error-message" style={{ color: '#ff4d4d', marginTop: '12px', fontSize: '14px', width: '100%', textAlign: 'center', fontWeight: '500' }}>
+                    {errorMessage}
+                  </div>
+                )}
               </form>
             )}
           </motion.div>

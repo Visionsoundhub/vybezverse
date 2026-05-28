@@ -12,6 +12,7 @@ import Bio from './pages/Bio';
 import Links from './pages/Links';
 import Podcasts from './pages/Podcasts';
 import Press from './pages/Press';
+import ChatbotWidget from './components/ChatbotWidget';
 import './App.css';
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
           </Routes>
         </main>
         <AudioPlayer />
+        <ChatbotWidget />
       </Router>
     </AudioProvider>
   );
