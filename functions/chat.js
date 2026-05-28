@@ -93,7 +93,7 @@ export async function onRequestPost(context) {
       
       return new Response(
         JSON.stringify({
-          response: `Τέλεια! Το email σου (${email}) καταχωρήθηκε επιτυχώς στο VIP Newsletter μου. \n\nΜπορείς να κατεβάσεις το δωρεάν σου beat ("${freeBeatTitle}") από εδώ: ${freeBeatLink}\n\nΑνυπομονώ να ακούσω τι θα δημιουργήσεις! 🔥`,
+          response: `Τέλεια! Το email σου (${email}) καταχωρήθηκε επιτυχώς στο VIP Newsletter του Black Vybez. \n\nΜπορείς να κατεβάσεις το δωρεάν σου beat ("${freeBeatTitle}") από εδώ: ${freeBeatLink}\n\nΑνυπομονώ να ακούσω τι θα δημιουργήσεις! 🔥`,
           emailCaptured: true,
           email: email
         }),
@@ -105,7 +105,7 @@ export async function onRequestPost(context) {
     if (isKeywordTrigger) {
       return new Response(
         JSON.stringify({
-          response: `Ευχαριστώ για το ενδιαφέρον σου! 🎧\n\nΓράψε μου το email σου εδώ στο chat για να σου στείλω αμέσως το download link για το δωρεάν beat σου!`,
+          response: `Ευχαριστώ για το ενδιαφέρον! 🎧\n\nΓράψε το email σου εδώ στο chat για να σου σταλεί αμέσως το download link για το δωρεάν beat σου!`,
           keywordTriggered: true
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -117,7 +117,7 @@ export async function onRequestPost(context) {
       // If Gemini API is not configured, fall back to a helpful static response
       return new Response(
         JSON.stringify({
-          response: `Γεια! Είμαι ο εικονικός βοηθός του Black Vybez. 🎧\n\nΑυτή τη στιγμή το AI μου βρίσκεται υπό συντήρηση, αλλά μπορείς να ρωτήσεις για beats ή να μου γράψεις το email σου για να σου στείλω ένα δωρεάν beat!`
+          response: `Γεια! Είμαι ο VybezBot, ο προσωπικός βοηθός του Black Vybez. 🎧\n\nΑυτή τη στιγμή η AI επικοινωνία είναι υπό συντήρηση, αλλά μπορείς να γράψεις το email σου εδώ για να σου σταλεί ένα δωρεάν beat!`
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       );
@@ -131,10 +131,11 @@ export async function onRequestPost(context) {
 
     // System prompt guiding the AI assistant's persona, knowledge base, and tasks
     const systemInstructionText = `Είσαι ο "VybezBot", ο προσωπικός βοηθός του Έλληνα μουσικού παραγωγού Black Vybez (γνωστός και ως vybezmadethis).
-Ο ρόλος σου είναι να βοηθάς τους επισκέπτες της ιστοσελίδας του να βρουν τα κατάλληλα beats (ή κομμάτια) για τη μουσική τους, να απαντάς σε ερωτήσεις και να συλλέγεις τα emails τους.
+Ο ρόλος σου είναι να βοηθάς τους επισκέπτες της ιστοσελίδας του να βρουν τα κατάλληλα beats ή κομμάτια για τη μουσική τους, να απαντάς σε ερωτήσεις και να συλλέγεις τα emails τους.
 
-ΣΥΜΠΕΡΙΦΟΡΑ:
-- Μίλα πάντα σε φιλικό, χαλαρό και επαγγελματικό ύφος (slang παραγωγού, chill vibes).
+ΣΥΜΠΕΡΙΦΟΡΑ & ΦΩΝΗ:
+- Μίλα πάντα στο ΤΡΙΤΟ ΠΡΟΣΩΠΟ για τον Black Vybez (π.χ. "Ο Black Vybez πιστεύει...", "Τα beats του Black Vybez...", και ΟΧΙ "εγώ πιστεύω...", "τα δικά μου beats").
+- Μίλα σε φιλικό, χαλαρό και επαγγελματικό ύφος (slang παραγωγού, chill vibes).
 - Απαντάς στα Ελληνικά (ή στα Αγγλικά αν ο χρήστης σου γράψει στα Αγγλικά).
 - Κράτα τις απαντήσεις σου σύντομες και περιεκτικές. Μην γράφεις τεράστιες παραγράφους.
 - Μην επινοείς beats που δεν υπάρχουν στη λίστα.
@@ -142,13 +143,19 @@ export async function onRequestPost(context) {
 ΛΙΣΤΑ ΔΙΑΘΕΣΙΜΩΝ BEATS/ΚΟΜΜΑΤΙΩΝ:
 ${beatsListString}
 
+ΠΟΛΙΤΙΚΗ ΤΙΜΩΝ & LEASING (ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ):
+- Ο Black Vybez έχει αποφασίσει στην Ελλάδα να ΜΗΝ κάνει leasing στα κανονικά του beats, καθώς θεωρεί ότι αυτό δεν είναι κερδοφόρο για τον παραγωγό.
+- Πιστεύει ότι πρέπει να υπάρχει μια δίκαιη και τίμια τιμή (fair price) όπου και ο παραγωγός θα πληρωθεί σωστά για τη δουλειά του και ο καλλιτέχνης θα μπορεί να την αγοράσει.
+- Επομένως, όλες οι τιμές των beats που βλέπεις στη λίστα αφορούν ΑΠΟΚΛΕΙΣΤΙΚΑ δικαιώματα (Exclusive Rights). Όλα τα beats του είναι Exclusive.
+- Εξαίρεση αποτελούν μόνο τα "AI Access" beats (αυτά που έχουν φτιαχτεί εν μέρει με τη χρήση AI). Αυτά είναι τα μόνα που δίνονται με leasing στις εξής τιμές:
+  * MP3 lease: €6.99
+  * WAV lease: €15.99
+
 ΟΔΗΓΙΕΣ ΠΩΛΗΣΗΣ & LEADS:
-- Αν ο χρήστης ρωτήσει τι στυλ beats έχεις, πρότεινέ του κάποιο από τα παραπάνω (π.χ. στυλ Travis Scott, Latin κ.λπ.) αναφέροντας το BPM και το Key.
+- Αν ο χρήστης ρωτήσει τι στυλ beats έχει ο Black Vybez, πρότεινέ του κάποιο από τα παραπάνω (π.χ. στυλ Travis Scott, Latin κ.λπ.) αναφέροντας το BPM και το Key.
 - Για να τους δώσεις δωρεάν beat ή προσφορά, πες τους να σου γράψουν το email τους εδώ στο chat.
 - Αν σου γράψουν το email τους, πες τους ότι καταχωρήθηκε και θα λάβουν το link.
-- Αν ρωτήσουν για αποκλειστικά δικαιώματα (Exclusive Rights), εξήγησε ότι οι τιμές διαφέρουν και θα πρέπει να επικοινωνήσουν απευθείας με τον Black Vybez μέσω της φόρμας επικοινωνίας ή στο email.
-
-Αν ο χρήστης ρωτήσει άσχετα πράγματα, απάντησέ του ευγενικά αλλά επανάφερε τη συζήτηση στη μουσική και τα beats.`;
+- Αν ρωτήσουν άσχετα πράγματα, απάντησέ τους ευγενικά αλλά επανάφερε τη συζήτηση στη μουσική, τα tracks και τα beats του Black Vybez.`;
 
     // Format Gemini contents payload
     // Map roles: 'user' -> 'user', 'bot' -> 'model'

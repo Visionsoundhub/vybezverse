@@ -237,7 +237,7 @@ const ChatbotWidget = () => {
             <div className="tooltip-avatar">🎧</div>
             <div className="tooltip-text">
               <strong>VybezBot</strong>
-              <p>Ψάχνεις beats; Κάνε κλικ εδώ! 🔥</p>
+              <p>Ψάχνεις μουσική ή beats; Κάνε κλικ εδώ! 🎧</p>
             </div>
             <button className="tooltip-close" onClick={(e) => { e.stopPropagation(); setShowTooltip(false); }}>
               <X size={14} />
