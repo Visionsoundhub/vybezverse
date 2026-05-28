@@ -1,21 +1,21 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, X, Send, Bot, Sparkles, RefreshCw } from 'lucide-react';
+import { MessageSquare, X, Send, Bot, Sparkles, RefreshCw, Music, Headphones, Gift, Mail } from 'lucide-react';
 import './ChatbotWidget.css';
 
 const SUGGESTIONS = [
-  '🎵 Με ενδιαφέρει η μουσική σου (Tracks)',
-  '🎧 Ψάχνω Beats για να γράψω',
-  '🎁 Θέλω ένα δωρεάν beat!',
-  '📩 Πώς επικοινωνώ μαζί σου;'
+  { label: 'Με ενδιαφέρει η μουσική του (Tracks)', icon: Music },
+  { label: 'Ψάχνω Beats για να γράψω', icon: Headphones },
+  { label: 'Θέλω ένα δωρεάν beat!', icon: Gift },
+  { label: 'Πώς επικοινωνώ μαζί του;', icon: Mail }
 ];
 
 const INITIAL_MESSAGES = [
   {
     id: 'init-1',
     role: 'bot',
-    text: 'Γεια! Είμαι ο **VybezBot**, ο προσωπικός βοηθός του Black Vybez. 🎧\n\nΚαλώς ήρθες στο Vybezverse! Εδώ θα βρεις τα δικά μου **tracks (τραγούδια)** αλλά και **beats (παραγωγές)** για να γράψεις τη δική σου μουσική.\n\nΜε τι θα ήθελες να ξεκινήσουμε;',
+    text: 'Γεια! Είμαι ο **VybezBot**, ο προσωπικός βοηθός του Black Vybez. 🤖\n\nΚαλώς ήρθες στο Vybezverse! Εδώ θα βρεις τα **tracks (τραγούδια)** αλλά και τα **beats (παραγωγές)** του Black Vybez για να γράψεις τη δική σου μουσική.\n\nΜε τι θα ήθελες να ξεκινήσουμε;',
     time: new Date()
   }
 ];
@@ -234,10 +234,12 @@ const ChatbotWidget = () => {
             exit={{ opacity: 0, scale: 0.8, x: 20 }}
             onClick={handleOpenToggle}
           >
-            <div className="tooltip-avatar">🎧</div>
+            <div className="tooltip-avatar">
+              <Bot size={22} color="#bc74f5" />
+            </div>
             <div className="tooltip-text">
               <strong>VybezBot</strong>
-              <p>Ψάχνεις μουσική ή beats; Κάνε κλικ εδώ! 🎧</p>
+              <p>Ψάχνεις μουσική ή beats; Κάνε κλικ εδώ!</p>
             </div>
             <button className="tooltip-close" onClick={(e) => { e.stopPropagation(); setShowTooltip(false); }}>
               <X size={14} />
@@ -332,15 +334,20 @@ const ChatbotWidget = () => {
             {/* Suggestions Chips */}
             {messages.length <= 2 && !isLoading && (
               <div className="chat-suggestions-chips">
-                {SUGGESTIONS.map((sug, idx) => (
-                  <button 
-                    key={idx} 
-                    className="suggestion-chip"
-                    onClick={() => handleSend(sug.replace(/[🎧🔥💰📩]\s*/, ''))}
-                  >
-                    {sug}
-                  </button>
-                ))}
+                {SUGGESTIONS.map((sug, idx) => {
+                  const Icon = sug.icon;
+                  return (
+                    <button 
+                      key={idx} 
+                      className="suggestion-chip"
+                      onClick={() => handleSend(sug.label)}
+                      style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <Icon size={14} className="chip-icon" style={{ flexShrink: 0 }} />
+                      <span>{sug.label}</span>
+                    </button>
+                  );
+                })}
               </div>
             )}
 
