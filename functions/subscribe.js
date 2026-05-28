@@ -1,10 +1,11 @@
 export async function onRequestPost(context) {
   try {
     const { env, request } = context;
-    const { MAILERLITE_API_KEY, MAILERLITE_TRACKS_GROUP_ID, MAILERLITE_GROUP_ID } = env;
+    const mailerliteApiKey = env.MAILERLITE_API_KEY || env.mailerllite || env.mailerlite;
+    const tracksGroupId = env.MAILERLITE_TRACKS_GROUP_ID || env.MAILERLITE_GROUP_ID;
 
     // 1. Verify API key is configured
-    if (!MAILERLITE_API_KEY) {
+    if (!mailerliteApiKey) {
       console.error('MailerLite API Key is missing.');
       return new Response(
         JSON.stringify({ error: 'MailerLite integration not configured on server.' }),
@@ -37,9 +38,8 @@ export async function onRequestPost(context) {
     };
 
     // If a group ID is configured, add subscriber to that group
-    const groupToUse = MAILERLITE_TRACKS_GROUP_ID || MAILERLITE_GROUP_ID;
-    if (groupToUse) {
-      mailerlitePayload.groups = [groupToUse.trim()];
+    if (tracksGroupId) {
+      mailerlitePayload.groups = [tracksGroupId.trim()];
     }
 
     // 4. Send to MailerLite API (v4)
@@ -48,7 +48,7 @@ export async function onRequestPost(context) {
       headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'Authorization': `Bearer ${MAILERLITE_API_KEY}`,
+        'Authorization': `Bearer ${mailerliteApiKey}`,
       },
       body: JSON.stringify(mailerlitePayload),
     });

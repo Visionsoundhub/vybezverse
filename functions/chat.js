@@ -3,7 +3,9 @@ import beatsData from '../src/data/beats.json';
 export async function onRequestPost(context) {
   try {
     const { env, request } = context;
-    const { GEMINI_API_KEY, MAILERLITE_API_KEY, MAILERLITE_BEATS_GROUP_ID, MAILERLITE_GROUP_ID } = env;
+    const geminiApiKey = env.GEMINI_API_KEY || env['Gemini api'] || env.gemini_api_key;
+    const mailerliteApiKey = env.MAILERLITE_API_KEY || env.mailerllite || env.mailerlite;
+    const beatsGroupId = env.MAILERLITE_BEATS_GROUP_ID || env.MAILERLITE_GROUP_ID;
 
     // 1. Parse request body
     let body;
@@ -37,16 +39,15 @@ export async function onRequestPost(context) {
     const emailMatch = cleanMsg.match(emailRegex);
 
     // If they sent an email, handle MailerLite subscription immediately
-    if (emailMatch && MAILERLITE_API_KEY) {
+    if (emailMatch && mailerliteApiKey) {
       const email = emailMatch[0];
       try {
         const mailerlitePayload = {
           email: email.trim(),
         };
         
-        const groupToUse = MAILERLITE_BEATS_GROUP_ID || MAILERLITE_GROUP_ID;
-        if (groupToUse) {
-          mailerlitePayload.groups = [groupToUse.trim()];
+        if (beatsGroupId) {
+          mailerlitePayload.groups = [beatsGroupId.trim()];
         }
 
         // Subscribe to MailerLite
@@ -55,7 +56,7 @@ export async function onRequestPost(context) {
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'Authorization': `Bearer ${MAILERLITE_API_KEY}`,
+            'Authorization': `Bearer ${mailerliteApiKey}`,
           },
           body: JSON.stringify(mailerlitePayload),
         });
@@ -91,7 +92,7 @@ export async function onRequestPost(context) {
     }
 
     // 3. GEMINI AI CHAT FALLBACK (If not a keyword or email)
-    if (!GEMINI_API_KEY) {
+    if (!geminiApiKey) {
       // If Gemini API is not configured, fall back to a helpful static response
       return new Response(
         JSON.stringify({
@@ -153,7 +154,7 @@ ${beatsListString}
     };
 
     // Call Gemini API
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
     const geminiResponse = await fetch(geminiUrl, {
       method: 'POST',
       headers: {
