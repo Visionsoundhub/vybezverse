@@ -167,9 +167,10 @@ ${beatsListString}
 
     if (!geminiResponse.ok) {
       console.error('Gemini API Error:', geminiData);
+      const errMsg = geminiData.error?.message || 'Άγνωστο σφάλμα';
       return new Response(
         JSON.stringify({ 
-          response: 'Υπήρξε ένα πρόβλημα επικοινωνίας με το AI. Μπορείς να μου γράψεις το email σου για να σου στείλω το δωρεάν beat!' 
+          response: `Υπήρξε ένα πρόβλημα επικοινωνίας με το AI (Σφάλμα: ${errMsg}). Μπορείς να μου γράψεις το email σου για να σου στείλω το δωρεάν beat!` 
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       );
