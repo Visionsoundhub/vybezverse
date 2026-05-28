@@ -100,12 +100,12 @@ const ChatbotWidget = () => {
         setMessages(prev => [...prev, {
           id: `bot-nav-${Date.now()}`,
           role: 'bot',
-          text: 'Τέλεια! Σε μεταφέρω στις κυκλοφορίες μου για να ακούσεις τα tracks μου. 🎵',
+          text: 'Τέλεια! Σε μεταφέρω στις κυκλοφορίες του Black Vybez. 🎵\n\nΗ πιο πρόσφατη κυκλοφορία του είναι το **"Jazz Bar των τεράτων"**, ενώ πολύ σύντομα έρχεται και το επόμενο drop του!\n\nΨάχνεις κάτι συγκεκριμένο;',
           time: new Date()
         }]);
         setIsLoading(false);
         navigate('/releases');
-      }, 700);
+      }, 1200); // slightly longer delay so user can read the track ad message
       return;
     }
 
@@ -116,7 +116,7 @@ const ChatbotWidget = () => {
         setMessages(prev => [...prev, {
           id: `bot-nav-${Date.now()}`,
           role: 'bot',
-          text: 'Βεβαίως! Σε μεταφέρω στο Beat Store για να ακούσεις όλα τα instrumentals. 🎧',
+          text: 'Βεβαίως! Σε μεταφέρω στο Beat Store του Black Vybez για να ακούσεις όλα τα instrumentals. 🎧',
           time: new Date()
         }]);
         setIsLoading(false);

@@ -1,4 +1,5 @@
 import beatsData from '../src/data/beats.json';
+import freeBeatsData from '../src/data/free_beats.json';
 
 export async function onRequestPost(context) {
   try {
@@ -87,9 +88,9 @@ export async function onRequestPost(context) {
       }
 
       // Return a quick success response
-      // Find a beat to offer for free (or use a default coming from settings)
-      const freeBeatLink = beatsData.beatslist?.[0]?.checkoutUrl || '#';
-      const freeBeatTitle = beatsData.beatslist?.[0]?.title || 'Free Beat';
+      // Find a beat to offer for free from free_beats.json
+      const freeBeatLink = freeBeatsData.freebeatslist?.[0]?.downloadUrl || '#';
+      const freeBeatTitle = freeBeatsData.freebeatslist?.[0]?.title || 'Free Beat';
       
       return new Response(
         JSON.stringify({
