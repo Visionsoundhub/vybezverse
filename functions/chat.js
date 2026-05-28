@@ -153,31 +153,55 @@ ${beatsListString}
       }
     };
 
-    // Call Gemini API
-    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${geminiApiKey}`;
-    const geminiResponse = await fetch(geminiUrl, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(geminiPayload)
-    });
+    // Call Gemini API in a loop with fallback models to avoid deprecation issues
+    const modelsToTry = [
+      'gemini-2.5-flash',
+      'gemini-3.5-flash',
+      'gemini-2.0-flash',
+      'gemini-1.5-flash'
+    ];
 
-    const geminiData = await geminiResponse.json();
+    let replyText = '';
+    let apiSuccess = false;
+    let lastErrorMsg = 'Unknown error';
 
-    if (!geminiResponse.ok) {
-      console.error('Gemini API Error:', geminiData);
-      const errMsg = geminiData.error?.message || 'Άγνωστο σφάλμα';
+    for (const modelName of modelsToTry) {
+      try {
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`;
+        const geminiResponse = await fetch(geminiUrl, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(geminiPayload)
+        });
+
+        const geminiData = await geminiResponse.json();
+
+        if (geminiResponse.ok) {
+          replyText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          if (replyText) {
+            apiSuccess = true;
+            break;
+          }
+        } else {
+          lastErrorMsg = geminiData.error?.message || `HTTP ${geminiResponse.status}`;
+          console.warn(`Model ${modelName} failed:`, lastErrorMsg);
+        }
+      } catch (err) {
+        lastErrorMsg = err.message;
+        console.warn(`Fetch error for ${modelName}:`, err);
+      }
+    }
+
+    if (!apiSuccess) {
       return new Response(
         JSON.stringify({ 
-          response: `Υπήρξε ένα πρόβλημα επικοινωνίας με το AI (Σφάλμα: ${errMsg}). Μπορείς να μου γράψεις το email σου για να σου στείλω το δωρεάν beat!` 
+          response: `Υπήρξε ένα πρόβλημα επικοινωνίας με το AI (Σφάλμα: ${lastErrorMsg}). Μπορείς να μου γράψεις το email σου για να σου στείλω το δωρεάν beat!` 
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       );
     }
-
-    const replyText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text || 
-                      'Δεν μπόρεσα να επεξεργαστώ την απάντηση. Πώς μπορώ να σε βοηθήσω με τα beats;';
 
     return new Response(
       JSON.stringify({ response: replyText }),
