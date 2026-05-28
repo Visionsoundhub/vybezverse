@@ -1,6 +1,82 @@
 import beatsData from '../src/data/beats.json';
 import freeBeatsData from '../src/data/free_beats.json';
 
+// Standalone CSV parser helper
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/);
+  if (lines.length < 2) return [];
+  
+  // Parse headers and normalize to lower case, spaces removed
+  const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase().replace(/\s+/g, ''));
+  const result = [];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const values = parseCSVLine(line);
+    const row = {};
+    headers.forEach((header, index) => {
+      row[header] = values[index] ? values[index].trim() : '';
+    });
+    result.push(row);
+  }
+  return result;
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current);
+  return result.map(val => val.replace(/^"|"$/g, '').replace(/""/g, '"'));
+}
+
+async function fetchGoogleSheetCampaigns(sheetUrl) {
+  try {
+    const res = await fetch(sheetUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    
+    // Normalize properties
+    return rows.map(r => {
+      const getVal = (possibleKeys) => {
+        for (const k of possibleKeys) {
+          if (r[k] !== undefined) return r[k];
+        }
+        return '';
+      };
+      
+      return {
+        campaignName: getVal(['campaignname', 'campaign']),
+        isActive: getVal(['isactive', 'active']).toLowerCase(),
+        keywords: getVal(['keywords', 'keyword']).split(',').map(kw => kw.trim().toUpperCase()).filter(Boolean),
+        action: getVal(['action']).toLowerCase(),
+        triggerResponse: getVal(['triggerresponse', 'response', 'botinitialmessage']),
+        successMessage: getVal(['successmessage', 'success']),
+        targetLink: getVal(['targetlink', 'link', 'downloadurl']),
+        targetTitle: getVal(['targettitle', 'title']),
+        mailerliteGroupId: getVal(['mailerlitegroupid', 'groupid', 'group'])
+      };
+    });
+  } catch (err) {
+    console.error('Error fetching/parsing Google Sheet:', err);
+    return null;
+  }
+}
+
 // Handle webhook verification (GET)
 export async function onRequestGet(context) {
   const { env, request } = context;
@@ -10,7 +86,6 @@ export async function onRequestGet(context) {
   const token = url.searchParams.get('hub.verify_token');
   const challenge = url.searchParams.get('hub.challenge');
   
-  // Retrieve token from Cloudflare environment variables or use fallback
   const verifyToken = env.META_VERIFY_TOKEN || 'vybezverse_secret_token';
   
   if (mode === 'subscribe' && token === verifyToken) {
@@ -32,7 +107,6 @@ export async function onRequestPost(context) {
   try {
     const body = await request.json();
     
-    // Handle Page (Messenger) or Instagram message events
     if (body.object === 'page' || body.object === 'instagram') {
       const pageAccessToken = env.META_PAGE_ACCESS_TOKEN;
       
@@ -41,27 +115,23 @@ export async function onRequestPost(context) {
         return new Response('Configuration missing', { status: 500 });
       }
 
-      // Process each entry sent by Meta
       for (const entry of body.entry || []) {
         for (const webhookEvent of entry.messaging || []) {
           const senderId = webhookEvent.sender?.id;
           const message = webhookEvent.message;
 
-          // Skip if no message text or if it is an echo message from the Page itself
           if (!senderId || !message || message.is_echo || !message.text) {
             continue;
           }
 
           const messageText = message.text.trim();
           
-          // Run the response worker asynchronously to satisfy Meta's 3-second timeout limit
           context.waitUntil(
             handleMetaMessage(senderId, messageText, pageAccessToken, env)
           );
         }
       }
       
-      // Confirm reception back to Meta
       return new Response('EVENT_RECEIVED', { status: 200 });
     } else {
       return new Response('Not Found', { status: 404 });
@@ -72,19 +142,36 @@ export async function onRequestPost(context) {
   }
 }
 
-// Main logic to decide response and invoke the Meta Send API
 async function handleMetaMessage(senderId, messageText, pageAccessToken, env) {
   try {
     const geminiApiKey = env.GEMINI_API_KEY || env['Gemini api'] || env.gemini_api_key;
     const mailerliteApiKey = env.MAILERLITE_API_KEY || env.mailerllite || env.mailerlite;
     const beatsGroupId = env.MAILERLITE_BEATS_GROUP_ID || env.MAILERLITE_GROUP_ID;
+    const sheetUrl = env.GOOGLE_SHEETS_CSV_URL;
 
     const cleanMsg = messageText.trim();
     const cleanMsgUpper = cleanMsg.toUpperCase();
 
-    // 1. KEYWORD DETECTOR
-    const keywords = ['BEAT', 'FREE', 'FREEBEAT', 'GIFT', 'ΔΩΡΟ', 'ΔΩΡΕΑΝ'];
-    const isKeywordTrigger = keywords.some(kw => cleanMsgUpper.includes(kw));
+    // 1. Fetch Google Sheets campaigns
+    let campaigns = null;
+    if (sheetUrl) {
+      campaigns = await fetchGoogleSheetCampaigns(sheetUrl);
+    }
+
+    const activeCampaigns = campaigns 
+      ? campaigns.filter(c => c.isActive === 'true' || c.isActive === 'yes' || c.isActive === '1')
+      : [];
+
+    let matchedCampaign = null;
+    if (activeCampaigns.length > 0) {
+      for (const campaign of activeCampaigns) {
+        const isMatch = campaign.keywords.some(kw => cleanMsgUpper.includes(kw));
+        if (isMatch) {
+          matchedCampaign = campaign;
+          break;
+        }
+      }
+    }
 
     // Email extraction
     const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
@@ -95,13 +182,35 @@ async function handleMetaMessage(senderId, messageText, pageAccessToken, env) {
     // Case A: User sent their email address
     if (emailMatch) {
       const email = emailMatch[0].trim();
-      
+      let successMessage = '';
+      let targetLink = '';
+      let targetTitle = '';
+      let specificGroupId = beatsGroupId;
+
+      // Extract success data from active email campaign
+      const activeEmailCampaign = activeCampaigns.find(c => c.action === 'email_capture');
+      if (activeEmailCampaign) {
+        successMessage = activeEmailCampaign.successMessage;
+        targetLink = activeEmailCampaign.targetLink;
+        targetTitle = activeEmailCampaign.targetTitle;
+        if (activeEmailCampaign.mailerliteGroupId) {
+          specificGroupId = activeEmailCampaign.mailerliteGroupId;
+        }
+      } else {
+        // Fallback to local values
+        const freeBeatLink = freeBeatsData.freebeatslist?.[0]?.downloadUrl || '#';
+        const freeBeatTitle = freeBeatsData.freebeatslist?.[0]?.title || 'Free Beat';
+        successMessage = `Τέλεια! Το email σου ({email}) καταχωρήθηκε επιτυχώς στο VIP Newsletter του Black Vybez. 🎶\n\nΜπορείς να κατεβάσεις το δωρεάν σου beat ("{title}") από εδώ: {link}\n\nΑνυπομονώ να ακούσω τι θα δημιουργήσεις! 🔥`;
+        targetLink = freeBeatLink;
+        targetTitle = freeBeatTitle;
+      }
+
       // Subscribe user to MailerLite
       if (mailerliteApiKey) {
         try {
           const mailerlitePayload = { email };
-          if (beatsGroupId) {
-            mailerlitePayload.groups = [beatsGroupId.trim()];
+          if (specificGroupId) {
+            mailerlitePayload.groups = [specificGroupId.trim()];
           }
 
           await fetch('https://connect.mailerlite.com/api/subscribers', {
@@ -119,22 +228,35 @@ async function handleMetaMessage(senderId, messageText, pageAccessToken, env) {
         }
       }
 
-      // Get free beat download link from free_beats.json
-      const freeBeatLink = freeBeatsData.freebeatslist?.[0]?.downloadUrl || '#';
-      const freeBeatTitle = freeBeatsData.freebeatslist?.[0]?.title || 'Free Beat';
+      replyText = successMessage
+        .replace(/{email}/g, email)
+        .replace(/{link}/g, targetLink)
+        .replace(/{title}/g, targetTitle);
+    }
+    // Case B: User triggered campaign keyword
+    else if (matchedCampaign) {
+      if (matchedCampaign.action === 'email_capture') {
+        replyText = matchedCampaign.triggerResponse || 'Γράψε το email σου για να λάβεις την προσφορά!';
+      } else if (matchedCampaign.action === 'link_direct' || matchedCampaign.action === 'text_only') {
+        replyText = (matchedCampaign.triggerResponse || '')
+          .replace(/{link}/g, matchedCampaign.targetLink || '')
+          .replace(/{title}/g, matchedCampaign.targetTitle || '');
+      }
+    }
+    // Case C: Local fallbacks if Google Sheet is empty/not configured
+    else if (!sheetUrl || activeCampaigns.length === 0) {
+      const localKeywords = ['BEAT', 'FREE', 'FREEBEAT', 'GIFT', 'ΔΩΡΟ', 'ΔΩΡΕΑΝ'];
+      const isLocalKeyword = localKeywords.some(kw => cleanMsgUpper.includes(kw));
+      if (isLocalKeyword) {
+        replyText = `Ευχαριστώ για το ενδιαφέρον! 🎧\n\nΓράψε το email σου εδώ στο chat για να σου σταλεί αμέσως το download link για το δωρεάν beat σου!`;
+      }
+    }
 
-      replyText = `Τέλεια! Το email σου (${email}) καταχωρήθηκε επιτυχώς στο VIP Newsletter του Black Vybez. 🎶\n\nΜπορείς να κατεβάσεις το δωρεάν σου beat ("${freeBeatTitle}") από εδώ: ${freeBeatLink}\n\nΑνυπομονώ να ακούσω τι θα δημιουργήσεις! 🔥`;
-    }
-    // Case B: User triggered free beat keyword
-    else if (isKeywordTrigger) {
-      replyText = `Ευχαριστώ για το ενδιαφέρον! 🎧\n\nΓράψε το email σου εδώ στο chat για να σου σταλεί αμέσως το download link για το δωρεάν beat σου!`;
-    }
-    // Case C: General chat (Gemini AI fallback)
-    else {
+    // Case D: General chat (Gemini AI fallback)
+    if (!replyText) {
       if (!geminiApiKey) {
         replyText = `Γεια! Είμαι ο VybezBot, ο προσωπικός βοηθός του Black Vybez. 🎧\n\nΑν ψάχνεις για δωρεάν beat, γράψε τη λέξη ΔΩΡΟ ή FREE για να σου στείλω το link!`;
       } else {
-        // Construct system instruction and context
         const beats = beatsData.beatslist || [];
         const beatsListString = beats.map(b => 
           `- Τίτλος: "${b.title}", Στυλ: "${b.category}", BPM: "${b.bpm}", Key: "${b.key}", Τιμή: "${b.price}", Link: "${b.checkoutUrl}"`
@@ -207,12 +329,12 @@ POΛΙΤΙΚΗ ΤΙΜΩΝ & LEASING (ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ):
         }
 
         if (!apiSuccess) {
-          replyText = `Γεια! Είμαι ο VybezBot, ο βοηθός του Black Vybez. Αν θέλεις ένα δωρεάν beat, γράψε το email σου εδώ! 🎶`;
+          replyText = `Γεια! Είμαι ο VybezBot, ο βοηθός του Black Vybez. Αυτή τη στιγμή η AI είναι απασχολημένη. Αν θέλεις ένα δωρεάν beat, γράψε το email σου εδώ! 🎶`;
         }
       }
     }
 
-    // Call Meta Send API to reply to the user
+    // Send response back to Meta Send API
     const sendUrl = `https://graph.facebook.com/v19.0/me/messages?access_token=${pageAccessToken}`;
     const sendResponse = await fetch(sendUrl, {
       method: 'POST',
@@ -232,6 +354,6 @@ POΛΙΤΙΚΗ ΤΙΜΩΝ & LEASING (ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ):
       console.log(`Successfully sent Meta message reply to sender ${senderId}`);
     }
   } catch (error) {
-    console.error('Error handling Meta message process:', error);
+    console.error('Error handling Meta message action:', error);
   }
 }

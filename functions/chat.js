@@ -1,12 +1,89 @@
 import beatsData from '../src/data/beats.json';
 import freeBeatsData from '../src/data/free_beats.json';
 
+// Standalone CSV parser helper
+function parseCSV(text) {
+  const lines = text.split(/\r?\n/);
+  if (lines.length < 2) return [];
+  
+  // Parse headers and normalize to lower case, spaces removed
+  const headers = parseCSVLine(lines[0]).map(h => h.trim().toLowerCase().replace(/\s+/g, ''));
+  const result = [];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+    const values = parseCSVLine(line);
+    const row = {};
+    headers.forEach((header, index) => {
+      row[header] = values[index] ? values[index].trim() : '';
+    });
+    result.push(row);
+  }
+  return result;
+}
+
+function parseCSVLine(line) {
+  const result = [];
+  let current = '';
+  let inQuotes = false;
+  
+  for (let i = 0; i < line.length; i++) {
+    const char = line[i];
+    if (char === '"') {
+      inQuotes = !inQuotes;
+    } else if (char === ',' && !inQuotes) {
+      result.push(current);
+      current = '';
+    } else {
+      current += char;
+    }
+  }
+  result.push(current);
+  return result.map(val => val.replace(/^"|"$/g, '').replace(/""/g, '"'));
+}
+
+async function fetchGoogleSheetCampaigns(sheetUrl) {
+  try {
+    const res = await fetch(sheetUrl);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const rows = parseCSV(text);
+    
+    // Normalize properties
+    return rows.map(r => {
+      const getVal = (possibleKeys) => {
+        for (const k of possibleKeys) {
+          if (r[k] !== undefined) return r[k];
+        }
+        return '';
+      };
+      
+      return {
+        campaignName: getVal(['campaignname', 'campaign']),
+        isActive: getVal(['isactive', 'active']).toLowerCase(),
+        keywords: getVal(['keywords', 'keyword']).split(',').map(kw => kw.trim().toUpperCase()).filter(Boolean),
+        action: getVal(['action']).toLowerCase(),
+        triggerResponse: getVal(['triggerresponse', 'response', 'botinitialmessage']),
+        successMessage: getVal(['successmessage', 'success']),
+        targetLink: getVal(['targetlink', 'link', 'downloadurl']),
+        targetTitle: getVal(['targettitle', 'title']),
+        mailerliteGroupId: getVal(['mailerlitegroupid', 'groupid', 'group'])
+      };
+    });
+  } catch (err) {
+    console.error('Error fetching/parsing Google Sheet:', err);
+    return null;
+  }
+}
+
 export async function onRequestPost(context) {
   try {
     const { env, request } = context;
     const geminiApiKey = env.GEMINI_API_KEY || env['Gemini api'] || env.gemini_api_key;
     const mailerliteApiKey = env.MAILERLITE_API_KEY || env.mailerllite || env.mailerlite;
     const beatsGroupId = env.MAILERLITE_BEATS_GROUP_ID || env.MAILERLITE_GROUP_ID;
+    const sheetUrl = env.GOOGLE_SHEETS_CSV_URL;
 
     // 1. Parse request body
     let body;
@@ -30,71 +107,111 @@ export async function onRequestPost(context) {
     const cleanMsg = message.trim();
     const cleanMsgUpper = cleanMsg.toUpperCase();
 
-    // 2. KEYWORD TRIGGER DETECTOR (ManyChat simple flow style)
-    // Keywords: BEAT, FREE, FREEBEAT, GIFT, ΔΩΡΟ, ΔΩΡΕΑΝ
-    const keywords = ['BEAT', 'FREE', 'FREEBEAT', 'GIFT', 'ΔΩΡΟ', 'ΔΩΡΕΑΝ'];
-    const isKeywordTrigger = keywords.some(kw => cleanMsgUpper.includes(kw));
+    // 2. Fetch and check dynamic Google Sheets campaigns
+    let campaigns = null;
+    if (sheetUrl) {
+      campaigns = await fetchGoogleSheetCampaigns(sheetUrl);
+    }
+
+    const activeCampaigns = campaigns 
+      ? campaigns.filter(c => c.isActive === 'true' || c.isActive === 'yes' || c.isActive === '1')
+      : [];
+
+    let matchedCampaign = null;
+    if (activeCampaigns.length > 0) {
+      for (const campaign of activeCampaigns) {
+        const isMatch = campaign.keywords.some(kw => cleanMsgUpper.includes(kw));
+        if (isMatch) {
+          matchedCampaign = campaign;
+          break;
+        }
+      }
+    }
 
     // Simple email extraction regex
     const emailRegex = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
     const emailMatch = cleanMsg.match(emailRegex);
 
-    // If they sent an email, handle MailerLite subscription immediately
-    if (emailMatch && mailerliteApiKey) {
+    // If they sent an email, handle subscription immediately
+    if (emailMatch) {
       const email = emailMatch[0];
-      try {
-        const mailerlitePayload = {
-          email: email.trim(),
-        };
-        
-        if (beatsGroupId) {
-          mailerlitePayload.groups = [beatsGroupId.trim()];
+      let successMessage = '';
+      let targetLink = '';
+      let targetTitle = '';
+      let specificGroupId = beatsGroupId;
+
+      // Extract success data from active email campaign
+      const activeEmailCampaign = activeCampaigns.find(c => c.action === 'email_capture');
+      if (activeEmailCampaign) {
+        successMessage = activeEmailCampaign.successMessage;
+        targetLink = activeEmailCampaign.targetLink;
+        targetTitle = activeEmailCampaign.targetTitle;
+        if (activeEmailCampaign.mailerliteGroupId) {
+          specificGroupId = activeEmailCampaign.mailerliteGroupId;
         }
+      } else {
+        // Fallback to local hardcoded values
+        const freeBeatLink = freeBeatsData.freebeatslist?.[0]?.downloadUrl || '#';
+        const freeBeatTitle = freeBeatsData.freebeatslist?.[0]?.title || 'Free Beat';
+        successMessage = `Τέλεια! Το email σου ({email}) καταχωρήθηκε επιτυχώς στο VIP Newsletter του Black Vybez. \n\nΜπορείς να κατεβάσεις το δωρεάν σου beat ("{title}") από εδώ: {link}\n\nΑνυπομονώ να ακούσω τι θα δημιουργήσεις! 🔥`;
+        targetLink = freeBeatLink;
+        targetTitle = freeBeatTitle;
+      }
 
-        // Subscribe to MailerLite
-        const mlRes = await fetch('https://connect.mailerlite.com/api/subscribers', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json',
-            'Authorization': `Bearer ${mailerliteApiKey}`,
-          },
-          body: JSON.stringify(mailerlitePayload),
-        });
+      if (mailerliteApiKey) {
+        try {
+          const mailerlitePayload = {
+            email: email.trim(),
+          };
+          
+          if (specificGroupId) {
+            mailerlitePayload.groups = [specificGroupId.trim()];
+          }
 
-        if (!mlRes.ok) {
-          const mlErr = await mlRes.json();
-          console.error('MailerLite API returned error:', mlErr);
-          const detailMsg = mlErr.message || JSON.stringify(mlErr.errors || mlErr);
+          // Subscribe to MailerLite
+          const mlRes = await fetch('https://connect.mailerlite.com/api/subscribers', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'application/json',
+              'Authorization': `Bearer ${mailerliteApiKey}`,
+            },
+            body: JSON.stringify(mailerlitePayload),
+          });
+
+          if (!mlRes.ok) {
+            const mlErr = await mlRes.json();
+            console.error('MailerLite API returned error:', mlErr);
+            const detailMsg = mlErr.message || JSON.stringify(mlErr.errors || mlErr);
+            return new Response(
+              JSON.stringify({
+                response: `Το email σου αναγνωρίστηκε, αλλά το MailerLite επέστρεψε σφάλμα: "${detailMsg}".`,
+                emailCaptured: false
+              }),
+              { status: 200, headers: { 'Content-Type': 'application/json' } }
+            );
+          }
+        } catch (err) {
+          console.error('Failed to subscribe email via chatbot:', err);
           return new Response(
             JSON.stringify({
-              response: `Το email σου αναγνωρίστηκε, αλλά το MailerLite επέστρεψε σφάλμα: "${detailMsg}". \n\nΒεβαιώσου ότι έχεις βάλει το σωστό **Group ID** (τον αριθμό της ομάδας) και όχι το όνομα της ομάδας στις ρυθμίσεις του Cloudflare!`,
+              response: `Σφάλμα κατά την επικοινωνία με το MailerLite: ${err.message}.`,
               emailCaptured: false
             }),
             { status: 200, headers: { 'Content-Type': 'application/json' } }
           );
         }
-
-        console.log(`Successfully subscribed ${email} to MailerLite via Chatbot.`);
-      } catch (err) {
-        console.error('Failed to subscribe email via chatbot:', err);
-        return new Response(
-          JSON.stringify({
-            response: `Σφάλμα κατά την επικοινωνία με το MailerLite: ${err.message}.`,
-            emailCaptured: false
-          }),
-          { status: 200, headers: { 'Content-Type': 'application/json' } }
-        );
       }
 
-      // Return a quick success response
-      // Find a beat to offer for free from free_beats.json
-      const freeBeatLink = freeBeatsData.freebeatslist?.[0]?.downloadUrl || '#';
-      const freeBeatTitle = freeBeatsData.freebeatslist?.[0]?.title || 'Free Beat';
-      
+      // Template string replacement
+      const finalReply = successMessage
+        .replace(/{email}/g, email)
+        .replace(/{link}/g, targetLink)
+        .replace(/{title}/g, targetTitle);
+
       return new Response(
         JSON.stringify({
-          response: `Τέλεια! Το email σου (${email}) καταχωρήθηκε επιτυχώς στο VIP Newsletter του Black Vybez. \n\nΜπορείς να κατεβάσεις το δωρεάν σου beat ("${freeBeatTitle}") από εδώ: ${freeBeatLink}\n\nΑνυπομονώ να ακούσω τι θα δημιουργήσεις! 🔥`,
+          response: finalReply,
           emailCaptured: true,
           email: email
         }),
@@ -102,23 +219,50 @@ export async function onRequestPost(context) {
       );
     }
 
-    // If it's a keyword trigger, guide them directly to give their email
-    if (isKeywordTrigger) {
-      return new Response(
-        JSON.stringify({
-          response: `Ευχαριστώ για το ενδιαφέρον! 🎧\n\nΓράψε το email σου εδώ στο chat για να σου σταλεί αμέσως το download link για το δωρεάν beat σου!`,
-          keywordTriggered: true
-        }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } }
-      );
+    // Trigger Campaign Reply
+    if (matchedCampaign) {
+      if (matchedCampaign.action === 'email_capture') {
+        return new Response(
+          JSON.stringify({
+            response: matchedCampaign.triggerResponse || 'Γράψε το email σου για να λάβεις την προσφορά!',
+            keywordTriggered: true
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+      } else if (matchedCampaign.action === 'link_direct' || matchedCampaign.action === 'text_only') {
+        const finalReply = (matchedCampaign.triggerResponse || '')
+          .replace(/{link}/g, matchedCampaign.targetLink || '')
+          .replace(/{title}/g, matchedCampaign.targetTitle || '');
+        return new Response(
+          JSON.stringify({
+            response: finalReply,
+            keywordTriggered: true
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
+    }
+
+    // Local hardcoded keyword fallbacks if Google Sheet is empty/not configured
+    if (!sheetUrl || activeCampaigns.length === 0) {
+      const localKeywords = ['BEAT', 'FREE', 'FREEBEAT', 'GIFT', 'ΔΩΡΟ', 'ΔΩΡΕΑΝ'];
+      const isLocalKeyword = localKeywords.some(kw => cleanMsgUpper.includes(kw));
+      if (isLocalKeyword) {
+        return new Response(
+          JSON.stringify({
+            response: `Ευχαριστώ για το ενδιαφέρον! 🎧\n\nΓράψε το email σου εδώ στο chat για να σου σταλεί αμέσως το download link για το δωρεάν beat σου!`,
+            keywordTriggered: true
+          }),
+          { status: 200, headers: { 'Content-Type': 'application/json' } }
+        );
+      }
     }
 
     // 3. GEMINI AI CHAT FALLBACK (If not a keyword or email)
     if (!geminiApiKey) {
-      // If Gemini API is not configured, fall back to a helpful static response
       return new Response(
         JSON.stringify({
-          response: `Γεια! Είμαι ο VybezBot, ο προσωπικός βοηθός του Black Vybez. 🎧\n\nΑυτή τη στιγμή η AI επικοινωνία είναι υπό συντήρηση, αλλά μπορείς να γράψεις το email σου εδώ για να σου σταλεί ένα δωρεάν beat!`
+          response: `Γεια! Είμαι ο VybezBot, ο προσωπικός βοηθός του Black Vybez. 🎧\n\nΑυτή τη στιγμή η AI επικοινωνία είναι υπό συντήρηση, αλλά μπορείς να μου γράψεις το email σου εδώ για να σου σταλεί ένα δωρεάν beat!`
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       );
@@ -144,7 +288,7 @@ export async function onRequestPost(context) {
 ΛΙΣΤΑ ΔΙΑΘΕΣΙΜΩΝ BEATS/ΚΟΜΜΑΤΙΩΝ:
 ${beatsListString}
 
-  POΛΙΤΙΚΗ ΤΙΜΩΝ & LEASING (ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ):
+POΛΙΤΙΚΗ ΤΙΜΩΝ & LEASING (ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ):
 - Ο Black Vybez έχει αποφασίσει στην Ελλάδα να ΜΗΝ κάνει leasing στα κανονικά του beats. Αν και το leasing γενικά συμφέρει καλύτερα τον παραγωγό (γιατί πουλάει το ίδιο beat πολλές φορές), ο Black Vybez καταλαβαίνει την ελληνική αγορά και τις ανάγκες των καλλιτεχνών για αποκλειστικότητα.
 - Γι' αυτό επιλέγει να δίνει τα beats του απευθείας ως Exclusive σε μια τίμια και δίκαιη τιμή (fair price), ώστε και ο παραγωγός να πληρώνεται σωστά για τη δημιουργία του και ο καλλιτέχνης να έχει την αποκλειστική κυριότητα του κομματιού του.
 - Επομένως, όλες οι τιμές των beats που βλέπεις στη λίστα αφορούν ΑΠΟΚΛΕΙΣΤΙΚΑ δικαιώματα (Exclusive Rights). Όλα τα beats του είναι Exclusive.
@@ -159,13 +303,11 @@ ${beatsListString}
 - Αν ρωτήσουν άσχετα πράγματα, απάντησέ τους ευγενικά αλλά επανάφερε τη συζήτηση στη μουσική, τα tracks και τα beats του Black Vybez.`;
 
     // Format Gemini contents payload
-    // Map roles: 'user' -> 'user', 'bot' -> 'model'
     const formattedHistory = (history || []).map(h => ({
       role: h.role === 'bot' ? 'model' : 'user',
       parts: [{ text: h.text }]
     }));
 
-    // Add current user message to contents
     formattedHistory.push({
       role: 'user',
       parts: [{ text: cleanMsg }]
@@ -182,7 +324,6 @@ ${beatsListString}
       }
     };
 
-    // Call Gemini API in a loop with fallback models to avoid deprecation issues
     const modelsToTry = [
       'gemini-2.5-flash',
       'gemini-3.5-flash',
