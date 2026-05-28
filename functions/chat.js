@@ -302,22 +302,50 @@ POΛΙΤΙΚΗ ΤΙΜΩΝ & LEASING (ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ):
 - Αν σου γράψουν το email τους, πες τους ότι καταχωρήθηκε και θα λάβουν το link.
 - Αν ρωτήσουν άσχετα πράγματα, απάντησέ τους ευγενικά αλλά επανάφερε τη συζήτηση στη μουσική, τα tracks και τα beats του Black Vybez.`;
 
-    // Format Gemini contents payload
-    const formattedHistory = (history || []).map(h => ({
-      role: h.role === 'bot' ? 'model' : 'user',
-      parts: [{ text: h.text }]
-    }));
+    // Format Gemini contents payload with strict alternation and starting with 'user'
+    const sanitizedHistory = [];
+    let lastRole = null;
 
-    formattedHistory.push({
+    for (const h of history || []) {
+      const role = h.role === 'bot' ? 'model' : 'user';
+      
+      // 1. First message must be 'user'
+      if (sanitizedHistory.length === 0 && role === 'model') {
+        continue; // Skip starting with model
+      }
+
+      // 2. Alternate roles (merge consecutive if same role)
+      if (role === lastRole) {
+        if (sanitizedHistory.length > 0) {
+          sanitizedHistory[sanitizedHistory.length - 1].parts[0].text += '\n' + h.text;
+        }
+        continue;
+      }
+
+      sanitizedHistory.push({
+        role: role,
+        parts: [{ text: h.text }]
+      });
+      lastRole = role;
+    }
+
+    // 3. The last message in history must be 'model' so that the current user message alternates correctly
+    let currentMsgText = cleanMsg;
+    if (sanitizedHistory.length > 0 && sanitizedHistory[sanitizedHistory.length - 1].role === 'user') {
+      const lastUserMsg = sanitizedHistory.pop();
+      currentMsgText = lastUserMsg.parts[0].text + '\n' + currentMsgText;
+    }
+
+    sanitizedHistory.push({
       role: 'user',
-      parts: [{ text: cleanMsg }]
+      parts: [{ text: currentMsgText }]
     });
 
     const geminiPayload = {
       systemInstruction: {
         parts: [{ text: systemInstructionText }]
       },
-      contents: formattedHistory,
+      contents: sanitizedHistory,
       generationConfig: {
         maxOutputTokens: 500,
         temperature: 0.7
