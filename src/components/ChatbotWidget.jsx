@@ -1,25 +1,27 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageSquare, X, Send, Bot, Sparkles, RefreshCw } from 'lucide-react';
 import './ChatbotWidget.css';
 
 const SUGGESTIONS = [
-  '🎧 Θέλω δωρεάν beat!',
-  '🔥 Δείξε μου τα διαθέσιμα beats',
-  '💰 Πόσο κοστίζουν τα exclusive rights;',
-  '📩 Πώς μπορώ να επικοινωνήσω μαζί σου;'
+  '🎵 Με ενδιαφέρει η μουσική σου (Tracks)',
+  '🎧 Ψάχνω Beats για να γράψω',
+  '🎁 Θέλω ένα δωρεάν beat!',
+  '📩 Πώς επικοινωνώ μαζί σου;'
 ];
 
 const INITIAL_MESSAGES = [
   {
     id: 'init-1',
     role: 'bot',
-    text: 'Γεια! Είμαι ο **VybezBot**, ο προσωπικός βοηθός του Black Vybez. 🎧\n\nΨάχνεις το επόμενο beat για το track σου; Ή μήπως θέλεις να σου στείλω ένα **δωρεάν beat** (γράψε απλά "FREE");\n\nΠες μου τι στυλ ψάχνεις!',
+    text: 'Γεια! Είμαι ο **VybezBot**, ο προσωπικός βοηθός του Black Vybez. 🎧\n\nΚαλώς ήρθες στο Vybezverse! Εδώ θα βρεις τα δικά μου **tracks (τραγούδια)** αλλά και **beats (παραγωγές)** για να γράψεις τη δική σου μουσική.\n\nΜε τι θα ήθελες να ξεκινήσουμε;',
     time: new Date()
   }
 ];
 
 const ChatbotWidget = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
   const [messages, setMessages] = useState(() => {
@@ -87,6 +89,42 @@ const ChatbotWidget = () => {
     };
 
     setMessages(prev => [...prev, userMsg]);
+
+    // Local Router Navigation Interceptors
+    const cleanText = text.trim().toLowerCase();
+
+    // 1. Tracks Redirect
+    if (cleanText.includes('μουσική') || cleanText.includes('tracks') || cleanText.includes('κομμάτια') || cleanText.includes('τραγούδια')) {
+      setIsLoading(true);
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: `bot-nav-${Date.now()}`,
+          role: 'bot',
+          text: 'Τέλεια! Σε μεταφέρω στις κυκλοφορίες μου για να ακούσεις τα tracks μου. 🎵',
+          time: new Date()
+        }]);
+        setIsLoading(false);
+        navigate('/releases');
+      }, 700);
+      return;
+    }
+
+    // 2. Beats Redirect
+    if (cleanText.includes('beats') || cleanText.includes('beatstore') || cleanText.includes('beat store') || cleanText.includes('παραγωγές')) {
+      setIsLoading(true);
+      setTimeout(() => {
+        setMessages(prev => [...prev, {
+          id: `bot-nav-${Date.now()}`,
+          role: 'bot',
+          text: 'Βεβαίως! Σε μεταφέρω στο Beat Store για να ακούσεις όλα τα instrumentals. 🎧',
+          time: new Date()
+        }]);
+        setIsLoading(false);
+        navigate('/beats');
+      }, 700);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
