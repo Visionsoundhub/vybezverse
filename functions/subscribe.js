@@ -1,7 +1,7 @@
 export async function onRequestPost(context) {
   try {
     const { env, request } = context;
-    const { MAILERLITE_API_KEY, MAILERLITE_GROUP_ID } = env;
+    const { MAILERLITE_API_KEY, MAILERLITE_TRACKS_GROUP_ID, MAILERLITE_GROUP_ID } = env;
 
     // 1. Verify API key is configured
     if (!MAILERLITE_API_KEY) {
@@ -37,8 +37,9 @@ export async function onRequestPost(context) {
     };
 
     // If a group ID is configured, add subscriber to that group
-    if (MAILERLITE_GROUP_ID) {
-      mailerlitePayload.groups = [MAILERLITE_GROUP_ID.trim()];
+    const groupToUse = MAILERLITE_TRACKS_GROUP_ID || MAILERLITE_GROUP_ID;
+    if (groupToUse) {
+      mailerlitePayload.groups = [groupToUse.trim()];
     }
 
     // 4. Send to MailerLite API (v4)

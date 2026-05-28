@@ -3,7 +3,7 @@ import beatsData from '../src/data/beats.json';
 export async function onRequestPost(context) {
   try {
     const { env, request } = context;
-    const { GEMINI_API_KEY, MAILERLITE_API_KEY, MAILERLITE_GROUP_ID } = env;
+    const { GEMINI_API_KEY, MAILERLITE_API_KEY, MAILERLITE_BEATS_GROUP_ID, MAILERLITE_GROUP_ID } = env;
 
     // 1. Parse request body
     let body;
@@ -43,8 +43,10 @@ export async function onRequestPost(context) {
         const mailerlitePayload = {
           email: email.trim(),
         };
-        if (MAILERLITE_GROUP_ID) {
-          mailerlitePayload.groups = [MAILERLITE_GROUP_ID.trim()];
+        
+        const groupToUse = MAILERLITE_BEATS_GROUP_ID || MAILERLITE_GROUP_ID;
+        if (groupToUse) {
+          mailerlitePayload.groups = [groupToUse.trim()];
         }
 
         // Subscribe to MailerLite
