@@ -30,8 +30,8 @@ const GalaxyBackground = () => {
         x: Math.random() * width,
         y: Math.random() * height,
         radius: Math.random() * 1.5,
-        alpha: Math.random(),
-        speed: Math.random() * 0.05 + 0.01,
+        alpha: Math.random() * 0.5, // Lower max alpha
+        speed: Math.random() * 0.02 + 0.005, // Slower twinkle
       });
     }
 
@@ -52,20 +52,20 @@ const GalaxyBackground = () => {
 
         // Twinkle
         star.alpha += star.speed;
-        if (star.alpha > 1 || star.alpha < 0) {
+        if (star.alpha > 0.6 || star.alpha < 0) { // Limit max opacity to 0.6
           star.speed = -star.speed;
         }
       });
 
-      // Spawn shooting stars randomly
-      if (Math.random() < 0.01) {
+      // Spawn shooting stars randomly - less frequent
+      if (Math.random() < 0.005) {
         shootingStars.push({
           x: Math.random() * width,
           y: 0,
-          length: Math.random() * 80 + 20,
-          speed: Math.random() * 10 + 5,
+          length: Math.random() * 50 + 20,
+          speed: Math.random() * 5 + 3, // Slower shooting stars
           angle: Math.PI / 4, // 45 degrees
-          opacity: 1
+          opacity: 0.5 // Lower opacity for shooting stars
         });
       }
 
@@ -76,7 +76,7 @@ const GalaxyBackground = () => {
         ctx.moveTo(s.x, s.y);
         ctx.lineTo(s.x - s.length * Math.cos(s.angle), s.y - s.length * Math.sin(s.angle));
         ctx.strokeStyle = `rgba(188, 116, 245, ${s.opacity})`;
-        ctx.lineWidth = 2;
+        ctx.lineWidth = 1.5;
         ctx.stroke();
 
         s.x += s.speed * Math.cos(s.angle);
