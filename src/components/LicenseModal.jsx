@@ -38,6 +38,9 @@ const LicenseModal = () => {
       
       // Open Payhip checkout
       window.open(url, '_blank');
+      
+      // Close the modal
+      closeLicenseModal();
     }
   };
 
