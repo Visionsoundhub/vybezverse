@@ -128,3 +128,28 @@ a:hover {
   margin: 0 auto;
   padding: 0 24px;
 }
+
+/* Global Form Inputs */
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  color: white;
+  padding: 12px 15px;
+  outline: none;
+  font-family: var(--font-family);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus {
+  border-color: var(--color-accent-purple);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+input::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}

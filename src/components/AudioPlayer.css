@@ -14,9 +14,9 @@
   pointer-events: auto; /* Re-enable clicks on the player itself */
   width: 100%;
   max-width: 1100px;
-  background: rgba(20, 15, 30, 0.75);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
+  background: rgba(10, 5, 15, 0.95);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 60px; /* Pill shape */
   padding: 12px 24px;

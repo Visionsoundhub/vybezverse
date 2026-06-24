@@ -49,7 +49,7 @@ const VisualizerCanvas = () => {
     const starTexture = createCircleTexture('rgba(188, 116, 245, 0.5)', 'rgba(255, 255, 255, 0.9)');
 
     // --- 3. WAVE GRID GEOMETRY ---
-    const numWaveParticles = 3000;
+    const numWaveParticles = 1500;
     const waveGeo = new THREE.BufferGeometry();
     const wavePos = new Float32Array(numWaveParticles * 3);
     const waveColors = new Float32Array(numWaveParticles * 3);
@@ -58,9 +58,9 @@ const VisualizerCanvas = () => {
     const color1 = new THREE.Color('#ff1493');
     const color2 = new THREE.Color('#bc74f5');
 
-    const cols = 60;
-    const rows = 50;
-    const spacing = 14;
+    const cols = 50;
+    const rows = 30;
+    const spacing = 16;
     const xOffset = (cols * spacing) / 2;
     const zOffset = (rows * spacing) / 2;
 
@@ -103,7 +103,7 @@ const VisualizerCanvas = () => {
     scene.add(wavePoints);
 
     // --- 4. GALAXY STARS BACKGROUND ---
-    const numStars = 1500;
+    const numStars = 500;
     const starsGeo = new THREE.BufferGeometry();
     const starsPos = new Float32Array(numStars * 3);
     const starsVel = new Float32Array(numStars); // For shooting stars
@@ -173,7 +173,7 @@ const VisualizerCanvas = () => {
         const dx = x - mouse.worldX;
         const dz = z - mouse.worldZ;
         const distSq = dx*dx + dz*dz;
-        const maxDist = 4000; // Radius of effect squared
+        const maxDist = 1500; // Radius of effect squared
 
         if (distSq < maxDist) {
           const force = (maxDist - distSq) / maxDist; // 0 to 1

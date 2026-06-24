@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { updateProfile, updatePassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, Ticket, Music, AlertCircle, ShoppingBag, FileText, X } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
@@ -19,6 +20,32 @@ const Dashboard = () => {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  // Update profile state
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [updateMessage, setUpdateMessage] = useState('');
+  const [updateError, setUpdateError] = useState('');
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setUpdateMessage('');
+    setUpdateError('');
+    try {
+      if (newUsername) {
+        await updateProfile(currentUser, { displayName: newUsername });
+      }
+      if (newPassword) {
+        await updatePassword(currentUser, newPassword);
+      }
+      setUpdateMessage('Το προφίλ ενημερώθηκε επιτυχώς!');
+      setNewUsername('');
+      setNewPassword('');
+    } catch (err) {
+      console.error(err);
+      setUpdateError('Σφάλμα: ' + err.message);
+    }
+  };
 
   useEffect(() => {
     if (!currentUser) return;
@@ -241,9 +268,43 @@ const Dashboard = () => {
           ) : (
             <div className="empty-state">
               <AlertCircle size={40} opacity={0.5} />
-              <p>Δεν έχεις αγοράσει Songs/Kits ακόμα.</p>
+              <p>Δεν έχεις αγοράσει Songs ακόμα.</p>
             </div>
           )}
+        </div>
+
+        {/* Update Profile Card */}
+        <div className="dashboard-card glass">
+          <div className="card-header">
+            <Ticket color="#ff1493" />
+            <h2>Update Profile</h2>
+          </div>
+          <form onSubmit={handleUpdateProfile} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+            {updateMessage && <div style={{ color: '#4CAF50', background: 'rgba(76, 175, 80, 0.1)', padding: '10px', borderRadius: '8px', fontSize: '0.85rem' }}>{updateMessage}</div>}
+            {updateError && <div style={{ color: '#ff4d4d', background: 'rgba(255, 77, 77, 0.1)', padding: '10px', borderRadius: '8px', fontSize: '0.85rem' }}>{updateError}</div>}
+            
+            <input 
+              type="text" 
+              placeholder="Νέο Username" 
+              value={newUsername} 
+              onChange={e => setNewUsername(e.target.value)} 
+              style={{ width: '100%', padding: '10px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '10px', color: 'white', outline: 'none' }}
+            />
+            <input 
+              type="password" 
+              placeholder="Νέος Κωδικός" 
+              value={newPassword} 
+              onChange={e => setNewPassword(e.target.value)} 
+              minLength="6"
+              style={{ width: '100%', padding: '10px', background: 'rgba(255, 255, 255, 0.05)', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '10px', color: 'white', outline: 'none' }}
+            />
+            <button 
+              type="submit" 
+              style={{ width: '100%', padding: '10px', background: 'var(--primary)', color: 'white', border: 'none', borderRadius: '25px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              ΑΠΟΘΗΚΕΥΣΗ
+            </button>
+          </form>
         </div>
       </div>
     </div>
