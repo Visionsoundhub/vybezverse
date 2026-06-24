@@ -1,10 +1,17 @@
 .beatstore-wide {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 60px 20px 120px 20px;
+  padding: 60px 40px 120px 40px;
   display: flex;
   flex-direction: column;
   gap: 40px;
+  background: rgba(15, 10, 20, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-left: 1px solid rgba(255, 255, 255, 0.03);
+  border-right: 1px solid rgba(255, 255, 255, 0.03);
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
+  min-height: 100vh;
 }
 
 /* Massive Banner (Mockup style restored) */
