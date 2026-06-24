@@ -194,16 +194,31 @@ const Home = () => {
                     required
                   />
                 </div>
-                <div className="preferences-group" style={{ textAlign: 'left', marginTop: '15px', marginBottom: '15px', color: '#ccc', fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                    <input type="radio" name="home_pref" value="beats_and_songs" checked={preference === 'beats_and_songs'} onChange={(e) => setPreference(e.target.value)} /> Θέλω Beats και να ενημερώνομαι για κυκλοφορίες
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                    <input type="radio" name="home_pref" value="only_beats" checked={preference === 'only_beats'} onChange={(e) => setPreference(e.target.value)} /> Μόνο Beats
-                  </label>
-                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                    <input type="radio" name="home_pref" value="only_songs" checked={preference === 'only_songs'} onChange={(e) => setPreference(e.target.value)} /> Μόνο Νέες Κυκλοφορίες και Νέα
-                  </label>
+                <div className="preferences-group custom-toggles">
+                  <div className="toggle-label">Τι σε ενδιαφέρει περισσότερο;</div>
+                  <div className="toggle-options">
+                    <button 
+                      type="button"
+                      className={`pref-toggle ${preference === 'beats_and_songs' ? 'active' : ''}`}
+                      onClick={() => setPreference('beats_and_songs')}
+                    >
+                      Beats & Songs
+                    </button>
+                    <button 
+                      type="button"
+                      className={`pref-toggle ${preference === 'only_beats' ? 'active' : ''}`}
+                      onClick={() => setPreference('only_beats')}
+                    >
+                      Μόνο Beats
+                    </button>
+                    <button 
+                      type="button"
+                      className={`pref-toggle ${preference === 'only_songs' ? 'active' : ''}`}
+                      onClick={() => setPreference('only_songs')}
+                    >
+                      Μόνο Νέα & Songs
+                    </button>
+                  </div>
                 </div>
                 <button type="submit" className="btn-subscribe">
                   SUBSCRIBE <ArrowRight size={18} />

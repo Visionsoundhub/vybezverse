@@ -416,6 +416,51 @@
   justify-content: center;
 }
 
+/* Custom Toggles for Newsletter */
+.custom-toggles {
+  margin: 20px 0;
+  text-align: left;
+}
+
+.toggle-label {
+  color: #bc74f5;
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.toggle-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.pref-toggle {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #aaa;
+  padding: 8px 16px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+.pref-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.pref-toggle.active {
+  background: rgba(188, 116, 245, 0.2);
+  border-color: #bc74f5;
+  color: white;
+  box-shadow: 0 0 15px rgba(188, 116, 245, 0.3);
+}
+
 @media (max-width: 900px) {
   .hero-name {
     font-size: clamp(2rem, 6vw, 3.5rem);
@@ -436,6 +481,12 @@
     text-align: center;
   }
   .newsletter-text h2 {
+    justify-content: center;
+  }
+  .custom-toggles {
+    text-align: center;
+  }
+  .toggle-options {
     justify-content: center;
   }
 }
