@@ -18,7 +18,6 @@ import ChatbotWidget from './components/ChatbotWidget';
 import './App.css';
 
 import { AuthProvider } from './context/AuthContext';
-import AuthModal from './components/AuthModal';
 
 function App() {
   return (
@@ -42,7 +41,6 @@ function App() {
           </main>
           <AudioPlayer />
           <LicenseModal />
-          <AuthModal />
           <ChatbotWidget />
         </Router>
       </AudioProvider>

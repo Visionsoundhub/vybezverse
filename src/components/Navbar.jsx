@@ -8,7 +8,7 @@ const Navbar = () => {
   const [moreOpen, setMoreOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const navigate = useNavigate();
-  const { currentUser, setAuthModalOpen } = useAuth();
+  const { currentUser } = useAuth();
 
   return (
     <nav className="navbar glass">
@@ -54,11 +54,7 @@ const Navbar = () => {
             className="nav-link nav-account-btn" 
             onClick={() => {
               setMobileOpen(false);
-              if (currentUser) {
-                navigate('/account');
-              } else {
-                setAuthModalOpen(true);
-              }
+              navigate('/account');
             }}
             style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'none', border: 'none', cursor: 'pointer' }}
           >

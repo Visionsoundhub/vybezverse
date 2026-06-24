@@ -4,10 +4,12 @@ import {
   signInWithEmailAndPassword, 
   signOut, 
   onAuthStateChanged,
-  updateProfile
+  updateProfile,
+  GoogleAuthProvider,
+  signInWithPopup
 } from 'firebase/auth';
 import { auth, db } from '../firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { doc, setDoc, getDoc } from 'firebase/firestore';
 
 const AuthContext = createContext();
 
@@ -61,6 +63,28 @@ export function AuthProvider({ children }) {
     return signOut(auth);
   }
 
+  async function loginWithGoogle() {
+    const provider = new GoogleAuthProvider();
+    const result = await signInWithPopup(auth, provider);
+    
+    // Check if user exists in Firestore, if not create them
+    try {
+      const userDoc = await getDoc(doc(db, 'users', result.user.uid));
+      if (!userDoc.exists()) {
+        await setDoc(doc(db, 'users', result.user.uid), {
+          uid: result.user.uid,
+          email: result.user.email,
+          name: result.user.displayName,
+          createdAt: new Date().toISOString()
+        });
+      }
+    } catch (e) {
+      console.error("Error checking/saving Google user to DB", e);
+    }
+    
+    return result;
+  }
+
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, user => {
       setCurrentUser(user);
@@ -74,6 +98,7 @@ export function AuthProvider({ children }) {
     currentUser,
     signup,
     login,
+    loginWithGoogle,
     logout,
     requireLogin,
     authModalOpen,
