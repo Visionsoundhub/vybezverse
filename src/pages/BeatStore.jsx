@@ -6,8 +6,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AudioContext } from '../context/AudioContext';
 import beatsData from '../data/beats.json';
 import vibesData from '../data/vibes.json';
-import settingsData from '../data/settings.json';
-import { Play, Pause, Search, X, ChevronDown, ChevronUp, Crown, Bot, Box, Heart, ThumbsDown } from 'lucide-react';
+import { Play, Pause, Search, X, Heart, ThumbsDown, Check, Music4, FileMusic, Disc3 } from 'lucide-react';
+import GalaxyBackground from './GalaxyBackground';
+import CustomCursor from './CustomCursor';
 import './BeatStore.css';
 
 // Register ScrollTrigger plugin
@@ -53,9 +54,6 @@ const BeatStore = () => {
   const [shuffledBeats, setShuffledBeats] = useState([]);
   const [swipeIndex, setSwipeIndex] = useState(0);
 
-  // Accordion state
-  const [expandedSection, setExpandedSection] = useState(null);
-
   // Filter states
   const [selectedGenre, setSelectedGenre] = useState('ALL');
   const [selectedBPM, setSelectedBPM] = useState('ALL');
@@ -68,28 +66,15 @@ const BeatStore = () => {
   useGSAP(() => {
     if (beats.length === 0) return;
 
-    // Banner entrance animation
+    // Banner entrance animation (simplified to avoid lag)
     gsap.from('.beatstore-banner', {
       opacity: 0,
-      y: 40,
-      duration: 1,
-      ease: 'power3.out',
+      y: 20,
+      duration: 0.8,
+      ease: 'power2.out',
       clearProps: 'opacity,transform',
     });
 
-    // Category accordions staggered load
-    gsap.from('.accordion-item', {
-      x: -40,
-      opacity: 0,
-      stagger: 0.1,
-      duration: 0.6,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '.categories-accordion',
-        start: 'top 90%',
-        toggleActions: 'play none none none',
-      }
-    });
   }, { dependencies: [beats], scope: containerRef });
 
   useEffect(() => {
@@ -106,10 +91,6 @@ const BeatStore = () => {
       playTrack(shuffled[0]);
     }
   }, [isVibeModalOpen, beats]);
-
-  const toggleAccordion = (section) => {
-    setExpandedSection(expandedSection === section ? null : section);
-  };
 
   const nextSwipeCard = (action) => {
     const currentBeat = shuffledBeats[swipeIndex];
@@ -128,7 +109,7 @@ const BeatStore = () => {
     }
   };
 
-  const handleDragEnd = (e, { offset, velocity }) => {
+  const handleDragEnd = (e, { offset }) => {
     const swipeThreshold = 100;
     if (offset.x < -swipeThreshold) {
       nextSwipeCard('skip');
@@ -157,123 +138,123 @@ const BeatStore = () => {
   });
 
   return (
-    <div className="beatstore-page beatstore-wide" ref={containerRef}>
+    <>
+      <GalaxyBackground />
+      <CustomCursor />
       
-      {/* Massive Hero Banner */}
-      <motion.div 
-        className="beatstore-banner"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-      >
-        <div className="banner-bg"></div>
-        <div className="banner-content">
-          <div className="banner-text-right">
-            <h1>PRODUCER HUB.<br/>FIND YOUR SOUND.</h1>
-            <p>Αποκλειστικά Instrumentals, Beats & AI Tools.</p>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Toolbar row: Vibe Search + Filters */}
-      <div className="beatstore-toolbar">
-        <button 
-          className="btn btn-vibe-search-main"
-          onClick={() => setIsVibeModalOpen(true)}
+      <div className="beatstore-page beatstore-wide" ref={containerRef}>
+        
+        {/* Massive Hero Banner */}
+        <motion.div 
+          className="beatstore-banner"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
         >
-          <div className="btn-vibe-content">
-            <Heart className="vibe-icon-tinder" size={20} /> 
-            VIBE SEARCH (SWIPE)
+          <div className="banner-bg"></div>
+          <div className="banner-content">
+            <div className="banner-text-right">
+              <h1>PRODUCER HUB.<br/>FIND YOUR SOUND.</h1>
+              <p>Αποκλειστικά Instrumentals, Beats & AI Tools.</p>
+            </div>
           </div>
-        </button>
+        </motion.div>
 
-        <div className="dropdown-filters">
-          <div className="filter-select">
-            <label>GENRE</label>
-            <select value={selectedGenre} onChange={(e) => setSelectedGenre(e.target.value)}>
-              {uniqueGenres.map(g => <option key={g} value={g}>{g}</option>)}
-            </select>
-          </div>
-          <div className="filter-select">
-            <label>BPM</label>
-            <select value={selectedBPM} onChange={(e) => setSelectedBPM(e.target.value)}>
-              {uniqueBPMs.map(b => <option key={b} value={b}>{b}</option>)}
-            </select>
-          </div>
-          <div className="filter-select">
-            <label>KEY</label>
-            <select value={selectedKey} onChange={(e) => setSelectedKey(e.target.value)}>
-              {uniqueKeys.map(k => <option key={k} value={k}>{k}</option>)}
-            </select>
+        {/* Toolbar row: Vibe Search + Filters */}
+        <div className="beatstore-toolbar">
+          <button 
+            className="btn btn-vibe-search-main"
+            onClick={() => setIsVibeModalOpen(true)}
+          >
+            <div className="btn-vibe-content">
+              <Heart className="vibe-icon-tinder" size={20} /> 
+              VIBE SEARCH (SWIPE)
+            </div>
+          </button>
+
+          <div className="dropdown-filters">
+            <div className="filter-select">
+              <label>GENRE</label>
+              <select value={selectedGenre} onChange={(e) => setSelectedGenre(e.target.value)}>
+                {uniqueGenres.map(g => <option key={g} value={g}>{g}</option>)}
+              </select>
+            </div>
+            <div className="filter-select">
+              <label>BPM</label>
+              <select value={selectedBPM} onChange={(e) => setSelectedBPM(e.target.value)}>
+                {uniqueBPMs.map(b => <option key={b} value={b}>{b}</option>)}
+              </select>
+            </div>
+            <div className="filter-select">
+              <label>KEY</label>
+              <select value={selectedKey} onChange={(e) => setSelectedKey(e.target.value)}>
+                {uniqueKeys.map(k => <option key={k} value={k}>{k}</option>)}
+              </select>
+            </div>
           </div>
         </div>
-      </div>
 
-      {activeVibe !== 'all' && (
-        <div className="active-vibe-indicator glass">
-          <span>Active Vibe: <strong style={{color: '#ff1493'}}>{activeVibe}</strong></span>
-          <button className="btn-clear-vibe" onClick={() => setActiveVibe('all')}><X size={16}/></button>
-        </div>
-      )}
-
-      {/* Accordion Categories */}
-      <div className="categories-accordion">
-        <div className="accordion-item glass">
-          <div className="accordion-header" onClick={() => toggleAccordion('exclusive')}>
-            <div className="acc-title"><Crown size={18} color="#bc74f5" /> {settingsData.exclusiveTitle || 'EXCLUSIVE BEATS'}</div>
-            {expandedSection === 'exclusive' ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+        {activeVibe !== 'all' && (
+          <div className="active-vibe-indicator glass">
+            <span>Active Vibe: <strong style={{color: '#ff1493'}}>{activeVibe}</strong></span>
+            <button className="btn-clear-vibe" onClick={() => setActiveVibe('all')}><X size={16}/></button>
           </div>
-          <AnimatePresence>
-            {expandedSection === 'exclusive' && (
-              <motion.div 
-                className="accordion-content"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-              >
-                <p>{settingsData.exclusiveText}</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+        )}
 
-        <div className="accordion-item glass">
-          <div className="accordion-header" onClick={() => toggleAccordion('ai')}>
-            <div className="acc-title"><Bot size={18} color="#bc74f5" /> {settingsData.aiTitle || 'AI ACCESS'}</div>
-            {expandedSection === 'ai' ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+        {/* BeatStars Style Licensing Info Cards */}
+        <div className="beatstore-pricing-cards">
+          <div className="pricing-header">
+            <h2>Licensing Info</h2>
+            <p>Επίλεξε την άδεια που σου ταιριάζει και κράτησε το 100% των Royalties σου.</p>
           </div>
-          <AnimatePresence>
-            {expandedSection === 'ai' && (
-              <motion.div 
-                className="accordion-content"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-              >
-                <p>{settingsData.aiText}</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+          <div className="pricing-grid">
+            
+            {/* Card 1: Showcase */}
+            <div className="pricing-card glass-card">
+              <div className="card-icon-wrap"><Music4 size={32} color="#4fa8ff" /></div>
+              <h3>SHOWCASE LICENSE (MP3)</h3>
+              <div className="pricing-price">$14.99</div>
+              <ul className="pricing-features">
+                <li><Check size={16} color="#4fa8ff" /> Used for Music Recording</li>
+                <li><Check size={16} color="#4fa8ff" /> Distribute up to 1,500 copies</li>
+                <li><Check size={16} color="#4fa8ff" /> 0 Online Audio Streams</li>
+                <li><Check size={16} color="#4fa8ff" /> 0 Music Video</li>
+                <li><Check size={16} color="#4fa8ff" /> UNLIMITED Non-profit Live Performances</li>
+              </ul>
+            </div>
 
-        <div className="accordion-item glass">
-          <div className="accordion-header" onClick={() => toggleAccordion('vault')}>
-            <div className="acc-title"><Box size={18} color="#bc74f5" /> {settingsData.vaultTitle || 'VAULT BEATS'}</div>
-            {expandedSection === 'vault' ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            {/* Card 2: Premium (Popular) */}
+            <div className="pricing-card glass-card pricing-popular">
+              <div className="popular-badge">BEST VALUE</div>
+              <div className="card-icon-wrap"><FileMusic size={32} color="#ff1493" /></div>
+              <h3>PREMIUM LICENSE (MP3+WAV)</h3>
+              <div className="pricing-price">$39.99</div>
+              <ul className="pricing-features">
+                <li><Check size={16} color="#ff1493" /> Used for Music Recording</li>
+                <li><Check size={16} color="#ff1493" /> Distribute up to 3,000 copies</li>
+                <li><Check size={16} color="#ff1493" /> 700,000 Online Audio Streams</li>
+                <li><Check size={16} color="#ff1493" /> 1 Music Video</li>
+                <li><Check size={16} color="#ff1493" /> For Profit Live Performances</li>
+                <li><Check size={16} color="#ff1493" /> Radio Broadcasting (2 Stations)</li>
+              </ul>
+            </div>
+
+            {/* Card 3: Unlimited */}
+            <div className="pricing-card glass-card">
+              <div className="card-icon-wrap"><Disc3 size={32} color="#bc74f5" /></div>
+              <h3>UNLIMITED LICENSE (TRACKOUTS)</h3>
+              <div className="pricing-price">$99.99</div>
+              <ul className="pricing-features">
+                <li><Check size={16} color="#bc74f5" /> Used for Music Recording</li>
+                <li><Check size={16} color="#bc74f5" /> UNLIMITED Distribution copies</li>
+                <li><Check size={16} color="#bc74f5" /> UNLIMITED Online Audio Streams</li>
+                <li><Check size={16} color="#bc74f5" /> UNLIMITED Music Videos</li>
+                <li><Check size={16} color="#bc74f5" /> For Profit Live Performances</li>
+                <li><Check size={16} color="#bc74f5" /> Radio Broadcasting (UNLIMITED)</li>
+              </ul>
+            </div>
+
           </div>
-          <AnimatePresence>
-            {expandedSection === 'vault' && (
-              <motion.div 
-                className="accordion-content"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-              >
-                <p>{settingsData.vaultText}</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
         </div>
-      </div>
 
       {/* Beats Grid */}
       <motion.div className="mockup-grid" layout>

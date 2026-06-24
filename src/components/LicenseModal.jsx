@@ -70,76 +70,80 @@ const LicenseModal = () => {
           {/* Grid of options */}
           <div className="license-grid">
             
-            {/* Tier 1: MP3 Lease */}
+            {/* Tier 1: Showcase License */}
             <div className="license-card glass-card">
-              <div className="card-badge">POPULAR</div>
               <div className="card-icon-wrap">
-                <Music4 size={32} color="#bc74f5" />
+                <Music4 size={32} color="#4fa8ff" />
               </div>
-              <h4>MP3 LEASE</h4>
-              <div className="card-price">{basePrice}</div>
+              <h4>SHOWCASE LICENSE (MP3)</h4>
+              <div className="card-price">$14.99</div>
               
               <ul className="license-features">
-                <li><Check size={16} color="#bc74f5" /> <span>Untagged MP3 File</span></li>
-                <li><Check size={16} color="#bc74f5" /> <span>Up to 100,000 Streams</span></li>
-                <li><Check size={16} color="#bc74f5" /> <span>Non-Exclusive Rights</span></li>
-                <li><Check size={16} color="#bc74f5" /> <span>1 Music Video Limit</span></li>
+                <li><Check size={16} color="#4fa8ff" /> <span>Used for Music Recording</span></li>
+                <li><Check size={16} color="#4fa8ff" /> <span>Distribute up to 1,500 copies</span></li>
+                <li><Check size={16} color="#4fa8ff" /> <span>0 Online Audio Streams</span></li>
+                <li><Check size={16} color="#4fa8ff" /> <span>0 Music Video</span></li>
+                <li><Check size={16} color="#4fa8ff" /> <span>UNLIMITED Non-profit Live Performances</span></li>
               </ul>
 
               <button 
-                onClick={() => handleCheckout(track.checkoutUrl || track.bundleUrl, 'MP3 LEASE')} 
+                onClick={() => handleCheckout(track.checkoutUrl || track.bundleUrl, 'SHOWCASE LICENSE (MP3)')} 
                 className="btn-card-buy mp3-btn"
+                style={{ background: 'rgba(79, 168, 255, 0.1)', borderColor: '#4fa8ff', color: '#4fa8ff' }}
               >
-                BUY MP3 LEASE
+                ADD TO CART
               </button>
             </div>
 
-            {/* Tier 2: WAV Lease */}
+            {/* Tier 2: Premium License */}
             <div className="license-card glass-card featured-license-card">
               <div className="card-badge badge-gradient">BEST VALUE</div>
               <div className="card-icon-wrap">
                 <FileMusic size={32} color="#ff1493" />
               </div>
-              <h4>WAV LEASE</h4>
-              <div className="card-price">{wavPrice}</div>
+              <h4>PREMIUM LICENSE (MP3+WAV)</h4>
+              <div className="card-price">$39.99</div>
               
               <ul className="license-features">
-                <li><Check size={16} color="#ff1493" /> <span>Untagged WAV + MP3</span></li>
-                <li><Check size={16} color="#ff1493" /> <span>Up to 500,000 Streams</span></li>
-                <li><Check size={16} color="#ff1493" /> <span>Non-Exclusive Rights</span></li>
-                <li><Check size={16} color="#ff1493" /> <span>Unlimited Music Videos</span></li>
-                <li><Check size={16} color="#ff1493" /> <span>Radio Broadcasting Rights</span></li>
+                <li><Check size={16} color="#ff1493" /> <span>Used for Music Recording</span></li>
+                <li><Check size={16} color="#ff1493" /> <span>Distribute up to 3,000 copies</span></li>
+                <li><Check size={16} color="#ff1493" /> <span>700,000 Online Audio Streams</span></li>
+                <li><Check size={16} color="#ff1493" /> <span>1 Music Video</span></li>
+                <li><Check size={16} color="#ff1493" /> <span>For Profit Live Performances</span></li>
+                <li><Check size={16} color="#ff1493" /> <span>Radio Broadcasting (2 Stations)</span></li>
               </ul>
 
               <button 
-                onClick={() => handleCheckout(track.checkoutUrl || track.bundleUrl, 'WAV LEASE')} 
+                onClick={() => handleCheckout(track.checkoutUrl || track.bundleUrl, 'PREMIUM LICENSE (MP3+WAV)')} 
                 className="btn-card-buy wav-btn"
               >
-                BUY WAV LEASE
+                ADD TO CART
               </button>
             </div>
 
-            {/* Tier 3: Exclusive Stems */}
+            {/* Tier 3: Unlimited License */}
             <div className="license-card glass-card">
               <div className="card-icon-wrap">
                 <Disc3 size={32} color="#bc74f5" />
               </div>
-              <h4>EXCLUSIVE STEMS</h4>
-              <div className="card-price">{stemsPrice}</div>
+              <h4>UNLIMITED LICENSE (TRACKOUTS)</h4>
+              <div className="card-price">$99.99</div>
               
               <ul className="license-features">
-                <li><Check size={16} color="#bc74f5" /> <span>WAV + MP3 + Trackout Stems</span></li>
-                <li><Check size={16} color="#bc74f5" /> <span>Unlimited Streams & Sales</span></li>
-                <li><Check size={16} color="#bc74f5" /> <span>Exclusive Commercial Rights</span></li>
-                <li><Check size={16} color="#bc74f5" /> <span>Beat removed from store</span></li>
+                <li><Check size={16} color="#bc74f5" /> <span>Used for Music Recording</span></li>
+                <li><Check size={16} color="#bc74f5" /> <span>UNLIMITED Distribution copies</span></li>
+                <li><Check size={16} color="#bc74f5" /> <span>UNLIMITED Online Audio Streams</span></li>
+                <li><Check size={16} color="#bc74f5" /> <span>UNLIMITED Music Videos</span></li>
+                <li><Check size={16} color="#bc74f5" /> <span>For Profit Live Performances</span></li>
+                <li><Check size={16} color="#bc74f5" /> <span>Radio Broadcasting (UNLIMITED)</span></li>
               </ul>
 
-              <a 
-                href={mailtoLink} 
+              <button 
+                onClick={() => handleCheckout(track.checkoutUrl || track.bundleUrl, 'UNLIMITED LICENSE (TRACKOUTS)')} 
                 className="btn-card-buy stems-btn"
               >
-                <Mail size={16} style={{ marginRight: '6px' }} /> REQUEST STEMS
-              </a>
+                ADD TO CART
+              </button>
             </div>
 
           </div>
