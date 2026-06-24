@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut, Ticket, Music, AlertCircle, ShoppingBag, FileText, X } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
 import './Dashboard.css';
 
 const Dashboard = () => {
@@ -208,6 +209,8 @@ const Dashboard = () => {
           <LogOut size={18} /> Logout
         </button>
       </div>
+
+      <LoyaltyProgressBar />
 
       <div className="dashboard-grid">
         <div className="dashboard-card glass">

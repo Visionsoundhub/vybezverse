@@ -8,12 +8,15 @@ import beatsData from '../data/beats.json';
 import vibesData from '../data/vibes.json';
 import { Play, Pause, Search, X, Heart, ThumbsDown, Check, Music4, FileMusic, Disc3 } from 'lucide-react';
 import GalaxyBackground from '../components/GalaxyBackground';
+import { useAuth } from '../context/AuthContext';
+import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
 import './BeatStore.css';
 
 // Register ScrollTrigger plugin
 gsap.registerPlugin(ScrollTrigger);
 
 const BeatStore = () => {
+  const { currentUser } = useAuth();
   const [beats, setBeats] = useState([]);
   const [vibes, setVibes] = useState([]);
   const [activeVibe, setActiveVibe] = useState('all');
@@ -156,6 +159,9 @@ const BeatStore = () => {
             </div>
           </div>
         </motion.div>
+
+        {/* Loyalty Progress for Logged In Users */}
+        {currentUser && <LoyaltyProgressBar />}
 
         {/* Toolbar row: Vibe Search + Filters */}
         <div className="beatstore-toolbar">
