@@ -81,8 +81,8 @@ export async function onRequestPost(context) {
   try {
     const { env, request } = context;
     const geminiApiKey = env.GEMINI_API_KEY || env['Gemini api'] || env.gemini_api_key;
-    const mailerliteApiKey = env.MAILERLITE_API_KEY || env.mailerllite || env.mailerlite;
-    const beatsGroupId = env.MAILERLITE_BEATS_GROUP_ID || env.MAILERLITE_GROUP_ID;
+    const resendApiKey = env.RESEND_API_KEY || 're_Mocb2WXP_PozwDzSrokLrEkKv2PFVU8Z7';
+    const audienceId = env.RESEND_AUDIENCE_ID || '66d1140c-d7df-4411-aae7-345d9d1432a1';
     const sheetUrl = env.GOOGLE_SHEETS_CSV_URL;
 
     // 1. Parse request body
@@ -158,34 +158,33 @@ export async function onRequestPost(context) {
         targetTitle = freeBeatTitle;
       }
 
-      if (mailerliteApiKey) {
+      if (resendApiKey) {
         try {
-          const mailerlitePayload = {
+          const resendPayload = {
             email: email.trim(),
+            audience_id: audienceId,
+            first_name: 'beats_and_songs',
+            last_name: 'απο chatbot',
+            unsubscribed: false
           };
-          
-          if (specificGroupId) {
-            mailerlitePayload.groups = [specificGroupId.trim()];
-          }
 
-          // Subscribe to MailerLite
-          const mlRes = await fetch('https://connect.mailerlite.com/api/subscribers', {
+          // Subscribe to Resend
+          const mlRes = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'Authorization': `Bearer ${mailerliteApiKey}`,
+              'Authorization': `Bearer ${resendApiKey}`,
             },
-            body: JSON.stringify(mailerlitePayload),
+            body: JSON.stringify(resendPayload),
           });
 
           if (!mlRes.ok) {
             const mlErr = await mlRes.json();
-            console.error('MailerLite API returned error:', mlErr);
-            const detailMsg = mlErr.message || JSON.stringify(mlErr.errors || mlErr);
+            console.error('Resend API returned error:', mlErr);
+            const detailMsg = mlErr.message || JSON.stringify(mlErr);
             return new Response(
               JSON.stringify({
-                response: `Το email σου αναγνωρίστηκε, αλλά το MailerLite επέστρεψε σφάλμα: "${detailMsg}".`,
+                response: `Το email σου αναγνωρίστηκε, αλλά το σύστημα επέστρεψε σφάλμα: "${detailMsg}".`,
                 emailCaptured: false
               }),
               { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -195,7 +194,7 @@ export async function onRequestPost(context) {
           console.error('Failed to subscribe email via chatbot:', err);
           return new Response(
             JSON.stringify({
-              response: `Σφάλμα κατά την επικοινωνία με το MailerLite: ${err.message}.`,
+              response: `Σφάλμα κατά την επικοινωνία με το σύστημα: ${err.message}.`,
               emailCaptured: false
             }),
             { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -282,7 +281,7 @@ export async function onRequestPost(context) {
 - Μίλα πάντα στο ΤΡΙΤΟ ΠΡΟΣΩΠΟ για τον Black Vybez (π.χ. "Ο Black Vybez πιστεύει...", "Τα beats του Black Vybez...", και ΟΧΙ "εγώ πιστεύω...", "τα δικά μου beats").
 - Μίλα σε φιλικό, χαλαρό και επαγγελματικό ύφος (slang παραγωγού, chill vibes).
 - Απαντάς στα Ελληνικά (ή στα Αγγλικά αν ο χρήστης σου γράψει στα Αγγλικά).
-- Κράτα τις απαντήσεις σου σύντομες και περιεκτικές. Μην γράφεις τεράστιες παραγράφους.
+- Κράτα τις απαντήσεις σου πολύ σύντομες, περιεκτικές και άμεσες (μέχρι 2-3 προτάσεις το πολύ). Μην μακρηγορείς και μην γράφεις μεγάλες παραγράφους.
 - Μην επινοείς beats που δεν υπάρχουν στη λίστα.
 
 ΛΙΣΤΑ ΔΙΑΘΕΣΙΜΩΝ BEATS/ΚΟΜΜΑΤΙΩΝ:
@@ -347,7 +346,7 @@ POΛΙΤΙΚΗ ΤΙΜΩΝ & LEASING (ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ):
       },
       contents: sanitizedHistory,
       generationConfig: {
-        maxOutputTokens: 500,
+        maxOutputTokens: 1200,
         temperature: 0.7
       }
     };

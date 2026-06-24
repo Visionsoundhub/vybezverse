@@ -1,0 +1,304 @@
+.license-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(5, 5, 10, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.license-modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 1050px;
+  background: rgba(20, 15, 30, 0.8);
+  border: 1px solid rgba(188, 116, 245, 0.25);
+  border-radius: 28px;
+  padding: 45px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.7), inset 0 0 30px rgba(188, 116, 245, 0.05);
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+/* Custom Scrollbar for Modal Content */
+.license-modal-content::-webkit-scrollbar {
+  width: 6px;
+}
+.license-modal-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.license-modal-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+
+.license-modal-close {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ccc;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.license-modal-close:hover {
+  background: rgba(255, 20, 147, 0.15);
+  border-color: #ff1493;
+  color: white;
+  transform: rotate(90deg);
+}
+
+/* Header */
+.license-modal-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.subtitle-tag {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 2px;
+  color: #ff1493;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 8px;
+}
+
+.license-modal-header h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #eee;
+  margin-bottom: 5px;
+}
+
+.track-title-highlight {
+  font-size: 2.2rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #fff, #bc74f5, #ff1493);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  display: inline-block;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  text-shadow: 0 0 20px rgba(188, 116, 245, 0.2);
+}
+
+/* Grid layout */
+.license-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 25px;
+  margin-bottom: 35px;
+}
+
+@media (max-width: 900px) {
+  .license-grid {
+    grid-template-columns: 1fr;
+  }
+  .license-modal-content {
+    padding: 30px 20px;
+  }
+}
+
+/* Pricing Cards */
+.glass-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 20px;
+  padding: 35px 25px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.glass-card:hover {
+  transform: translateY(-8px);
+  background: rgba(255, 255, 255, 0.04);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+}
+
+/* Featured / WAV Card Special Glow */
+.featured-license-card {
+  border: 1px solid rgba(255, 20, 147, 0.35);
+  background: rgba(255, 20, 147, 0.015);
+  box-shadow: 0 10px 40px rgba(255, 20, 147, 0.05);
+}
+
+.featured-license-card:hover {
+  border-color: #ff1493;
+  box-shadow: 0 15px 45px rgba(255, 20, 147, 0.15);
+}
+
+/* Badges */
+.card-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ccc;
+}
+
+.badge-gradient {
+  background: linear-gradient(135deg, #ff1493, #bc74f5);
+  color: white;
+  border: none;
+}
+
+.card-icon-wrap {
+  margin-bottom: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.featured-license-card .card-icon-wrap {
+  background: rgba(255, 20, 147, 0.05);
+  border-color: rgba(255, 20, 147, 0.15);
+}
+
+.license-card h4 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  color: white;
+  margin-bottom: 10px;
+}
+
+.card-price {
+  font-size: 2.2rem;
+  font-weight: 900;
+  color: white;
+  margin-bottom: 25px;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.5px;
+}
+
+.featured-license-card .card-price {
+  color: #ff1493;
+  text-shadow: 0 0 10px rgba(255, 20, 147, 0.2);
+}
+
+/* Features List */
+.license-features {
+  list-style: none;
+  padding: 0;
+  width: 100%;
+  margin-bottom: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1; /* Pushes button to bottom */
+}
+
+.license-features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.9rem;
+  color: #bbb;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.license-features li span {
+  flex: 1;
+}
+
+/* Purchase Buttons */
+.btn-card-buy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 14px 20px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+}
+
+.mp3-btn, .stems-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: white;
+}
+
+.mp3-btn:hover, .stems-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: #bc74f5;
+  color: white;
+  box-shadow: 0 5px 15px rgba(188, 116, 245, 0.15);
+}
+
+.wav-btn {
+  background: linear-gradient(135deg, #ff1493, #bc74f5);
+  color: white;
+  box-shadow: 0 5px 15px rgba(255, 20, 147, 0.25);
+}
+
+.wav-btn:hover {
+  opacity: 0.95;
+  transform: translateY(-1px);
+  box-shadow: 0 8px 20px rgba(255, 20, 147, 0.4);
+}
+
+/* Modal Footer */
+.license-modal-footer {
+  text-align: center;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 25px;
+}
+
+.license-modal-footer p {
+  color: #666;
+  font-size: 0.8rem;
+  max-width: 700px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+.footer-email-link {
+  color: #bc74f5;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.footer-email-link:hover {
+  text-decoration: underline;
+  color: #ff1493;
+}

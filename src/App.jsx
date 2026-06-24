@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { AudioProvider } from './context/AudioContext';
 import Navbar from './components/Navbar';
 import AudioPlayer from './components/AudioPlayer';
+import LicenseModal from './components/LicenseModal';
 import Home from './pages/Home';
 import BeatStore from './pages/BeatStore';
 import Releases from './pages/Releases';
@@ -34,6 +35,7 @@ function App() {
           </Routes>
         </main>
         <AudioPlayer />
+        <LicenseModal />
         <ChatbotWidget />
       </Router>
     </AudioProvider>

@@ -43,11 +43,11 @@ const ChatbotWidget = () => {
 
   // Show tooltip after a small delay on first mount
   useEffect(() => {
-    const hasSeenChat = localStorage.getItem('vybez_chat_seen');
+    const hasSeenChat = sessionStorage.getItem('vybez_chat_seen');
     if (!hasSeenChat) {
       const timer = setTimeout(() => {
         setShowTooltip(true);
-      }, 4000);
+      }, 2000);
       return () => clearTimeout(timer);
     }
   }, []);
@@ -69,7 +69,7 @@ const ChatbotWidget = () => {
   const handleOpenToggle = () => {
     setIsOpen(!isOpen);
     setShowTooltip(false);
-    localStorage.setItem('vybez_chat_seen', 'true');
+    sessionStorage.setItem('vybez_chat_seen', 'true');
   };
 
   const handleSend = async (textToSend) => {
@@ -238,10 +238,14 @@ const ChatbotWidget = () => {
               <Bot size={22} color="#bc74f5" />
             </div>
             <div className="tooltip-text">
-              <strong>VybezBot</strong>
-              <p>Ψάχνεις μουσική ή beats; Κάνε κλικ εδώ!</p>
+              <strong>VybezBot 🤖</strong>
+              <p>Είμαι ο βοηθός του Black Vybez. Χρειάζεσαι βοήθεια με beats ή μουσική;</p>
             </div>
-            <button className="tooltip-close" onClick={(e) => { e.stopPropagation(); setShowTooltip(false); }}>
+            <button className="tooltip-close" onClick={(e) => { 
+              e.stopPropagation(); 
+              setShowTooltip(false); 
+              sessionStorage.setItem('vybez_chat_seen', 'true');
+            }}>
               <X size={14} />
             </button>
           </motion.div>

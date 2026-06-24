@@ -1,5 +1,8 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { AudioContext } from '../context/AudioContext';
 import beatsData from '../data/beats.json';
 import vibesData from '../data/vibes.json';
@@ -7,10 +10,43 @@ import settingsData from '../data/settings.json';
 import { Play, Pause, Search, X, ChevronDown, ChevronUp, Crown, Bot, Box, Heart, ThumbsDown } from 'lucide-react';
 import './BeatStore.css';
 
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
+
 const BeatStore = () => {
   const [beats, setBeats] = useState([]);
   const [vibes, setVibes] = useState([]);
   const [activeVibe, setActiveVibe] = useState('all');
+  
+  const [email, setEmail] = useState('');
+  const [preference, setPreference] = useState('beats_offers_releases');
+  const [subscribed, setSubscribed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+
+    try {
+      setErrorMessage('');
+      const response = await fetch('/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, preference, source: 'beatstore' }),
+      });
+
+      const data = await response.json();
+      if (response.ok && (data.success || data.emailCaptured)) {
+        setSubscribed(true);
+        setEmail('');
+      } else {
+        setErrorMessage(data.error || 'Υπήρξε ένα σφάλμα. Δοκιμάστε ξανά.');
+      }
+    } catch (err) {
+      console.error('Subscription error:', err);
+      setErrorMessage('Σφάλμα σύνδεσης.');
+    }
+  };
   
   // Tinder Swipe States
   const [isVibeModalOpen, setIsVibeModalOpen] = useState(false);
@@ -25,7 +61,48 @@ const BeatStore = () => {
   const [selectedBPM, setSelectedBPM] = useState('ALL');
   const [selectedKey, setSelectedKey] = useState('ALL');
 
-  const { currentTrack, isPlaying, playTrack, pauseTrack } = useContext(AudioContext);
+  const { currentTrack, isPlaying, playTrack, pauseTrack, openLicenseModal } = useContext(AudioContext);
+
+  const containerRef = useRef(null);
+
+  useGSAP(() => {
+    if (beats.length === 0) return;
+
+    // Banner entrance animation
+    gsap.from('.beatstore-banner', {
+      opacity: 0,
+      y: 40,
+      duration: 1,
+      ease: 'power3.out',
+    });
+
+    // Staggered beat cards slide up on scroll
+    gsap.from('.mockup-card', {
+      y: 60,
+      opacity: 0,
+      stagger: 0.08,
+      duration: 0.8,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.mockup-grid',
+        start: 'top 85%',
+        toggleActions: 'play none none none',
+      }
+    });
+
+    // Category accordions staggered load
+    gsap.from('.accordion-item', {
+      x: -40,
+      opacity: 0,
+      stagger: 0.1,
+      duration: 0.6,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.categories-accordion',
+        start: 'top 90%',
+      }
+    });
+  }, { dependencies: [beats], scope: containerRef });
 
   useEffect(() => {
     setBeats(beatsData.beatslist || []);
@@ -92,7 +169,7 @@ const BeatStore = () => {
   });
 
   return (
-    <div className="beatstore-page beatstore-wide">
+    <div className="beatstore-page beatstore-wide" ref={containerRef}>
       
       {/* Massive Hero Banner */}
       <motion.div 
@@ -254,9 +331,12 @@ const BeatStore = () => {
                       <span className="lbl">Price</span>
                       <span className="val price-val">{beat.price}</span>
                     </div>
-                    <a href={beat.checkoutUrl} target="_blank" rel="noreferrer" className="btn btn-add-cart">
+                    <button 
+                      onClick={() => openLicenseModal(beat)} 
+                      className="btn btn-add-cart"
+                    >
                       ADD TO CART
-                    </a>
+                    </button>
                   </div>
                 </div>
               </motion.div>
@@ -320,6 +400,31 @@ const BeatStore = () => {
           </div>
         )}
       </AnimatePresence>
+
+      {/* BEATSTORE NEWSLETTER */}
+      <section className="beatstore-newsletter glass" style={{ padding: '40px', marginTop: '60px', borderRadius: '16px', textAlign: 'center' }}>
+        <h2>Μείνε Συντονισμένος</h2>
+        <p style={{ color: '#ccc', marginBottom: '20px' }}>Γράψου στο VIP Newsletter του Beatstore.</p>
+        {subscribed ? (
+          <div style={{ color: '#bc74f5', fontWeight: 'bold' }}>✓ Επιτυχής Εγγραφή!</div>
+        ) : (
+          <form onSubmit={handleSubscribe} style={{ maxWidth: '400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <input type="email" placeholder="Το email σου..." value={email} onChange={e => setEmail(e.target.value)} required style={{ padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff' }} />
+            <div style={{ textAlign: 'left', fontSize: '0.9rem', color: '#ccc', display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '8px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input type="radio" name="bs_pref" value="beats_offers_releases" checked={preference === 'beats_offers_releases'} onChange={e => setPreference(e.target.value)} /> 
+                Με ενδιαφέρουν Beats, Προσφορές & Κυκλοφορίες του Black Vybez
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input type="radio" name="bs_pref" value="only_beats_offers" checked={preference === 'only_beats_offers'} onChange={e => setPreference(e.target.value)} /> 
+                Μόνο Beats και Προσφορές
+              </label>
+            </div>
+            <button type="submit" className="btn-solid" style={{ width: '100%' }}>ΕΓΓΡΑΦΗ</button>
+            {errorMessage && <div style={{ color: '#ff4d4d' }}>{errorMessage}</div>}
+          </form>
+        )}
+      </section>
 
     </div>
   );

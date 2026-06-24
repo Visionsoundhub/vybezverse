@@ -9,6 +9,36 @@ import './Releases.css';
 const Releases = () => {
   const tracks = releasesData.tracks || [];
 
+  const [email, setEmail] = useState('');
+  const [preference, setPreference] = useState('beats_and_songs');
+  const [subscribed, setSubscribed] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+
+  const handleSubscribe = async (e) => {
+    e.preventDefault();
+    if (!email) return;
+
+    try {
+      setErrorMessage('');
+      const response = await fetch('/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, preference, source: 'releases' }),
+      });
+
+      const data = await response.json();
+      if (response.ok && (data.success || data.emailCaptured)) {
+        setSubscribed(true);
+        setEmail('');
+      } else {
+        setErrorMessage(data.error || 'Υπήρξε ένα σφάλμα. Δοκιμάστε ξανά.');
+      }
+    } catch (err) {
+      console.error('Subscription error:', err);
+      setErrorMessage('Σφάλμα σύνδεσης.');
+    }
+  };
+
   return (
     <div className="releases-page container">
       <motion.div 
@@ -109,6 +139,32 @@ const Releases = () => {
           </ul>
         </motion.div>
       </div>
+
+      {/* RELEASES NEWSLETTER */}
+      <section className="releases-newsletter glass" style={{ padding: '40px', marginTop: '60px', borderRadius: '16px', textAlign: 'center', width: '100%', gridColumn: '1 / -1' }}>
+        <h2>Μείνε Συντονισμένος</h2>
+        <p style={{ color: '#ccc', marginBottom: '20px' }}>Γράψου στο VIP Newsletter για Νέες Κυκλοφορίες.</p>
+        {subscribed ? (
+          <div style={{ color: '#bc74f5', fontWeight: 'bold' }}>✓ Επιτυχής Εγγραφή!</div>
+        ) : (
+          <form onSubmit={handleSubscribe} style={{ maxWidth: '400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+            <input type="email" placeholder="Το email σου..." value={email} onChange={e => setEmail(e.target.value)} required style={{ padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff' }} />
+            <div style={{ textAlign: 'left', fontSize: '0.9rem', color: '#ccc', display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '8px' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input type="radio" name="rel_pref" value="beats_and_songs" checked={preference === 'beats_and_songs'} onChange={e => setPreference(e.target.value)} /> Θέλω Beats και να ενημερώνομαι για κυκλοφορίες
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input type="radio" name="rel_pref" value="only_beats" checked={preference === 'only_beats'} onChange={e => setPreference(e.target.value)} /> Μόνο Beats
+              </label>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                <input type="radio" name="rel_pref" value="only_songs" checked={preference === 'only_songs'} onChange={e => setPreference(e.target.value)} /> Μόνο Νέες Κυκλοφορίες και Νέα
+              </label>
+            </div>
+            <button type="submit" className="action-btn" style={{ width: '100%', justifyContent: 'center', padding: '12px' }}>ΕΓΓΡΑΦΗ</button>
+            {errorMessage && <div style={{ color: '#ff4d4d' }}>{errorMessage}</div>}
+          </form>
+        )}
+      </section>
     </div>
   );
 };

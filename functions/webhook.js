@@ -145,8 +145,8 @@ export async function onRequestPost(context) {
 async function handleMetaMessage(senderId, messageText, pageAccessToken, env) {
   try {
     const geminiApiKey = env.GEMINI_API_KEY || env['Gemini api'] || env.gemini_api_key;
-    const mailerliteApiKey = env.MAILERLITE_API_KEY || env.mailerllite || env.mailerlite;
-    const beatsGroupId = env.MAILERLITE_BEATS_GROUP_ID || env.MAILERLITE_GROUP_ID;
+    const resendApiKey = env.RESEND_API_KEY || 're_Mocb2WXP_PozwDzSrokLrEkKv2PFVU8Z7';
+    const audienceId = env.RESEND_AUDIENCE_ID || '66d1140c-d7df-4411-aae7-345d9d1432a1';
     const sheetUrl = env.GOOGLE_SHEETS_CSV_URL;
 
     const cleanMsg = messageText.trim();
@@ -205,26 +205,34 @@ async function handleMetaMessage(senderId, messageText, pageAccessToken, env) {
         targetTitle = freeBeatTitle;
       }
 
-      // Subscribe user to MailerLite
-      if (mailerliteApiKey) {
+      // Subscribe user to Resend
+      if (resendApiKey) {
         try {
-          const mailerlitePayload = { email };
-          if (specificGroupId) {
-            mailerlitePayload.groups = [specificGroupId.trim()];
-          }
+          const resendPayload = {
+            email: email.trim(),
+            audience_id: audienceId,
+            first_name: 'beats_and_songs',
+            last_name: 'απο Meta Webhook',
+            unsubscribed: false
+          };
 
-          await fetch('https://connect.mailerlite.com/api/subscribers', {
+          const mlRes = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Accept': 'application/json',
-              'Authorization': `Bearer ${mailerliteApiKey}`,
+              'Authorization': `Bearer ${resendApiKey}`,
             },
-            body: JSON.stringify(mailerlitePayload),
+            body: JSON.stringify(resendPayload),
           });
-          console.log(`Subscribed ${email} via Meta Webhook.`);
+
+          if (mlRes.ok) {
+            console.log(`Subscribed ${email} via Meta Webhook to Resend.`);
+          } else {
+            const mlErr = await mlRes.json();
+            console.error('Resend API returned error in webhook:', mlErr);
+          }
         } catch (mlErr) {
-          console.error('MailerLite error in webhook:', mlErr);
+          console.error('Resend connection error in webhook:', mlErr);
         }
       }
 
@@ -269,7 +277,7 @@ async function handleMetaMessage(senderId, messageText, pageAccessToken, env) {
 - Μίλα πάντα στο ΤΡΙΤΟ ΠΡΟΣΩΠΟ για τον Black Vybez (π.χ. "Ο Black Vybez πιστεύει...", "Τα beats του Black Vybez...", και ΟΧΙ "εγώ πιστεύω...", "τα δικά μου beats").
 - Μίλα σε φιλικό, χαλαρό και επαγγελματικό ύφος (slang παραγωγού, chill vibes).
 - Απαντάς στα Ελληνικά (ή στα Αγγλικά αν ο χρήστης σου γράψει στα Αγγλικά).
-- Κράτα τις απαντήσεις σου σύντομες και περιεκτικές. Μην γράφεις τεράστιες παραγράφους.
+- Κράτα τις απαντήσεις σου πολύ σύντομες, περιεκτικές και άμεσες (μέχρι 2-3 προτάσεις το πολύ). Μην μακρηγορείς και μην γράφεις μεγάλες παραγράφους.
 - Μην επινοείς beats που δεν υπάρχουν στη λίστα.
 
 ΛΙΣΤΑ ΔΙΑΘΕΣΙΜΩΝ BEATS/ΚΟΜΜΑΤΙΩΝ:
@@ -294,7 +302,7 @@ POΛΙΤΙΚΗ ΤΙΜΩΝ & LEASING (ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ):
           contents: [
             { role: 'user', parts: [{ text: cleanMsg }] }
           ],
-          generationConfig: { maxOutputTokens: 250, temperature: 0.7 }
+          generationConfig: { maxOutputTokens: 1200, temperature: 0.7 }
         };
 
         const modelsToTry = [

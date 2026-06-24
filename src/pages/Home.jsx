@@ -1,15 +1,109 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Headphones, Mic2, ArrowRight, Mail, Sparkles } from 'lucide-react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import homeData from '../data/home.json';
 import releasesData from '../data/releases.json';
+import VisualizerCanvas from '../components/VisualizerCanvas';
 import './Home.css';
+
+// Register ScrollTrigger plugin
+gsap.registerPlugin(ScrollTrigger);
 
 const Home = () => {
   const [email, setEmail] = useState('');
+  const [preference, setPreference] = useState('beats_and_songs');
   const [subscribed, setSubscribed] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
+  
+  const containerRef = useRef(null);
+
+  useGSAP(() => {
+    // --- 1. HERO ENTRANCE ANIMATIONS ---
+    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+    
+    tl.from('.hero-name-left', { x: -120, opacity: 0, duration: 1 })
+      .from('.hero-name-right', { x: 120, opacity: 0, duration: 1 }, '-=0.8')
+      .from('.hero-x', { scale: 0, rotation: -180, opacity: 0, duration: 0.8, ease: 'back.out(1.7)' }, '-=0.6')
+      .from('.hero-desc', { y: 20, opacity: 0, duration: 0.6 }, '-=0.4')
+      .from('.hero-buttons', { y: 20, opacity: 0, duration: 0.6 }, '-=0.4');
+
+    // --- 2. SCROLL TRIGGER PARALLAX FOR HERO ---
+    gsap.to('.hero-name-left', {
+      x: -160,
+      opacity: 0.1,
+      scrollTrigger: {
+        trigger: '.hero-section',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true,
+      }
+    });
+
+    gsap.to('.hero-name-right', {
+      x: 160,
+      opacity: 0.1,
+      scrollTrigger: {
+        trigger: '.hero-section',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true,
+      }
+    });
+
+    gsap.to('.hero-x', {
+      rotation: 360,
+      scale: 0.4,
+      opacity: 0.1,
+      scrollTrigger: {
+        trigger: '.hero-section',
+        start: 'top top',
+        end: 'bottom top',
+        scrub: true,
+      }
+    });
+
+    gsap.to('.hero-desc, .hero-buttons', {
+      y: 60,
+      opacity: 0,
+      scrollTrigger: {
+        trigger: '.hero-section',
+        start: 'top top',
+        end: '40% top',
+        scrub: true,
+      }
+    });
+
+    // --- 3. LATEST DROP SCROLL TRIGGER ---
+    gsap.from('.featured-card', {
+      y: 80,
+      opacity: 0,
+      scale: 0.95,
+      duration: 1,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.featured-section',
+        start: 'top 85%',
+        toggleActions: 'play none none reverse',
+      }
+    });
+
+    // --- 4. NEWSLETTER SCROLL TRIGGER (STAGGERED) ---
+    gsap.from('.newsletter-text h2, .newsletter-text p, .newsletter-form-wrap form > *', {
+      y: 40,
+      opacity: 0,
+      stagger: 0.1,
+      duration: 0.8,
+      ease: 'power2.out',
+      scrollTrigger: {
+        trigger: '.newsletter-section',
+        start: 'top 80%',
+        toggleActions: 'play none none reverse',
+      }
+    });
+  }, { scope: containerRef });
 
   const handleSubscribe = async (e) => {
     e.preventDefault();
@@ -22,7 +116,7 @@ const Home = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, preference }),
       });
 
       const data = await response.json();
@@ -42,69 +136,35 @@ const Home = () => {
   const featuredRelease = releasesData.tracks[0]; // Get the newest track
 
   return (
-    <div className="home-page">
+    <div className="home-page" ref={containerRef}>
       
       {/* HERO SECTION - Dual Identity */}
       <section className="hero-section">
+        <VisualizerCanvas />
         <div className="hero-bg-glow"></div>
-        <div className="hero-particles">
-          {[...Array(20)].map((_, i) => (
-            <div key={i} className="particle" style={{
-              '--delay': `${Math.random() * 5}s`,
-              '--x': `${Math.random() * 100}%`,
-              '--y': `${Math.random() * 100}%`,
-              '--size': `${Math.random() * 4 + 1}px`,
-            }}></div>
-          ))}
-        </div>
         <div className="container hero-content">
           <div className="hero-text">
             
             {/* THE BIG ANIMATED TITLE */}
             <div className="hero-title-block">
-              <motion.h1 
-                className="hero-name hero-name-left"
-                initial={{ x: -120, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.8, ease: 'easeOut' }}
-              >
+              <h1 className="hero-name hero-name-left">
                 {homeData.heroLine1 || 'BLACK VYBEZ'}
-              </motion.h1>
+              </h1>
               
-              <motion.span 
-                className="hero-x"
-                initial={{ scale: 0, rotate: -180, opacity: 0 }}
-                animate={{ scale: 1, rotate: 0, opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.5, type: 'spring', stiffness: 200 }}
-              >
+              <span className="hero-x">
                 ×
-              </motion.span>
+              </span>
               
-              <motion.h1 
-                className="hero-name hero-name-right"
-                initial={{ x: 120, opacity: 0 }}
-                animate={{ x: 0, opacity: 1 }}
-                transition={{ duration: 0.8, ease: 'easeOut', delay: 0.3 }}
-              >
+              <h1 className="hero-name hero-name-right">
                 {homeData.heroLine2 || 'VYBEZMADETHIS'}
-              </motion.h1>
+              </h1>
             </div>
 
-            <motion.p 
-              className="hero-desc"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1 }}
-            >
+            <p className="hero-desc">
               {homeData.heroDesc || 'Δεν φτιάχνω απλά beats, δημιουργώ κόσμους.'}
-            </motion.p>
+            </p>
             
-            <motion.div 
-              className="hero-buttons"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 1.2 }}
-            >
+            <div className="hero-buttons">
               <Link to="/releases" className="btn-dual artist-btn">
                 <Mic2 size={20} />
                 <span>MY MUSIC</span>
@@ -113,7 +173,7 @@ const Home = () => {
                 <Headphones size={20} />
                 <span>BEATSTORE</span>
               </Link>
-            </motion.div>
+            </div>
           </div>
         </div>
       </section>
@@ -126,12 +186,7 @@ const Home = () => {
             <div className="title-line"></div>
           </div>
           
-          <motion.div 
-            className="featured-card glass"
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-          >
+          <div className="featured-card glass">
             <div className="featured-cover">
               <img src={featuredRelease.cover} alt={featuredRelease.title} />
               <div className="featured-badge">NEW</div>
@@ -152,7 +207,7 @@ const Home = () => {
                 </Link>
               </div>
             </div>
-          </motion.div>
+          </div>
         </section>
       )}
 
@@ -160,22 +215,12 @@ const Home = () => {
       <section className="newsletter-section">
         <div className="newsletter-bg"></div>
         <div className="container newsletter-content glass">
-          <motion.div 
-            className="newsletter-text"
-            initial={{ opacity: 0, x: -30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-          >
+          <div className="newsletter-text">
             <h2><Sparkles color="#bc74f5" /> {homeData.newsletterTitle || 'JOIN THE VYBEZ FAMILY'}</h2>
             <p>{homeData.newsletterText || 'Γράψου στο VIP Newsletter μου.'}</p>
-          </motion.div>
+          </div>
           
-          <motion.div 
-            className="newsletter-form-wrap"
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-          >
+          <div className="newsletter-form-wrap">
             {subscribed ? (
               <div className="success-message">
                 <span className="success-icon">✓</span>
@@ -193,6 +238,17 @@ const Home = () => {
                     required
                   />
                 </div>
+                <div className="preferences-group" style={{ textAlign: 'left', marginTop: '15px', marginBottom: '15px', color: '#ccc', fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input type="radio" name="home_pref" value="beats_and_songs" checked={preference === 'beats_and_songs'} onChange={(e) => setPreference(e.target.value)} /> Θέλω Beats και να ενημερώνομαι για κυκλοφορίες
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input type="radio" name="home_pref" value="only_beats" checked={preference === 'only_beats'} onChange={(e) => setPreference(e.target.value)} /> Μόνο Beats
+                  </label>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
+                    <input type="radio" name="home_pref" value="only_songs" checked={preference === 'only_songs'} onChange={(e) => setPreference(e.target.value)} /> Μόνο Νέες Κυκλοφορίες και Νέα
+                  </label>
+                </div>
                 <button type="submit" className="btn-subscribe">
                   SUBSCRIBE <ArrowRight size={18} />
                 </button>
@@ -203,7 +259,7 @@ const Home = () => {
                 )}
               </form>
             )}
-          </motion.div>
+          </div>
         </div>
       </section>
 

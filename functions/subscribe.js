@@ -1,14 +1,14 @@
 export async function onRequestPost(context) {
   try {
     const { env, request } = context;
-    const mailerliteApiKey = env.MAILERLITE_API_KEY || env.mailerllite || env.mailerlite;
-    const tracksGroupId = env.MAILERLITE_TRACKS_GROUP_ID || env.MAILERLITE_GROUP_ID;
+    const resendApiKey = env.RESEND_API_KEY || 're_Mocb2WXP_PozwDzSrokLrEkKv2PFVU8Z7';
+    const audienceId = env.RESEND_AUDIENCE_ID || '66d1140c-d7df-4411-aae7-345d9d1432a1';
 
     // 1. Verify API key is configured
-    if (!mailerliteApiKey) {
-      console.error('MailerLite API Key is missing.');
+    if (!resendApiKey) {
+      console.error('Resend API Key is missing.');
       return new Response(
-        JSON.stringify({ error: 'MailerLite integration not configured on server.' }),
+        JSON.stringify({ error: 'Resend integration not configured on server.' }),
         { status: 500, headers: { 'Content-Type': 'application/json' } }
       );
     }
@@ -24,7 +24,7 @@ export async function onRequestPost(context) {
       );
     }
 
-    const { email } = body;
+    const { email, preference, source } = body;
     if (!email || !email.includes('@')) {
       return new Response(
         JSON.stringify({ error: 'A valid email address is required.' }),
@@ -32,40 +32,38 @@ export async function onRequestPost(context) {
       );
     }
 
-    // 3. Prepare MailerLite request
-    const mailerlitePayload = {
+    // 3. Prepare Resend request
+    const resendPayload = {
       email: email.trim(),
+      audience_id: audienceId,
+      first_name: preference || 'beats_and_songs',
+      last_name: source || 'website',
+      unsubscribed: false
     };
 
-    // If a group ID is configured, add subscriber to that group
-    if (tracksGroupId) {
-      mailerlitePayload.groups = [tracksGroupId.trim()];
-    }
-
-    // 4. Send to MailerLite API (v4)
-    const mlResponse = await fetch('https://connect.mailerlite.com/api/subscribers', {
+    // 4. Send to Resend Contacts API
+    const resRes = await fetch(`https://api.resend.com/audiences/${audienceId}/contacts`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json',
-        'Authorization': `Bearer ${mailerliteApiKey}`,
+        'Authorization': `Bearer ${resendApiKey}`,
       },
-      body: JSON.stringify(mailerlitePayload),
+      body: JSON.stringify(resendPayload),
     });
 
-    const mlData = await mlResponse.json();
+    const resData = await resRes.json();
 
-    if (!mlResponse.ok) {
-      console.error('MailerLite API Error:', mlData);
+    if (!resRes.ok) {
+      console.error('Resend API Error:', resData);
       return new Response(
-        JSON.stringify({ error: mlData.message || 'Error subscribing to MailerLite.' }),
-        { status: mlResponse.status, headers: { 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: resData.message || 'Error subscribing to Resend.' }),
+        { status: resRes.status, headers: { 'Content-Type': 'application/json' } }
       );
     }
 
     // 5. Success response
     return new Response(
-      JSON.stringify({ success: true, subscriber: mlData.data }),
+      JSON.stringify({ success: true, subscriber: resData }),
       { status: 200, headers: { 'Content-Type': 'application/json' } }
     );
 
