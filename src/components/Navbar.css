@@ -4,6 +4,9 @@
   z-index: 100;
   padding: 20px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(10, 10, 12, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .nav-container {
@@ -66,9 +69,15 @@
   position: absolute;
   top: 100%;
   right: 0;
-  margin-top: 15px;
+  margin-top: 0;
+  padding-top: 12px;
   min-width: 180px;
-  background: rgba(20, 15, 30, 0.95);
+  z-index: 200;
+  animation: dropdownFadeIn 0.2s ease-out;
+}
+
+.dropdown-menu-inner {
+  background: rgba(20, 15, 30, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(188, 116, 245, 0.2);
@@ -77,17 +86,11 @@
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
   display: flex;
   flex-direction: column;
-  z-index: 200;
 }
 
-.dropdown-menu::before {
-  content: '';
-  position: absolute;
-  top: -15px;
-  left: 0;
-  right: 0;
-  height: 15px;
-  background: transparent;
+@keyframes dropdownFadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .dropdown-item {
@@ -142,6 +145,11 @@
   .dropdown-menu {
     position: static;
     margin-top: 5px;
+    padding-top: 0;
+    animation: none;
+  }
+  
+  .dropdown-menu-inner {
     box-shadow: none;
     border: none;
     background: rgba(255,255,255,0.03);

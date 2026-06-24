@@ -1,7 +1,7 @@
 .beatstore-wide {
   max-width: 1400px;
   margin: 0 auto;
-  padding: 40px 20px 120px 20px;
+  padding: 60px 20px 120px 20px;
   display: flex;
   flex-direction: column;
   gap: 40px;

@@ -36,11 +36,13 @@ const Navbar = () => {
               MORE <ChevronDown size={16} className={`more-chevron ${moreOpen ? 'rotated' : ''}`} />
             </button>
             {moreOpen && (
-              <div className="dropdown-menu glass">
-                <NavLink to="/bio" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>BIO</NavLink>
-                <NavLink to="/links" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>LINKS</NavLink>
-                <NavLink to="/podcasts" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>PODCASTS</NavLink>
-                <NavLink to="/press" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>PRESS</NavLink>
+              <div className="dropdown-menu">
+                <div className="dropdown-menu-inner">
+                  <NavLink to="/bio" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>BIO</NavLink>
+                  <NavLink to="/links" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>LINKS</NavLink>
+                  <NavLink to="/podcasts" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>PODCASTS</NavLink>
+                  <NavLink to="/press" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>PRESS</NavLink>
+                </div>
               </div>
             )}
           </div>
