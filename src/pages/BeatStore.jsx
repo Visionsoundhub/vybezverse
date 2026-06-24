@@ -269,7 +269,7 @@ const BeatStore = () => {
         <div className="beatstore-pricing-cards">
           <div className="pricing-header">
             <h2>Licensing Info</h2>
-            <p>Επίλεξε την άδεια που σου ταιριάζει και κράτησε το 100% των Royalties σου.</p>
+            <p>Επίλεξε την άδεια που καλύπτει τις ανάγκες σου.</p>
           </div>
           <div className="pricing-grid">
             

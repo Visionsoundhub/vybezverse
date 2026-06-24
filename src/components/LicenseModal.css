@@ -4,9 +4,9 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(5, 5, 10, 0.85);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(10, 10, 15, 0.4);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -19,7 +19,9 @@
   position: relative;
   width: 100%;
   max-width: 1050px;
-  background: rgba(20, 15, 30, 0.8);
+  background: rgba(15, 10, 25, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid rgba(188, 116, 245, 0.25);
   border-radius: 28px;
   padding: 45px;

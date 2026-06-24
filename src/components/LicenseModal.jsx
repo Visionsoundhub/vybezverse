@@ -3,7 +3,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, FileMusic, Music4, Disc3, Mail } from 'lucide-react';
 import { AudioContext } from '../context/AudioContext';
 import { useAuth } from '../context/AuthContext';
-import { generatePDFLicense } from '../utils/generateLicense';
 import './LicenseModal.css';
 
 const LicenseModal = () => {
@@ -32,11 +31,7 @@ const LicenseModal = () => {
   const handleCheckout = (url, licenseType) => {
     if (!url || url === "#") return;
     if (requireLogin()) {
-      // Generate the PDF immediately before checkout
-      const userName = currentUser?.displayName || currentUser?.email || "Valued Artist";
-      generatePDFLicense(userName, track.title, licenseType);
-      
-      // Open Payhip checkout
+      // Open Payhip checkout immediately without generating a client-side PDF
       window.open(url, '_blank');
       
       // Close the modal
