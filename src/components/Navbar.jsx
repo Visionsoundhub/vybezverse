@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { ChevronDown, Menu, X } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { ChevronDown, Menu, X, User } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import './Navbar.css';
 
 const Navbar = () => {
   const [moreOpen, setMoreOpen] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const navigate = useNavigate();
+  const { currentUser, setAuthModalOpen } = useAuth();
 
   return (
     <nav className="navbar glass">
@@ -46,6 +49,21 @@ const Navbar = () => {
               </div>
             )}
           </div>
+          
+          <button 
+            className="nav-link nav-account-btn" 
+            onClick={() => {
+              setMobileOpen(false);
+              if (currentUser) {
+                navigate('/account');
+              } else {
+                setAuthModalOpen(true);
+              }
+            }}
+            style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'none', border: 'none', cursor: 'pointer' }}
+          >
+            <User size={18} /> ACCOUNT
+          </button>
         </div>
       </div>
     </nav>

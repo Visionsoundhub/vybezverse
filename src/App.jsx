@@ -13,6 +13,7 @@ import Bio from './pages/Bio';
 import Links from './pages/Links';
 import Podcasts from './pages/Podcasts';
 import Press from './pages/Press';
+import Dashboard from './pages/Dashboard';
 import ChatbotWidget from './components/ChatbotWidget';
 import './App.css';
 
@@ -36,6 +37,7 @@ function App() {
               <Route path="/links" element={<Links />} />
               <Route path="/podcasts" element={<Podcasts />} />
               <Route path="/press" element={<Press />} />
+              <Route path="/account" element={<Dashboard />} />
             </Routes>
           </main>
           <AudioPlayer />

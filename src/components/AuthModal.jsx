@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { X, Mail, Lock, User, ArrowRight } from 'lucide-react';
 import './AuthModal.css';
@@ -11,6 +12,7 @@ const AuthModal = () => {
   const [name, setName] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   if (!authModalOpen) return null;
 
@@ -26,6 +28,7 @@ const AuthModal = () => {
         await signup(email, password, name);
       }
       setAuthModalOpen(false);
+      navigate('/account');
     } catch (err) {
       if (err.code === 'auth/email-already-in-use') {
         setError('Το email υπάρχει ήδη. Κάνε Login.');

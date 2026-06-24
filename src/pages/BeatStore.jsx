@@ -77,20 +77,6 @@ const BeatStore = () => {
       clearProps: 'opacity,transform',
     });
 
-    // Staggered beat cards slide up on scroll
-    gsap.from('.mockup-card', {
-      y: 60,
-      opacity: 0,
-      stagger: 0.08,
-      duration: 0.8,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '.mockup-grid',
-        start: 'top 85%',
-        toggleActions: 'play none none none',
-      }
-    });
-
     // Category accordions staggered load
     gsap.from('.accordion-item', {
       x: -40,
@@ -412,15 +398,24 @@ const BeatStore = () => {
         ) : (
           <form onSubmit={handleSubscribe} style={{ maxWidth: '400px', margin: '0 auto', display: 'flex', flexDirection: 'column', gap: '15px' }}>
             <input type="email" placeholder="Το email σου..." value={email} onChange={e => setEmail(e.target.value)} required style={{ padding: '12px', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.1)', background: 'rgba(0,0,0,0.3)', color: '#fff' }} />
-            <div style={{ textAlign: 'left', fontSize: '0.9rem', color: '#ccc', display: 'flex', flexDirection: 'column', gap: '8px', background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '8px' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                <input type="radio" name="bs_pref" value="beats_offers_releases" checked={preference === 'beats_offers_releases'} onChange={e => setPreference(e.target.value)} /> 
-                Με ενδιαφέρουν Beats, Προσφορές & Κυκλοφορίες του Black Vybez
-              </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer' }}>
-                <input type="radio" name="bs_pref" value="only_beats_offers" checked={preference === 'only_beats_offers'} onChange={e => setPreference(e.target.value)} /> 
-                Μόνο Beats και Προσφορές
-              </label>
+            <div className="custom-toggles" style={{ background: 'rgba(0,0,0,0.2)', padding: '15px', borderRadius: '8px', marginTop: '5px' }}>
+              <div className="toggle-label" style={{ textAlign: 'center' }}>Τι σε ενδιαφέρει περισσότερο;</div>
+              <div className="toggle-options" style={{ justifyContent: 'center' }}>
+                <button 
+                  type="button"
+                  className={`pref-toggle ${preference === 'beats_offers_releases' ? 'active' : ''}`}
+                  onClick={() => setPreference('beats_offers_releases')}
+                >
+                  Beats, Προσφορές & Νέα
+                </button>
+                <button 
+                  type="button"
+                  className={`pref-toggle ${preference === 'only_beats_offers' ? 'active' : ''}`}
+                  onClick={() => setPreference('only_beats_offers')}
+                >
+                  Μόνο Beats & Προσφορές
+                </button>
+              </div>
             </div>
             <button type="submit" className="btn-solid" style={{ width: '100%' }}>ΕΓΓΡΑΦΗ</button>
             {errorMessage && <div style={{ color: '#ff4d4d' }}>{errorMessage}</div>}
