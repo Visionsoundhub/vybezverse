@@ -8,7 +8,6 @@ import beatsData from '../data/beats.json';
 import vibesData from '../data/vibes.json';
 import { Play, Pause, Search, X, Heart, ThumbsDown, Check, Music4, FileMusic, Disc3 } from 'lucide-react';
 import GalaxyBackground from '../components/GalaxyBackground';
-import CustomCursor from '../components/CustomCursor';
 import './BeatStore.css';
 
 // Register ScrollTrigger plugin
@@ -140,7 +139,6 @@ const BeatStore = () => {
   return (
     <>
       <GalaxyBackground />
-      <CustomCursor />
       
       <div className="beatstore-page beatstore-wide" ref={containerRef}>
         
