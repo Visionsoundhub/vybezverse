@@ -32,46 +32,46 @@ const Home = () => {
 
     // --- 2. SCROLL TRIGGER PARALLAX FOR HERO ---
     gsap.to('.hero-name-left', {
-      x: -160,
-      opacity: 0.1,
+      x: -80,
+      opacity: 0,
       scrollTrigger: {
         trigger: '.hero-section',
-        start: 'top top',
+        start: '60% top',
         end: 'bottom top',
         scrub: true,
       }
     });
 
     gsap.to('.hero-name-right', {
-      x: 160,
-      opacity: 0.1,
+      x: 80,
+      opacity: 0,
       scrollTrigger: {
         trigger: '.hero-section',
-        start: 'top top',
+        start: '60% top',
         end: 'bottom top',
         scrub: true,
       }
     });
 
     gsap.to('.hero-x', {
-      rotation: 360,
-      scale: 0.4,
-      opacity: 0.1,
+      rotation: 180,
+      scale: 0.6,
+      opacity: 0,
       scrollTrigger: {
         trigger: '.hero-section',
-        start: 'top top',
+        start: '60% top',
         end: 'bottom top',
         scrub: true,
       }
     });
 
     gsap.to('.hero-desc, .hero-buttons', {
-      y: 60,
+      y: 30,
       opacity: 0,
       scrollTrigger: {
         trigger: '.hero-section',
-        start: 'top top',
-        end: '40% top',
+        start: '70% top',
+        end: 'bottom top',
         scrub: true,
       }
     });
