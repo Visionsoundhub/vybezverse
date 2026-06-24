@@ -74,6 +74,7 @@ const BeatStore = () => {
       y: 40,
       duration: 1,
       ease: 'power3.out',
+      clearProps: 'opacity,transform',
     });
 
     // Staggered beat cards slide up on scroll
@@ -100,6 +101,7 @@ const BeatStore = () => {
       scrollTrigger: {
         trigger: '.categories-accordion',
         start: 'top 90%',
+        toggleActions: 'play none none none',
       }
     });
   }, { dependencies: [beats], scope: containerRef });

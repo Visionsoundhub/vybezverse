@@ -21,7 +21,7 @@ const Home = () => {
   const containerRef = useRef(null);
 
   useGSAP(() => {
-    // --- 1. HERO ENTRANCE ANIMATIONS ---
+    // --- 1. HERO ENTRANCE ANIMATIONS (one-time, on page load) ---
     const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
     
     tl.from('.hero-name-left', { x: -120, opacity: 0, duration: 1 })
@@ -30,77 +30,33 @@ const Home = () => {
       .from('.hero-desc', { y: 20, opacity: 0, duration: 0.6 }, '-=0.4')
       .from('.hero-buttons', { y: 20, opacity: 0, duration: 0.6 }, '-=0.4');
 
-    // --- 2. SCROLL TRIGGER PARALLAX FOR HERO ---
-    gsap.to('.hero-name-left', {
-      x: -80,
-      opacity: 0,
-      scrollTrigger: {
-        trigger: '.hero-section',
-        start: '60% top',
-        end: 'bottom top',
-        scrub: true,
-      }
-    });
+    // (Scroll parallax removed — was causing hero content to vanish on scroll)
 
-    gsap.to('.hero-name-right', {
-      x: 80,
-      opacity: 0,
-      scrollTrigger: {
-        trigger: '.hero-section',
-        start: '60% top',
-        end: 'bottom top',
-        scrub: true,
-      }
-    });
-
-    gsap.to('.hero-x', {
-      rotation: 180,
-      scale: 0.6,
-      opacity: 0,
-      scrollTrigger: {
-        trigger: '.hero-section',
-        start: '60% top',
-        end: 'bottom top',
-        scrub: true,
-      }
-    });
-
-    gsap.to('.hero-desc, .hero-buttons', {
-      y: 30,
-      opacity: 0,
-      scrollTrigger: {
-        trigger: '.hero-section',
-        start: '70% top',
-        end: 'bottom top',
-        scrub: true,
-      }
-    });
-
-    // --- 3. LATEST DROP SCROLL TRIGGER ---
+    // --- 2. LATEST DROP — slide up once when scrolled into view ---
     gsap.from('.featured-card', {
-      y: 80,
+      y: 60,
       opacity: 0,
-      scale: 0.95,
-      duration: 1,
+      scale: 0.97,
+      duration: 0.8,
       ease: 'power2.out',
       scrollTrigger: {
         trigger: '.featured-section',
         start: 'top 85%',
-        toggleActions: 'play none none reverse',
+        toggleActions: 'play none none none',
       }
     });
 
-    // --- 4. NEWSLETTER SCROLL TRIGGER (STAGGERED) ---
+    // --- 3. NEWSLETTER — staggered entrance once ---
     gsap.from('.newsletter-text h2, .newsletter-text p, .newsletter-form-wrap form > *', {
-      y: 40,
+      y: 30,
       opacity: 0,
       stagger: 0.1,
-      duration: 0.8,
+      duration: 0.6,
       ease: 'power2.out',
       scrollTrigger: {
         trigger: '.newsletter-section',
         start: 'top 80%',
-        toggleActions: 'play none none reverse',
+        toggleActions: 'play none none none',
       }
     });
   }, { scope: containerRef });
