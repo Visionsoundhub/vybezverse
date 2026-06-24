@@ -2,10 +2,13 @@ import React, { useContext } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check, FileMusic, Music4, Disc3, Mail } from 'lucide-react';
 import { AudioContext } from '../context/AudioContext';
+import { useAuth } from '../context/AuthContext';
+import { generatePDFLicense } from '../utils/generateLicense';
 import './LicenseModal.css';
 
 const LicenseModal = () => {
   const { isLicenseModalOpen, licenseModalTrack, closeLicenseModal } = useContext(AudioContext);
+  const { requireLogin, currentUser } = useAuth();
 
   if (!isLicenseModalOpen || !licenseModalTrack) return null;
 
@@ -25,6 +28,18 @@ const LicenseModal = () => {
   // Contact email for exclusive/stems requests
   const contactEmail = "studiovisionsound@gmail.com";
   const mailtoLink = `mailto:${contactEmail}?subject=Exclusive Stems Request: ${encodeURIComponent(track.title)}&body=Hi Black Vybez, I am interested in purchasing the Exclusive Stems / Trackouts license for your beat "${encodeURIComponent(track.title)}". Please let me know the details.`;
+
+  const handleCheckout = (url, licenseType) => {
+    if (!url || url === "#") return;
+    if (requireLogin()) {
+      // Generate the PDF immediately before checkout
+      const userName = currentUser?.displayName || currentUser?.email || "Valued Artist";
+      generatePDFLicense(userName, track.title, licenseType);
+      
+      // Open Payhip checkout
+      window.open(url, '_blank');
+    }
+  };
 
   return (
     <AnimatePresence>
@@ -68,14 +83,12 @@ const LicenseModal = () => {
                 <li><Check size={16} color="#bc74f5" /> <span>1 Music Video Limit</span></li>
               </ul>
 
-              <a 
-                href={track.checkoutUrl || track.bundleUrl || "#"} 
-                target="_blank" 
-                rel="noreferrer" 
+              <button 
+                onClick={() => handleCheckout(track.checkoutUrl || track.bundleUrl, 'MP3 LEASE')} 
                 className="btn-card-buy mp3-btn"
               >
                 BUY MP3 LEASE
-              </a>
+              </button>
             </div>
 
             {/* Tier 2: WAV Lease */}
@@ -95,14 +108,12 @@ const LicenseModal = () => {
                 <li><Check size={16} color="#ff1493" /> <span>Radio Broadcasting Rights</span></li>
               </ul>
 
-              <a 
-                href={track.checkoutUrl || track.bundleUrl || "#"} 
-                target="_blank" 
-                rel="noreferrer" 
+              <button 
+                onClick={() => handleCheckout(track.checkoutUrl || track.bundleUrl, 'WAV LEASE')} 
                 className="btn-card-buy wav-btn"
               >
                 BUY WAV LEASE
-              </a>
+              </button>
             </div>
 
             {/* Tier 3: Exclusive Stems */}

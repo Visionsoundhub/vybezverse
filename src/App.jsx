@@ -16,29 +16,35 @@ import Press from './pages/Press';
 import ChatbotWidget from './components/ChatbotWidget';
 import './App.css';
 
+import { AuthProvider } from './context/AuthContext';
+import AuthModal from './components/AuthModal';
+
 function App() {
   return (
-    <AudioProvider>
-      <Router>
-        <Navbar />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/beats" element={<BeatStore />} />
-            <Route path="/releases" element={<Releases />} />
-            <Route path="/store" element={<Store />} />
-            <Route path="/gallery" element={<Gallery />} />
-            <Route path="/bio" element={<Bio />} />
-            <Route path="/links" element={<Links />} />
-            <Route path="/podcasts" element={<Podcasts />} />
-            <Route path="/press" element={<Press />} />
-          </Routes>
-        </main>
-        <AudioPlayer />
-        <LicenseModal />
-        <ChatbotWidget />
-      </Router>
-    </AudioProvider>
+    <AuthProvider>
+      <AudioProvider>
+        <Router>
+          <Navbar />
+          <main>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/beats" element={<BeatStore />} />
+              <Route path="/releases" element={<Releases />} />
+              <Route path="/store" element={<Store />} />
+              <Route path="/gallery" element={<Gallery />} />
+              <Route path="/bio" element={<Bio />} />
+              <Route path="/links" element={<Links />} />
+              <Route path="/podcasts" element={<Podcasts />} />
+              <Route path="/press" element={<Press />} />
+            </Routes>
+          </main>
+          <AudioPlayer />
+          <LicenseModal />
+          <AuthModal />
+          <ChatbotWidget />
+        </Router>
+      </AudioProvider>
+    </AuthProvider>
   );
 }
 
