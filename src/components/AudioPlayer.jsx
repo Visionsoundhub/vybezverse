@@ -76,8 +76,12 @@ const AudioPlayer = () => {
 
       ctx.fillStyle = fillColor;
       ctx.beginPath();
-      // Draw rounded bars
-      ctx.roundRect(x, y, barWidth, h, 2);
+      // Draw rounded bars (with browser safety fallback)
+      if (typeof ctx.roundRect === 'function') {
+        ctx.roundRect(x, y, barWidth, h, 2);
+      } else {
+        ctx.rect(x, y, barWidth, h);
+      }
       ctx.fill();
     }
   }, [currentTrack, progress, hoverX]);

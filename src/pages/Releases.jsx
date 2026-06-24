@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import releasesData from '../data/releases.json';
 import releasesSettings from '../data/releases_settings.json';
