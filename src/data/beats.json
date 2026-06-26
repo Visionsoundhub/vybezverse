@@ -14,6 +14,21 @@
       "category": "latin",
       "bpm": "90",
       "key": "Fminor"
+    },
+    {
+      "price": "19.99€",
+      "checkoutUrl": "#",
+      "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/lonely-road-preview.mp3",
+      "status": "available",
+      "cover": "/assets/uploads/banner.png",
+      "title": "LONELY ROAD",
+      "tags": [
+        "dark",
+        "drill"
+      ],
+      "category": "drill",
+      "bpm": "90",
+      "key": "Unknown"
     }
   ],
   "storeActive": false,
