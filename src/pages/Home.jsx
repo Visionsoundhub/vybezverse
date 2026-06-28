@@ -145,7 +145,7 @@ function Home() {
     <div style={{ position: 'relative' }}>
       
       {/* SIDE NAVIGATION */}
-      <div style={{ position: 'fixed', right: '40px', top: '50%', transform: 'translateY(-50%)', zIndex: 100, display: 'flex', flexDirection: 'column', gap: '24px' }}>
+      <div className="side-nav" style={{ position: 'fixed', right: '40px', top: '50%', transform: 'translateY(-50%)', zIndex: 100, display: 'flex', flexDirection: 'column', gap: '24px' }}>
         {sectionsList.map((sec) => (
           <div 
             key={sec.id}

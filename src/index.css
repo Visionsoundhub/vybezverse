@@ -147,3 +147,9 @@ p {
   flex-direction: row !important;
   flex-wrap: nowrap !important;
 }
+
+@media (max-width: 768px) {
+  .side-nav {
+    display: none !important;
+  }
+}
