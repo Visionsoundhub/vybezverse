@@ -178,12 +178,12 @@ function Home() {
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: '80px', position: 'relative', width: '100%' }}>
           
           {/* LAYOUT PLACEHOLDER: Keeps the layout stable */}
-          <div style={{ width: '400px', height: '400px', marginBottom: '-100px', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 0 }}>
+          <div style={{ width: 'min(90vw, 400px)', height: 'min(90vw, 400px)', marginBottom: 'clamp(-50px, -10vw, -100px)', marginTop: 'clamp(-20vh, -10vh, 0px)', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 0 }}>
             
             <motion.div 
               style={{ 
-                width: '400px', 
-                height: '400px', 
+                width: '100%', 
+                height: '100%', 
                 borderRadius: '50%',
                 position: 'absolute',
                 zIndex: 0,
@@ -195,7 +195,7 @@ function Home() {
                {/* APPLE-STYLE CANVAS SCRUBBING */}
                <canvas 
                  ref={canvasRef}
-                 style={{ width: '100%', height: '100%', mixBlendMode: 'luminosity' }}
+                 style={{ width: '100%', height: '100%', mixBlendMode: 'luminosity', borderRadius: '50%' }}
                />
             </motion.div>
 
