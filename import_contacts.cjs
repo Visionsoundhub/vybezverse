@@ -1,6 +1,6 @@
 const fs = require('fs');
 
-const API_KEY = 're_Mocb2WXP_PozwDzSrokLrEkKv2PFVU8Z7';
+const API_KEY = 're_LHEXeicY_2QLeMmCDKKXeB9Tr4vRZfZjf';
 const AUDIENCE_ID = '66d1140c-d7df-4411-aae7-345d9d1432a1';
 const CSV_PATH = 'C:\\Users\\Theo\\Downloads\\1780000384_188744083320079655_subscribers_active.csv';
 

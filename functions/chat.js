@@ -81,7 +81,7 @@ export async function onRequestPost(context) {
   try {
     const { env, request } = context;
     const geminiApiKey = env.GEMINI_API_KEY || env['Gemini api'] || env.gemini_api_key;
-    const resendApiKey = env.RESEND_API_KEY || 're_Mocb2WXP_PozwDzSrokLrEkKv2PFVU8Z7';
+    const resendApiKey = env.RESEND_API_KEY || 're_LHEXeicY_2QLeMmCDKKXeB9Tr4vRZfZjf';
     const audienceId = env.RESEND_AUDIENCE_ID || '66d1140c-d7df-4411-aae7-345d9d1432a1';
     const sheetUrl = env.GOOGLE_SHEETS_CSV_URL;
 

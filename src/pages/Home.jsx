@@ -1,241 +1,392 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, useScroll, useTransform, useMotionTemplate } from 'framer-motion';
+import { Play, Heart, Mic2, Disc3, Ticket, Pause } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { Headphones, Mic2, ArrowRight, Mail, Sparkles } from 'lucide-react';
-import gsap from 'gsap';
-import { useGSAP } from '@gsap/react';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import homeData from '../data/home.json';
-import releasesData from '../data/releases.json';
-import VisualizerCanvas from '../components/VisualizerCanvas';
-import './Home.css';
+import beatsDataRaw from '../data/beats.json';
+import { AudioContext } from '../context/AudioContext';
 
-// Register ScrollTrigger plugin
-gsap.registerPlugin(ScrollTrigger);
+const sectionsList = [
+  { id: 'hero', label: '01. INTRO' },
+  { id: 'album', label: '02. ΠΑΛΙΡΡΟΙΑ' },
+  { id: 'latest', label: '03. LATEST DROP' },
+  { id: 'charity', label: '04. CHARITY' },
+  { id: 'beats', label: '05. NEW BEATS' },
+  { id: 'live', label: '06. LIVE SHOWS' }
+];
 
-const Home = () => {
-  const [email, setEmail] = useState('');
-  const [preference, setPreference] = useState('beats_and_songs');
-  const [subscribed, setSubscribed] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
-  
-  const containerRef = useRef(null);
+const StickySection = ({ children, bg, index, zIndex, id }) => (
+  <section 
+    id={id}
+    className="scroll-section"
+    style={{ 
+      position: 'sticky', 
+      top: 0, 
+      minHeight: '100vh', 
+      background: bg,
+      zIndex: zIndex,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      overflow: 'hidden',
+      borderBottom: '1px solid rgba(255,255,255,0.05)',
+      transform: 'translateZ(0)',
+      willChange: 'transform',
+      WebkitFontSmoothing: 'antialiased',
+      backfaceVisibility: 'hidden'
+    }}
+  >
+    <div className="container" style={{ width: '100%' }}>
+      {children}
+    </div>
+  </section>
+);
 
-  useGSAP(() => {
-    // --- 1. HERO ENTRANCE ANIMATIONS (one-time, on page load) ---
-    const tl = gsap.timeline({ defaults: { ease: 'power3.out' } });
+function Home() {
+  const { playTrack, currentTrack, isPlaying, openLicenseModal } = React.useContext(AudioContext);
+  const [activeSection, setActiveSection] = useState('hero');
+  const canvasRef = useRef(null);
+  const imagesRef = useRef([]);
+  const totalFrames = 300;
+
+  // Track active section
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const vh = window.innerHeight;
+      
+      const index = Math.min(
+        sectionsList.length - 1,
+        Math.max(0, Math.floor((scrollY + vh / 2) / vh))
+      );
+      
+      setActiveSection(sectionsList[index].id);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    setTimeout(handleScroll, 100);
+
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Preload Images for Canvas
+  useEffect(() => {
+    const images = [];
+    for (let i = 1; i <= totalFrames; i++) {
+      const img = new Image();
+      const paddedIndex = i.toString().padStart(3, '0');
+      img.src = `/ezgif-8a8f85f21e3368a5-jpg/ezgif-frame-${paddedIndex}.jpg`;
+      images.push(img);
+    }
+    imagesRef.current = images;
+  }, []);
+
+  // Apple-Style Canvas Scrubbing
+  useEffect(() => {
+    let animationFrameId;
+
+    const renderLoop = () => {
+      const canvas = canvasRef.current;
+      const images = imagesRef.current;
+      
+      if (canvas && images.length > 0) {
+        const ctx = canvas.getContext('2d');
+        const scrollY = window.scrollY;
+        const vh = window.innerHeight;
+        
+        // Progress 0 to 1 as we scroll down
+        const progress = Math.min(Math.max(scrollY / vh, 0), 1);
+        
+        // FORWARD PLAYBACK
+        let frameIndex = Math.floor(progress * (totalFrames - 1));
+        frameIndex = Math.max(0, Math.min(frameIndex, totalFrames - 1));
+        
+        const img = images[frameIndex];
+        
+        if (img && img.complete && img.naturalWidth > 0) {
+          canvas.width = 800; 
+          canvas.height = 800;
+          
+          const scale = Math.max(canvas.width / img.naturalWidth, canvas.height / img.naturalHeight);
+          const x = (canvas.width / 2) - (img.naturalWidth / 2) * scale;
+          const y = (canvas.height / 2) - (img.naturalHeight / 2) * scale;
+          
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, x, y, img.naturalWidth * scale, img.naturalHeight * scale);
+        }
+      }
+      animationFrameId = requestAnimationFrame(renderLoop);
+    };
     
-    tl.from('.hero-name-left', { x: -120, opacity: 0, duration: 1 })
-      .from('.hero-name-right', { x: 120, opacity: 0, duration: 1 }, '-=0.8')
-      .from('.hero-x', { scale: 0, rotation: -180, opacity: 0, duration: 0.8, ease: 'back.out(1.7)' }, '-=0.6')
-      .from('.hero-desc', { y: 20, opacity: 0, duration: 0.6 }, '-=0.4')
-      .from('.hero-buttons', { y: 20, opacity: 0, duration: 0.6 }, '-=0.4');
+    renderLoop();
+    const intervalId = setInterval(renderLoop, 100);
 
-    // (Scroll parallax removed — was causing hero content to vanish on scroll)
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+      clearInterval(intervalId);
+    };
+  }, []);
 
-    // --- 2. LATEST DROP — slide up once when scrolled into view ---
-    gsap.from('.featured-card', {
-      y: 60,
-      opacity: 0,
-      scale: 0.97,
-      duration: 0.8,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '.featured-section',
-        start: 'top 85%',
-        toggleActions: 'play none none none',
-      }
-    });
-
-    // --- 3. NEWSLETTER — staggered entrance once ---
-    gsap.from('.newsletter-text h2, .newsletter-text p, .newsletter-form-wrap form > *', {
-      y: 30,
-      opacity: 0,
-      stagger: 0.1,
-      duration: 0.6,
-      ease: 'power2.out',
-      scrollTrigger: {
-        trigger: '.newsletter-section',
-        start: 'top 80%',
-        toggleActions: 'play none none none',
-      }
-    });
-  }, { scope: containerRef });
-
-  const handleSubscribe = async (e) => {
-    e.preventDefault();
-    if (!email) return;
-
-    try {
-      setErrorMessage('');
-      const response = await fetch('/subscribe', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, preference }),
+  const scrollTo = (id) => {
+    const index = sectionsList.findIndex(sec => sec.id === id);
+    if (index !== -1) {
+      window.scrollTo({
+        top: index * window.innerHeight,
+        behavior: 'smooth'
       });
-
-      const data = await response.json();
-
-      if (response.ok && data.success) {
-        setSubscribed(true);
-        setEmail('');
-      } else {
-        setErrorMessage(data.error || 'Υπήρξε ένα σφάλμα. Δοκιμάστε ξανά.');
-      }
-    } catch (err) {
-      console.error('Subscription error:', err);
-      setErrorMessage('Σφάλμα σύνδεσης. Δοκιμάστε ξανά αργότερα.');
     }
   };
 
-  const featuredRelease = releasesData.tracks[0]; // Get the newest track
+  const { scrollY } = useScroll();
+  
+  const textY = useTransform(scrollY, [0, 500], [0, 150]);
+  const textOpacity = useTransform(scrollY, [0, 400], [1, 0]);
 
   return (
-    <div className="home-page" ref={containerRef}>
+    <div style={{ position: 'relative' }}>
       
-      {/* HERO SECTION - Dual Identity */}
-      <section className="hero-section">
-        <VisualizerCanvas />
-        <div className="hero-bg-glow"></div>
-        <div className="container hero-content">
-          <div className="hero-text">
-            
-            {/* THE BIG ANIMATED TITLE */}
-            <div className="hero-title-block">
-              <h1 className="hero-name hero-name-left">
-                {homeData.heroLine1 || 'BLACK VYBEZ'}
-              </h1>
-              
-              <span className="hero-x">
-                ×
-              </span>
-              
-              <h1 className="hero-name hero-name-right">
-                {homeData.heroLine2 || 'VYBEZMADETHIS'}
-              </h1>
-            </div>
+      {/* SIDE NAVIGATION */}
+      <div style={{ position: 'fixed', right: '40px', top: '50%', transform: 'translateY(-50%)', zIndex: 100, display: 'flex', flexDirection: 'column', gap: '24px' }}>
+        {sectionsList.map((sec) => (
+          <div 
+            key={sec.id}
+            onClick={() => scrollTo(sec.id)}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              justifyContent: 'flex-end', 
+              gap: '16px', 
+              cursor: 'pointer',
+              opacity: activeSection === sec.id ? 1 : 0.4,
+              transition: 'all 0.3s ease'
+            }}
+            onMouseEnter={(e) => { e.currentTarget.style.opacity = 1; }}
+            onMouseLeave={(e) => { if (activeSection !== sec.id) e.currentTarget.style.opacity = 0.4; }}
+          >
+            <span style={{ fontSize: '0.7rem', fontWeight: '800', letterSpacing: '2px', color: activeSection === sec.id ? 'var(--accent-magenta)' : 'white' }}>
+              {sec.label}
+            </span>
+            <div style={{ 
+              width: activeSection === sec.id ? '24px' : '8px', 
+              height: '2px', 
+              background: activeSection === sec.id ? 'var(--accent-magenta)' : 'white',
+              transition: 'all 0.3s ease'
+            }} />
+          </div>
+        ))}
+      </div>
 
-            <p className="hero-desc">
-              {homeData.heroDesc || 'Δεν φτιάχνω απλά beats, δημιουργώ κόσμους.'}
+      {/* 1. HERO SECTION */}
+      <StickySection id="hero" bg="var(--bg-color)" zIndex={1}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: '80px', position: 'relative', width: '100%' }}>
+          
+          {/* LAYOUT PLACEHOLDER: Keeps the layout stable */}
+          <div style={{ width: '400px', height: '400px', marginBottom: '-100px', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 0 }}>
+            
+            <motion.div 
+              style={{ 
+                width: '400px', 
+                height: '400px', 
+                borderRadius: '50%',
+                position: 'absolute',
+                zIndex: 0,
+                overflow: 'hidden',
+                background: 'radial-gradient(circle, rgba(112,0,255,0.2) 0%, rgba(5,5,8,0) 70%)',
+                boxShadow: '0 0 50px rgba(112,0,255,0.3)'
+              }}
+            >
+               {/* APPLE-STYLE CANVAS SCRUBBING */}
+               <canvas 
+                 ref={canvasRef}
+                 style={{ width: '100%', height: '100%', mixBlendMode: 'luminosity' }}
+               />
+            </motion.div>
+
+          </div>
+
+          <motion.h1 
+            style={{ 
+              y: textY,
+              opacity: textOpacity,
+              fontSize: '10vw', 
+              fontWeight: '800', 
+              lineHeight: 1, 
+              position: 'relative', 
+              zIndex: 1, 
+              whiteSpace: 'nowrap',
+              textShadow: '0 10px 30px rgba(0,0,0,0.8)' 
+            }}
+            className="text-gradient"
+          >
+            BLACK VYBEZ
+          </motion.h1>
+          
+          <motion.p 
+             style={{ 
+               y: textY,
+               opacity: textOpacity,
+               color: 'var(--accent-magenta)', 
+               letterSpacing: '8px', 
+               fontWeight: '800', 
+               marginTop: '16px', 
+               fontSize: '1.2rem', 
+               position: 'relative',
+               zIndex: 1,
+               whiteSpace: 'nowrap',
+               textShadow: '0 0 20px rgba(255,0,127,0.5)' 
+             }}
+          >
+            PRODUCER <span style={{ color: 'var(--text-secondary)', margin: '0 12px' }}>×</span> VYBEZMADETHIS
+          </motion.p>
+        </div>
+      </StickySection>
+
+      {/* 2. ALBUM TEASER: ΠΑΛΙΡΡΟΙΑ */}
+      <StickySection id="album" bg="radial-gradient(circle at center, #0a1128 0%, #050508 100%)" zIndex={2}>
+        <motion.div 
+          initial={{ opacity: 0, y: 100 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8 }}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}
+        >
+          <span style={{ color: '#4cc9f0', letterSpacing: '4px', fontSize: '0.9rem', marginBottom: '16px', fontWeight: '700' }}>ΝΕΟ ALBUM / COMING SOON</span>
+          <h2 style={{ fontSize: '8vw', fontWeight: '800', letterSpacing: '-2px', color: '#fff', textShadow: '0 0 40px rgba(76, 201, 240, 0.4)' }}>
+            ΠΑΛΙΡΡΟΙΑ
+          </h2>
+          <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: '500px', fontSize: '1.2rem', lineHeight: 1.6, marginTop: '24px' }}>
+            Το νερό δεν ρωτάει. Απλά παρασέρνει τα πάντα. Το νέο κεφάλαιο ανοίγει σύντομα.
+          </p>
+        </motion.div>
+      </StickySection>
+
+      {/* 3. LATEST DROP */}
+      <StickySection id="latest" bg="var(--bg-secondary)" zIndex={3}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '60px', flexWrap: 'wrap', justifyContent: 'center' }}>
+          
+          <motion.div 
+            initial={{ opacity: 0, x: -100 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
+            style={{ width: '400px', height: '400px', borderRadius: '24px', background: 'radial-gradient(circle, #2a0845 0%, #050508 100%)', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid var(--glass-border)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}
+          >
+            <span style={{ color: '#ffcc00', fontFamily: 'Brush Script MT, cursive', fontSize: '3.5rem' }}>Jazz Bar</span>
+          </motion.div>
+
+          <motion.div 
+            initial={{ opacity: 0, x: 100 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+            style={{ maxWidth: '400px' }}
+          >
+            <span style={{ display: 'inline-block', background: 'var(--accent-magenta)', color: '#fff', padding: '4px 12px', borderRadius: '100px', fontSize: '0.8rem', fontWeight: '800', marginBottom: '16px' }}>LATEST DROP</span>
+            <h2 style={{ fontSize: '3.5rem', lineHeight: 1.1, marginBottom: '16px' }}>Jazz Bar των τεράτων</h2>
+            <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', marginBottom: '32px' }}>
+              Το απόλυτο single από τη σειρά Vintage Freq. Συντονίσου.
             </p>
-            
-            <div className="hero-buttons">
-              <Link to="/releases" className="btn-dual artist-btn">
-                <Mic2 size={20} />
-                <span>MY MUSIC</span>
-              </Link>
-              <Link to="/beats" className="btn-dual producer-btn">
-                <Headphones size={20} />
-                <span>BEATSTORE</span>
-              </Link>
+            <div style={{ display: 'flex', gap: '16px' }}>
+               <button className="btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><Play size={18} /> STREAM NOW</button>
+               <button className="btn-outline">VIEW BUNDLE</button>
             </div>
-          </div>
+          </motion.div>
+
         </div>
-      </section>
+      </StickySection>
 
-      {/* FEATURED RELEASE SECTION */}
-      {featuredRelease && (
-        <section className="featured-section container">
-          <div className="section-title-wrap">
-            <h2 className="section-title">LATEST DROP</h2>
-            <div className="title-line"></div>
-          </div>
-          
-          <div className="featured-card glass">
-            <div className="featured-cover">
-              <img src={featuredRelease.cover} alt={featuredRelease.title} />
-              <div className="featured-badge">NEW</div>
-            </div>
-            <div className="featured-info">
-              <h3>{featuredRelease.title}</h3>
-              <p className="featured-genre">{featuredRelease.genre} | {featuredRelease.type}</p>
-              <p className="featured-desc">
-                {homeData.featuredDesc || 'Το πλήρες πακέτο περιλαμβάνει High Quality MP3, οδηγίες για iPhone ringtone, και χειρόγραφους στίχους με υπογραφή.'}
-              </p>
-              
-              <div className="featured-actions">
-                <a href={featuredRelease.streamUrl} target="_blank" rel="noreferrer" className="btn-outline">
-                  STREAM NOW
-                </a>
-                <Link to="/store" className="btn-solid">
-                  VIEW BUNDLE
-                </Link>
-              </div>
-            </div>
-          </div>
-        </section>
-      )}
+      {/* 4. CHARITY STATEMENT */}
+      <StickySection id="charity" bg="radial-gradient(circle at center, #1a0510 0%, #050508 100%)" zIndex={4}>
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8 }}
+          style={{ textAlign: 'center', color: '#fff', padding: '40px' }}
+        >
+          <Heart size={48} color="var(--accent-magenta)" style={{ marginBottom: '24px' }} />
+          <h2 style={{ fontSize: '4vw', fontWeight: '800', letterSpacing: '-1px', marginBottom: '24px', lineHeight: 1.2, textShadow: '0 0 30px rgba(255,0,127,0.4)' }}>
+            Η ΜΟΥΣΙΚΗ<br/>ΕΠΙΣΤΡΕΦΕΙ
+          </h2>
+          <p style={{ fontSize: '1.5rem', fontWeight: '500', maxWidth: '600px', margin: '0 auto', color: 'var(--text-secondary)' }}>
+            Όλα τα έσοδα από τα streams στο Spotify πηγαίνουν απευθείας σε φιλανθρωπικό οργανισμό. 
+            Ακούγοντας, βοηθάς.
+          </p>
+          <button className="btn-primary" style={{ marginTop: '40px', background: '#1db954', color: '#fff', border: 'none', display: 'flex', alignItems: 'center', gap: '8px', margin: '40px auto 0' }}>
+            <Play size={18} /> ΑΚΟΥ ΣΤΟ SPOTIFY
+          </button>
+        </motion.div>
+      </StickySection>
 
-      {/* NEWSLETTER / EMAIL CAPTURE */}
-      <section className="newsletter-section">
-        <div className="newsletter-bg"></div>
-        <div className="container newsletter-content glass">
-          <div className="newsletter-text">
-            <h2><Sparkles color="#bc74f5" /> {homeData.newsletterTitle || 'JOIN THE VYBEZ FAMILY'}</h2>
-            <p>{homeData.newsletterText || 'Γράψου στο VIP Newsletter μου.'}</p>
-          </div>
-          
-          <div className="newsletter-form-wrap">
-            {subscribed ? (
-              <div className="success-message">
-                <span className="success-icon">✓</span>
-                Καλωσήρθες στην παρέα! Check the email.
-              </div>
-            ) : (
-              <form className="newsletter-form" onSubmit={handleSubscribe}>
-                <div className="input-group">
-                  <Mail size={20} className="input-icon" />
-                  <input 
-                    type="email" 
-                    placeholder="Enter your email address" 
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="preferences-group custom-toggles">
-                  <div className="toggle-label">Τι σε ενδιαφέρει περισσότερο;</div>
-                  <div className="toggle-options">
-                    <button 
-                      type="button"
-                      className={`pref-toggle ${preference === 'beats_and_songs' ? 'active' : ''}`}
-                      onClick={() => setPreference('beats_and_songs')}
-                    >
-                      Beats & Songs
-                    </button>
-                    <button 
-                      type="button"
-                      className={`pref-toggle ${preference === 'only_beats' ? 'active' : ''}`}
-                      onClick={() => setPreference('only_beats')}
-                    >
-                      Μόνο Beats
-                    </button>
-                    <button 
-                      type="button"
-                      className={`pref-toggle ${preference === 'only_songs' ? 'active' : ''}`}
-                      onClick={() => setPreference('only_songs')}
-                    >
-                      Μόνο Νέα & Songs
-                    </button>
+      {/* 5. NEW BEATS */}
+      <StickySection id="beats" bg="var(--bg-color)" zIndex={5}>
+        <div style={{ width: '100%', maxWidth: '1000px', margin: '0 auto' }}>
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
+            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}
+          >
+            <div>
+              <h2 style={{ fontSize: '3rem', color: 'var(--accent-violet)', display: 'flex', alignItems: 'center', gap: '16px' }}><Disc3 size={40} /> NEW BEATS</h2>
+              <p style={{ color: 'var(--text-secondary)' }}>Φρέσκα instrumentals έτοιμα για vocals.</p>
+            </div>
+            <Link to="/beats" style={{ color: 'var(--accent-magenta)', textDecoration: 'none', fontWeight: '800' }}>GO TO BEATSTORE →</Link>
+          </motion.div>
+
+          <div style={{ display: 'grid', gap: '16px' }}>
+            {beatsDataRaw.beatslist.slice(0, 3).map((beat, i) => (
+              <motion.div 
+                key={beat.title}
+                initial={{ opacity: 0, x: -50 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="glass-card" 
+                style={{ display: 'flex', alignItems: 'center', padding: '16px 24px', justifyContent: 'space-between', cursor: 'pointer' }}
+                onClick={() => playTrack(beat)}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                  <button style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'var(--gradient-primary)', border: 'none', color: '#fff', display: 'flex', justifyContent: 'center', alignItems: 'center', cursor: 'pointer' }}>
+                    {currentTrack?.title === beat.title && isPlaying ? <Pause size={16} fill="white" /> : <Play size={16} fill="white" />}
+                  </button>
+                  <div>
+                    <h3 style={{ fontSize: '1.2rem' }}>{beat.title}</h3>
+                    <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>{beat.bpm || 120} BPM • {beat.key || 'Am'}</span>
                   </div>
                 </div>
-                <button type="submit" className="btn-subscribe">
-                  SUBSCRIBE <ArrowRight size={18} />
-                </button>
-                {errorMessage && (
-                  <div className="error-message" style={{ color: '#ff4d4d', marginTop: '12px', fontSize: '14px', width: '100%', textAlign: 'center', fontWeight: '500' }}>
-                    {errorMessage}
-                  </div>
-                )}
-              </form>
-            )}
+                <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+                   <span style={{ fontSize: '0.8rem', color: 'var(--accent-violet)' }}>{(beat.tags || []).join(', ')}</span>
+                   <button onClick={(e) => { e.stopPropagation(); openLicenseModal(beat); }} className="btn-outline" style={{ padding: '8px 16px', fontSize: '0.8rem' }}>BUY LEASE</button>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </section>
+      </StickySection>
+
+      {/* 6. LIVE SHOWS */}
+      <StickySection id="live" bg="var(--bg-secondary)" zIndex={6}>
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-100px" }}
+          transition={{ duration: 0.8 }}
+          style={{ textAlign: 'center', padding: '60px', border: '1px dashed var(--accent-magenta)', borderRadius: '24px', background: 'rgba(255,0,127,0.02)', maxWidth: '600px', margin: '0 auto' }}
+        >
+          <Ticket size={48} color="var(--accent-magenta)" style={{ marginBottom: '24px' }} />
+          <h2 style={{ fontSize: '3rem', marginBottom: '16px' }}>LIVE SHOWS</h2>
+          <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', marginBottom: '32px' }}>
+            Η σκηνή ετοιμάζεται. Οι επόμενες ζωντανές εμφανίσεις θα ανακοινωθούν σύντομα.
+          </p>
+          <div style={{ display: 'inline-block', padding: '12px 24px', background: 'var(--bg-color)', border: '1px solid var(--glass-border)', borderRadius: '8px', fontWeight: '800', letterSpacing: '2px', color: 'var(--text-secondary)' }}>
+            STAY TUNED
+          </div>
+        </motion.div>
+      </StickySection>
 
     </div>
   );
-};
+}
 
 export default Home;

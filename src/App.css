@@ -1,1 +1,325 @@
-/* Custom styles for App components if needed, globally index.css handles most */
+/* Navbar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background: rgba(5, 5, 8, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--glass-border);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+}
+
+.nav-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.logo {
+  font-weight: 800;
+  font-size: 1.5rem;
+  letter-spacing: 2px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 32px;
+}
+
+.nav-links a {
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.nav-links a:hover, .nav-links a.active {
+  color: var(--text-primary);
+}
+
+.chevron {
+  font-size: 0.7rem;
+}
+
+.account-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+/* Hero Section (Scroll Animation) */
+.hero-scroll-container {
+  height: 300vh; /* Gives room to scroll and animate */
+  position: relative;
+}
+
+.sticky-hero {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  padding-top: 80px; /* navbar offset */
+}
+
+.hero-text {
+  text-align: center;
+  z-index: 10;
+  position: relative;
+  max-width: 800px;
+  padding: 0 24px;
+}
+
+.hero-text h1 {
+  font-size: 5rem;
+  line-height: 1;
+  margin-bottom: 10px;
+}
+
+.hero-text .subtitle {
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent-violet);
+  margin-bottom: 24px;
+  letter-spacing: 4px;
+}
+
+.hero-text .description {
+  font-size: 1.2rem;
+  margin-bottom: 40px;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+}
+
+.hero-actions button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Silhouette */
+.silhouette-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 400px;
+  height: 400px;
+  margin-top: -200px;
+  margin-left: -200px;
+  z-index: 1;
+  pointer-events: none; /* Let clicks pass through */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.silhouette-placeholder {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.silhouette-glow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 150%;
+  height: 150%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, rgba(255,0,127,0.4) 0%, rgba(5,5,8,0) 70%);
+  z-index: 1;
+}
+
+.silhouette-img {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 2;
+  mix-blend-mode: luminosity; /* makes it look like a silhouette/darkened */
+  opacity: 0.6;
+}
+
+/* Content Sections */
+.content-section {
+  position: relative;
+  z-index: 20;
+  background-color: var(--bg-color); /* Hide scroll things behind this */
+  padding-top: 100px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+.section-header h2 {
+  font-size: 2rem;
+  white-space: nowrap;
+}
+
+.section-header .line {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--glass-border), transparent);
+}
+
+/* Latest Drop Card */
+.latest-drop-card {
+  padding: 32px;
+  position: relative;
+}
+
+.drop-badge {
+  position: absolute;
+  top: -12px;
+  left: 32px;
+  background: var(--accent-magenta);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 100px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  box-shadow: 0 0 10px var(--accent-magenta);
+}
+
+.drop-content {
+  display: flex;
+  gap: 40px;
+  align-items: center;
+}
+
+.drop-artwork {
+  width: 250px;
+  height: 250px;
+  flex-shrink: 0;
+  border-radius: 16px;
+  background: #111;
+  border: 1px solid var(--glass-border);
+  overflow: hidden;
+}
+
+.artwork-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Brush Script MT', cursive; /* To mock the typography in the screenshot */
+  font-size: 2rem;
+  color: #ffcc00;
+  background: radial-gradient(circle, #222, #000);
+}
+
+.drop-info h3 {
+  font-size: 2.5rem;
+  margin-bottom: 8px;
+}
+
+.drop-meta {
+  color: var(--accent-violet);
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.drop-desc {
+  margin-bottom: 32px;
+  font-size: 1.1rem;
+}
+
+.drop-actions {
+  display: flex;
+  gap: 16px;
+}
+
+/* Newsletter Card */
+.newsletter-card {
+  padding: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  background: linear-gradient(135deg, rgba(255,255,255,0.02), rgba(112,0,255,0.05));
+}
+
+.newsletter-info h3 {
+  font-size: 2rem;
+  margin-bottom: 16px;
+}
+
+.newsletter-form {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 16px 24px;
+  border-radius: 100px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--glass-border);
+  color: white;
+  font-family: var(--font-main);
+  font-size: 1rem;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--accent-magenta);
+}
+
+.interests p {
+  font-size: 0.9rem;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.interest-tags {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.tag {
+  padding: 8px 16px;
+  border-radius: 100px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid var(--glass-border);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.tag.active {
+  background: var(--accent-magenta);
+  border-color: var(--accent-magenta);
+  color: white;
+}
