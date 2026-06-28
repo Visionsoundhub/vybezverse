@@ -6,7 +6,7 @@ import { AuthProvider } from './context/AuthContext';
 import AudioPlayer from './components/AudioPlayer';
 import LicenseModal from './components/LicenseModal';
 import ChatbotWidget from './components/ChatbotWidget';
-
+import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Beats from './pages/Beats';
 import Store from './pages/Store';
@@ -26,26 +26,7 @@ function AppContent() {
   return (
     <div className="app-container">
       {/* Sticky Navbar */}
-      {!isLinksPage && (
-        <nav className="navbar">
-          <div className="nav-content container">
-            <Link to="/" className="logo">BLACK VYBEZ</Link>
-            <div className="nav-links">
-              <Link to="/" className={location.pathname === '/' ? 'active' : ''}>HOME</Link>
-              <Link to="/releases" className={location.pathname === '/releases' ? 'active' : ''}>RELEASES</Link>
-              <Link to="/beats" className={location.pathname === '/beats' ? 'active' : ''}>BEATS</Link>
-              <Link to="/store" className={location.pathname === '/store' ? 'active' : ''}>STORE</Link>
-              <Link to="/gallery" className={location.pathname === '/gallery' ? 'active' : ''}>GALLERY</Link>
-              <Link to="/podcasts" className={location.pathname === '/podcasts' ? 'active' : ''}>PODCASTS</Link>
-              <Link to="/press" className={location.pathname === '/press' ? 'active' : ''}>PRESS</Link>
-              <Link to="/bio" className={location.pathname === '/bio' ? 'active' : ''}>BIO</Link>
-            </div>
-            <div className="nav-actions">
-              <Link to="/account" className="account-link"><User size={18} /> ACCOUNT</Link>
-            </div>
-          </div>
-        </nav>
-      )}
+      {!isLinksPage && <Navbar />}
 
       <main>
         <Routes>
