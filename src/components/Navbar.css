@@ -21,6 +21,7 @@
   letter-spacing: 2px;
   color: #ffffff !important;
   text-decoration: none !important;
+  white-space: nowrap;
 }
 
 .nav-links {
