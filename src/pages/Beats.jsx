@@ -227,7 +227,7 @@ function Beats() {
           style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '40px' }}
         >
           {currentBeats.map((beat, idx) => (
-            <div key={idx} className="glass-card" style={{ padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '24px', transition: 'all 0.2s ease', cursor: 'pointer', flexWrap: 'wrap' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}>
+            <div key={idx} className="glass-card" style={{ padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '24px', transition: 'all 0.2s ease', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}>
               
               {/* Play Button & Thumb */}
               <div onClick={(e) => { e.stopPropagation(); playTrack(beat); }} style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '12px', background: `url(${beat.cover}) center/cover, radial-gradient(circle, ${beat.color}44 0%, #050508 100%)`, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
