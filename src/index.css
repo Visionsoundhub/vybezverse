@@ -141,3 +141,9 @@ p {
   color: var(--text-secondary);
   line-height: 1.6;
 }
+
+.list-view-card {
+  display: flex !important;
+  flex-direction: row !important;
+  flex-wrap: nowrap !important;
+}
