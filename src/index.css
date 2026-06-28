@@ -202,3 +202,19 @@ p {
     max-width: 100vw;
   }
 }
+
+.hero-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding-top: 80px;
+  position: relative;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .hero-content-wrapper {
+    padding-top: 0px;
+  }
+}

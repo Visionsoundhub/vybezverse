@@ -175,7 +175,7 @@ function Home() {
 
       {/* 1. HERO SECTION */}
       <StickySection id="hero" bg="var(--bg-color)" zIndex={1}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', paddingTop: '80px', position: 'relative', width: '100%' }}>
+        <div className="hero-content-wrapper">
           
           {/* LAYOUT PLACEHOLDER: Keeps the layout stable */}
           <div style={{ width: 'min(90vw, 400px)', height: 'min(90vw, 400px)', marginBottom: 'clamp(-50px, -10vw, -100px)', marginTop: 'clamp(-20vh, -10vh, 0px)', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 0 }}>
