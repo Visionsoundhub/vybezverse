@@ -162,3 +162,43 @@ p {
     top: auto !important;
   }
 }
+
+/* --- Hero Section Typography --- */
+.hero-main-title {
+  font-size: clamp(3rem, 10vw, 8rem);
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.hero-sub-title {
+  color: var(--accent-magenta);
+  letter-spacing: 8px;
+  font-weight: 800;
+  margin-top: 16px;
+  font-size: 1.2rem;
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .hero-main-title {
+    font-size: clamp(2.5rem, 12vw, 4rem);
+    white-space: normal; /* Allow wrap if needed */
+    text-align: center;
+  }
+  
+  .hero-sub-title {
+    font-size: 0.8rem;
+    letter-spacing: 4px;
+    white-space: normal; /* Allow wrap */
+    text-align: center;
+    line-height: 1.5;
+  }
+  
+  /* Prevent horizontal scrolling from any overflowing elements */
+  body, html, #root {
+    overflow-x: hidden !important;
+    width: 100%;
+    max-width: 100vw;
+  }
+}

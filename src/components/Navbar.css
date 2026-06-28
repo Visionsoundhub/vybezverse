@@ -121,8 +121,18 @@
 }
 
 @media (max-width: 768px) {
+  .navbar {
+    padding: 15px 0;
+  }
+
+  .nav-logo {
+    font-size: 1.2rem; /* slightly smaller on mobile to avoid overflow */
+    letter-spacing: 1px;
+  }
+
   .mobile-toggle {
     display: flex;
+    z-index: 201; /* Above the menu */
   }
   
   .nav-links {
@@ -137,6 +147,7 @@
     padding: 20px;
     gap: 15px;
     border-bottom: 1px solid rgba(255,255,255,0.05);
+    z-index: 200;
   }
   
   .nav-links.nav-open {

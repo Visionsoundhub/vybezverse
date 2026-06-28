@@ -205,15 +205,11 @@ function Home() {
             style={{ 
               y: textY,
               opacity: textOpacity,
-              fontSize: '10vw', 
-              fontWeight: '800', 
-              lineHeight: 1, 
               position: 'relative', 
               zIndex: 1, 
-              whiteSpace: 'nowrap',
               textShadow: '0 10px 30px rgba(0,0,0,0.8)' 
             }}
-            className="text-gradient"
+            className="text-gradient hero-main-title"
           >
             BLACK VYBEZ
           </motion.h1>
@@ -222,16 +218,11 @@ function Home() {
              style={{ 
                y: textY,
                opacity: textOpacity,
-               color: 'var(--accent-magenta)', 
-               letterSpacing: '8px', 
-               fontWeight: '800', 
-               marginTop: '16px', 
-               fontSize: '1.2rem', 
                position: 'relative',
                zIndex: 1,
-               whiteSpace: 'nowrap',
                textShadow: '0 0 20px rgba(255,0,127,0.5)' 
              }}
+             className="hero-sub-title"
           >
             PRODUCER <span style={{ color: 'var(--text-secondary)', margin: '0 12px' }}>×</span> VYBEZMADETHIS
           </motion.p>
@@ -248,7 +239,7 @@ function Home() {
           style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}
         >
           <span style={{ color: '#4cc9f0', letterSpacing: '4px', fontSize: '0.9rem', marginBottom: '16px', fontWeight: '700' }}>ΝΕΟ ALBUM / COMING SOON</span>
-          <h2 style={{ fontSize: '8vw', fontWeight: '800', letterSpacing: '-2px', color: '#fff', textShadow: '0 0 40px rgba(76, 201, 240, 0.4)' }}>
+          <h2 style={{ fontSize: 'clamp(2.5rem, 8vw, 6rem)', fontWeight: '800', letterSpacing: '-2px', color: '#fff', textShadow: '0 0 40px rgba(76, 201, 240, 0.4)' }}>
             ΠΑΛΙΡΡΟΙΑ
           </h2>
           <p style={{ color: 'rgba(255,255,255,0.6)', maxWidth: '500px', fontSize: '1.2rem', lineHeight: 1.6, marginTop: '24px' }}>
@@ -266,7 +257,7 @@ function Home() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
-            style={{ width: '400px', height: '400px', borderRadius: '24px', background: 'radial-gradient(circle, #2a0845 0%, #050508 100%)', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid var(--glass-border)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}
+            style={{ width: '100%', maxWidth: '400px', aspectRatio: '1/1', borderRadius: '24px', background: 'radial-gradient(circle, #2a0845 0%, #050508 100%)', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid var(--glass-border)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}
           >
             <span style={{ color: '#ffcc00', fontFamily: 'Brush Script MT, cursive', fontSize: '3.5rem' }}>Jazz Bar</span>
           </motion.div>
@@ -302,7 +293,7 @@ function Home() {
           style={{ textAlign: 'center', color: '#fff', padding: '40px' }}
         >
           <Heart size={48} color="var(--accent-magenta)" style={{ marginBottom: '24px' }} />
-          <h2 style={{ fontSize: '4vw', fontWeight: '800', letterSpacing: '-1px', marginBottom: '24px', lineHeight: 1.2, textShadow: '0 0 30px rgba(255,0,127,0.4)' }}>
+          <h2 style={{ fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: '800', letterSpacing: '-1px', marginBottom: '24px', lineHeight: 1.2, textShadow: '0 0 30px rgba(255,0,127,0.4)' }}>
             Η ΜΟΥΣΙΚΗ<br/>ΕΠΙΣΤΡΕΦΕΙ
           </h2>
           <p style={{ fontSize: '1.5rem', fontWeight: '500', maxWidth: '600px', margin: '0 auto', color: 'var(--text-secondary)' }}>
