@@ -7,15 +7,15 @@ import { AudioContext } from '../context/AudioContext';
 function Beats() {
   const { playTrack, currentTrack, isPlaying, openLicenseModal } = useContext(AudioContext);
   const [newsletterType, setNewsletterType] = useState('beats_news');
-  const [viewMode, setViewMode] = useState('list');
+  const [viewMode, setViewMode] = useState('list'); // Default to list for beatstores
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
 
   const genres = ['All', 'Trap', 'Drill', 'Boombap', 'R&B', 'Synthwave', 'Pop'];
 
-  // Use real data from JSON, map properties to match the new UI
-  const beatsData = beatsDataRaw.beatslist.map((beat, i) => ({
-    id: beat.id || i,
+  // Real beats from our JSON
+  const realBeats = beatsDataRaw.beatslist.map((beat, i) => ({
+    id: `real-${i}`,
     title: beat.title,
     tags: beat.tags || [],
     genre: beat.genre || 'Trap',
@@ -25,8 +25,28 @@ function Beats() {
     color: i % 2 === 0 ? 'var(--accent-magenta)' : 'var(--accent-violet)',
     audioSrc: beat.audioSrc,
     checkoutUrl: beat.checkoutUrl,
-    cover: beat.cover
+    cover: beat.cover,
+    isReal: true
   }));
+
+  // Dummy catalog to demonstrate pagination working perfectly
+  const dummyBeats = Array.from({ length: 22 }).map((_, i) => {
+    const genresList = ['Trap', 'Drill', 'Boombap', 'R&B', 'Synthwave', 'Pop'];
+    const genre = genresList[i % genresList.length];
+    return { 
+      id: `dummy-${i}`,
+      title: `Beat Track ${i + 1}`, 
+      tags: [genre.toUpperCase(), 'VIBE'], 
+      genre: genre, 
+      key: ['Am', 'Fm', 'Cm', 'Gm'][i % 4], 
+      bpm: 80 + (i * 5) % 60, 
+      price: i % 3 === 0 ? '79.99€' : '29.99€', 
+      color: i % 2 === 0 ? 'var(--accent-magenta)' : 'var(--accent-violet)',
+      isReal: false
+    };
+  });
+
+  const beatsData = [...realBeats, ...dummyBeats];
 
   // Filter beats based on selected genre
   const filteredBeats = selectedGenre === 'All' 
@@ -192,7 +212,7 @@ function Beats() {
           {currentBeats.map((beat, idx) => (
             <div key={idx} className="glass-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', transition: 'all 0.3s ease', cursor: 'pointer' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-10px)'; e.currentTarget.style.borderColor = beat.color; e.currentTarget.style.boxShadow = `0 10px 30px ${beat.color}22`; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'; e.currentTarget.style.boxShadow = 'none'; }}>
               <div style={{ width: '100%', aspectRatio: '1/1', borderRadius: '16px', background: `radial-gradient(circle, ${beat.color}44 0%, #050508 100%)`, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-                 <div onClick={(e) => { e.stopPropagation(); playTrack(beat); }} style={{ width: '60px', height: '60px', borderRadius: '50%', border: `2px solid ${beat.color}`, display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)', transition: 'transform 0.3s ease' }} className="play-btn">
+                 <div onClick={(e) => { e.stopPropagation(); if(beat.isReal) playTrack(beat); }} style={{ width: '60px', height: '60px', borderRadius: '50%', border: `2px solid ${beat.color}`, display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)', transition: 'transform 0.3s ease' }} className="play-btn">
                    {currentTrack?.title === beat.title && isPlaying ? <Pause size={24} color={beat.color} /> : <Play size={24} color={beat.color} style={{ marginLeft: '4px' }} />}
                  </div>
               </div>
@@ -211,7 +231,7 @@ function Beats() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
                   <strong style={{ fontSize: '1.2rem' }}>{beat.price}</strong>
-                  <button onClick={() => openLicenseModal(beat)} className="btn-outline" style={{ padding: '8px 16px', fontSize: '0.8rem', display: 'flex', gap: '8px', alignItems: 'center', borderColor: 'rgba(255,255,255,0.2)', transition: 'all 0.3s' }} onMouseEnter={(e) => { e.currentTarget.style.background = beat.color; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = beat.color; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
+                  <button onClick={(e) => { e.stopPropagation(); if(beat.isReal) openLicenseModal(beat); }} className="btn-outline" style={{ padding: '8px 16px', fontSize: '0.8rem', display: 'flex', gap: '8px', alignItems: 'center', borderColor: 'rgba(255,255,255,0.2)', transition: 'all 0.3s' }} onMouseEnter={(e) => { e.currentTarget.style.background = beat.color; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = beat.color; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
                     ADD TO CART <ShoppingCart size={14} />
                   </button>
                 </div>
@@ -227,10 +247,10 @@ function Beats() {
           style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '40px' }}
         >
           {currentBeats.map((beat, idx) => (
-            <div key={idx} className="glass-card" style={{ padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '24px', transition: 'all 0.2s ease', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}>
+            <div key={idx} className="glass-card" style={{ padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '24px', transition: 'all 0.2s ease', cursor: 'pointer', flexWrap: 'wrap' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}>
               
               {/* Play Button & Thumb */}
-              <div onClick={(e) => { e.stopPropagation(); playTrack(beat); }} style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '12px', background: `url(${beat.cover}) center/cover, radial-gradient(circle, ${beat.color}44 0%, #050508 100%)`, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+              <div onClick={(e) => { e.stopPropagation(); if(beat.isReal) playTrack(beat); }} style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '12px', background: beat.isReal && beat.cover ? `url(${beat.cover}) center/cover` : `radial-gradient(circle, ${beat.color}44 0%, #050508 100%)`, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
                 {currentTrack?.title === beat.title && isPlaying ? <Pause size={20} color={beat.color} /> : <Play size={20} color={beat.color} style={{ marginLeft: '2px' }} />}
               </div>
 
@@ -253,7 +273,7 @@ function Beats() {
               {/* Price & Action */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexShrink: 0, minWidth: '140px', justifyContent: 'flex-end' }}>
                 <strong style={{ fontSize: '1.1rem' }}>{beat.price}</strong>
-                <button onClick={(e) => { e.stopPropagation(); openLicenseModal(beat); }} className="btn-outline" style={{ padding: '10px 16px', fontSize: '0.8rem', display: 'flex', gap: '8px', alignItems: 'center', borderColor: 'rgba(255,255,255,0.2)', transition: 'all 0.3s', borderRadius: '100px' }} onMouseEnter={(e) => { e.currentTarget.style.background = beat.color; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = beat.color; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
+                <button onClick={(e) => { e.stopPropagation(); if(beat.isReal) openLicenseModal(beat); }} className="btn-outline" style={{ padding: '10px 16px', fontSize: '0.8rem', display: 'flex', gap: '8px', alignItems: 'center', borderColor: 'rgba(255,255,255,0.2)', transition: 'all 0.3s', borderRadius: '100px' }} onMouseEnter={(e) => { e.currentTarget.style.background = beat.color; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = beat.color; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
                   <ShoppingCart size={16} />
                 </button>
               </div>
