@@ -17,10 +17,8 @@ const sectionsList = [
 const StickySection = ({ children, bg, index, zIndex, id }) => (
   <section 
     id={id}
-    className="scroll-section"
+    className="scroll-section sticky-section-wrapper"
     style={{ 
-      position: 'sticky', 
-      top: 0, 
       minHeight: '100vh', 
       background: bg,
       zIndex: zIndex,

@@ -148,8 +148,17 @@ p {
   flex-wrap: nowrap !important;
 }
 
+.sticky-section-wrapper {
+  position: sticky;
+  top: 0;
+}
+
 @media (max-width: 768px) {
   .side-nav {
     display: none !important;
+  }
+  .sticky-section-wrapper {
+    position: relative !important;
+    top: auto !important;
   }
 }
