@@ -240,11 +240,11 @@
 
 @media (max-width: 900px) {
   .floating-player {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr;
     border-radius: 24px;
     padding: 15px;
   }
-  .player-right {
+  .volume-control {
     display: none;
   }
 }
@@ -255,7 +255,7 @@
     bottom: 15px;
   }
   .floating-player {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: auto 1fr auto;
     gap: 10px;
     padding: 10px 15px;
     border-radius: 20px;
@@ -286,5 +286,12 @@
   }
   .ctrl-btn {
     display: none; /* hide skip/shuffle to save space, keep only play */
+  }
+  .btn-player-outline {
+    display: none; /* hide licensing btn to save space */
+  }
+  .btn-player-solid {
+    padding: 8px 12px;
+    font-size: 0.7rem;
   }
 }
