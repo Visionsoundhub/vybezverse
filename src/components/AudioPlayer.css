@@ -250,11 +250,41 @@
 }
 
 @media (max-width: 600px) {
+  .player-wrapper {
+    padding: 0 10px;
+    bottom: 15px;
+  }
   .floating-player {
-    grid-template-columns: 1fr;
+    grid-template-columns: auto 1fr;
+    gap: 10px;
+    padding: 10px 15px;
+    border-radius: 20px;
+  }
+  .player-track-info {
+    gap: 10px;
+  }
+  .player-cover {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+  }
+  .player-title {
+    font-size: 0.9rem;
+  }
+  .player-center {
+    align-items: flex-end; /* right align controls */
+  }
+  .player-controls {
     gap: 15px;
+  }
+  .play-pause-btn {
+    width: 40px;
+    height: 40px;
   }
   .progress-row {
     display: none; /* Hide progress bar on very small screens to save space */
+  }
+  .ctrl-btn {
+    display: none; /* hide skip/shuffle to save space, keep only play */
   }
 }

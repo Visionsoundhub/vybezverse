@@ -474,12 +474,22 @@
 /* Responsive adjust for mobile */
 @media (max-width: 480px) {
   .chatbot-widget-container {
-    bottom: 20px;
-    right: 20px;
+    bottom: 90px; /* higher than audio player */
+    right: 15px;
+  }
+  .chat-toggle-btn {
+    width: 50px;
+    height: 50px;
   }
   .chat-window-wrapper {
-    width: calc(100vw - 40px);
-    height: calc(100vh - 120px);
-    max-height: 520px;
+    width: calc(100vw - 30px);
+    height: calc(100vh - 180px);
+    max-height: 450px;
+    bottom: 60px; /* space from toggle btn */
+  }
+  .chat-tooltip {
+    bottom: 60px;
+    width: 250px;
+    padding: 10px 12px;
   }
 }

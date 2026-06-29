@@ -178,7 +178,7 @@ function Home() {
         <div className="hero-content-wrapper">
           
           {/* LAYOUT PLACEHOLDER: Keeps the layout stable */}
-          <div style={{ width: 'min(90vw, 400px)', height: 'min(90vw, 400px)', marginBottom: 'clamp(-50px, -10vw, -100px)', marginTop: 'clamp(-20vh, -10vh, 0px)', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 0 }}>
+          <div style={{ width: 'min(90vw, 400px)', height: 'min(90vw, 400px)', marginBottom: 'clamp(-20px, -5vw, -80px)', marginTop: 'clamp(10px, 2vh, 40px)', position: 'relative', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 0 }}>
             
             <motion.div 
               style={{ 
@@ -259,7 +259,7 @@ function Home() {
             transition={{ duration: 0.8 }}
             style={{ width: '100%', maxWidth: '400px', aspectRatio: '1/1', borderRadius: '24px', background: 'radial-gradient(circle, #2a0845 0%, #050508 100%)', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid var(--glass-border)', boxShadow: '0 20px 50px rgba(0,0,0,0.5)' }}
           >
-            <span style={{ color: '#ffcc00', fontFamily: 'Brush Script MT, cursive', fontSize: '3.5rem' }}>Jazz Bar</span>
+            <span style={{ color: '#ffcc00', fontFamily: 'Brush Script MT, cursive', fontSize: 'clamp(2rem, 8vw, 3.5rem)' }}>Jazz Bar</span>
           </motion.div>
 
           <motion.div 
@@ -270,7 +270,7 @@ function Home() {
             style={{ maxWidth: '400px' }}
           >
             <span style={{ display: 'inline-block', background: 'var(--accent-magenta)', color: '#fff', padding: '4px 12px', borderRadius: '100px', fontSize: '0.8rem', fontWeight: '800', marginBottom: '16px' }}>LATEST DROP</span>
-            <h2 style={{ fontSize: '3.5rem', lineHeight: 1.1, marginBottom: '16px' }}>Jazz Bar των τεράτων</h2>
+            <h2 style={{ fontSize: 'clamp(2rem, 8vw, 3.5rem)', lineHeight: 1.1, marginBottom: '16px' }}>Jazz Bar των τεράτων</h2>
             <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)', marginBottom: '32px' }}>
               Το απόλυτο single από τη σειρά Vintage Freq. Συντονίσου.
             </p>
@@ -314,10 +314,10 @@ function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-100px" }}
             transition={{ duration: 0.8 }}
-            style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}
+            style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px', gap: '16px' }}
           >
             <div>
-              <h2 style={{ fontSize: '3rem', color: 'var(--accent-violet)', display: 'flex', alignItems: 'center', gap: '16px' }}><Disc3 size={40} /> NEW BEATS</h2>
+              <h2 style={{ fontSize: 'clamp(2rem, 6vw, 3rem)', color: 'var(--accent-violet)', display: 'flex', alignItems: 'center', gap: '16px' }}><Disc3 size={40} /> NEW BEATS</h2>
               <p style={{ color: 'var(--text-secondary)' }}>Φρέσκα instrumentals έτοιμα για vocals.</p>
             </div>
             <Link to="/beats" style={{ color: 'var(--accent-magenta)', textDecoration: 'none', fontWeight: '800' }}>GO TO BEATSTORE →</Link>
@@ -356,15 +356,15 @@ function Home() {
 
       {/* 6. LIVE SHOWS */}
       <StickySection id="live" bg="var(--bg-secondary)" zIndex={6}>
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.9 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.8 }}
-          style={{ textAlign: 'center', padding: '60px', border: '1px dashed var(--accent-magenta)', borderRadius: '24px', background: 'rgba(255,0,127,0.02)', maxWidth: '600px', margin: '0 auto' }}
-        >
-          <Ticket size={48} color="var(--accent-magenta)" style={{ marginBottom: '24px' }} />
-          <h2 style={{ fontSize: '3rem', marginBottom: '16px' }}>LIVE SHOWS</h2>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-100px" }}
+            transition={{ duration: 0.8 }}
+            style={{ textAlign: 'center', padding: 'clamp(30px, 6vw, 60px)', border: '1px dashed var(--accent-magenta)', borderRadius: '24px', background: 'rgba(255,0,127,0.02)', maxWidth: '600px', margin: '0 auto' }}
+          >
+            <Ticket size={48} color="var(--accent-magenta)" style={{ marginBottom: '24px' }} />
+            <h2 style={{ fontSize: 'clamp(2rem, 8vw, 3rem)', marginBottom: '16px' }}>LIVE SHOWS</h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '1.2rem', marginBottom: '32px' }}>
             Η σκηνή ετοιμάζεται. Οι επόμενες ζωντανές εμφανίσεις θα ανακοινωθούν σύντομα.
           </p>
