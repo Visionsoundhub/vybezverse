@@ -61,17 +61,17 @@ const AudioPlayer = () => {
       const y = (height - h) / 2;
 
       const barPercent = (i / totalBars) * 100;
-      let fillColor = 'rgba(255, 255, 255, 0.15)'; // Default unplayed bar
+      let fillColor = 'rgba(236, 227, 208, 0.16)'; // Default unplayed bar (warm bone dim)
 
       if (barPercent <= currentPercent) {
-        // Played section: Glowing Linear Gradient
+        // Played section: warm ochre -> vermilion gradient
         const grad = ctx.createLinearGradient(0, y, 0, y + h);
-        grad.addColorStop(0, '#ff1493'); // Neon Pink
-        grad.addColorStop(1, '#bc74f5'); // Neon Purple
+        grad.addColorStop(0, '#E0902F'); // Ochre
+        grad.addColorStop(1, '#E24A26'); // Vermilion
         fillColor = grad;
       } else if (hoverPercent !== null && barPercent <= hoverPercent) {
         // Preview seek section on mouse hover
-        fillColor = 'rgba(255, 20, 147, 0.45)';
+        fillColor = 'rgba(224, 144, 47, 0.45)';
       }
 
       ctx.fillStyle = fillColor;

@@ -42,6 +42,7 @@ const Navbar = () => {
               <div className="dropdown-menu">
                 <div className="dropdown-menu-inner">
                   <NavLink to="/bio" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>BIO</NavLink>
+                  <NavLink to="/blog" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>BLOG</NavLink>
                   <NavLink to="/links" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>LINKS</NavLink>
                   <NavLink to="/podcasts" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>PODCASTS</NavLink>
                   <NavLink to="/press" className="dropdown-item" onClick={() => { setMoreOpen(false); setMobileOpen(false); }}>PRESS</NavLink>

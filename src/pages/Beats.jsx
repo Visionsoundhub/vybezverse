@@ -58,13 +58,13 @@ function Beats() {
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.8, ease: "easeOut" }}
         style={{ 
-          background: 'radial-gradient(ellipse at center, rgba(112,0,255,0.4) 0%, rgba(20,0,40,0.8) 60%, rgba(5,5,10,1) 100%)',
-          borderRadius: '30px',
+          background: 'radial-gradient(ellipse at center, rgba(224,144,47,0.22) 0%, rgba(124,43,37,0.28) 55%, var(--bg) 100%)',
+          borderRadius: 'var(--radius)',
           padding: '80px 40px',
           textAlign: 'center',
           marginBottom: '40px',
-          border: '1px solid rgba(112,0,255,0.2)',
-          boxShadow: '0 20px 60px rgba(112,0,255,0.1)'
+          border: '1px solid var(--border-strong)',
+          boxShadow: 'var(--shadow-print)'
         }}
       >
         <h1 style={{ fontSize: 'clamp(3rem, 6vw, 5rem)', fontWeight: '900', letterSpacing: '-1px', margin: '0', lineHeight: 1.1 }}>
@@ -316,7 +316,7 @@ function Beats() {
         
         {/* Showcase License */}
         <div className="glass-card" style={{ padding: '40px', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ width: '50px', height: '50px', background: 'rgba(112,0,255,0.1)', borderRadius: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', color: 'var(--accent-violet)' }}>
+          <div style={{ width: '50px', height: '50px', background: 'rgba(224,144,47,0.12)', borderRadius: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', color: 'var(--accent)' }}>
             <Music size={24} />
           </div>
           <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px' }}>SHOWCASE LICENSE (MP3)</h3>
