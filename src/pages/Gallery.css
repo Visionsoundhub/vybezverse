@@ -1,46 +1,63 @@
-.gallery-page {
-  padding-top: 60px;
-  padding-bottom: 120px;
-  display: flex;
-  flex-direction: column;
-  gap: 40px;
+.gal { padding-top: clamp(120px, 16vh, 180px); padding-bottom: 60px; min-height: 100vh; }
+
+.gal-hero { margin-bottom: clamp(40px, 6vh, 70px); }
+.gal-eyebrow {
+  font-family: var(--font-mono);
+  font-size: .82rem;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin-bottom: 14px;
+}
+.gal-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -.03em;
+  line-height: .9;
+  font-size: clamp(3rem, 11vw, 7rem);
+  margin: 0;
+  color: var(--text);
 }
 
-.gallery-grid {
+.gal-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 30px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 22px;
 }
 
-.gallery-item {
-  padding: 15px;
-  border-radius: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-.gallery-img-wrapper {
-  width: 100%;
-  aspect-ratio: 16/10;
-  border-radius: 12px;
+.gal-item { margin: 0; }
+.gal-frame {
+  position: relative;
+  height: 260px;
+  border-radius: var(--radius);
   overflow: hidden;
+  background: var(--ink-800);
+  border: 1px solid var(--border);
+  box-shadow: 4px 4px 0 var(--oxblood);
+  transition: transform .2s ease, box-shadow .2s ease;
 }
-
-.gallery-img-wrapper img {
+.gal-frame img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: transform 0.4s;
+  transition: transform .5s ease;
 }
-
-.gallery-item:hover .gallery-img-wrapper img {
-  transform: scale(1.05);
+.gal-item:hover .gal-frame {
+  transform: translate(-2px, -2px);
+  box-shadow: 6px 6px 0 var(--oxblood);
 }
+.gal-item:hover .gal-frame img { transform: scale(1.05); }
 
-.gallery-caption {
+.gal-cap {
+  margin-top: 12px;
+  font-family: var(--font-mono);
+  font-size: .8rem;
+  letter-spacing: .04em;
+  color: var(--text-dim);
   text-align: center;
-  color: #ccc;
-  font-weight: 600;
-  letter-spacing: 1px;
+}
+
+@media (max-width: 480px) {
+  .gal-grid { grid-template-columns: 1fr; }
+  .gal-frame { height: 300px; }
 }

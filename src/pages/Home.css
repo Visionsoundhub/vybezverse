@@ -34,7 +34,8 @@
 /* ---------- HERO ---------- */
 .hm-hero { padding-top: clamp(90px, 15vh, 170px); }
 .hm-hero-top { font-family: var(--font-mono); font-size: .82rem; letter-spacing: .18em;
-  text-transform: uppercase; color: var(--text-dim); margin-bottom: 26px; }
+  text-transform: uppercase; color: var(--text-dim); margin-bottom: 26px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
 .hm-hero-top b { color: var(--accent); font-weight: 700; }
 .hm-title { font-family: var(--font-display); font-weight: 800; line-height: .86;
   letter-spacing: -.03em; font-size: clamp(3.4rem, 15vw, 12rem); margin: 0; }

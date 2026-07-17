@@ -6,6 +6,7 @@ import beatsDataRaw from '../data/beats.json';
 import homeData from '../data/home.json';
 import genresData from '../data/genres.json';
 import { AudioContext } from '../context/AudioContext';
+import HeroAccount from '../components/HeroAccount';
 import './Home.css';
 
 const sectionsList = [
@@ -75,7 +76,10 @@ function Home() {
 
         {/* HERO */}
         <section id="hero" ref={set('hero')} className="hm-section hm-hero">
-          <div className="hm-hero-top">Flowless Music &nbsp;·&nbsp; Producer &nbsp;·&nbsp; <b>Larisa → ∞</b></div>
+          <div className="hm-hero-top">
+            <span>Flowless Music &nbsp;·&nbsp; Producer &nbsp;·&nbsp; <b>Larisa → ∞</b></span>
+            <HeroAccount />
+          </div>
           <Reveal>
             <h1 className="hm-title">
               <span className="l1">{homeData.heroLine1 || 'BLACK VYBEZ'}</span>

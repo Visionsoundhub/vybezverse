@@ -30,7 +30,7 @@ export const generatePDFLicense = (userName, trackTitle, licenseType) => {
     4. The Producer retains all underlying copyright and ownership of the original composition.
     5. The Licensee must credit "Prod. by Black Vybez" in all releases.
     
-    By completing the purchase on Payhip, the Licensee agrees to all terms associated 
+    By completing the purchase on Lemon Squeezy, the Licensee agrees to all terms associated
     with the ${licenseType} tier as described on the VybezVerse official store.
     
     Authorized by: Black Vybez (VybezMadeThis)

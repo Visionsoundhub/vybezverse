@@ -7,6 +7,7 @@ import AudioPlayer from './components/AudioPlayer';
 import LicenseModal from './components/LicenseModal';
 import ChatbotWidget from './components/ChatbotWidget';
 import Navbar from './components/Navbar';
+import Footer from './components/Footer';
 import Home from './pages/Home';
 import Beats from './pages/Beats';
 import Store from './pages/Store';
@@ -46,6 +47,8 @@ function AppContent() {
           <Route path="/blog/:slug" element={<BlogPost />} />
         </Routes>
       </main>
+
+      {!isLinksPage && <Footer />}
 
       <AudioPlayer />
       <LicenseModal />

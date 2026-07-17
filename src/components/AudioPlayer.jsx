@@ -1,7 +1,10 @@
 import React, { useContext, useState, useRef, useEffect } from 'react';
 import { AudioContext } from '../context/AudioContext';
 import { Play, Pause, SkipBack, SkipForward, Volume2, Repeat, Shuffle } from 'lucide-react';
+import beatsDataRaw from '../data/beats.json';
 import './AudioPlayer.css';
+
+const STORE_ACTIVE = beatsDataRaw.storeActive !== false;
 
 const AudioPlayer = () => {
   const { 
@@ -163,10 +166,12 @@ const AudioPlayer = () => {
             />
           </div>
           
-          <div className="player-actions">
-            <button className="btn-player-outline" onClick={() => openLicenseModal(currentTrack)}>LICENSING</button>
-            <a href={currentTrack.checkoutUrl} target="_blank" rel="noreferrer" className="btn-player-solid">BUY NOW</a>
-          </div>
+          {STORE_ACTIVE && currentTrack.checkoutUrl && (
+            <div className="player-actions">
+              <button className="btn-player-outline" onClick={() => openLicenseModal(currentTrack)}>LICENSING</button>
+              <a href={currentTrack.checkoutUrl} target="_blank" rel="noreferrer" className="btn-player-solid">BUY NOW</a>
+            </div>
+          )}
         </div>
 
       </div>

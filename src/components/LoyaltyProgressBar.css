@@ -1,10 +1,9 @@
 .loyalty-container {
   padding: 24px;
-  border-radius: 16px;
-  background: rgba(20, 15, 30, 0.5);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-  margin-bottom: 30px;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  margin-bottom: 24px;
   width: 100%;
 }
 
@@ -14,9 +13,9 @@
 }
 
 @keyframes pulse {
-  0% { background: rgba(255, 255, 255, 0.02); }
-  50% { background: rgba(255, 255, 255, 0.05); }
-  100% { background: rgba(255, 255, 255, 0.02); }
+  0% { background: var(--surface); }
+  50% { background: var(--bg-2); }
+  100% { background: var(--surface); }
 }
 
 .loyalty-header {
@@ -34,91 +33,62 @@
 
 .tier-badge h3 {
   margin: 0;
-  font-size: 1.3rem;
-  background: linear-gradient(135deg, #fff, #bbb);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  font-size: 1.2rem;
+  color: var(--text);
 }
 
 .tier-badge p {
   margin: 5px 0 0 0;
   font-size: 0.9rem;
-  color: var(--color-accent-purple);
+  color: var(--accent);
   font-weight: 700;
 }
 
 .loyalty-status {
-  font-size: 0.95rem;
-  color: #ccc;
+  font-size: 0.9rem;
+  color: var(--text-dim);
   text-align: right;
+  font-family: var(--font-main);
 }
 
 .loyalty-status strong {
-  color: #fff;
+  color: var(--text);
 }
 
 .gold-status {
-  color: #ffd700;
-  font-weight: bold;
+  color: var(--ochre-hi);
+  font-weight: 700;
 }
 
 .progress-track {
   width: 100%;
-  height: 14px;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 20px;
+  height: 12px;
+  background: var(--bg-2);
+  border-radius: var(--radius-sm);
   overflow: hidden;
   position: relative;
-  box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+  border: 1px solid var(--border);
 }
 
 .progress-fill {
   height: 100%;
-  border-radius: 20px;
+  border-radius: var(--radius-sm);
   transition: width 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
   position: relative;
+  background: var(--gradient-primary);
 }
 
-/* Colors for tiers */
-.progress-fill.bronze {
-  background: linear-gradient(90deg, #cd7f32, #f5d061);
-  box-shadow: 0 0 15px rgba(205, 127, 50, 0.6);
-}
-
-.progress-fill.silver {
-  background: linear-gradient(90deg, #888, #e0e0e0);
-  box-shadow: 0 0 15px rgba(192, 192, 192, 0.6);
-}
-
-.progress-fill.gold {
-  background: linear-gradient(90deg, #ff8c00, #ffd700);
-  box-shadow: 0 0 20px rgba(255, 215, 0, 0.8);
-}
-
-/* Glowing shimmer effect */
-.progress-fill::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-  animation: progress-shimmer 2s infinite linear;
-}
-
-@keyframes progress-shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
-}
+.progress-fill.bronze { background: linear-gradient(90deg, var(--oxblood), var(--ochre)); }
+.progress-fill.silver { background: linear-gradient(90deg, var(--text-dim), var(--bone-100)); }
+.progress-fill.gold { background: linear-gradient(90deg, var(--ochre), var(--vermilion)); }
 
 .progress-labels {
   display: flex;
   justify-content: space-between;
   margin-top: 10px;
-  font-size: 0.8rem;
-  color: #888;
-  font-weight: 700;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  font-family: var(--font-mono);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -141,9 +111,9 @@
 }
 
 .btn-info {
-  background: rgba(255, 255, 255, 0.1);
-  border: none;
-  color: #ccc;
+  background: var(--bg-2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
   border-radius: 50%;
   width: 24px;
   height: 24px;
@@ -156,9 +126,8 @@
 }
 
 .btn-info:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-  transform: scale(1.1);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .loyalty-info-modal-overlay {
@@ -167,8 +136,8 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(5px);
+  background: rgba(22, 17, 15, 0.7);
+  backdrop-filter: blur(4px);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -177,20 +146,14 @@
 }
 
 .loyalty-info-modal {
-  background: rgba(20, 15, 30, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-print);
   padding: 30px;
   max-width: 500px;
   width: 100%;
   position: relative;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-  animation: modal-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-}
-
-@keyframes modal-pop {
-  0% { transform: scale(0.9); opacity: 0; }
-  100% { transform: scale(1); opacity: 1; }
 }
 
 .btn-close-modal {
@@ -199,24 +162,24 @@
   right: 15px;
   background: transparent;
   border: none;
-  color: #aaa;
+  color: var(--text-dim);
   cursor: pointer;
   transition: color 0.2s ease;
 }
 
 .btn-close-modal:hover {
-  color: #fff;
+  color: var(--text);
 }
 
 .loyalty-info-modal h4 {
   margin-top: 0;
   margin-bottom: 15px;
-  font-size: 1.4rem;
-  color: #fff;
+  font-size: 1.3rem;
+  color: var(--text);
 }
 
 .loyalty-info-modal p {
-  color: #ccc;
+  color: var(--text-dim);
   line-height: 1.5;
   margin-bottom: 15px;
 }
@@ -229,17 +192,17 @@
 
 .loyalty-info-modal li {
   padding: 8px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  color: #ddd;
+  border-bottom: 1px solid var(--border);
+  color: var(--text);
 }
 
 .loyalty-info-modal li strong {
-  color: var(--color-accent-purple);
+  color: var(--accent);
 }
 
 .loyalty-info-modal .note {
   font-size: 0.85rem;
-  color: #888;
+  color: var(--text-dim);
   font-style: italic;
   margin-bottom: 0;
 }

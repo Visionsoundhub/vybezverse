@@ -1,130 +1,243 @@
-import React from 'react';
-import { User, LogOut, Disc, Music, Settings, Ticket, Crown, Mail, Star, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { updateProfile, updatePassword } from 'firebase/auth';
+import { useNavigate } from 'react-router-dom';
+import { LogOut, Ticket, Music, AlertCircle, ShoppingBag } from 'lucide-react';
+import { doc, getDoc } from 'firebase/firestore';
+import { db } from '../firebase';
+import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
+import './Account.css';
 
 function Account() {
-  return (
-    <div style={{ paddingTop: '140px', paddingBottom: '100px', minHeight: '100vh', background: 'radial-gradient(ellipse at top, #110022 0%, #050508 60%)' }}>
-      <div className="container" style={{ maxWidth: '1000px' }}>
-        
-        {/* Dashboard Header */}
-        <motion.div 
-          initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
-          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '40px' }}
-        >
-          <div>
-            <h1 style={{ fontSize: '3rem', fontWeight: '900', letterSpacing: '-1px', marginBottom: '8px' }}>MY DASHBOARD</h1>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '1.1rem' }}>Welcome back, <strong style={{ color: 'white' }}>VYBEZ</strong></p>
-          </div>
-          <button className="btn-outline" style={{ display: 'flex', gap: '8px', alignItems: 'center', borderColor: 'rgba(255,255,255,0.1)', color: 'white', padding: '12px 24px', cursor: 'pointer' }}>
-            <LogOut size={16} /> LOGOUT
+  const { currentUser, logout, login, signup, loginWithGoogle } = useAuth();
+  const navigate = useNavigate();
+  const [userData, setUserData] = useState(null);
+  const [discountCode, setDiscountCode] = useState(null);
+
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const [newUsername, setNewUsername] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [updateMessage, setUpdateMessage] = useState('');
+  const [updateError, setUpdateError] = useState('');
+
+  useEffect(() => {
+    if (!currentUser) return;
+
+    const fetchAccountData = async () => {
+      try {
+        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
+        if (userDoc.exists()) {
+          setUserData(userDoc.data());
+        }
+
+        const discountDoc = await getDoc(doc(db, 'global_settings', 'discounts'));
+        if (discountDoc.exists() && discountDoc.data().activeCode) {
+          setDiscountCode(discountDoc.data().activeCode);
+        } else {
+          setDiscountCode('VYBEZ2026');
+        }
+      } catch (e) {
+        console.error('Error fetching account data', e);
+      }
+    };
+
+    fetchAccountData();
+  }, [currentUser]);
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      navigate('/');
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
+  const handleAuthSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      if (isLogin) {
+        await login(email, password);
+      } else {
+        await signup(email, password, name);
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Υπήρξε ένα πρόβλημα. Προσπάθησε ξανά.');
+    }
+    setLoading(false);
+  };
+
+  const handleGoogleAuth = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+    } catch (err) {
+      console.error(err);
+      setError('Το Google Login απέτυχε. Προσπάθησε ξανά.');
+    }
+    setLoading(false);
+  };
+
+  const handleUpdateProfile = async (e) => {
+    e.preventDefault();
+    setUpdateMessage('');
+    setUpdateError('');
+    try {
+      if (newUsername) {
+        await updateProfile(currentUser, { displayName: newUsername });
+      }
+      if (newPassword) {
+        await updatePassword(currentUser, newPassword);
+      }
+      setUpdateMessage('Το προφίλ ενημερώθηκε επιτυχώς!');
+      setNewUsername('');
+      setNewPassword('');
+    } catch (err) {
+      console.error(err);
+      setUpdateError('Σφάλμα: ' + err.message);
+    }
+  };
+
+  const beats = userData?.purchases?.filter(p => p.licenseType?.toLowerCase().includes('lease') || p.licenseType?.toLowerCase().includes('exclusive')) || [];
+  const songs = userData?.purchases?.filter(p => !p.licenseType?.toLowerCase().includes('lease') && !p.licenseType?.toLowerCase().includes('exclusive') && p.licenseType) || [];
+
+  if (!currentUser) {
+    return (
+      <div className="account-page container">
+        <div className="account-auth-box">
+          <h2>{isLogin ? 'ΚΑΛΩΣ ΗΡΘΕΣ ΠΙΣΩ' : 'ΓΙΝΕ ΜΕΛΟΣ'}</h2>
+          <p className="account-auth-sub">
+            {isLogin ? 'Συνδέσου στο λογαριασμό σου.' : 'Δημιούργησε λογαριασμό για να έχεις τα beats σου σε ένα μέρος.'}
+          </p>
+
+          {error && <div className="account-alert account-alert-error">{error}</div>}
+
+          <button onClick={handleGoogleAuth} disabled={loading} type="button" className="account-google-btn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" width="18" />
+            Συνέχεια με Google
           </button>
-        </motion.div>
 
-        {/* Top Section: Membership & Avatar */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '24px', marginBottom: '24px' }}>
-          
-          {/* Profile Card */}
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.1 }} className="glass-card" style={{ padding: '32px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', textAlign: 'center' }}>
-            <div style={{ width: '80px', height: '80px', borderRadius: '50%', background: 'var(--gradient-primary)', display: 'flex', justifyContent: 'center', alignItems: 'center', fontSize: '2.5rem', fontWeight: '900', marginBottom: '16px', boxShadow: '0 10px 20px rgba(255,0,127,0.3)', textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
-              V
-            </div>
-            <h3 style={{ fontSize: '1.4rem', fontWeight: '800', marginBottom: '4px' }}>Vybez</h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-secondary)', fontSize: '0.9rem' }}>
-              <Mail size={14} /> blackvybez.official@gmail.com
-            </div>
-          </motion.div>
+          <div className="account-divider"><span /> ή με Email <span /></div>
 
-          {/* Membership Tier */}
-          <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }} className="glass-card" style={{ padding: '40px 32px', position: 'relative', overflow: 'hidden' }}>
-            {/* Glowing background */}
-            <div style={{ position: 'absolute', right: '-50px', top: '-50px', width: '200px', height: '200px', background: 'var(--accent-magenta)', filter: 'blur(80px)', opacity: 0.15, borderRadius: '50%' }}></div>
-            
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px', position: 'relative', zIndex: 1 }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
-                  <Star fill="var(--text-secondary)" color="var(--text-secondary)" size={20} />
-                  <span style={{ fontSize: '1rem', color: 'var(--text-secondary)', fontWeight: '800', letterSpacing: '2px', textTransform: 'uppercase' }}>Current Tier</span>
-                </div>
-                <h2 style={{ fontSize: '2.8rem', fontWeight: '900', color: 'white', display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  STARTER <span style={{ fontSize: '1.1rem', background: 'rgba(255,255,255,0.1)', padding: '6px 16px', borderRadius: '100px', fontWeight: '800', color: 'white' }}>0% OFF</span>
-                </h2>
-              </div>
-              <Crown size={50} color="var(--accent-magenta)" opacity={0.3} />
-            </div>
+          <form onSubmit={handleAuthSubmit} className="account-form">
+            {!isLogin && (
+              <input type="text" placeholder="Όνομα Καλλιτέχνη" value={name} onChange={e => setName(e.target.value)} required />
+            )}
+            <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+            <input type="password" placeholder="Κωδικός" value={password} onChange={e => setPassword(e.target.value)} required minLength="6" />
+            <button type="submit" disabled={loading} className="btn-primary">
+              {loading ? 'Φόρτωση...' : (isLogin ? 'LOGIN' : 'SIGN UP')}
+            </button>
+          </form>
 
-            <div style={{ position: 'relative', zIndex: 1 }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '12px', fontSize: '1rem' }}>
-                <span style={{ color: 'var(--text-secondary)' }}>Buy <strong>3 more beats</strong> to unlock BRONZE</span>
-                <span style={{ color: 'var(--accent-magenta)', fontWeight: '900', letterSpacing: '1px' }}>BRONZE (10% OFF)</span>
-              </div>
-              <div style={{ width: '100%', height: '14px', background: 'rgba(255,255,255,0.05)', borderRadius: '100px', overflow: 'hidden', border: '1px solid rgba(255,255,255,0.1)' }}>
-                 <motion.div initial={{ width: 0 }} animate={{ width: '25%' }} transition={{ duration: 1.5, ease: "easeOut", delay: 0.5 }} style={{ height: '100%', background: 'var(--gradient-primary)', borderRadius: '100px', boxShadow: '0 0 10px rgba(255,0,127,0.5)' }}></motion.div>
-              </div>
-            </div>
-          </motion.div>
+          <p className="account-toggle">
+            {isLogin ? 'Δεν έχεις λογαριασμό; ' : 'Έχεις ήδη λογαριασμό; '}
+            <span onClick={() => setIsLogin(!isLogin)}>{isLogin ? 'Sign Up' : 'Login'}</span>
+          </p>
         </div>
+      </div>
+    );
+  }
 
-        {/* Dashboard Grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-          
-          {/* VIP Code */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="glass-card" style={{ padding: '32px', display: 'flex', flexDirection: 'column' }}>
-            <h3 style={{ fontSize: '1.2rem', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--accent-magenta)', fontWeight: '900' }}><Ticket size={20} /> VIP DISCOUNT CODE</h3>
-            <div style={{ background: 'rgba(255,0,127,0.05)', border: '2px dashed rgba(255,0,127,0.3)', padding: '40px 24px', borderRadius: '16px', textAlign: 'center', position: 'relative', flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-              <p style={{ marginBottom: '24px', color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: 1.5 }}>Use this secret code at the Payhip checkout to claim your tier discount.</p>
-              <h2 style={{ fontSize: '3.5rem', color: 'white', letterSpacing: '6px', fontWeight: '900', textShadow: '0 0 30px rgba(255,0,127,0.4)', margin: 0 }}>VYBEZ26</h2>
-            </div>
-          </motion.div>
+  return (
+    <div className="account-page container">
+      <div className="account-header">
+        <div className="account-profile">
+          <div className="account-avatar">
+            {currentUser.displayName ? currentUser.displayName.charAt(0).toUpperCase() : 'V'}
+          </div>
+          <div>
+            <h1>Καλωσόρισες, {currentUser.displayName || 'Artist'}</h1>
+            <p>{currentUser.email}</p>
+          </div>
+        </div>
+        <button onClick={handleLogout} className="btn-outline account-logout-btn">
+          <LogOut size={16} /> Logout
+        </button>
+      </div>
 
-          {/* Collection Column */}
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            
-            {/* My Beats */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} className="glass-card" style={{ padding: '24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.2)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <Disc size={28} color="var(--accent-violet)" />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '1.3rem', fontWeight: '900', marginBottom: '4px' }}>My Beats</h3>
-                  <span style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>0 tracks purchased</span>
-                </div>
-              </div>
-              <ChevronRight color="var(--text-secondary)" />
-            </motion.div>
+      <LoyaltyProgressBar />
 
-            {/* My Songs */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="glass-card" style={{ padding: '24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.2)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <Music size={28} color="#cd7f32" />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '1.3rem', fontWeight: '900', marginBottom: '4px' }}>My Releases</h3>
-                  <span style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>0 items purchased</span>
-                </div>
-              </div>
-              <ChevronRight color="var(--text-secondary)" />
-            </motion.div>
-
-            {/* Settings */}
-            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }} className="glass-card" style={{ padding: '24px 32px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }} whileHover={{ backgroundColor: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.2)' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
-                <div style={{ width: '56px', height: '56px', borderRadius: '16px', background: 'rgba(255,255,255,0.05)', display: 'flex', justifyContent: 'center', alignItems: 'center', border: '1px solid rgba(255,255,255,0.1)' }}>
-                  <Settings size={28} color="var(--text-secondary)" />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '1.3rem', fontWeight: '900', marginBottom: '4px' }}>Account Settings</h3>
-                  <span style={{ color: 'var(--text-secondary)', fontSize: '1rem' }}>Password, email, preferences</span>
-                </div>
-              </div>
-              <ChevronRight color="var(--text-secondary)" />
-            </motion.div>
-
+      <div className="account-grid">
+        <div className="account-card">
+          <div className="account-card-header">
+            <Ticket size={20} color="var(--accent)" />
+            <h2>VIP Έκπτωση</h2>
+          </div>
+          <div className="account-discount-banner">
+            <p>Χρησιμοποίησε τον παρακάτω κωδικό στο ταμείο για την έκπτωσή σου.</p>
+            <div className="account-discount-code">{discountCode}</div>
           </div>
         </div>
 
+        <div className="account-card">
+          <div className="account-card-header">
+            <Music size={20} color="var(--accent)" />
+            <h2>Τα Beats μου</h2>
+          </div>
+          {beats.length > 0 ? (
+            <ul className="account-purchases-list">
+              {beats.map((purchase, idx) => (
+                <li key={idx}>
+                  <span><Music size={16} /> {purchase.trackTitle}</span>
+                  <span className="account-purchase-type">{purchase.licenseType}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="account-empty-state">
+              <AlertCircle size={36} opacity={0.5} />
+              <p>Δεν έχεις αγοράσει Instrumentals ακόμα.</p>
+            </div>
+          )}
+        </div>
+
+        <div className="account-card">
+          <div className="account-card-header">
+            <ShoppingBag size={20} color="var(--accent)" />
+            <h2>Τα Songs μου</h2>
+          </div>
+          {songs.length > 0 ? (
+            <ul className="account-purchases-list">
+              {songs.map((purchase, idx) => (
+                <li key={idx}>
+                  <span><ShoppingBag size={16} /> {purchase.trackTitle}</span>
+                  <span className="account-purchase-type">{purchase.licenseType}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="account-empty-state">
+              <AlertCircle size={36} opacity={0.5} />
+              <p>Δεν έχεις αγοράσει Songs ακόμα.</p>
+            </div>
+          )}
+        </div>
+
+        <div className="account-card">
+          <div className="account-card-header">
+            <Ticket size={20} color="var(--accent)" />
+            <h2>Ενημέρωση Προφίλ</h2>
+          </div>
+          <form onSubmit={handleUpdateProfile} className="account-form account-form-inline">
+            {updateMessage && <div className="account-alert account-alert-success">{updateMessage}</div>}
+            {updateError && <div className="account-alert account-alert-error">{updateError}</div>}
+
+            <input type="text" placeholder="Νέο Username" value={newUsername} onChange={e => setNewUsername(e.target.value)} />
+            <input type="password" placeholder="Νέος Κωδικός" value={newPassword} onChange={e => setNewPassword(e.target.value)} minLength="6" />
+            <button type="submit" className="btn-primary">ΑΠΟΘΗΚΕΥΣΗ</button>
+          </form>
+        </div>
       </div>
     </div>
   );

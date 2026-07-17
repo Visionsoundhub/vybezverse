@@ -13,6 +13,11 @@ function Beats() {
 
   const genres = ['All', 'Trap', 'Drill', 'Boombap', 'R&B', 'Synthwave', 'Pop'];
 
+  // Beatstore live? Until the Lemon Squeezy products are ready, keep it in "coming soon"
+  // (storeActive:false in beats.json) so no untested checkout is exposed. Audio preview stays on.
+  const storeActive = beatsDataRaw.storeActive !== false;
+  const comingSoonText = beatsDataRaw.comingSoonText || 'Σύντομα διαθέσιμο';
+
   // Real beats from our JSON
   const beatsData = beatsDataRaw.beatslist.map((beat, i) => ({
     id: `real-${i}`,
@@ -117,7 +122,7 @@ function Beats() {
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '20px' }}>
           <button 
             className="btn-outline" 
-            style={{ display: 'flex', gap: '12px', alignItems: 'center', borderColor: 'var(--accent-magenta)', color: 'var(--accent-magenta)', boxShadow: '0 0 15px rgba(255,0,127,0.2)' }}
+            style={{ display: 'flex', gap: '12px', alignItems: 'center', borderColor: 'var(--accent-magenta)', color: 'var(--accent-magenta)', boxShadow: '0 0 15px rgba(224,144,47,0.2)' }}
           >
             <SlidersHorizontal size={18} /> VIBE SEARCH
           </button>
@@ -166,14 +171,14 @@ function Beats() {
                 padding: '10px 24px',
                 borderRadius: '100px',
                 background: selectedGenre === genre ? 'var(--accent-magenta)' : 'rgba(255,255,255,0.05)',
-                color: selectedGenre === genre ? 'white' : 'var(--text-secondary)',
+                color: selectedGenre === genre ? 'var(--ink-900)' : 'var(--text-secondary)',
                 border: selectedGenre === genre ? '1px solid var(--accent-magenta)' : '1px solid rgba(255,255,255,0.1)',
                 fontWeight: '700',
                 fontSize: '0.9rem',
                 cursor: 'pointer',
                 whiteSpace: 'nowrap',
                 transition: 'all 0.3s ease',
-                boxShadow: selectedGenre === genre ? '0 5px 15px rgba(255,0,127,0.3)' : 'none'
+                boxShadow: selectedGenre === genre ? '0 5px 15px rgba(224,144,47,0.3)' : 'none'
               }}
             >
               {genre}
@@ -192,7 +197,7 @@ function Beats() {
         >
           {currentBeats.map((beat, idx) => (
             <div key={idx} className="glass-card" style={{ padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px', transition: 'all 0.3s ease', cursor: 'pointer' }} onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-10px)'; e.currentTarget.style.borderColor = beat.color; e.currentTarget.style.boxShadow = `0 10px 30px ${beat.color}22`; }} onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)'; e.currentTarget.style.boxShadow = 'none'; }}>
-              <div style={{ width: '100%', aspectRatio: '1/1', borderRadius: '16px', background: `radial-gradient(circle, ${beat.color}44 0%, #050508 100%)`, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div style={{ width: '100%', aspectRatio: '1/1', borderRadius: '16px', background: `radial-gradient(circle, ${beat.color}44 0%, var(--ink-900) 100%)`, position: 'relative', overflow: 'hidden', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                  <div onClick={(e) => { e.stopPropagation(); if(beat.isReal) playTrack(beat); }} style={{ width: '60px', height: '60px', borderRadius: '50%', border: `2px solid ${beat.color}`, display: 'flex', justifyContent: 'center', alignItems: 'center', background: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(5px)', transition: 'transform 0.3s ease' }} className="play-btn">
                    {currentTrack?.title === beat.title && isPlaying ? <Pause size={24} color={beat.color} /> : <Play size={24} color={beat.color} style={{ marginLeft: '4px' }} />}
                  </div>
@@ -212,9 +217,13 @@ function Beats() {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '16px' }}>
                   <strong style={{ fontSize: '1.2rem' }}>{beat.price}</strong>
-                  <button onClick={(e) => { e.stopPropagation(); if(beat.isReal) openLicenseModal(beat); }} className="btn-outline" style={{ padding: '8px 16px', fontSize: '0.8rem', display: 'flex', gap: '8px', alignItems: 'center', borderColor: 'rgba(255,255,255,0.2)', transition: 'all 0.3s' }} onMouseEnter={(e) => { e.currentTarget.style.background = beat.color; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = beat.color; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
-                    ADD TO CART <ShoppingCart size={14} />
-                  </button>
+                  {storeActive ? (
+                    <button onClick={(e) => { e.stopPropagation(); if(beat.isReal) openLicenseModal(beat); }} className="btn-outline" style={{ padding: '8px 16px', fontSize: '0.8rem', display: 'flex', gap: '8px', alignItems: 'center', borderColor: 'rgba(255,255,255,0.2)', transition: 'all 0.3s' }} onMouseEnter={(e) => { e.currentTarget.style.background = beat.color; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = beat.color; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
+                      ADD TO CART <ShoppingCart size={14} />
+                    </button>
+                  ) : (
+                    <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--text-dim)', border: '1px dashed var(--border-strong)', borderRadius: 'var(--radius-sm)', padding: '7px 14px' }}>{comingSoonText}</span>
+                  )}
                 </div>
               </div>
             </div>
@@ -231,7 +240,7 @@ function Beats() {
             <div key={idx} className="glass-card list-view-card" style={{ padding: '12px 24px', display: 'flex', alignItems: 'center', gap: '24px', transition: 'all 0.2s ease', cursor: 'pointer' }} onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'} onMouseLeave={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}>
               
               {/* Play Button & Thumb */}
-              <div onClick={(e) => { e.stopPropagation(); if(beat.isReal) playTrack(beat); }} style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '12px', background: beat.isReal && beat.cover ? `url(${beat.cover}) center/cover` : `radial-gradient(circle, ${beat.color}44 0%, #050508 100%)`, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
+              <div onClick={(e) => { e.stopPropagation(); if(beat.isReal) playTrack(beat); }} style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '12px', background: beat.isReal && beat.cover ? `url(${beat.cover}) center/cover` : `radial-gradient(circle, ${beat.color}44 0%, var(--ink-900) 100%)`, display: 'flex', justifyContent: 'center', alignItems: 'center', flexShrink: 0 }}>
                 {currentTrack?.title === beat.title && isPlaying ? <Pause size={20} color={beat.color} /> : <Play size={20} color={beat.color} style={{ marginLeft: '2px' }} />}
               </div>
 
@@ -254,9 +263,13 @@ function Beats() {
               {/* Price & Action */}
               <div style={{ display: 'flex', alignItems: 'center', gap: '24px', flexShrink: 0, minWidth: '140px', justifyContent: 'flex-end' }}>
                 <strong style={{ fontSize: '1.1rem' }}>{beat.price}</strong>
-                <button onClick={(e) => { e.stopPropagation(); if(beat.isReal) openLicenseModal(beat); }} className="btn-outline" style={{ padding: '10px 16px', fontSize: '0.8rem', display: 'flex', gap: '8px', alignItems: 'center', borderColor: 'rgba(255,255,255,0.2)', transition: 'all 0.3s', borderRadius: '100px' }} onMouseEnter={(e) => { e.currentTarget.style.background = beat.color; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = beat.color; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
-                  <ShoppingCart size={16} />
-                </button>
+                {storeActive ? (
+                  <button onClick={(e) => { e.stopPropagation(); if(beat.isReal) openLicenseModal(beat); }} className="btn-outline" style={{ padding: '10px 16px', fontSize: '0.8rem', display: 'flex', gap: '8px', alignItems: 'center', borderColor: 'rgba(255,255,255,0.2)', transition: 'all 0.3s', borderRadius: '100px' }} onMouseEnter={(e) => { e.currentTarget.style.background = beat.color; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = beat.color; }} onMouseLeave={(e) => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'white'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.2)'; }}>
+                    <ShoppingCart size={16} />
+                  </button>
+                ) : (
+                  <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.68rem', letterSpacing: '.08em', textTransform: 'uppercase', color: 'var(--text-dim)', border: '1px dashed var(--border-strong)', borderRadius: '100px', padding: '7px 14px', whiteSpace: 'nowrap' }}>{comingSoonText}</span>
+                )}
               </div>
 
             </div>
@@ -284,7 +297,7 @@ function Beats() {
                   width: '40px', height: '40px',
                   borderRadius: '50%',
                   background: currentPage === idx + 1 ? 'var(--accent-magenta)' : 'transparent',
-                  color: currentPage === idx + 1 ? 'white' : 'var(--text-secondary)',
+                  color: currentPage === idx + 1 ? 'var(--ink-900)' : 'var(--text-secondary)',
                   border: currentPage === idx + 1 ? 'none' : '1px solid rgba(255,255,255,0.1)',
                   cursor: 'pointer',
                   fontWeight: '800',
@@ -332,9 +345,9 @@ function Beats() {
         </div>
 
         {/* Premium License (Highlighted) */}
-        <div className="glass-card" style={{ padding: '40px', display: 'flex', flexDirection: 'column', position: 'relative', border: '2px solid var(--accent-magenta)', boxShadow: '0 0 40px rgba(255,0,127,0.15)', transform: 'scale(1.05)', zIndex: 10 }}>
+        <div className="glass-card" style={{ padding: '40px', display: 'flex', flexDirection: 'column', position: 'relative', border: '2px solid var(--accent-magenta)', boxShadow: '0 0 40px rgba(224,144,47,0.15)', transform: 'scale(1.05)', zIndex: 10 }}>
           <div style={{ position: 'absolute', top: '-1px', right: '-1px', background: 'var(--accent-magenta)', color: 'white', padding: '6px 24px', fontSize: '0.7rem', fontWeight: '900', letterSpacing: '1px', borderBottomLeftRadius: '16px', borderTopRightRadius: '14px' }}>BEST VALUE</div>
-          <div style={{ width: '50px', height: '50px', background: 'rgba(255,0,127,0.1)', borderRadius: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', color: 'var(--accent-magenta)' }}>
+          <div style={{ width: '50px', height: '50px', background: 'rgba(224,144,47,0.1)', borderRadius: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', color: 'var(--accent-magenta)' }}>
             <Music size={24} />
           </div>
           <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px' }}>PREMIUM LICENSE (MP3+WAV)</h3>
@@ -381,7 +394,7 @@ function Beats() {
           width: '100%', 
           maxWidth: '800px', 
           borderRadius: '30px',
-          background: 'linear-gradient(145deg, #0a0a0f 0%, #050508 100%)',
+          background: 'linear-gradient(145deg, var(--ink-800) 0%, var(--ink-900) 100%)',
           border: '1px solid rgba(255,255,255,0.05)',
           padding: '60px',
           overflow: 'hidden',
@@ -393,7 +406,7 @@ function Beats() {
           <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', display: 'flex', flexDirection: 'column', gap: '40px' }}>
             
             <div>
-              <span style={{ background: 'rgba(255,0,127,0.1)', color: 'var(--accent-magenta)', padding: '6px 16px', borderRadius: '100px', fontSize: '0.8rem', fontWeight: '800', letterSpacing: '1px', textTransform: 'uppercase' }}>Beatstore Newsletter</span>
+              <span style={{ background: 'rgba(224,144,47,0.1)', color: 'var(--accent-magenta)', padding: '6px 16px', borderRadius: '100px', fontSize: '0.8rem', fontWeight: '800', letterSpacing: '1px', textTransform: 'uppercase' }}>Beatstore Newsletter</span>
               <h3 style={{ fontSize: '2.5rem', fontWeight: '900', marginTop: '24px', marginBottom: '12px' }}>Μείνε Συντονισμένος</h3>
             </div>
 
@@ -409,14 +422,14 @@ function Beats() {
                   style={{ 
                     background: newsletterType === radio.id ? 'var(--accent-magenta)' : 'rgba(255,255,255,0.03)',
                     border: newsletterType === radio.id ? '1px solid var(--accent-magenta)' : '1px solid rgba(255,255,255,0.1)',
-                    color: newsletterType === radio.id ? 'white' : 'var(--text-secondary)',
+                    color: newsletterType === radio.id ? 'var(--ink-900)' : 'var(--text-secondary)',
                     padding: '12px 24px',
                     borderRadius: '100px',
                     fontSize: '0.9rem',
                     fontWeight: '700',
                     cursor: 'pointer',
                     transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                    boxShadow: newsletterType === radio.id ? '0 10px 20px rgba(255,0,127,0.3)' : 'none'
+                    boxShadow: newsletterType === radio.id ? '0 10px 20px rgba(224,144,47,0.3)' : 'none'
                   }}
                 >
                   {radio.label}
@@ -451,7 +464,7 @@ function Beats() {
                   top: '6px',
                   bottom: '6px',
                   background: 'var(--accent-magenta)',
-                  color: 'white',
+                  color: 'var(--ink-900)',
                   border: 'none',
                   borderRadius: '100px',
                   padding: '0 32px',

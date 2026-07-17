@@ -2,23 +2,20 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Play, Music, Disc3, ShoppingBag, ExternalLink } from 'lucide-react';
 
-const BUY = 'https://payhip.com/b/D0xpc';
+// TODO: swap to the per-product Lemon Squeezy checkout once the Jazz Bar bundle is created.
+const BUY = 'https://blackvybez.lemonsqueezy.com';
 const BUNDLE_TIP = 'Στο single παίρνεις: High-Quality audio (MP3/WAV), εναλλακτικές εκδόσεις, ringtone, signed digital artwork, χειρόγραφοι στίχοι με υπογραφή.';
 
 const SPOTIFY = 'https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3';
 const APPLE = 'https://music.apple.com/gr/artist/black-vybez/1510069891';
 const YOUTUBE = 'https://www.youtube.com/@BlackVybezwiththeflow';
 
-// links: per-release streaming URLs (fallback to artist pages until provided)
+// Real releases only. Add new entries here as they drop (per-release streaming URLs).
 const singles = [
   { title: 'Jazz Bar των τεράτων', tag: 'Vintage Freq', type: 'Single', apple: 'https://music.apple.com/us/album/jazz-bar-ton-teraton-single/1874438406', youtube: 'https://www.youtube.com/watch?v=KNvq3idRHe8', noSpotify: true },
-  { title: 'Neon Nights', tag: 'Dark Synth', type: 'Single' },
-  { title: 'Midnight Drive', tag: 'Trap / Drill', type: 'Single' },
-  { title: 'Lost In Translation', tag: 'R&B / Soul', type: 'Single' },
 ];
 const albums = [
-  { title: 'ΠΑΛΙΡΡΟΙΑ', tag: 'Studio Album', type: 'Album', tracks: 12 },
-  { title: 'The Beat Tape Vol.1', tag: 'Instrumental', type: 'EP', tracks: 5 },
+  { title: 'ΠΑΛΙΡΡΟΙΑ', tag: 'Studio Album', type: 'Album', comingSoon: true },
 ];
 
 function Releases() {
@@ -69,17 +66,23 @@ function Releases() {
                 <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: 700, margin: 0 }}>{item.title}</h3>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '.78rem', color: 'var(--accent)', marginTop: 4 }}>{item.tag}{item.tracks ? ` · ${item.tracks} tracks` : ''}</p>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '.68rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Stream</div>
-                <div style={{ display: 'grid', gridTemplateColumns: item.noSpotify ? '1fr 1fr' : '1fr 1fr 1fr', gap: 6 }}>
-                  {!item.noSpotify && (
-                    <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" title="Spotify"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Spotify"><Play size={15} /></button></a>
-                  )}
-                  <a href={item.apple || APPLE} target="_blank" rel="noreferrer" title="Apple Music"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Apple Music"><Music size={15} /></button></a>
-                  <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" title="YouTube"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="YouTube"><ExternalLink size={15} /></button></a>
+              {item.comingSoon ? (
+                <div style={{ marginTop: 'auto', fontFamily: 'var(--font-mono)', fontSize: '.72rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--text-dim)', border: '1px dashed var(--border-strong)', borderRadius: 'var(--radius-sm)', padding: '12px', textAlign: 'center' }}>
+                  Coming soon
                 </div>
-                <a href={item.buy || BUY} target="_blank" rel="noreferrer"><button className="btn-primary tip" data-tip={BUNDLE_TIP} style={{ width: '100%', padding: '10px' }}><ShoppingBag size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Αγόρασε</button></a>
-              </div>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '.68rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Stream</div>
+                  <div style={{ display: 'grid', gridTemplateColumns: item.noSpotify ? '1fr 1fr' : '1fr 1fr 1fr', gap: 6 }}>
+                    {!item.noSpotify && (
+                      <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" title="Spotify"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Spotify"><Play size={15} /></button></a>
+                    )}
+                    <a href={item.apple || APPLE} target="_blank" rel="noreferrer" title="Apple Music"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Apple Music"><Music size={15} /></button></a>
+                    <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" title="YouTube"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="YouTube"><ExternalLink size={15} /></button></a>
+                  </div>
+                  <a href={item.buy || BUY} target="_blank" rel="noreferrer"><button className="btn-primary tip" data-tip={BUNDLE_TIP} style={{ width: '100%', padding: '10px' }}><ShoppingBag size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Αγόρασε</button></a>
+                </div>
+              )}
             </div>
           ))}
         </motion.div>

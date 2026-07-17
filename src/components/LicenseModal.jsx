@@ -31,7 +31,7 @@ const LicenseModal = () => {
   const handleCheckout = (url, licenseType) => {
     if (!url || url === "#") return;
     if (requireLogin()) {
-      // Open Payhip checkout immediately without generating a client-side PDF
+      // Open Lemon Squeezy checkout immediately without generating a client-side PDF
       window.open(url, '_blank');
       
       // Close the modal
@@ -145,7 +145,7 @@ const LicenseModal = () => {
 
           {/* Footer warning info */}
           <div className="license-modal-footer">
-            <p>All purchases are secured via Payhip. Standard leases are non-exclusive unless purchasing the Exclusive license. For custom contracts or inquiries, contact <a href={`mailto:${contactEmail}`} className="footer-email-link">{contactEmail}</a>.</p>
+            <p>All purchases are secured via Lemon Squeezy. Standard leases are non-exclusive unless purchasing the Exclusive license. For custom contracts or inquiries, contact <a href={`mailto:${contactEmail}`} className="footer-email-link">{contactEmail}</a>.</p>
           </div>
 
         </motion.div>

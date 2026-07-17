@@ -1,21 +1,34 @@
 import React from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import galleryData from '../data/gallery.json';
+import './Gallery.css';
 
 function Gallery() {
-  return (
-    <div className="container" style={{ paddingTop: '120px', paddingBottom: '100px' }}>
-      <div style={{ textAlign: 'center', marginBottom: '80px' }}>
-        <h1 className="text-gradient" style={{ fontSize: '4rem', marginBottom: '16px' }}>GALLERY</h1>
-        <p style={{ fontSize: '1.2rem', color: 'var(--text-secondary)' }}>Visual vibes</p>
-      </div>
+  const reduce = useReducedMotion();
+  const images = galleryData.images || [];
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '24px' }}>
-        {galleryData.images.map((img, idx) => (
-          <div key={idx} className="glass-card" style={{ padding: '16px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <div style={{ width: '100%', height: '250px', borderRadius: '16px', background: `url(${img.src}) center/cover`, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+  return (
+    <div className="gal container">
+      <header className="gal-hero">
+        <div className="gal-eyebrow">Gallery · Visual vibes</div>
+        <h1 className="gal-title">GALLERY</h1>
+      </header>
+
+      <div className="gal-grid">
+        {images.map((img, idx) => (
+          <motion.figure
+            key={idx}
+            className="gal-item"
+            initial={reduce ? false : { opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-40px' }}
+            transition={{ duration: 0.45, delay: reduce ? 0 : (idx % 3) * 0.06 }}
+          >
+            <div className="gal-frame">
+              <img src={img.src} alt={img.caption || ''} loading="lazy" />
             </div>
-            <p style={{ textAlign: 'center', fontWeight: '800' }}>{img.caption}</p>
-          </div>
+            {img.caption && <figcaption className="gal-cap">{img.caption}</figcaption>}
+          </motion.figure>
         ))}
       </div>
     </div>
