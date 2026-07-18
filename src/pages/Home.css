@@ -80,6 +80,7 @@
 .hm-lead { font-size: clamp(1.05rem, 1.5vw, 1.4rem); line-height: 1.55; color: var(--text-dim);
   max-width: 46ch; margin-top: 26px; }
 .hm-mark { color: var(--accent); }
+.hm-mark-tide { color: #A6BBC7; }
 
 .hm-album-art {
   display: block;
@@ -87,8 +88,8 @@
   aspect-ratio: 1;
   margin-top: 40px;
   border-radius: var(--radius);
-  border: 1px solid var(--border-strong);
-  box-shadow: var(--shadow-print);
+  border: 1px solid #0A3547;
+  box-shadow: 3px 3px 0 #03212E;
 }
 .hm-mark-cool { color: #4FB08C; }
 .hm-mark-hot { color: var(--accent-hot); }

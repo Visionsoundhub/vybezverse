@@ -16,10 +16,14 @@ import './SectionBg.css';
  * motion should stay opt-in.
  */
 export default function SectionBg({ src, position = 'center 28%', overlay = true, parallax = false }) {
+  // Non-hero sections sit further down the scroll and don't need to compete
+  // for attention the way the hero does — dim them ~15-20% darker so the
+  // photo reads as a faint backdrop rather than a full visual anchor.
+  const overlayCss = parallax
+    ? 'linear-gradient(180deg, rgba(22,17,15,.90) 0%, rgba(22,17,15,.74) 42%, var(--bg) 96%)'
+    : 'linear-gradient(180deg, rgba(22,17,15,.96) 0%, rgba(22,17,15,.89) 42%, var(--bg) 96%)';
   const style = {
-    backgroundImage: overlay
-      ? `linear-gradient(180deg, rgba(22,17,15,.90) 0%, rgba(22,17,15,.74) 42%, var(--bg) 96%), url(${src})`
-      : `url(${src})`,
+    backgroundImage: overlay ? `${overlayCss}, url(${src})` : `url(${src})`,
     backgroundPosition: position,
   };
   return <div className={`section-bg${parallax ? ' section-bg--parallax' : ''}`} style={style} aria-hidden="true" />;

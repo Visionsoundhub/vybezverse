@@ -126,7 +126,7 @@ function Home() {
           <SectionBg src="/assets/uploads/section-tide.webp" position="center 55%" />
           <div className="hm-eyebrow"><b>02</b> Νέο album / coming soon</div>
           <Reveal>
-            <h2 className="hm-statement"><span className="hm-mark">ΠΑΛΙΡΡΟΙΑ</span></h2>
+            <h2 className="hm-statement"><span className="hm-mark-tide">ΠΑΛΙΡΡΟΙΑ</span></h2>
             <p className="hm-lead">Το νερό δεν ρωτάει. Απλά παρασέρνει τα πάντα. Το νέο κεφάλαιο ανοίγει σύντομα.</p>
           </Reveal>
           <Reveal delay={0.1}>
