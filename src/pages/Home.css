@@ -80,6 +80,16 @@
 .hm-lead { font-size: clamp(1.05rem, 1.5vw, 1.4rem); line-height: 1.55; color: var(--text-dim);
   max-width: 46ch; margin-top: 26px; }
 .hm-mark { color: var(--accent); }
+
+.hm-album-art {
+  display: block;
+  width: clamp(220px, 32vw, 360px);
+  aspect-ratio: 1;
+  margin-top: 40px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-print);
+}
 .hm-mark-cool { color: #4FB08C; }
 .hm-mark-hot { color: var(--accent-hot); }
 

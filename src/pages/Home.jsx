@@ -129,6 +129,9 @@ function Home() {
             <h2 className="hm-statement"><span className="hm-mark">ΠΑΛΙΡΡΟΙΑ</span></h2>
             <p className="hm-lead">Το νερό δεν ρωτάει. Απλά παρασέρνει τα πάντα. Το νέο κεφάλαιο ανοίγει σύντομα.</p>
           </Reveal>
+          <Reveal delay={0.1}>
+            <img className="hm-album-art" src="/assets/uploads/palirroia-artwork.webp" alt="ΠΑΛΙΡΡΟΙΑ — official artwork" loading="lazy" />
+          </Reveal>
         </section>
 
         {/* LATEST DROP */}
