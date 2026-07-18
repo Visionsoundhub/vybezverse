@@ -77,7 +77,7 @@ function Home() {
 
         {/* HERO */}
         <section id="hero" ref={set('hero')} className="hm-section hm-hero">
-          <SectionBg src="/assets/uploads/hero-banner.webp" />
+          <SectionBg src="/assets/uploads/hero-banner.webp" parallax />
           <div className="hm-hero-top">
             <span>Flowless Music &nbsp;·&nbsp; Producer &nbsp;·&nbsp; <b>Larisa → ∞</b></span>
             <HeroAccount />
@@ -123,6 +123,7 @@ function Home() {
 
         {/* ALBUM */}
         <section id="album" ref={set('album')} className="hm-section">
+          <SectionBg src="/assets/uploads/section-tide.webp" position="center 55%" />
           <div className="hm-eyebrow"><b>02</b> Νέο album / coming soon</div>
           <Reveal>
             <h2 className="hm-statement"><span className="hm-mark">ΠΑΛΙΡΡΟΙΑ</span></h2>
@@ -132,6 +133,7 @@ function Home() {
 
         {/* LATEST DROP */}
         <section id="latest" ref={set('latest')} className="hm-section">
+          <SectionBg src="/assets/uploads/section-jazzbar.webp" position="center 40%" />
           <div className="hm-eyebrow"><b>03</b> Latest drop</div>
           <div className="hm-drop">
             <Reveal>
@@ -156,6 +158,7 @@ function Home() {
 
         {/* CHARITY */}
         <section id="charity" ref={set('charity')} className="hm-section">
+          <SectionBg src="/assets/uploads/section-charity.webp" position="center 60%" />
           <div className="hm-eyebrow"><b>04</b> Charity</div>
           <Reveal>
             <h2 className="hm-statement" style={{ maxWidth: '18ch' }}>Η μουσική <span className="hm-mark-cool">επιστρέφει</span></h2>
@@ -168,6 +171,7 @@ function Home() {
 
         {/* NEW BEATS */}
         <section id="beats" ref={set('beats')} className="hm-section">
+          <SectionBg src="/assets/uploads/section-beats.webp" position="center 30%" />
           <div className="hm-eyebrow"><b>05</b> New beats <Link to="/beats" className="hm-more" style={{ marginLeft: 'auto' }}>Beatstore <ArrowUpRight size={13} style={{ verticalAlign: -2 }} /></Link></div>
           <Reveal>
             <h2 className="hm-statement" style={{ fontSize: 'clamp(2rem,7vw,4.5rem)' }}>New <span className="hm-mark">beats</span></h2>
@@ -195,6 +199,7 @@ function Home() {
 
         {/* LIVE */}
         <section id="live" ref={set('live')} className="hm-section">
+          <SectionBg src="/assets/uploads/section-live.webp" position="center 30%" />
           <div className="hm-eyebrow"><b>06</b> Live shows</div>
           <Reveal>
             <div className="hm-stamp">

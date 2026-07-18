@@ -10,7 +10,7 @@
 
 .hm-wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(20px, 5vw, 56px); }
 
-.hm-section { padding: clamp(70px, 11vh, 130px) 0; border-top: 1px solid var(--border); }
+.hm-section { padding: clamp(70px, 11vh, 130px) 0; border-top: 1px solid var(--border); position: relative; z-index: 0; }
 .hm-section:first-child { border-top: none; }
 
 /* section eyebrow: track index + label, mono */
@@ -35,8 +35,6 @@
 .hm-hero {
   padding-top: clamp(90px, 15vh, 170px);
   padding-bottom: clamp(40px, 6vh, 70px);
-  position: relative;
-  z-index: 0;
 }
 .hm-hero-top { font-family: var(--font-mono); font-size: .82rem; letter-spacing: .18em;
   text-transform: uppercase; color: var(--text-dim); margin-bottom: 26px;
