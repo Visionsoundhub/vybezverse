@@ -138,7 +138,7 @@ export async function onRequestPost(context) {
       let successMessage = '';
       let targetLink = '';
       let targetTitle = '';
-      let specificGroupId = beatsGroupId;
+      let specificGroupId = null; // was `beatsGroupId` (undeclared -> ReferenceError); value is never read downstream
 
       // Extract success data from active email campaign
       const activeEmailCampaign = activeCampaigns.find(c => c.action === 'email_capture');
