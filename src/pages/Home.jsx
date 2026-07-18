@@ -123,7 +123,7 @@ function Home() {
 
         {/* ALBUM */}
         <section id="album" ref={set('album')} className="hm-section">
-          <SectionBg src="/assets/uploads/section-tide.webp" position="center 55%" overlayRgb="3,33,46" />
+          <SectionBg src="/assets/uploads/section-tide.webp" position="center 55%" overlayRgb="3,33,46" overlayOpacity={[0.72, 0.42]} />
           <div className="hm-eyebrow"><b>02</b> Νέο album / coming soon</div>
           <Reveal>
             <h2 className="hm-statement"><span className="hm-mark-tide">ΠΑΛΙΡΡΟΙΑ</span></h2>

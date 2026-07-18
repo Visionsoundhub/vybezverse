@@ -80,7 +80,7 @@
 .hm-lead { font-size: clamp(1.05rem, 1.5vw, 1.4rem); line-height: 1.55; color: var(--text-dim);
   max-width: 46ch; margin-top: 26px; }
 .hm-mark { color: var(--accent); }
-.hm-mark-tide { color: #A6BBC7; }
+.hm-mark-tide { color: #A6BBC7; text-shadow: 0 2px 18px rgba(3,33,46,.85); }
 
 .hm-album-art {
   display: block;
