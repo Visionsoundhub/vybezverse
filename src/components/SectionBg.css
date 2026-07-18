@@ -1,0 +1,18 @@
+.section-bg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  margin-left: -50vw;
+  z-index: -1;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* iOS Safari renders fixed backgrounds as scroll (buggy/jank) — and motion
+   should be opt-out anyway, so drop the parallax on mobile / reduced-motion. */
+@media (max-width: 1024px), (prefers-reduced-motion: reduce) {
+  .section-bg { background-attachment: scroll; }
+}

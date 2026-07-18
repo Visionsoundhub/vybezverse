@@ -38,24 +38,6 @@
   position: relative;
   z-index: 0;
 }
-/* Full-bleed banner: breaks out of .hm-wrap's max-width/padding to span the
-   whole viewport edge-to-edge, while hero content keeps its normal position. */
-.hm-hero::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 100vw;
-  margin-left: -50vw;
-  z-index: -1;
-  background-image:
-    linear-gradient(180deg, rgba(22,17,15,.90) 0%, rgba(22,17,15,.74) 42%, var(--bg) 96%),
-    url('/assets/uploads/hero-banner.webp');
-  background-size: cover;
-  background-position: center 28%;
-  background-repeat: no-repeat;
-}
 .hm-hero-top { font-family: var(--font-mono); font-size: .82rem; letter-spacing: .18em;
   text-transform: uppercase; color: var(--text-dim); margin-bottom: 26px;
   display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }

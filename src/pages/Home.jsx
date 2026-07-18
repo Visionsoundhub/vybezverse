@@ -7,6 +7,7 @@ import homeData from '../data/home.json';
 import genresData from '../data/genres.json';
 import { AudioContext } from '../context/AudioContext';
 import HeroAccount from '../components/HeroAccount';
+import SectionBg from '../components/SectionBg';
 import './Home.css';
 
 const sectionsList = [
@@ -76,6 +77,7 @@ function Home() {
 
         {/* HERO */}
         <section id="hero" ref={set('hero')} className="hm-section hm-hero">
+          <SectionBg src="/assets/uploads/hero-banner.webp" />
           <div className="hm-hero-top">
             <span>Flowless Music &nbsp;·&nbsp; Producer &nbsp;·&nbsp; <b>Larisa → ∞</b></span>
             <HeroAccount />
