@@ -15,13 +15,15 @@ import './SectionBg.css';
  * the prop, since iOS Safari doesn't support fixed backgrounds well and
  * motion should stay opt-in.
  */
-export default function SectionBg({ src, position = 'center 28%', overlay = true, parallax = false }) {
+export default function SectionBg({ src, position = 'center 28%', overlay = true, parallax = false, overlayRgb = '22,17,15' }) {
   // Non-hero sections sit further down the scroll and don't need to compete
   // for attention the way the hero does — dim them ~15-20% darker so the
   // photo reads as a faint backdrop rather than a full visual anchor.
+  // overlayRgb defaults to the site's ink tone; pass a different "r,g,b" to
+  // tint a section's overlay (e.g. matching an album's own color) instead.
   const overlayCss = parallax
-    ? 'linear-gradient(180deg, rgba(22,17,15,.90) 0%, rgba(22,17,15,.74) 42%, var(--bg) 96%)'
-    : 'linear-gradient(180deg, rgba(22,17,15,.96) 0%, rgba(22,17,15,.89) 42%, var(--bg) 96%)';
+    ? `linear-gradient(180deg, rgba(${overlayRgb},.90) 0%, rgba(${overlayRgb},.74) 42%, var(--bg) 96%)`
+    : `linear-gradient(180deg, rgba(${overlayRgb},.96) 0%, rgba(${overlayRgb},.89) 42%, var(--bg) 96%)`;
   const style = {
     backgroundImage: overlay ? `${overlayCss}, url(${src})` : `url(${src})`,
     backgroundPosition: position,
