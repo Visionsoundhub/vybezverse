@@ -1,7 +1,7 @@
 export async function onRequestPost(context) {
   try {
     const { env, request } = context;
-    const resendApiKey = env.RESEND_API_KEY || 're_LHEXeicY_2QLeMmCDKKXeB9Tr4vRZfZjf';
+    const resendApiKey = env.RESEND_API_KEY; // set as a Cloudflare Pages secret; no hardcoded fallback
     const audienceId = env.RESEND_AUDIENCE_ID || '66d1140c-d7df-4411-aae7-345d9d1432a1';
 
     // 1. Verify API key is configured
