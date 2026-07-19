@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, Check, FileMusic, Music4, Layers, Crown, Mail } from 'lucide-react';
+import { X, Check, Mail } from 'lucide-react';
 import { AudioContext } from '../context/AudioContext';
 import { useAuth } from '../context/AuthContext';
 import { LICENSE_TIERS } from '../data/licenseTiers';
@@ -35,8 +35,7 @@ function LicenseModal() {
     closeLicenseModal();
   };
 
-  const icons = { mp3: Music4, wav: FileMusic, stems: Layers, exclusive: Crown };
-  const tiers = LICENSE_TIERS.map((t) => ({ ...t, icon: icons[t.key] }));
+  const tiers = LICENSE_TIERS;
 
   return (
     <AnimatePresence>

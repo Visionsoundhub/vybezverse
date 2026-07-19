@@ -327,7 +327,9 @@ function Beats() {
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '100px' }}>
-        {LICENSE_TIERS.map((tier) => (
+        {LICENSE_TIERS.map((tier) => {
+          const TierIcon = tier.icon;
+          return (
           <div
             key={tier.key}
             className="glass-card"
@@ -344,7 +346,7 @@ function Beats() {
               <div style={{ position: 'absolute', top: '-1px', right: '-1px', background: 'var(--accent)', color: 'var(--ink-900)', padding: '6px 20px', fontSize: '0.68rem', fontWeight: '900', letterSpacing: '1px', borderBottomLeftRadius: '14px', borderTopRightRadius: '10px' }}>BEST VALUE</div>
             )}
             <div style={{ width: '46px', height: '46px', background: 'rgba(224,144,47,0.12)', borderRadius: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px', color: 'var(--accent)' }}>
-              <Music size={22} />
+              <TierIcon size={22} />
             </div>
             <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '6px' }}>{tier.name}</h3>
             <div style={{ fontSize: '2rem', fontWeight: '900', marginBottom: '24px', color: tier.featured ? 'var(--accent)' : 'var(--text)' }}>{tier.price}</div>
@@ -356,7 +358,8 @@ function Beats() {
               ))}
             </ul>
           </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* 6. NEWSLETTER */}
