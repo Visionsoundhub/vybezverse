@@ -200,7 +200,7 @@ async function handleMetaMessage(senderId, messageText, pageAccessToken, env) {
         // Fallback to local values
         const freeBeatLink = freeBeatsData.freebeatslist?.[0]?.downloadUrl || '#';
         const freeBeatTitle = freeBeatsData.freebeatslist?.[0]?.title || 'Free Beat';
-        successMessage = `Τέλεια! Το email σου ({email}) καταχωρήθηκε επιτυχώς στο VIP Newsletter του Black Vybez. 🎶\n\nΜπορείς να κατεβάσεις το δωρεάν σου beat ("{title}") από εδώ: {link}\n\nΑνυπομονώ να ακούσω τι θα δημιουργήσεις! 🔥`;
+        successMessage = `Τέλεια! Το email σου ({email}) καταχωρήθηκε επιτυχώς στο VIP Newsletter του Black Vybez.\n\nΜπορείς να κατεβάσεις το δωρεάν σου beat ("{title}") από εδώ: {link}\n\nΑνυπομονώ να ακούσω τι θα δημιουργήσεις!`;
         targetLink = freeBeatLink;
         targetTitle = freeBeatTitle;
       }
@@ -256,14 +256,14 @@ async function handleMetaMessage(senderId, messageText, pageAccessToken, env) {
       const localKeywords = ['BEAT', 'FREE', 'FREEBEAT', 'GIFT', 'ΔΩΡΟ', 'ΔΩΡΕΑΝ'];
       const isLocalKeyword = localKeywords.some(kw => cleanMsgUpper.includes(kw));
       if (isLocalKeyword) {
-        replyText = `Ευχαριστώ για το ενδιαφέρον! 🎧\n\nΓράψε το email σου εδώ στο chat για να σου σταλεί αμέσως το download link για το δωρεάν beat σου!`;
+        replyText = `Ευχαριστώ για το ενδιαφέρον!\n\nΓράψε το email σου εδώ στο chat για να σου σταλεί αμέσως το download link για το δωρεάν beat σου!`;
       }
     }
 
     // Case D: General chat (Gemini AI fallback)
     if (!replyText) {
       if (!geminiApiKey) {
-        replyText = `Γεια! Είμαι ο VybezBot, ο προσωπικός βοηθός του Black Vybez. 🎧\n\nΑν ψάχνεις για δωρεάν beat, γράψε τη λέξη ΔΩΡΟ ή FREE για να σου στείλω το link!`;
+        replyText = `Γεια! Είμαι ο VybezBot, ο προσωπικός βοηθός του Black Vybez.\n\nΑν ψάχνεις για δωρεάν beat, γράψε τη λέξη ΔΩΡΟ ή FREE για να σου στείλω το link!`;
       } else {
         const beats = beatsData.beatslist || [];
         const beatsListString = beats.map(b => 
@@ -337,7 +337,7 @@ POΛΙΤΙΚΗ ΤΙΜΩΝ & LEASING (ΠΟΛΥ ΣΗΜΑΝΤΙΚΟ):
         }
 
         if (!apiSuccess) {
-          replyText = `Γεια! Είμαι ο VybezBot, ο βοηθός του Black Vybez. Αυτή τη στιγμή η AI είναι απασχολημένη. Αν θέλεις ένα δωρεάν beat, γράψε το email σου εδώ! 🎶`;
+          replyText = `Γεια! Είμαι ο VybezBot, ο βοηθός του Black Vybez. Αυτή τη στιγμή η AI είναι απασχολημένη. Αν θέλεις ένα δωρεάν beat, γράψε το email σου εδώ!`;
         }
       }
     }

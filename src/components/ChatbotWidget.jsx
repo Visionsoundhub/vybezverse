@@ -15,7 +15,7 @@ const INITIAL_MESSAGES = [
   {
     id: 'init-1',
     role: 'bot',
-    text: 'Γεια! Είμαι ο **VybezBot**, ο προσωπικός βοηθός του Black Vybez. 🤖\n\nΚαλώς ήρθες στο Vybezverse! Εδώ θα βρεις τα **tracks (τραγούδια)** αλλά και τα **beats (παραγωγές)** του Black Vybez για να γράψεις τη δική σου μουσική.\n\nΜε τι θα ήθελες να ξεκινήσουμε;',
+    text: 'Γεια! Είμαι ο **VybezBot**, ο προσωπικός βοηθός του Black Vybez.\n\nΚαλώς ήρθες στο Vybezverse! Εδώ θα βρεις τα **tracks (τραγούδια)** αλλά και τα **beats (παραγωγές)** του Black Vybez για να γράψεις τη δική σου μουσική.\n\nΜε τι θα ήθελες να ξεκινήσουμε;',
     time: new Date()
   }
 ];
@@ -100,7 +100,7 @@ const ChatbotWidget = () => {
         setMessages(prev => [...prev, {
           id: `bot-nav-${Date.now()}`,
           role: 'bot',
-          text: 'Τέλεια! Σε μεταφέρω στις κυκλοφορίες του Black Vybez. 🎵\n\nΗ πιο πρόσφατη κυκλοφορία του είναι το **"Jazz Bar των τεράτων"**, ενώ πολύ σύντομα έρχεται και το επόμενο drop του!\n\nΨάχνεις κάτι συγκεκριμένο;',
+          text: 'Τέλεια! Σε μεταφέρω στις κυκλοφορίες του Black Vybez.\n\nΗ πιο πρόσφατη κυκλοφορία του είναι το **"Jazz Bar των τεράτων"**, ενώ πολύ σύντομα έρχεται και το επόμενο drop του!\n\nΨάχνεις κάτι συγκεκριμένο;',
           time: new Date()
         }]);
         setIsLoading(false);
@@ -116,7 +116,7 @@ const ChatbotWidget = () => {
         setMessages(prev => [...prev, {
           id: `bot-nav-${Date.now()}`,
           role: 'bot',
-          text: 'Βεβαίως! Σε μεταφέρω στο Beat Store του Black Vybez για να ακούσεις όλα τα instrumentals. 🎧',
+          text: 'Βεβαίως! Σε μεταφέρω στο Beat Store του Black Vybez για να ακούσεις όλα τα instrumentals.',
           time: new Date()
         }]);
         setIsLoading(false);
@@ -238,7 +238,7 @@ const ChatbotWidget = () => {
               <Bot size={22} color="#bc74f5" />
             </div>
             <div className="tooltip-text">
-              <strong>VybezBot 🤖</strong>
+              <strong>VybezBot</strong>
               <p>Είμαι ο βοηθός του Black Vybez. Χρειάζεσαι βοήθεια με beats ή μουσική;</p>
             </div>
             <button className="tooltip-close" onClick={(e) => { 

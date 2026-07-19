@@ -18,7 +18,7 @@ function Store() {
           Coming <span style={{ color: 'var(--accent)' }}>soon</span>
         </h1>
         <p style={{ color: 'var(--text-dim)', fontSize: '1.15rem', lineHeight: 1.6, marginTop: 24, maxWidth: '44ch', marginInline: 'auto' }}>
-          Το επίσημο apparel ετοιμάζεται. Σύντομα κάθε κομμάτι θα ανοίγει σαν gallery — όχι απλό thumbnail.
+          Το επίσημο apparel ετοιμάζεται. Σύντομα κάθε κομμάτι θα ανοίγει σαν gallery, όχι απλό thumbnail.
         </p>
       </motion.div>
     </div>

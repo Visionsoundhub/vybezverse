@@ -95,8 +95,8 @@ function Home() {
                   Καλωσήρθες στο σύμπαν μου. <em>Δημιουργώ κόσμους.</em>
                 </p>
                 <div className="hm-hero-cta">
-                  <Link to="/beats"><button className="btn-primary">Άκου beats</button></Link>
-                  <Link to="/releases"><button className="btn-outline">Releases</button></Link>
+                  <Link to="/releases"><button className="btn-primary">Releases</button></Link>
+                  <Link to="/beats"><button className="btn-outline">Άκου beats</button></Link>
                 </div>
               </div>
             </Reveal>
@@ -105,7 +105,7 @@ function Home() {
                 <div className="cat">Now pressing</div>
                 <div className="big">{homeData.heroTitle || 'VYBEZONE'}</div>
                 <div className="sub">{homeData.heroSubtitle || 'No limits in music. Just pure vibes.'}</div>
-                <div className="hm-script">για κάθε διαφορετικό μυαλό — δεν είσαι μόνος.</div>
+                <div className="hm-script">για κάθε διαφορετικό μυαλό. Δεν είσαι μόνος.</div>
               </div>
             </Reveal>
           </div>
@@ -130,7 +130,7 @@ function Home() {
             <p className="hm-lead">Το νερό δεν ρωτάει. Απλά παρασέρνει τα πάντα. Το νέο κεφάλαιο ανοίγει σύντομα.</p>
           </Reveal>
           <Reveal delay={0.1}>
-            <img className="hm-album-art" src="/assets/uploads/palirroia-artwork.webp" alt="ΠΑΛΙΡΡΟΙΑ — official artwork" loading="lazy" />
+            <img className="hm-album-art" src="/assets/uploads/palirroia-artwork.webp" alt="ΠΑΛΙΡΡΟΙΑ official artwork" loading="lazy" />
           </Reveal>
         </section>
 

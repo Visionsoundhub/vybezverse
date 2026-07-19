@@ -6,7 +6,7 @@ import './SectionBg.css';
  * Drop as the first child of any `position: relative` section.
  *
  * parallax = native `background-attachment: fixed` (no JS, no scroll listener).
- * Only pass `parallax` on ONE section per page (typically the hero) — stacking
+ * Only pass `parallax` on ONE section per page (typically the hero); stacking
  * several fixed backgrounds forces the browser to repaint every one of them
  * on every scroll tick, which gets janky fast. The rest of a page's sections
  * should stay static (parallax={false}, the default): still full-bleed photos,
@@ -21,10 +21,10 @@ export default function SectionBg({
   overlay = true,
   parallax = false,
   overlayRgb = '22,17,15',
-  overlayOpacity, // optional [top, mid] override, e.g. [0.55, 0.4] — lets the photo show through more
+  overlayOpacity, // optional [top, mid] override, e.g. [0.55, 0.4], lets the photo show through more
 }) {
   // Non-hero sections sit further down the scroll and don't need to compete
-  // for attention the way the hero does — dim them ~15-20% darker by default
+  // for attention the way the hero does, so dim them ~15-20% darker by default
   // so the photo reads as a faint backdrop. overlayRgb tints that backdrop
   // (e.g. matching an album's own color); overlayOpacity lets a section
   // lighten the dimming when the photo needs to stay visibly a *photo*

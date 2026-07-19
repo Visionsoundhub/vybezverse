@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import footer from '../data/footer.json';
 import './Footer.css';
 
-// lucide-react in this project ships no brand/social icons — use mono text glyphs (same as Links.jsx)
+// lucide-react in this project ships no brand/social icons, so use mono text glyphs (same as Links.jsx)
 const Glyph = ({ label }) => <span className="ft-glyph">{label}</span>;
 
 const navLinks = [
@@ -35,7 +35,7 @@ export default function Footer() {
         <div className="ft-top">
           <div className="ft-brand">
             <Link to="/" className="ft-logo">BLACK VYBEZ</Link>
-            <p className="ft-tagline">Μουσική για κάθε διαφορετικό μυαλό — δεν είσαι μόνος.</p>
+            <p className="ft-tagline">Μουσική για κάθε διαφορετικό μυαλό. Δεν είσαι μόνος.</p>
           </div>
 
           <nav className="ft-nav" aria-label="Footer">

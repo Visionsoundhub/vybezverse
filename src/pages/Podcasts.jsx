@@ -50,11 +50,11 @@ function Podcasts() {
           Μπαμπάς των 2 <span style={{ color: 'var(--accent)' }}>&amp; rapper</span>
         </h1>
         <p style={{ color: 'var(--text-dim)', fontSize: '1.15rem', lineHeight: 1.6, marginTop: 22, maxWidth: '56ch' }}>
-          Η φωνή πίσω από τη μουσική. Νευροδιαφορετικότητα, δημιουργία, πατρότητα — ανοιχτές κουβέντες. Δεν είμαστε μόνοι.
+          Η φωνή πίσω από τη μουσική. Νευροδιαφορετικότητα, δημιουργία, πατρότητα, ανοιχτές κουβέντες. Δεν είμαστε μόνοι.
         </p>
       </motion.div>
 
-      {/* HERO — latest episode */}
+      {/* HERO: latest episode */}
       <div style={{ marginBottom: 64 }}>
         <span style={{ display: 'inline-block', transform: 'rotate(-1.4deg)', background: 'var(--accent)', color: 'var(--ink-900)', fontFamily: 'var(--font-mono)', fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', padding: '6px 14px', borderRadius: 3, marginBottom: 16 }}>
           Φρέσκο απ' το studio · Τελευταίο
@@ -62,7 +62,7 @@ function Podcasts() {
         <EpisodeFrame id={latest.id} title="Τελευταίο επεισόδιο" height={232} />
       </div>
 
-      {/* THE REST — in order */}
+      {/* THE REST: in order */}
       <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 26 }}>
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.7rem,4.5vw,2.8rem)', letterSpacing: '-.02em', margin: 0 }}>
           Θες να τα ακούσεις <span style={{ color: 'var(--accent)' }}>με τη σειρά;</span>

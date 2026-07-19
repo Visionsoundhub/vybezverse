@@ -153,7 +153,7 @@ export async function onRequestPost(context) {
         // Fallback to local hardcoded values
         const freeBeatLink = freeBeatsData.freebeatslist?.[0]?.downloadUrl || '#';
         const freeBeatTitle = freeBeatsData.freebeatslist?.[0]?.title || 'Free Beat';
-        successMessage = `Τέλεια! Το email σου ({email}) καταχωρήθηκε επιτυχώς στο VIP Newsletter του Black Vybez. \n\nΜπορείς να κατεβάσεις το δωρεάν σου beat ("{title}") από εδώ: {link}\n\nΑνυπομονώ να ακούσω τι θα δημιουργήσεις! 🔥`;
+        successMessage = `Τέλεια! Το email σου ({email}) καταχωρήθηκε επιτυχώς στο VIP Newsletter του Black Vybez. \n\nΜπορείς να κατεβάσεις το δωρεάν σου beat ("{title}") από εδώ: {link}\n\nΑνυπομονώ να ακούσω τι θα δημιουργήσεις!`;
         targetLink = freeBeatLink;
         targetTitle = freeBeatTitle;
       }
@@ -249,7 +249,7 @@ export async function onRequestPost(context) {
       if (isLocalKeyword) {
         return new Response(
           JSON.stringify({
-            response: `Ευχαριστώ για το ενδιαφέρον! 🎧\n\nΓράψε το email σου εδώ στο chat για να σου σταλεί αμέσως το download link για το δωρεάν beat σου!`,
+            response: `Ευχαριστώ για το ενδιαφέρον!\n\nΓράψε το email σου εδώ στο chat για να σου σταλεί αμέσως το download link για το δωρεάν beat σου!`,
             keywordTriggered: true
           }),
           { status: 200, headers: { 'Content-Type': 'application/json' } }
@@ -261,7 +261,7 @@ export async function onRequestPost(context) {
     if (!geminiApiKey) {
       return new Response(
         JSON.stringify({
-          response: `Γεια! Είμαι ο VybezBot, ο προσωπικός βοηθός του Black Vybez. 🎧\n\nΑυτή τη στιγμή η AI επικοινωνία είναι υπό συντήρηση, αλλά μπορείς να μου γράψεις το email σου εδώ για να σου σταλεί ένα δωρεάν beat!`
+          response: `Γεια! Είμαι ο VybezBot, ο προσωπικός βοηθός του Black Vybez.\n\nΑυτή τη στιγμή η AI επικοινωνία είναι υπό συντήρηση, αλλά μπορείς να μου γράψεις το email σου εδώ για να σου σταλεί ένα δωρεάν beat!`
         }),
         { status: 200, headers: { 'Content-Type': 'application/json' } }
       );

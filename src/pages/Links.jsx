@@ -26,7 +26,7 @@ function Links() {
         {linksData.showLatest && linksData.releaseCover && (
           <a className="links-latest" href={linksData.streamLink || APPLE} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', display: 'block' }}>
             <img className="links-release-cover" src={linksData.releaseCover} alt={linksData.latestTitle} />
-            <p className="links-release-title">New release — {linksData.latestTitle}</p>
+            <p className="links-release-title">New release: {linksData.latestTitle}</p>
           </a>
         )}
 
@@ -35,7 +35,7 @@ function Links() {
           <a className="links-btn" href={APPLE} target="_blank" rel="noreferrer"><Music size={20} /> Apple Music</a>
           <a className="links-btn" href={YOUTUBE} target="_blank" rel="noreferrer"><ExternalLink size={20} /> YouTube</a>
           <a className="links-btn" href="/beats"><Star size={20} /> Beats catalog</a>
-          <a className="links-btn" href="/store"><ShoppingBag size={20} /> Merch — coming soon</a>
+          <a className="links-btn" href="/store"><ShoppingBag size={20} /> Merch · coming soon</a>
           <a className="links-btn" href={(linksData.buttons && linksData.buttons[0] && linksData.buttons[0].url) || 'https://blackvybez.gr/'} target="_blank" rel="noreferrer"><Globe size={20} /> Official site</a>
         </div>
 

@@ -22,7 +22,10 @@ function tierFor(count) {
 
 export default function HeroAccount() {
   const { currentUser, login, signup, loginWithGoogle } = useAuth();
-  const [open, setOpen] = useState(true);
+  // Open by default on desktop (matches the site's hero-grid breakpoint);
+  // on mobile it starts collapsed so it doesn't cover the hero, just the
+  // ΣΥΝΔΕΣΗ trigger shows until tapped.
+  const [open, setOpen] = useState(() => window.matchMedia('(min-width: 861px)').matches);
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

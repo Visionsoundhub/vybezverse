@@ -2,7 +2,7 @@
 
 .ha-root { position: relative; display: inline-block; }
 
-/* Discreet trigger — mono, low-key, matches the hero-top eyebrow */
+/* Discreet trigger: mono, low-key, matches the hero-top eyebrow */
 .ha-trigger {
   display: inline-flex;
   align-items: center;

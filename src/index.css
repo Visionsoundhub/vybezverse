@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Familjen+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&family=Caveat:wght@500;600&display=swap');
 
 /* ============================================================
-   VYBEZVERSE — Direction A "Pressing"
+   VYBEZVERSE: Direction A "Pressing"
    Layered tokens: primitive -> semantic -> component
    Warm, tactile, print. Legacy var/class names kept as aliases
    so existing components render the new look without edits.
@@ -50,7 +50,7 @@
   --radius:    8px;
   --radius-sm: 4px;
 
-  /* ---- Legacy aliases (do not remove — components depend on these) ---- */
+  /* ---- Legacy aliases (do not remove: components depend on these) ---- */
   --bg-color: var(--bg);
   --bg-secondary: var(--bg-2);
   --accent-magenta: var(--accent);
@@ -64,7 +64,7 @@
   --glass-blur: blur(6px);
 }
 
-/* Calm mode — reduced sensory load: softer contrast, muted accents, no hard shadows */
+/* Calm mode: reduced sensory load, softer contrast, muted accents, no hard shadows */
 :root.calm, body.calm {
   --bg:   #1B1512;
   --bg-2: #221B16;
