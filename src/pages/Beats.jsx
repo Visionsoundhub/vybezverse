@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import { Play, Search, ShoppingCart, SlidersHorizontal, Music, Star, Send, LayoutGrid, List, Pause } from 'lucide-react';
 import { motion } from 'framer-motion';
 import beatsDataRaw from '../data/beats.json';
+import { LICENSE_TIERS } from '../data/licenseTiers';
 import { AudioContext } from '../context/AudioContext';
 
 function Beats() {
@@ -325,61 +326,37 @@ function Beats() {
         <p style={{ color: 'var(--text-secondary)' }}>Επίλεξε την άδεια που καλύπτει τις ανάγκες σου.</p>
       </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginBottom: '100px' }}>
-        
-        {/* Showcase License */}
-        <div className="glass-card" style={{ padding: '40px', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ width: '50px', height: '50px', background: 'rgba(224,144,47,0.12)', borderRadius: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', color: 'var(--accent)' }}>
-            <Music size={24} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '100px' }}>
+        {LICENSE_TIERS.map((tier) => (
+          <div
+            key={tier.key}
+            className="glass-card"
+            style={{
+              padding: '32px 24px',
+              display: 'flex',
+              flexDirection: 'column',
+              position: 'relative',
+              border: tier.featured ? '2px solid var(--accent)' : undefined,
+              boxShadow: tier.featured ? 'var(--shadow-print)' : undefined,
+            }}
+          >
+            {tier.featured && (
+              <div style={{ position: 'absolute', top: '-1px', right: '-1px', background: 'var(--accent)', color: 'var(--ink-900)', padding: '6px 20px', fontSize: '0.68rem', fontWeight: '900', letterSpacing: '1px', borderBottomLeftRadius: '14px', borderTopRightRadius: '10px' }}>BEST VALUE</div>
+            )}
+            <div style={{ width: '46px', height: '46px', background: 'rgba(224,144,47,0.12)', borderRadius: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '20px', color: 'var(--accent)' }}>
+              <Music size={22} />
+            </div>
+            <h3 style={{ fontSize: '1.1rem', fontWeight: '800', marginBottom: '6px' }}>{tier.name}</h3>
+            <div style={{ fontSize: '2rem', fontWeight: '900', marginBottom: '24px', color: tier.featured ? 'var(--accent)' : 'var(--text)' }}>{tier.price}</div>
+            <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: 0, flexGrow: 1, fontSize: '0.86rem' }}>
+              {tier.features.map((f) => (
+                <li key={f} style={{ display: 'flex', gap: '10px', alignItems: 'flex-start', color: 'var(--text-secondary)' }}>
+                  <span style={{ color: 'var(--accent)' }}>✓</span> {f}
+                </li>
+              ))}
+            </ul>
           </div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px' }}>SHOWCASE LICENSE (MP3)</h3>
-          <div style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '32px' }}>$14.99</div>
-          
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '40px', flexGrow: 1, fontSize: '0.9rem' }}>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', color: 'var(--text-secondary)' }}><span style={{ color: 'var(--accent-violet)' }}>✓</span> Used for Music Recording</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', color: 'var(--text-secondary)' }}><span style={{ color: 'var(--accent-violet)' }}>✓</span> Distribute up to 1,500 copies</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', color: 'var(--text-secondary)' }}><span style={{ color: 'var(--accent-violet)' }}>✓</span> 0 Online Audio Streams</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', color: 'var(--text-secondary)' }}><span style={{ color: 'var(--accent-violet)' }}>✓</span> 0 Music Video</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', color: 'var(--text-secondary)' }}><span style={{ color: 'var(--accent-violet)' }}>✓</span> UNLIMITED Non-profit Live Performances</li>
-          </ul>
-        </div>
-
-        {/* Premium License (Highlighted) */}
-        <div className="glass-card" style={{ padding: '40px', display: 'flex', flexDirection: 'column', position: 'relative', border: '2px solid var(--accent-magenta)', boxShadow: '0 0 40px rgba(224,144,47,0.15)', transform: 'scale(1.05)', zIndex: 10 }}>
-          <div style={{ position: 'absolute', top: '-1px', right: '-1px', background: 'var(--accent-magenta)', color: 'white', padding: '6px 24px', fontSize: '0.7rem', fontWeight: '900', letterSpacing: '1px', borderBottomLeftRadius: '16px', borderTopRightRadius: '14px' }}>BEST VALUE</div>
-          <div style={{ width: '50px', height: '50px', background: 'rgba(224,144,47,0.1)', borderRadius: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', color: 'var(--accent-magenta)' }}>
-            <Music size={24} />
-          </div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px' }}>PREMIUM LICENSE (MP3+WAV)</h3>
-          <div style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '32px' }}>$39.99</div>
-          
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '40px', flexGrow: 1, fontSize: '0.9rem' }}>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}><span style={{ color: 'var(--accent-magenta)' }}>✓</span> Used for Music Recording</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}><span style={{ color: 'var(--accent-magenta)' }}>✓</span> Distribute up to 3,000 copies</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}><span style={{ color: 'var(--accent-magenta)' }}>✓</span> 700,000 Online Audio Streams</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}><span style={{ color: 'var(--accent-magenta)' }}>✓</span> 1 Music Video</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}><span style={{ color: 'var(--accent-magenta)' }}>✓</span> For Profit Live Performances</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}><span style={{ color: 'var(--accent-magenta)' }}>✓</span> Radio Broadcasting (2 Stations)</li>
-          </ul>
-        </div>
-
-        {/* Unlimited License */}
-        <div className="glass-card" style={{ padding: '40px', display: 'flex', flexDirection: 'column' }}>
-          <div style={{ width: '50px', height: '50px', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: '24px', color: 'white' }}>
-            <Music size={24} />
-          </div>
-          <h3 style={{ fontSize: '1.2rem', fontWeight: '800', marginBottom: '8px' }}>UNLIMITED LICENSE (TRACKOUTS)</h3>
-          <div style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '32px' }}>$99.99</div>
-          
-          <ul style={{ listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '16px', marginBottom: '40px', flexGrow: 1, fontSize: '0.9rem' }}>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', color: 'var(--text-secondary)' }}><span style={{ color: 'white' }}>✓</span> Used for Music Recording</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', color: 'var(--text-secondary)' }}><span style={{ color: 'white' }}>✓</span> UNLIMITED Distribution copies</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', color: 'var(--text-secondary)' }}><span style={{ color: 'white' }}>✓</span> UNLIMITED Online Audio Streams</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', color: 'var(--text-secondary)' }}><span style={{ color: 'white' }}>✓</span> UNLIMITED Music Videos</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', color: 'var(--text-secondary)' }}><span style={{ color: 'white' }}>✓</span> For Profit Live Performances</li>
-            <li style={{ display: 'flex', gap: '12px', alignItems: 'flex-start', color: 'var(--text-secondary)' }}><span style={{ color: 'white' }}>✓</span> Radio Broadcasting (UNLIMITED)</li>
-          </ul>
-        </div>
+        ))}
       </div>
 
       {/* 6. NEWSLETTER */}
