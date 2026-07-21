@@ -57,7 +57,7 @@ const staticRoutes = [
 ];
 
 // 3. Helper συνάρτηση για να αντικαθιστά τα Meta Tags
-function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, postData, releaseData }) {
+function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, postData, releaseData, podcastData }) {
   let html = htmlTemplate;
 
   // Αντικατάσταση Title
@@ -113,6 +113,29 @@ function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, p
       "url": fullUrl
     };
     html = html.replace('</head>', `  <script type="application/ld+json">\n${JSON.stringify(musicSchema, null, 2)}\n  </script>\n</head>`);
+  }
+
+  // Αν πρόκειται για Podcast, προσθέτουμε PodcastEpisode JSON-LD Schema
+  if (podcastData) {
+    const podcastSchema = {
+      "@context": "https://schema.org",
+      "@type": "PodcastEpisode",
+      "name": podcastData.title,
+      "description": podcastData.description,
+      "datePublished": podcastData.date,
+      "episodeNumber": podcastData.episode,
+      "partOfSeries": {
+        "@type": "PodcastSeries",
+        "name": "Μπαμπάς των 2 & Rapper",
+        "url": "https://blackvybez.gr/podcasts"
+      },
+      "creator": {
+        "@type": "Person",
+        "name": "Black Vybez (Θοδωρής Παρασχάκης)",
+        "url": "https://blackvybez.gr/bio"
+      }
+    };
+    html = html.replace('</head>', `  <script type="application/ld+json">\n${JSON.stringify(podcastSchema, null, 2)}\n  </script>\n</head>`);
   }
 
   return html;
@@ -191,6 +214,40 @@ async function generatePages() {
       });
       fs.writeFileSync(path.join(releaseDir, 'index.html'), htmlContent);
       console.log(`✅ Δημιουργήθηκε: /releases/${release.slug}`);
+    }
+  }
+
+  // Δ. Δυναμικές Σελίδες (Podcasts)
+  const PODCASTS_JSON_PATH = path.resolve(__dirname, 'src/data/podcasts.json');
+  if (fs.existsSync(PODCASTS_JSON_PATH)) {
+    const podcastsFile = JSON.parse(fs.readFileSync(PODCASTS_JSON_PATH, 'utf-8'));
+    
+    for (const podcast of podcastsFile.podcasts || []) {
+      if (!podcast.slug) continue;
+      
+      const podcastDir = path.join(DIST_DIR, 'podcasts', podcast.slug);
+      if (!fs.existsSync(podcastDir)) {
+        fs.mkdirSync(podcastDir, { recursive: true });
+      }
+
+      // We'll create a minimal podcastData object to trigger JSON-LD in injectMetaTags
+      const podcastDataObj = {
+        title: podcast.title,
+        description: podcast.description,
+        date: podcast.date,
+        episode: podcast.episode,
+        season: podcast.season
+      };
+
+      const htmlContent = injectMetaTags(baseHtml, {
+        title: `${podcast.title} | Black Vybez Podcast`,
+        description: podcast.description || `Ακούστε το επεισόδιο ${podcast.title} από το podcast του Black Vybez.`,
+        urlPath: `podcasts/${podcast.slug}`,
+        imageUrl: DEFAULT_IMAGE,
+        podcastData: podcastDataObj
+      });
+      fs.writeFileSync(path.join(podcastDir, 'index.html'), htmlContent);
+      console.log(`✅ Δημιουργήθηκε: /podcasts/${podcast.slug}`);
     }
   }
 

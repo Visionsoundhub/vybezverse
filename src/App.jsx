@@ -21,6 +21,7 @@ import Releases from './pages/Releases';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
 import ReleasePost from './pages/ReleasePost';
+import PodcastPost from './pages/PodcastPost';
 import './App.css';
 
 function AppContent() {
@@ -39,6 +40,7 @@ function AppContent() {
           <Route path="/store" element={<Store />} />
           <Route path="/gallery" element={<Gallery />} />
           <Route path="/podcasts" element={<Podcasts />} />
+          <Route path="/podcasts/:slug" element={<PodcastPost />} />
           <Route path="/press" element={<Press />} />
           <Route path="/account" element={<Account />} />
           <Route path="/bio" element={<Bio />} />

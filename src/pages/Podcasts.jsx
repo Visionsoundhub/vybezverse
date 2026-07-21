@@ -1,18 +1,8 @@
 import React from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Mic } from 'lucide-react';
-
-// Episodes newest → last. The LAST one is the latest (hero on top).
-const EPISODES = [
-  { id: '2DmCeCjz7UbGoak0VqOahQ' },
-  { id: '0oeMEeSQKad817hZ80Kszg' },
-  { id: '0KhP3s0MQDFjfcr3PhfG3V' },
-  { id: '306f84j2hWbIlxk3CPAQOi' },
-  { id: '3ratiZ7bDvnuZvGo6ZTX12' },
-  { id: '2VI6MlaNWjQdlBAEl8Zt3k' },
-  { id: '1JpyqIUHRE8cyEUD2RxxeG' },
-  { id: '5ljlWDLDfdUlOJfoPJsI0r' },
-];
+import { Link } from 'react-router-dom';
+import podcastsData from '../data/podcasts.json';
 
 function EpisodeFrame({ id, title, height }) {
   return (
@@ -32,8 +22,23 @@ function EpisodeFrame({ id, title, height }) {
 
 function Podcasts() {
   const reduce = useReducedMotion();
-  const latest = EPISODES[EPISODES.length - 1];
-  const rest = EPISODES.slice(0, -1);
+  const podcasts = podcastsData.podcasts;
+  
+  // Sort podcasts by date descending (newest first)
+  const sortedPodcasts = [...podcasts].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const latest = sortedPodcasts[0];
+
+  // Group podcasts by season
+  const seasons = podcasts.reduce((acc, podcast) => {
+    if (!acc[podcast.season]) {
+      acc[podcast.season] = [];
+    }
+    acc[podcast.season].push(podcast);
+    return acc;
+  }, {});
+
+  // Sort seasons descending
+  const seasonNumbers = Object.keys(seasons).map(Number).sort((a, b) => b - a);
 
   return (
     <div className="container" style={{ paddingTop: '130px', paddingBottom: '100px' }}>
@@ -55,29 +60,57 @@ function Podcasts() {
       </motion.div>
 
       {/* HERO: latest episode */}
-      <div style={{ marginBottom: 64 }}>
-        <span style={{ display: 'inline-block', transform: 'rotate(-1.4deg)', background: 'var(--accent)', color: 'var(--ink-900)', fontFamily: 'var(--font-mono)', fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', padding: '6px 14px', borderRadius: 3, marginBottom: 16 }}>
-          Φρέσκο απ' το studio · Τελευταίο
-        </span>
-        <EpisodeFrame id={latest.id} title="Τελευταίο επεισόδιο" height={232} />
-      </div>
+      {latest && (
+        <div style={{ marginBottom: 64 }}>
+          <span style={{ display: 'inline-block', transform: 'rotate(-1.4deg)', background: 'var(--accent)', color: 'var(--ink-900)', fontFamily: 'var(--font-mono)', fontSize: '.72rem', fontWeight: 700, letterSpacing: '.12em', textTransform: 'uppercase', padding: '6px 14px', borderRadius: 3, marginBottom: 16 }}>
+            Φρέσκο απ' το studio · Τελευταίο
+          </span>
+          <div style={{ position: 'relative' }}>
+            <Link to={`/podcasts/${latest.slug}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10, cursor: 'pointer' }} aria-label={`Άκου το ${latest.title}`} />
+            <EpisodeFrame id={latest.id} title={latest.title} height={232} />
+          </div>
+          <div style={{ marginTop: 16 }}>
+             <Link to={`/podcasts/${latest.slug}`} style={{ color: 'var(--accent)', fontFamily: 'var(--font-mono)', fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.1em', textDecoration: 'none' }}>
+               Διάβασε περισσότερα &rarr;
+             </Link>
+          </div>
+        </div>
+      )}
 
-      {/* THE REST: in order */}
-      <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 26 }}>
+      {/* THE REST: Grouped by Season */}
+      <div style={{ marginBottom: 26 }}>
         <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.7rem,4.5vw,2.8rem)', letterSpacing: '-.02em', margin: 0 }}>
-          Θες να τα ακούσεις <span style={{ color: 'var(--accent)' }}>με τη σειρά;</span>
+          Επεισόδια ανά <span style={{ color: 'var(--accent)' }}>σεζόν</span>
         </h2>
       </div>
 
-      <div style={{ display: 'grid', gap: 16 }}>
-        {rest.map((ep, i) => (
-          <div key={ep.id} style={{ display: 'grid', gridTemplateColumns: '44px 1fr', gap: 16, alignItems: 'center' }}>
-            <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.1rem', color: 'var(--accent)', fontWeight: 700, textAlign: 'right' }}>
-              {String(i + 1).padStart(2, '0')}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '60px' }}>
+        {seasonNumbers.map(seasonNum => {
+          // Sort episodes within season ascending (Episode 1, 2, 3...)
+          const seasonEpisodes = [...seasons[seasonNum]].sort((a, b) => a.episode - b.episode);
+          
+          return (
+            <div key={seasonNum}>
+              <h3 style={{ fontFamily: 'var(--font-mono)', fontSize: '1.2rem', color: 'var(--text)', borderBottom: '1px solid var(--border-strong)', paddingBottom: '12px', marginBottom: '24px' }}>
+                SEASON {seasonNum}
+              </h3>
+              <div style={{ display: 'grid', gap: 24 }}>
+                {seasonEpisodes.map((ep) => (
+                  <div key={ep.id} style={{ display: 'grid', gridTemplateColumns: '44px 1fr', gap: 16, alignItems: 'center' }}>
+                    <div style={{ fontFamily: 'var(--font-mono)', fontSize: '1.1rem', color: 'var(--accent)', fontWeight: 700, textAlign: 'right' }}>
+                      {String(ep.episode).padStart(2, '0')}
+                    </div>
+                    <div style={{ position: 'relative' }}>
+                       {/* Invisible overlay link to intercept clicks and route to SEO page */}
+                       <Link to={`/podcasts/${ep.slug}`} style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 10, cursor: 'pointer' }} aria-label={`Άκου το ${ep.title}`} />
+                       <EpisodeFrame id={ep.id} title={ep.title} height={152} />
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-            <EpisodeFrame id={ep.id} title={`Επεισόδιο ${i + 1}`} height={152} />
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
