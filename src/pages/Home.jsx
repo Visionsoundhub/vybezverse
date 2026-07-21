@@ -167,7 +167,9 @@ function Home() {
             <h2 className="hm-statement" style={{ maxWidth: '18ch' }}>Η μουσική <span className="hm-mark-cool">επιστρέφει</span></h2>
             <p className="hm-lead">Όλα τα έσοδα από τα streams στο Spotify πηγαίνουν απευθείας σε φιλανθρωπικό οργανισμό. Ακούγοντας, βοηθάς.</p>
             <div className="hm-hero-cta">
-              <button className="btn-primary hm-btn-spotify"><Play size={17} style={{ marginRight: 8, verticalAlign: -3 }} />Άκου στο Spotify</button>
+              <a href="https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3" target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                <button className="btn-primary hm-btn-spotify"><Play size={17} style={{ marginRight: 8, verticalAlign: -3 }} />Άκου στο Spotify</button>
+              </a>
             </div>
           </Reveal>
         </section>
