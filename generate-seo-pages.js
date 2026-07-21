@@ -9,6 +9,7 @@ const __dirname = path.dirname(__filename);
 const DIST_DIR = path.resolve(__dirname, 'dist');
 const INDEX_HTML_PATH = path.join(DIST_DIR, 'index.html');
 const BLOG_JSON_PATH = path.resolve(__dirname, 'src/data/blog.json');
+const RELEASES_JSON_PATH = path.resolve(__dirname, 'src/data/releases.json');
 const DEFAULT_IMAGE = '/assets/uploads/banner.png'; // Ή όποιο είναι το default σου
 
 // 2. Στατικές σελίδες και τα SEO στοιχεία τους
@@ -56,7 +57,7 @@ const staticRoutes = [
 ];
 
 // 3. Helper συνάρτηση για να αντικαθιστά τα Meta Tags
-function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, postData }) {
+function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, postData, releaseData }) {
   let html = htmlTemplate;
 
   // Αντικατάσταση Title
@@ -95,6 +96,23 @@ function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, p
       }]
     };
     html = html.replace('</head>', `  <script type="application/ld+json">\n${JSON.stringify(articleSchema, null, 2)}\n  </script>\n</head>`);
+  }
+
+  // Αν πρόκειται για Release, προσθέτουμε MusicAlbum JSON-LD Schema
+  if (releaseData) {
+    const musicSchema = {
+      "@context": "https://schema.org",
+      "@type": releaseData.type === 'Single' ? "MusicRelease" : "MusicAlbum",
+      "name": releaseData.title,
+      "image": imageUrl || DEFAULT_IMAGE,
+      "byArtist": {
+        "@type": "MusicGroup",
+        "name": "Black Vybez"
+      },
+      "datePublished": releaseData.date || "2026",
+      "url": fullUrl
+    };
+    html = html.replace('</head>', `  <script type="application/ld+json">\n${JSON.stringify(musicSchema, null, 2)}\n  </script>\n</head>`);
   }
 
   return html;
@@ -148,6 +166,31 @@ async function generatePages() {
       });
       fs.writeFileSync(path.join(postDir, 'index.html'), htmlContent);
       console.log(`✅ Δημιουργήθηκε: /blog/${post.slug}`);
+    }
+  }
+
+  // Γ. Δυναμικές Σελίδες (Releases)
+  if (fs.existsSync(RELEASES_JSON_PATH)) {
+    const releasesFile = JSON.parse(fs.readFileSync(RELEASES_JSON_PATH, 'utf-8'));
+    const allReleases = [...(releasesFile.releases || []), ...(releasesFile.upcoming || [])];
+    
+    for (const release of allReleases) {
+      if (!release.slug) continue;
+      
+      const releaseDir = path.join(DIST_DIR, 'releases', release.slug);
+      if (!fs.existsSync(releaseDir)) {
+        fs.mkdirSync(releaseDir, { recursive: true });
+      }
+
+      const htmlContent = injectMetaTags(baseHtml, {
+        title: `${release.title} - Black Vybez | Release`,
+        description: release.description || `Ακούστε το ${release.title} από τον Black Vybez.`,
+        urlPath: `releases/${release.slug}`,
+        imageUrl: release.cover || DEFAULT_IMAGE,
+        releaseData: release
+      });
+      fs.writeFileSync(path.join(releaseDir, 'index.html'), htmlContent);
+      console.log(`✅ Δημιουργήθηκε: /releases/${release.slug}`);
     }
   }
 
