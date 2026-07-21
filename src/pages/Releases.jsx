@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Play, Music, Disc3, ShoppingBag, ExternalLink } from 'lucide-react';
+import { Play, Music, Disc3, ShoppingBag, ExternalLink, ArrowRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import releasesData from '../data/releases.json';
 
-// TODO: swap to the per-product Lemon Squeezy checkout once the Jazz Bar bundle is created.
 const BUY = 'https://blackvybez.lemonsqueezy.com';
 const BUNDLE_TIP = 'Στο single παίρνεις: High-Quality audio (MP3/WAV), εναλλακτικές εκδόσεις, ringtone, signed digital artwork, χειρόγραφοι στίχοι με υπογραφή.';
 
@@ -10,18 +11,10 @@ const SPOTIFY = 'https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3';
 const APPLE = 'https://music.apple.com/gr/artist/black-vybez/1510069891';
 const YOUTUBE = 'https://www.youtube.com/@BlackVybezwiththeflow';
 
-// Real releases only. Add new entries here as they drop (per-release streaming URLs).
-const singles = [
-  { title: 'Jazz Bar των τεράτων', tag: 'Vintage Freq', type: 'Single', apple: 'https://music.apple.com/us/album/jazz-bar-ton-teraton-single/1874438406', youtube: 'https://www.youtube.com/watch?v=KNvq3idRHe8', noSpotify: true },
-];
-const albums = [
-  { title: 'ΠΑΛΙΡΡΟΙΑ', tag: 'Studio Album', type: 'Album', comingSoon: true },
-];
-
 function Releases() {
   const [tab, setTab] = useState('singles');
   const reduce = useReducedMotion();
-  const items = tab === 'singles' ? singles : albums;
+  const items = tab === 'singles' ? releasesData.releases || [] : releasesData.upcoming || [];
 
   return (
     <div className="container hm" style={{ paddingTop: '130px', paddingBottom: '110px', background: 'none' }}>
@@ -81,6 +74,11 @@ function Releases() {
                     <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" title="YouTube"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="YouTube"><ExternalLink size={15} /></button></a>
                   </div>
                   <a href={item.buy || BUY} target="_blank" rel="noreferrer"><button className="btn-primary tip" data-tip={BUNDLE_TIP} style={{ width: '100%', padding: '10px' }}><ShoppingBag size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Αγόρασε</button></a>
+                  <Link to={`/releases/${item.slug}`} style={{ textDecoration: 'none', marginTop: 4 }}>
+                    <button className="btn-outline" style={{ width: '100%', padding: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                      Προβολή <ArrowRight size={14} style={{ marginLeft: 6 }} />
+                    </button>
+                  </Link>
                 </div>
               )}
             </div>

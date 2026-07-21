@@ -1,15 +1,30 @@
 {
-  "tracks": [
+  "releases": [
     {
-      "genre": "Vintage Freq",
-      "downloadUrl": "https://drive.google.com/file/d/1ytVh2KgFzv7j8YjNr0Wz-7QKY3YUf6bv/view?usp=sharing",
-      "youtubeUrl": "https://www.youtube.com/watch?v=KNvq3idRHe8&list=RDKNvq3idRHe8&start_radio=1",
-      "bundleUrl": "https://blackvybez.lemonsqueezy.com",
-      "streamUrl": "https://digitalminds.bfan.link/jazz-bar-ton-teraton",
-      "audio": "assets/audio/demo_track.mp3",
-      "cover": "/assets/uploads/jazz-bar-των-τεράτων-high-resolution.jpg",
+      "slug": "jazz-bar-ton-teraton",
       "title": "Jazz Bar των τεράτων",
-      "type": "Single"
+      "tag": "Vintage Freq",
+      "type": "Single",
+      "date": "2026-07-15",
+      "cover": "/assets/uploads/jazzbar.webp",
+      "spotify": "https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3",
+      "apple": "https://music.apple.com/us/album/jazz-bar-ton-teraton-single/1874438406",
+      "youtube": "https://www.youtube.com/watch?v=KNvq3idRHe8",
+      "buy": "https://blackvybez.lemonsqueezy.com",
+      "noSpotify": true,
+      "description": "Το απόλυτο single από τη σειρά Vintage Freq. Μια σκοτεινή, jazz-hop παραγωγή που παντρεύει την ατμόσφαιρα των παλιών καπνισμένων bar με τον σύγχρονο, βαρύ ήχο. Συντονίσου.",
+      "lyrics": ""
+    }
+  ],
+  "upcoming": [
+    {
+      "slug": "palirroia",
+      "title": "ΠΑΛΙΡΡΟΙΑ",
+      "tag": "Studio Album",
+      "type": "Album",
+      "comingSoon": true,
+      "cover": "/assets/uploads/palirroia-artwork.webp",
+      "description": "Το νερό δεν ρωτάει. Απλά παρασέρνει τα πάντα. Το νέο μεγάλο project του Black Vybez."
     }
   ]
 }

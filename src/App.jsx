@@ -20,6 +20,7 @@ import Links from './pages/Links';
 import Releases from './pages/Releases';
 import Blog from './pages/Blog';
 import BlogPost from './pages/BlogPost';
+import ReleasePost from './pages/ReleasePost';
 import './App.css';
 
 function AppContent() {
@@ -43,6 +44,7 @@ function AppContent() {
           <Route path="/bio" element={<Bio />} />
           <Route path="/links" element={<Links />} />
           <Route path="/releases" element={<Releases />} />
+          <Route path="/releases/:slug" element={<ReleasePost />} />
           <Route path="/blog" element={<Blog />} />
           <Route path="/blog/:slug" element={<BlogPost />} />
         </Routes>
