@@ -7,7 +7,7 @@ const SPOTIFY = 'https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3';
 const APPLE = 'https://music.apple.com/gr/artist/black-vybez/1510069891';
 const YOUTUBE = 'https://www.youtube.com/@BlackVybezwiththeflow';
 const BUY = 'https://blackvybez.lemonsqueezy.com';
-const BUNDLE_TIP = 'Στο single παίρνεις: High-Quality audio (MP3/WAV), εναλλακτικές εκδόσεις, ringtone, signed digital artwork, χειρόγραφοι στίχοι με υπογραφή.';
+const BUNDLE_TIP = 'Digital Bundle: High-Quality Audio (WAV/MP3), Instrumental έκδοση, Ringtone & High-Res Artwork. Υποστήριξε απευθείας τον καλλιτέχνη!';
 
 function ReleasePost() {
   const { slug } = useParams();
