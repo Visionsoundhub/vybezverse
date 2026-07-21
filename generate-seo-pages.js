@@ -56,7 +56,7 @@ const staticRoutes = [
 ];
 
 // 3. Helper συνάρτηση για να αντικαθιστά τα Meta Tags
-function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl }) {
+function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, postData }) {
   let html = htmlTemplate;
 
   // Αντικατάσταση Title
@@ -78,6 +78,23 @@ function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl })
   const fullUrl = `https://blackvybez.gr/${urlPath}`;
   if (!html.includes('<meta property="og:url"')) {
       html = html.replace('</head>', `  <meta property="og:url" content="${fullUrl}" />\n  </head>`);
+  }
+
+  // Αν πρόκειται για Blog Post, προσθέτουμε Article JSON-LD Schema
+  if (postData) {
+    const articleSchema = {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": postData.title,
+      "image": [imageUrl || DEFAULT_IMAGE],
+      "datePublished": postData.date,
+      "author": [{
+        "@type": "Person",
+        "name": postData.author || "Black Vybez",
+        "url": "https://blackvybez.gr"
+      }]
+    };
+    html = html.replace('</head>', `  <script type="application/ld+json">\n${JSON.stringify(articleSchema, null, 2)}\n  </script>\n</head>`);
   }
 
   return html;
@@ -126,7 +143,8 @@ async function generatePages() {
         title: `${post.title} | Black Vybez Blog`,
         description: cleanExcerpt,
         urlPath: `blog/${post.slug}`,
-        imageUrl: post.cover || DEFAULT_IMAGE
+        imageUrl: post.cover || DEFAULT_IMAGE,
+        postData: post
       });
       fs.writeFileSync(path.join(postDir, 'index.html'), htmlContent);
       console.log(`✅ Δημιουργήθηκε: /blog/${post.slug}`);

@@ -41,10 +41,19 @@ function BlogPost() {
         <div style={{ display: 'flex', gap: 14, alignItems: 'baseline', fontFamily: 'var(--font-mono)', fontSize: '.8rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 16 }}>
           <span>{fmt(post.date)}</span>
           {post.tag && <span style={{ color: 'var(--accent)' }}>· {post.tag}</span>}
-          {post.author && <span>· {post.author}</span>}
         </div>
 
-        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem,6vw,3.4rem)', lineHeight: 1.02, letterSpacing: '-.02em', margin: '0 0 30px' }}>{post.title}</h1>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem,6vw,3.4rem)', lineHeight: 1.02, letterSpacing: '-.02em', margin: '0 0 16px' }}>{post.title}</h1>
+        
+        {post.author && (
+          <div style={{ fontFamily: 'var(--font-sans)', fontSize: '1rem', color: 'var(--text)', marginBottom: 30, display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--bg)', fontWeight: 'bold', fontSize: '0.8rem' }}>BV</div>
+            <div>
+              <div style={{ fontWeight: 600 }}>{post.author}</div>
+              <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Producer & Creator</div>
+            </div>
+          </div>
+        )}
 
         {post.cover ? (
           <img src={post.cover} alt={post.title} style={{ width: '100%', borderRadius: 'var(--radius)', border: '1px solid var(--border-strong)', boxShadow: 'var(--shadow-print)', marginBottom: 40 }} />
