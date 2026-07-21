@@ -60,7 +60,20 @@
   <url>
     <loc>https://blackvybez.gr/blog/pos-ftiaxno-ena-beat</loc>
     <lastmod>2026-07-07</lastmod>
-    <changefreq>monthly</changefreq>
     <priority>0.7</priority>
+  </url>
+
+  <!-- Δυναμικές Σελίδες Releases (από src/data/releases.json) -->
+  <url>
+    <loc>https://blackvybez.gr/releases/jazz-bar-ton-teraton</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://blackvybez.gr/releases/palirroia</loc>
+    <lastmod>2026-07-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>
