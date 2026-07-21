@@ -37,7 +37,7 @@ const staticRoutes = [
   {
     path: 'bio',
     title: 'Βιογραφία | Black Vybez (Θοδωρής Παρασχάκης)',
-    description: 'Η ιστορία πίσω από τον Black Vybez: Μουσικός παραγωγός από τη Λάρισα, beats, podcasts και η φωνή του για τη νευροδιαφορετικότητα (ΔΕΠΥ).'
+    description: 'Η ιστορία πίσω από τον Black Vybez: Μουσικός παραγωγός από τη Λάρισα και την Αθήνα, beats, podcasts και η φωνή του για τη νευροδιαφορετικότητα (ΔΕΠΥ).'
   },
   {
     path: 'store',

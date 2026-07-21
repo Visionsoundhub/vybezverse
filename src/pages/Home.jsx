@@ -79,7 +79,7 @@ function Home() {
         <section id="hero" ref={set('hero')} className="hm-section hm-hero">
           <SectionBg src="/assets/uploads/hero-banner.webp" parallax />
           <div className="hm-hero-top">
-            <span>Flowless Music &nbsp;·&nbsp; Producer &nbsp;·&nbsp; <b>Larisa → ∞</b></span>
+            <span>Flowless Music &nbsp;·&nbsp; Producer &nbsp;·&nbsp; <b>Larissa / Athens → ∞</b></span>
             <HeroAccount />
           </div>
           <Reveal>

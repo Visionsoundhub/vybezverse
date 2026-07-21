@@ -48,7 +48,7 @@ function Bio() {
       {/* HERO */}
       <section className="bio-hero container">
         <span className="bio-ghost" aria-hidden="true">BLACK VYBEZ</span>
-        <div className="bio-eyebrow">Bio · Producer · Λάρισα → ∞</div>
+        <div className="bio-eyebrow">Bio · Producer · Λάρισα / Αθήνα → ∞</div>
         <h1 className="bio-title">BLACK VYBEZ</h1>
         <div className="bio-realname">Θοδωρής Παρασχάκης «Ντόμας»</div>
       </section>
