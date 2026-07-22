@@ -153,16 +153,17 @@ async function generatePages() {
 
   // Α. Στατικές Σελίδες
   for (const route of staticRoutes) {
-    const routeDir = path.join(DIST_DIR, route.path);
-    if (!fs.existsSync(routeDir)) {
-      fs.mkdirSync(routeDir, { recursive: true });
-    }
+    // Generate e.g. dist/blog.html instead of dist/blog/index.html
+    const filePath = path.join(DIST_DIR, `${route.path}.html`);
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    
     const htmlContent = injectMetaTags(baseHtml, {
       title: route.title,
       description: route.description,
       urlPath: route.path
     });
-    fs.writeFileSync(path.join(routeDir, 'index.html'), htmlContent);
+    fs.writeFileSync(filePath, htmlContent);
     console.log(`✅ Δημιουργήθηκε: /${route.path}`);
   }
 
@@ -172,10 +173,9 @@ async function generatePages() {
     for (const post of blogData.posts) {
       if (!post.slug) continue;
       
-      const postDir = path.join(DIST_DIR, 'blog', post.slug);
-      if (!fs.existsSync(postDir)) {
-        fs.mkdirSync(postDir, { recursive: true });
-      }
+      const filePath = path.join(DIST_DIR, 'blog', `${post.slug}.html`);
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
       // Καθαρισμός HTML tags από το excerpt (αν υπάρχουν) για το meta description
       const cleanExcerpt = post.excerpt ? post.excerpt.replace(/<[^>]+>/g, '').substring(0, 155) : 'Διαβάστε το νέο άρθρο στο blog του Black Vybez.';
@@ -187,7 +187,7 @@ async function generatePages() {
         imageUrl: post.cover || DEFAULT_IMAGE,
         postData: post
       });
-      fs.writeFileSync(path.join(postDir, 'index.html'), htmlContent);
+      fs.writeFileSync(filePath, htmlContent);
       console.log(`✅ Δημιουργήθηκε: /blog/${post.slug}`);
     }
   }
@@ -200,10 +200,9 @@ async function generatePages() {
     for (const release of allReleases) {
       if (!release.slug) continue;
       
-      const releaseDir = path.join(DIST_DIR, 'releases', release.slug);
-      if (!fs.existsSync(releaseDir)) {
-        fs.mkdirSync(releaseDir, { recursive: true });
-      }
+      const filePath = path.join(DIST_DIR, 'releases', `${release.slug}.html`);
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
       const htmlContent = injectMetaTags(baseHtml, {
         title: `${release.title} - Black Vybez | Release`,
@@ -212,7 +211,7 @@ async function generatePages() {
         imageUrl: release.cover || DEFAULT_IMAGE,
         releaseData: release
       });
-      fs.writeFileSync(path.join(releaseDir, 'index.html'), htmlContent);
+      fs.writeFileSync(filePath, htmlContent);
       console.log(`✅ Δημιουργήθηκε: /releases/${release.slug}`);
     }
   }
@@ -225,10 +224,9 @@ async function generatePages() {
     for (const podcast of podcastsFile.podcasts || []) {
       if (!podcast.slug) continue;
       
-      const podcastDir = path.join(DIST_DIR, 'podcasts', podcast.slug);
-      if (!fs.existsSync(podcastDir)) {
-        fs.mkdirSync(podcastDir, { recursive: true });
-      }
+      const filePath = path.join(DIST_DIR, 'podcasts', `${podcast.slug}.html`);
+      const dir = path.dirname(filePath);
+      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
       // We'll create a minimal podcastData object to trigger JSON-LD in injectMetaTags
       const podcastDataObj = {
@@ -246,7 +244,7 @@ async function generatePages() {
         imageUrl: DEFAULT_IMAGE,
         podcastData: podcastDataObj
       });
-      fs.writeFileSync(path.join(podcastDir, 'index.html'), htmlContent);
+      fs.writeFileSync(filePath, htmlContent);
       console.log(`✅ Δημιουργήθηκε: /podcasts/${podcast.slug}`);
     }
   }
