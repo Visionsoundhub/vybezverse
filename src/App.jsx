@@ -9,7 +9,7 @@ import ChatbotWidget from './components/ChatbotWidget';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import './App.css';
-
+import ErrorBoundary from './components/ErrorBoundary';
 // Lazy loaded pages for code splitting
 const Home = lazy(() => import('./pages/Home'));
 const Beats = lazy(() => import('./pages/Beats'));
@@ -74,13 +74,15 @@ function AppContent() {
 
 function App() {
   return (
-    <AuthProvider>
-      <AudioProvider>
-        <Router>
-          <AppContent />
-        </Router>
-      </AudioProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <AudioProvider>
+          <Router>
+            <AppContent />
+          </Router>
+        </AudioProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
 
