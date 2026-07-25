@@ -6,7 +6,7 @@ import releasesData from '../data/releases.json';
 import { AudioContext } from '../context/AudioContext';
 
 const BUY = 'https://blackvybez.lemonsqueezy.com';
-const BUNDLE_TIP = 'Digital Bundle: High-Quality Audio (WAV/MP3), Acapella (μόνο τα φωνητικά), Ringtone, High-Res Artwork & επιπλέον υλικό!';
+const BUNDLE_TIP = 'MP3 (κανονική έκδοση) + Slowed & Reverb + Sped Up εκδόσεις.';
 
 const SPOTIFY = 'https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3';
 const APPLE = 'https://music.apple.com/gr/artist/black-vybez/1510069891';
