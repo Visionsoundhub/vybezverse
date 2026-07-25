@@ -10,15 +10,21 @@
       "spotify": "https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3",
       "apple": "https://music.apple.com/us/album/jazz-bar-ton-teraton-single/1874438406",
       "youtube": "https://www.youtube.com/watch?v=KNvq3idRHe8",
-      "buy": "https://blackvybez.lemonsqueezy.com",
+      "buy": "https://blackvybez.lemonsqueezy.com/checkout/buy/b0e7ddb1-5b03-48eb-8869-fa0662553df9",
       "localAudio": true,
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-download.mp3",
       "downloadSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-download.mp3",
       "description": "Το απόλυτο single από τη σειρά Vintage Freq. Μια σκοτεινή, jazz-hop παραγωγή που παντρεύει την ατμόσφαιρα των παλιών καπνισμένων bar με τον σύγχρονο, βαρύ ήχο. Συντονίσου.",
       "lyrics": "",
       "altVersions": [
-        { "label": "Slowed + Reverb", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-slowed.mp3" },
-        { "label": "Sped Up", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-sped.mp3" }
+        {
+          "label": "Slowed + Reverb",
+          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-slowed.mp3"
+        },
+        {
+          "label": "Sped Up",
+          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-sped.mp3"
+        }
       ]
     },
     {
@@ -30,14 +36,20 @@
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-preview.mp3",
       "localAudio": true,
       "spotify": "https://open.spotify.com/track/5KQtb5PRjUEKlb7fafBSaV",
-      "buy": "https://blackvybez.lemonsqueezy.com",
+      "buy": "https://blackvybez.lemonsqueezy.com/checkout/buy/4cdf3b02-968a-495f-b57e-b85d9294692f",
       "price": "1.99€",
       "downloadSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-download.mp3",
       "description": "Black Vybez ft. Megaloudis.",
       "lyrics": "",
       "altVersions": [
-        { "label": "Slowed + Reverb", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-slowed.mp3" },
-        { "label": "Sped Up", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-sped.mp3" }
+        {
+          "label": "Slowed + Reverb",
+          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-slowed.mp3"
+        },
+        {
+          "label": "Sped Up",
+          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-sped.mp3"
+        }
       ]
     },
     {
@@ -50,14 +62,20 @@
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/hamogela-preview.mp3",
       "localAudio": true,
       "spotify": "https://open.spotify.com/album/1T5QiZXC7MRjSXDTTFKKPX",
-      "buy": "https://blackvybez.lemonsqueezy.com",
+      "buy": "https://blackvybez.lemonsqueezy.com/checkout/buy/96811810-d836-4f58-acc2-bb2d326a259f",
       "price": "1.99€",
       "downloadSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/hamogela-download.mp3",
       "description": "Official audio release.",
       "lyrics": "",
       "altVersions": [
-        { "label": "Slowed + Reverb", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/hamogela-slowed.mp3" },
-        { "label": "Sped Up", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/hamogela-sped.mp3" }
+        {
+          "label": "Slowed + Reverb",
+          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/hamogela-slowed.mp3"
+        },
+        {
+          "label": "Sped Up",
+          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/hamogela-sped.mp3"
+        }
       ]
     },
     {
@@ -70,7 +88,7 @@
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/fiesta-preview.mp3",
       "localAudio": true,
       "spotify": "https://open.spotify.com/track/52uDEhkr00wIAw3wz7xgz2",
-      "buy": "https://blackvybez.lemonsqueezy.com",
+      "buy": "https://blackvybez.lemonsqueezy.com/checkout/buy/c334ab66-c40b-441a-aec9-4765b0816065",
       "price": "1.99€",
       "description": "Black Vybez x Michalis Megaloudis.",
       "lyrics": ""
@@ -85,14 +103,20 @@
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/keno-preview.mp3",
       "localAudio": true,
       "noSpotify": true,
-      "buy": "https://blackvybez.lemonsqueezy.com",
+      "buy": "https://blackvybez.lemonsqueezy.com/checkout/buy/04a0fba5-cf6c-4433-ada7-89e7b7a941db",
       "price": "1.99€",
       "downloadSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/keno-download.mp3",
       "description": "E Void x Toxical x Black Vybez.",
       "lyrics": "",
       "altVersions": [
-        { "label": "Slowed + Reverb", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/keno-slowed.mp3" },
-        { "label": "Sped Up", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/keno-sped.mp3" }
+        {
+          "label": "Slowed + Reverb",
+          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/keno-slowed.mp3"
+        },
+        {
+          "label": "Sped Up",
+          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/keno-sped.mp3"
+        }
       ]
     },
     {
@@ -105,14 +129,20 @@
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/selini-preview.mp3",
       "localAudio": true,
       "spotify": "https://open.spotify.com/album/3yKw9WjObaFK1lirqbvnfX",
-      "buy": "https://blackvybez.lemonsqueezy.com",
+      "buy": "https://blackvybez.lemonsqueezy.com/checkout/buy/6ddd2e4d-8635-4350-91c8-abf8175ae5c6",
       "price": "1.99€",
       "downloadSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/selini-download.mp3",
       "description": "Black Vybez x Fuji Latifudia.",
       "lyrics": "",
       "altVersions": [
-        { "label": "Slowed + Reverb", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/selini-slowed.mp3" },
-        { "label": "Sped Up", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/selini-sped.mp3" }
+        {
+          "label": "Slowed + Reverb",
+          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/selini-slowed.mp3"
+        },
+        {
+          "label": "Sped Up",
+          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/selini-sped.mp3"
+        }
       ]
     },
     {
@@ -125,14 +155,20 @@
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/apothimeno-preview.mp3",
       "localAudio": true,
       "spotify": "https://open.spotify.com/track/6dmByWAUh2SdFDUtpsiroV",
-      "buy": "https://blackvybez.lemonsqueezy.com",
+      "buy": "https://blackvybez.lemonsqueezy.com/checkout/buy/ab7fa7f3-8642-4a35-94e0-642676b662b5",
       "price": "1.99€",
       "downloadSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/apothimeno-download.mp3",
       "description": "Fuji Latifudia x Black Vybez.",
       "lyrics": "",
       "altVersions": [
-        { "label": "Slowed + Reverb", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/apothimeno-slowed.mp3" },
-        { "label": "Sped Up", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/apothimeno-sped.mp3" }
+        {
+          "label": "Slowed + Reverb",
+          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/apothimeno-slowed.mp3"
+        },
+        {
+          "label": "Sped Up",
+          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/apothimeno-sped.mp3"
+        }
       ]
     }
   ],
