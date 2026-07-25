@@ -71,17 +71,12 @@ function Releases() {
                   {item.localAudio ? (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
                       <button className="btn-outline" style={{ width: '100%', padding: '9px' }} onClick={() => playTrack({ title: item.title, cover: item.cover, audioSrc: item.audioSrc })}>
-                        <Play size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Play preview
+                        <Play size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Άκουσέ το
                       </button>
-                      {item.altVersions?.length > 0 && (
-                        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${item.altVersions.length}, 1fr)`, gap: 6 }}>
-                          {item.altVersions.map((v) => (
-                            <button key={v.label} className="btn-outline" style={{ padding: '6px', fontSize: '.72rem' }} onClick={() => playTrack({ title: `${item.title} (${v.label})`, cover: item.cover, audioSrc: v.audioSrc })}>
-                              {v.label}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                        <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" title="Spotify"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Spotify"><Play size={15} /></button></a>
+                        <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" title="YouTube"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="YouTube"><ExternalLink size={15} /></button></a>
+                      </div>
                       {item.downloadSrc && (
                         <a href={item.downloadSrc} download={`${item.title}.mp3`}><button className="btn-outline" style={{ width: '100%', padding: '9px' }}><Download size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Δωρεάν MP3</button></a>
                       )}
