@@ -1,21 +1,6 @@
 {
   "beatslist": [
     {
-      "price": "79.99€",
-      "checkoutUrl": "https://blackvybez.lemonsqueezy.com",
-      "audioSrc": "/assets/uploads/solo-lio-rising-93bpm.mp3",
-      "status": "available",
-      "cover": "/assets/uploads/banner.png",
-      "title": "Late Hours",
-      "tags": [
-        "love",
-        "party"
-      ],
-      "category": "latin",
-      "bpm": "90",
-      "key": "Fminor"
-    },
-    {
       "price": "19.99€",
       "checkoutUrl": "https://blackvybez.lemonsqueezy.com/checkout/buy/193358d1-0fe7-4900-8309-4f01324b8403",
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/lonely-road-preview.mp3",
@@ -31,6 +16,6 @@
       "key": "Unknown"
     }
   ],
-  "storeActive": false,
+  "storeActive": true,
   "comingSoonText": "Σύντομα Διαθέσιμο!"
 }
