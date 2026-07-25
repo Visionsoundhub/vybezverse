@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Play, Music, Disc3, ShoppingBag, ExternalLink, ArrowRight } from 'lucide-react';
+import { Play, Music, Disc3, ShoppingBag, ExternalLink, ArrowRight, Download } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import releasesData from '../data/releases.json';
 import { AudioContext } from '../context/AudioContext';
@@ -81,6 +81,9 @@ function Releases() {
                             </button>
                           ))}
                         </div>
+                      )}
+                      {item.downloadSrc && (
+                        <a href={item.downloadSrc} download={`${item.title}.mp3`}><button className="btn-outline" style={{ width: '100%', padding: '9px' }}><Download size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Δωρεάν MP3</button></a>
                       )}
                     </div>
                   ) : (

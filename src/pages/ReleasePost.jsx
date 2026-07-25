@@ -1,6 +1,6 @@
 import React, { useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Play, Music, ExternalLink, ShoppingBag } from 'lucide-react';
+import { ArrowLeft, Play, Music, ExternalLink, ShoppingBag, Download } from 'lucide-react';
 import releasesData from '../data/releases.json';
 import { AudioContext } from '../context/AudioContext';
 
@@ -54,6 +54,13 @@ function ReleasePost() {
                           {v.label}
                         </button>
                       ))}
+                      {item.downloadSrc && (
+                        <a href={item.downloadSrc} download={`${item.title}.mp3`} style={{ textDecoration: 'none' }}>
+                          <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}>
+                            <Download size={16} style={{ marginRight: 8 }} /> Δωρεάν λήψη MP3
+                          </button>
+                        </a>
+                      )}
                     </>
                   ) : (
                     <>
