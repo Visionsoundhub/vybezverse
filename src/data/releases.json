@@ -13,7 +13,29 @@
       "buy": "https://blackvybez.lemonsqueezy.com",
       "noSpotify": true,
       "description": "Το απόλυτο single από τη σειρά Vintage Freq. Μια σκοτεινή, jazz-hop παραγωγή που παντρεύει την ατμόσφαιρα των παλιών καπνισμένων bar με τον σύγχρονο, βαρύ ήχο. Συντονίσου.",
-      "lyrics": ""
+      "lyrics": "",
+      "altVersions": [
+        { "label": "Slowed + Reverb", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-slowed.mp3" },
+        { "label": "Sped Up", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-sped.mp3" }
+      ]
+    },
+    {
+      "slug": "den-me-noiazei",
+      "title": "Den me noiazei oti kai an les",
+      "tag": "ft. Megaloudis",
+      "type": "Single",
+      "cover": "/assets/uploads/black-vybez-den-me-noiazei.jpg",
+      "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-preview.mp3",
+      "localAudio": true,
+      "noSpotify": true,
+      "buy": "https://blackvybez.lemonsqueezy.com",
+      "price": "2.99€",
+      "description": "Black Vybez ft. Megaloudis.",
+      "lyrics": "",
+      "altVersions": [
+        { "label": "Slowed + Reverb", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-slowed.mp3" },
+        { "label": "Sped Up", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-sped.mp3" }
+      ]
     },
     {
       "slug": "hamogela-mou",
@@ -26,9 +48,13 @@
       "localAudio": true,
       "noSpotify": true,
       "buy": "https://blackvybez.lemonsqueezy.com",
-      "price": "1.99€",
+      "price": "2.99€",
       "description": "Official audio release.",
-      "lyrics": ""
+      "lyrics": "",
+      "altVersions": [
+        { "label": "Slowed + Reverb", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/hamogela-slowed.mp3" },
+        { "label": "Sped Up", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/hamogela-sped.mp3" }
+      ]
     },
     {
       "slug": "fiesta",
@@ -41,7 +67,7 @@
       "localAudio": true,
       "noSpotify": true,
       "buy": "https://blackvybez.lemonsqueezy.com",
-      "price": "1.99€",
+      "price": "2.99€",
       "description": "Black Vybez x Michalis Megaloudis.",
       "lyrics": ""
     },
@@ -56,9 +82,13 @@
       "localAudio": true,
       "noSpotify": true,
       "buy": "https://blackvybez.lemonsqueezy.com",
-      "price": "1.99€",
+      "price": "2.99€",
       "description": "E Void x Toxical x Black Vybez.",
-      "lyrics": ""
+      "lyrics": "",
+      "altVersions": [
+        { "label": "Slowed + Reverb", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/keno-slowed.mp3" },
+        { "label": "Sped Up", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/keno-sped.mp3" }
+      ]
     },
     {
       "slug": "selini",
@@ -71,9 +101,13 @@
       "localAudio": true,
       "noSpotify": true,
       "buy": "https://blackvybez.lemonsqueezy.com",
-      "price": "1.99€",
+      "price": "2.99€",
       "description": "Black Vybez x Fuji Latifudia.",
-      "lyrics": ""
+      "lyrics": "",
+      "altVersions": [
+        { "label": "Slowed + Reverb", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/selini-slowed.mp3" },
+        { "label": "Sped Up", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/selini-sped.mp3" }
+      ]
     },
     {
       "slug": "apothimeno",
@@ -86,9 +120,13 @@
       "localAudio": true,
       "noSpotify": true,
       "buy": "https://blackvybez.lemonsqueezy.com",
-      "price": "1.99€",
+      "price": "2.99€",
       "description": "Fuji Latifudia x Black Vybez.",
-      "lyrics": ""
+      "lyrics": "",
+      "altVersions": [
+        { "label": "Slowed + Reverb", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/apothimeno-slowed.mp3" },
+        { "label": "Sped Up", "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/apothimeno-sped.mp3" }
+      ]
     }
   ],
   "upcoming": [

@@ -69,9 +69,20 @@ function Releases() {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '.68rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Stream</div>
                   {item.localAudio ? (
-                    <button className="btn-outline" style={{ width: '100%', padding: '9px' }} onClick={() => playTrack({ title: item.title, cover: item.cover, audioSrc: item.audioSrc })}>
-                      <Play size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Play preview
-                    </button>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                      <button className="btn-outline" style={{ width: '100%', padding: '9px' }} onClick={() => playTrack({ title: item.title, cover: item.cover, audioSrc: item.audioSrc })}>
+                        <Play size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Play preview
+                      </button>
+                      {item.altVersions?.length > 0 && (
+                        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${item.altVersions.length}, 1fr)`, gap: 6 }}>
+                          {item.altVersions.map((v) => (
+                            <button key={v.label} className="btn-outline" style={{ padding: '6px', fontSize: '.72rem' }} onClick={() => playTrack({ title: `${item.title} (${v.label})`, cover: item.cover, audioSrc: v.audioSrc })}>
+                              {v.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   ) : (
                     <div style={{ display: 'grid', gridTemplateColumns: item.noSpotify ? '1fr 1fr' : '1fr 1fr 1fr', gap: 6 }}>
                       {!item.noSpotify && (

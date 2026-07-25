@@ -45,9 +45,16 @@ function ReleasePost() {
               ) : (
                 <>
                   {item.localAudio ? (
-                    <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => playTrack({ title: item.title, cover: item.cover, audioSrc: item.audioSrc })}>
-                      <Play size={16} style={{ marginRight: 8 }} /> Play preview
-                    </button>
+                    <>
+                      <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => playTrack({ title: item.title, cover: item.cover, audioSrc: item.audioSrc })}>
+                        <Play size={16} style={{ marginRight: 8 }} /> Play preview
+                      </button>
+                      {item.altVersions?.map((v) => (
+                        <button key={v.label} className="btn-outline" style={{ width: '100%', justifyContent: 'center' }} onClick={() => playTrack({ title: `${item.title} (${v.label})`, cover: item.cover, audioSrc: v.audioSrc })}>
+                          {v.label}
+                        </button>
+                      ))}
+                    </>
                   ) : (
                     <>
                       {!item.noSpotify && (
