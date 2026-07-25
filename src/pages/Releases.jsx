@@ -4,6 +4,7 @@ import { Play, Music, Disc3, ShoppingBag, ExternalLink, ArrowRight, Download } f
 import { Link } from 'react-router-dom';
 import releasesData from '../data/releases.json';
 import { AudioContext } from '../context/AudioContext';
+import { openCheckout } from '../utils/lemon';
 
 const BUY = 'https://blackvybez.lemonsqueezy.com';
 const BUNDLE_TIP = 'MP3 (κανονική έκδοση) + Slowed & Reverb + Sped Up εκδόσεις.';
@@ -95,7 +96,7 @@ function Releases() {
                       <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>YouTube</button></a>
                     </div>
                   )}
-                  <a href={item.buy || BUY} target="_blank" rel="noreferrer"><button className="btn-primary tip" data-tip={BUNDLE_TIP} style={{ width: '100%', padding: '10px' }}><ShoppingBag size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Αγόρασε{item.price ? ` ${item.price}` : ''}</button></a>
+                  <a href={item.buy || BUY} onClick={(e) => openCheckout(e, item.buy || BUY)} target="_blank" rel="noreferrer"><button className="btn-primary tip" data-tip={BUNDLE_TIP} style={{ width: '100%', padding: '10px' }}><ShoppingBag size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Αγόρασε{item.price ? ` ${item.price}` : ''}</button></a>
                   <Link to={`/releases/${item.slug}`} style={{ textDecoration: 'none', marginTop: 4 }}>
                     <button className="btn-outline" style={{ width: '100%', padding: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                       Προβολή <ArrowRight size={14} style={{ marginLeft: 6 }} />

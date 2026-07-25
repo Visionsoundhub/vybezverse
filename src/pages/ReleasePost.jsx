@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Play, Music, ExternalLink, ShoppingBag, Download } from 'lucide-react';
 import releasesData from '../data/releases.json';
 import { AudioContext } from '../context/AudioContext';
+import { openCheckout } from '../utils/lemon';
 
 const SPOTIFY = 'https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3';
 const APPLE = 'https://music.apple.com/gr/artist/black-vybez/1510069891';
@@ -103,7 +104,7 @@ function ReleasePost() {
                       </a>
                     </>
                   )}
-                  <a href={item.buy || BUY} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                  <a href={item.buy || BUY} onClick={(e) => openCheckout(e, item.buy || BUY)} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
                     <button className="btn-primary tip" data-tip={BUNDLE_TIP} style={{ width: '100%', justifyContent: 'center', background: 'var(--accent)', color: 'var(--bg)', marginTop: 12 }}>
                       <ShoppingBag size={16} style={{ marginRight: 8 }} /> Αγορά{item.price ? ` (${item.price})` : ''}
                     </button>
