@@ -73,8 +73,9 @@ function Releases() {
                       <button className="btn-outline" style={{ width: '100%', padding: '9px' }} onClick={() => playTrack({ title: item.title, cover: item.cover, audioSrc: item.audioSrc })}>
                         <Play size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Άκουσέ το
                       </button>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 6 }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
                         <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" title="Spotify"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Spotify"><Play size={15} /></button></a>
+                        <a href={item.apple || APPLE} target="_blank" rel="noreferrer" title="Apple Music"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Apple Music"><Music size={15} /></button></a>
                         <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" title="YouTube"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="YouTube"><ExternalLink size={15} /></button></a>
                       </div>
                       {item.downloadSrc && (

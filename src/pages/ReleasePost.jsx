@@ -32,7 +32,7 @@ function ReleasePost() {
           <ArrowLeft size={14} /> Catalog
         </Link>
 
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: 40, '@media (min-width: 768px)': { gridTemplateColumns: '300px 1fr' } }}>
+        <div className="release-hero-grid">
           {/* Cover & Links */}
           <div>
             <img src={item.cover} alt={item.title} style={{ width: '100%', borderRadius: 'var(--radius)', border: '1px solid var(--border-strong)', boxShadow: 'var(--shadow-print)' }} />
@@ -51,6 +51,9 @@ function ReleasePost() {
                       </button>
                       <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
                         <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><Play size={16} style={{ marginRight: 8 }} /> Spotify</button>
+                      </a>
+                      <a href={item.apple || APPLE} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                        <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><Music size={16} style={{ marginRight: 8 }} /> Apple Music</button>
                       </a>
                       <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
                         <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><ExternalLink size={16} style={{ marginRight: 8 }} /> YouTube</button>
