@@ -128,9 +128,6 @@
 .hm-tags { display: flex; gap: 6px; }
 .hm-tag { font-family: var(--font-mono); font-size: .68rem; letter-spacing: .04em; color: var(--text-dim);
   border: 1px solid var(--border); padding: 3px 8px; border-radius: 3px; }
-.hm-more { font-family: var(--font-mono); font-size: .8rem; color: var(--accent); text-decoration: none;
-  letter-spacing: .06em; }
-.hm-more:hover { color: var(--accent-hot); }
 
 /* ---------- live: stamp ---------- */
 .hm-stamp { border: 2px dashed var(--border-strong); border-radius: var(--radius);
