@@ -53,9 +53,13 @@ function Releases() {
           style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: 24 }}>
           {items.map((item, i) => (
             <div key={i} className="glass-card" style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
-              <div style={{ aspectRatio: '1', borderRadius: 'var(--radius-sm)', background: 'var(--ink-800)', border: '1px solid var(--border-strong)', boxShadow: '5px 5px 0 var(--oxblood)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                <span style={{ position: 'absolute', top: 12, right: 12, fontFamily: 'var(--font-mono)', fontSize: '.65rem', letterSpacing: '.1em', textTransform: 'uppercase', background: 'var(--accent)', color: 'var(--ink-900)', padding: '3px 9px', borderRadius: 3 }}>{item.type}</span>
-                <Disc3 size={56} color="var(--accent)" opacity={0.6} />
+              <div style={{ aspectRatio: '1', borderRadius: 'var(--radius-sm)', background: 'var(--ink-800)', border: '1px solid var(--border-strong)', boxShadow: '5px 5px 0 var(--oxblood)', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative', overflow: 'hidden' }}>
+                <span style={{ position: 'absolute', top: 12, right: 12, zIndex: 1, fontFamily: 'var(--font-mono)', fontSize: '.65rem', letterSpacing: '.1em', textTransform: 'uppercase', background: 'var(--accent)', color: 'var(--ink-900)', padding: '3px 9px', borderRadius: 3 }}>{item.type}</span>
+                {item.cover ? (
+                  <img src={item.cover} alt={item.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                ) : (
+                  <Disc3 size={56} color="var(--accent)" opacity={0.6} />
+                )}
               </div>
               <div>
                 <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: 700, margin: 0 }}>{item.title}</h3>
@@ -74,9 +78,9 @@ function Releases() {
                         <Play size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Άκουσέ το
                       </button>
                       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
-                        <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" title="Spotify"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Spotify"><Play size={15} /></button></a>
-                        <a href={item.apple || APPLE} target="_blank" rel="noreferrer" title="Apple Music"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Apple Music"><Music size={15} /></button></a>
-                        <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" title="YouTube"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="YouTube"><ExternalLink size={15} /></button></a>
+                        <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>Spotify</button></a>
+                        <a href={item.apple || APPLE} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>Apple</button></a>
+                        <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>YouTube</button></a>
                       </div>
                       {item.downloadSrc && (
                         <a href={item.downloadSrc} download={`${item.title}.mp3`}><button className="btn-outline" style={{ width: '100%', padding: '9px' }}><Download size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Δωρεάν MP3</button></a>
@@ -85,10 +89,10 @@ function Releases() {
                   ) : (
                     <div style={{ display: 'grid', gridTemplateColumns: item.noSpotify ? '1fr 1fr' : '1fr 1fr 1fr', gap: 6 }}>
                       {!item.noSpotify && (
-                        <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" title="Spotify"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Spotify"><Play size={15} /></button></a>
+                        <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>Spotify</button></a>
                       )}
-                      <a href={item.apple || APPLE} target="_blank" rel="noreferrer" title="Apple Music"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Apple Music"><Music size={15} /></button></a>
-                      <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" title="YouTube"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="YouTube"><ExternalLink size={15} /></button></a>
+                      <a href={item.apple || APPLE} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>Apple</button></a>
+                      <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>YouTube</button></a>
                     </div>
                   )}
                   <a href={item.buy || BUY} target="_blank" rel="noreferrer"><button className="btn-primary tip" data-tip={BUNDLE_TIP} style={{ width: '100%', padding: '10px' }}><ShoppingBag size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Αγόρασε{item.price ? ` ${item.price}` : ''}</button></a>

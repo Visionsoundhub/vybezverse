@@ -27,18 +27,40 @@ function ReleasePost() {
 
   return (
     <div className="container" style={{ paddingTop: '130px', paddingBottom: '110px' }}>
-      <div style={{ maxWidth: '840px', margin: '0 auto' }}>
+      <div style={{ maxWidth: '480px', margin: '0 auto' }}>
         <Link to="/releases" className="hm-more" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, marginBottom: 40 }}>
           <ArrowLeft size={14} /> Catalog
         </Link>
 
-        <div className="release-hero-grid">
-          {/* Cover & Links */}
-          <div>
-            <img src={item.cover} alt={item.title} style={{ width: '100%', borderRadius: 'var(--radius)', border: '1px solid var(--border-strong)', boxShadow: 'var(--shadow-print)' }} />
-            
-            <div style={{ marginTop: 24, display: 'flex', flexDirection: 'column', gap: 12 }}>
-              {item.comingSoon ? (
+        <div>
+          {/* Cover */}
+          <img src={item.cover} alt={item.title} style={{ width: '100%', borderRadius: 'var(--radius)', border: '1px solid var(--border-strong)', boxShadow: 'var(--shadow-print)' }} />
+
+          {/* Title & Details */}
+          <div style={{ marginTop: 30 }}>
+            <div style={{ display: 'flex', gap: 14, alignItems: 'baseline', fontFamily: 'var(--font-mono)', fontSize: '.8rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 16 }}>
+              <span>{item.type}</span>
+              <span style={{ color: 'var(--accent)' }}>· {item.tag}</span>
+              {item.date && <span>· {new Date(item.date).getFullYear()}</span>}
+            </div>
+
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem,6vw,3.2rem)', lineHeight: 0.95, letterSpacing: '-.02em', margin: '0 0 20px' }}>{item.title}</h1>
+
+            <p style={{ color: 'var(--text)', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: 0 }}>{item.description}</p>
+
+            {item.lyrics && (
+              <div style={{ marginTop: 30, borderTop: '1px solid var(--border)', paddingTop: 24 }}>
+                <h3 style={{ fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '.1em', fontSize: '.9rem', color: 'var(--text-dim)', marginBottom: 20 }}>Στίχοι / Σημειώσεις</h3>
+                <div style={{ whiteSpace: 'pre-wrap', color: 'var(--text)', lineHeight: 1.8, fontSize: '1.05rem', fontStyle: 'italic' }}>
+                  {item.lyrics}
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Links */}
+          <div style={{ marginTop: 30, display: 'flex', flexDirection: 'column', gap: 12 }}>
+            {item.comingSoon ? (
                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '.8rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--text-dim)', border: '1px dashed var(--border-strong)', borderRadius: 'var(--radius-sm)', padding: '16px', textAlign: 'center' }}>
                    Coming soon
                  </div>
@@ -88,29 +110,6 @@ function ReleasePost() {
                   </a>
                 </>
               )}
-            </div>
-          </div>
-
-          {/* Details */}
-          <div>
-            <div style={{ display: 'flex', gap: 14, alignItems: 'baseline', fontFamily: 'var(--font-mono)', fontSize: '.8rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 16 }}>
-              <span>{item.type}</span>
-              <span style={{ color: 'var(--accent)' }}>· {item.tag}</span>
-              {item.date && <span>· {new Date(item.date).getFullYear()}</span>}
-            </div>
-
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.4rem,6vw,4.5rem)', lineHeight: 0.95, letterSpacing: '-.02em', margin: '0 0 24px' }}>{item.title}</h1>
-            
-            <p style={{ color: 'var(--text)', fontSize: '1.2rem', lineHeight: 1.6, marginBottom: 30 }}>{item.description}</p>
-            
-            {item.lyrics && (
-              <div style={{ marginTop: 40, borderTop: '1px solid var(--border)', paddingTop: 30 }}>
-                <h3 style={{ fontFamily: 'var(--font-mono)', textTransform: 'uppercase', letterSpacing: '.1em', fontSize: '.9rem', color: 'var(--text-dim)', marginBottom: 20 }}>Στίχοι / Σημειώσεις</h3>
-                <div style={{ whiteSpace: 'pre-wrap', color: 'var(--text)', lineHeight: 1.8, fontSize: '1.05rem', fontStyle: 'italic' }}>
-                  {item.lyrics}
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
