@@ -14,6 +14,21 @@
       "category": "drill",
       "bpm": "90",
       "key": "Unknown"
+    },
+    {
+      "price": "14.99€",
+      "checkoutUrl": "https://blackvybez.lemonsqueezy.com/checkout/buy/749d04e8-13d6-40e7-9b24-4625b48c4bc2",
+      "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/lovecrime-preview.mp3",
+      "status": "available",
+      "cover": "/assets/uploads/lovecrime-cover.webp",
+      "title": "Love Crime",
+      "tags": [
+        "dark",
+        "trap"
+      ],
+      "category": "trap",
+      "bpm": "144",
+      "key": "Dminor"
     }
   ],
   "storeActive": true,

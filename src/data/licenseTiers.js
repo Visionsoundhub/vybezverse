@@ -26,7 +26,7 @@ export const LICENSE_TIERS = [
     icon: Layers,
     name: 'Stems',
     price: '64,99€',
-    features: ['Ό,τι και το WAV', 'Ξεχωριστά stems (drums, bass, melody...)', 'Παραδίδονται εντός 48 ωρών', 'Ζητούνται ξεχωριστά μέσω email'],
+    features: ['Ό,τι και το WAV', 'Ξεχωριστά stems (drums, bass, melody...)', 'Παραδίδονται εντός 48 ωρών', 'Κατόπιν συνεννόησης'],
     action: 'contact',
     contactExtra: 'Θέλω το Stems license (WAV + ξεχωριστά stems).',
   },
