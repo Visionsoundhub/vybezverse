@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { Play, Music, Disc3, ShoppingBag, ExternalLink, ArrowRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import releasesData from '../data/releases.json';
+import { AudioContext } from '../context/AudioContext';
 
 const BUY = 'https://blackvybez.lemonsqueezy.com';
 const BUNDLE_TIP = 'Digital Bundle: High-Quality Audio (WAV/MP3), Acapella (μόνο τα φωνητικά), Ringtone, High-Res Artwork & επιπλέον υλικό!';
@@ -14,6 +15,7 @@ const YOUTUBE = 'https://www.youtube.com/@BlackVybezwiththeflow';
 function Releases() {
   const [tab, setTab] = useState('singles');
   const reduce = useReducedMotion();
+  const { playTrack } = useContext(AudioContext);
   const items = tab === 'singles' ? releasesData.releases || [] : releasesData.upcoming || [];
 
   return (
@@ -66,14 +68,20 @@ function Releases() {
               ) : (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
                   <div style={{ fontFamily: 'var(--font-mono)', fontSize: '.68rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--text-dim)' }}>Stream</div>
-                  <div style={{ display: 'grid', gridTemplateColumns: item.noSpotify ? '1fr 1fr' : '1fr 1fr 1fr', gap: 6 }}>
-                    {!item.noSpotify && (
-                      <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" title="Spotify"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Spotify"><Play size={15} /></button></a>
-                    )}
-                    <a href={item.apple || APPLE} target="_blank" rel="noreferrer" title="Apple Music"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Apple Music"><Music size={15} /></button></a>
-                    <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" title="YouTube"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="YouTube"><ExternalLink size={15} /></button></a>
-                  </div>
-                  <a href={item.buy || BUY} target="_blank" rel="noreferrer"><button className="btn-primary tip" data-tip={BUNDLE_TIP} style={{ width: '100%', padding: '10px' }}><ShoppingBag size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Αγόρασε</button></a>
+                  {item.localAudio ? (
+                    <button className="btn-outline" style={{ width: '100%', padding: '9px' }} onClick={() => playTrack({ title: item.title, cover: item.cover, audioSrc: item.audioSrc })}>
+                      <Play size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Play preview
+                    </button>
+                  ) : (
+                    <div style={{ display: 'grid', gridTemplateColumns: item.noSpotify ? '1fr 1fr' : '1fr 1fr 1fr', gap: 6 }}>
+                      {!item.noSpotify && (
+                        <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" title="Spotify"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Spotify"><Play size={15} /></button></a>
+                      )}
+                      <a href={item.apple || APPLE} target="_blank" rel="noreferrer" title="Apple Music"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Apple Music"><Music size={15} /></button></a>
+                      <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" title="YouTube"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="YouTube"><ExternalLink size={15} /></button></a>
+                    </div>
+                  )}
+                  <a href={item.buy || BUY} target="_blank" rel="noreferrer"><button className="btn-primary tip" data-tip={BUNDLE_TIP} style={{ width: '100%', padding: '10px' }}><ShoppingBag size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Αγόρασε{item.price ? ` ${item.price}` : ''}</button></a>
                   <Link to={`/releases/${item.slug}`} style={{ textDecoration: 'none', marginTop: 4 }}>
                     <button className="btn-outline" style={{ width: '100%', padding: '10px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                       Προβολή <ArrowRight size={14} style={{ marginLeft: 6 }} />

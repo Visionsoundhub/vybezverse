@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Play, Music, ExternalLink, ShoppingBag } from 'lucide-react';
 import releasesData from '../data/releases.json';
+import { AudioContext } from '../context/AudioContext';
 
 const SPOTIFY = 'https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3';
 const APPLE = 'https://music.apple.com/gr/artist/black-vybez/1510069891';
@@ -11,6 +12,7 @@ const BUNDLE_TIP = 'Digital Bundle: High-Quality Audio (WAV/MP3), Acapella (μό
 
 function ReleasePost() {
   const { slug } = useParams();
+  const { playTrack } = useContext(AudioContext);
   const allReleases = [...(releasesData.releases || []), ...(releasesData.upcoming || [])];
   const item = allReleases.find((r) => r.slug === slug);
 
@@ -42,20 +44,28 @@ function ReleasePost() {
                  </div>
               ) : (
                 <>
-                  {!item.noSpotify && (
-                    <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
-                      <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}><Play size={16} style={{ marginRight: 8 }} /> Άκου στο Spotify</button>
-                    </a>
+                  {item.localAudio ? (
+                    <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => playTrack({ title: item.title, cover: item.cover, audioSrc: item.audioSrc })}>
+                      <Play size={16} style={{ marginRight: 8 }} /> Play preview
+                    </button>
+                  ) : (
+                    <>
+                      {!item.noSpotify && (
+                        <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                          <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}><Play size={16} style={{ marginRight: 8 }} /> Άκου στο Spotify</button>
+                        </a>
+                      )}
+                      <a href={item.apple || APPLE} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                        <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><Music size={16} style={{ marginRight: 8 }} /> Apple Music</button>
+                      </a>
+                      <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                        <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><ExternalLink size={16} style={{ marginRight: 8 }} /> YouTube</button>
+                      </a>
+                    </>
                   )}
-                  <a href={item.apple || APPLE} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
-                    <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><Music size={16} style={{ marginRight: 8 }} /> Apple Music</button>
-                  </a>
-                  <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
-                    <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><ExternalLink size={16} style={{ marginRight: 8 }} /> YouTube</button>
-                  </a>
                   <a href={item.buy || BUY} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
                     <button className="btn-primary tip" data-tip={BUNDLE_TIP} style={{ width: '100%', justifyContent: 'center', background: 'var(--accent)', color: 'var(--bg)', marginTop: 12 }}>
-                      <ShoppingBag size={16} style={{ marginRight: 8 }} /> Αγορά (Digital Bundle)
+                      <ShoppingBag size={16} style={{ marginRight: 8 }} /> Αγορά{item.price ? ` (${item.price})` : ' (Digital Bundle)'}
                     </button>
                   </a>
                 </>
