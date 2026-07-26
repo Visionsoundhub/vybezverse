@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
@@ -10,9 +10,19 @@ function fmt(d) {
   } catch { return d; }
 }
 
+const TABS = [
+  { key: 'news', label: 'Music News' },
+  { key: 'blog', label: 'Blog' },
+];
+
 function Blog() {
   const reduce = useReducedMotion();
-  const posts = [...(blogData.posts || [])].sort((a, b) => new Date(b.date) - new Date(a.date));
+  const [tab, setTab] = useState('news');
+  // Older posts predate the news/blog split; default them to news since the
+  // first post ever written here was a release announcement.
+  const posts = [...(blogData.posts || [])]
+    .filter((p) => (p.category || 'news') === tab)
+    .sort((a, b) => new Date(b.date) - new Date(a.date));
 
   return (
     <div className="container" style={{ paddingTop: '130px', paddingBottom: '110px' }}>
@@ -24,7 +34,26 @@ function Blog() {
         Σκέψεις για τη μουσική, τη νευροδιαφορετικότητα και τη ζωή πίσω από τα beats.
       </p>
 
-      <div style={{ marginTop: 56, display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'flex', gap: 10, marginTop: 40 }}>
+        {TABS.map((t) => (
+          <button key={t.key} onClick={() => setTab(t.key)}
+            className={tab === t.key ? 'btn-primary' : 'btn-outline'}
+            style={{ padding: '9px 20px', fontFamily: 'var(--font-mono)', fontSize: '.8rem', textTransform: 'uppercase', letterSpacing: '.08em' }}>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      <motion.div key={tab}
+        initial={reduce ? false : { opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.28 }}
+        style={{ marginTop: 24, display: 'flex', flexDirection: 'column' }}>
+        {posts.length === 0 && (
+          <p style={{ color: 'var(--text-dim)', padding: '30px 0', borderTop: '1px solid var(--border)' }}>
+            Δεν υπάρχουν άρθρα εδώ ακόμα.
+          </p>
+        )}
         {posts.map((p, i) => (
           <motion.div key={p.slug}
             initial={reduce ? false : { opacity: 0, y: 20 }}
@@ -42,7 +71,7 @@ function Blog() {
             </Link>
           </motion.div>
         ))}
-      </div>
+      </motion.div>
     </div>
   );
 }
