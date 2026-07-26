@@ -5,20 +5,8 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { User, X } from 'lucide-react';
 import './HeroAccount.css';
-
-const TIERS = [
-  { name: 'Starter', min: 0, discount: '—' },
-  { name: 'Bronze', min: 3, discount: '10%' },
-  { name: 'Silver', min: 6, discount: '20%' },
-  { name: 'Gold', min: 10, discount: '30%' },
-];
-
-function tierFor(count) {
-  if (count >= 10) return TIERS[3];
-  if (count >= 6) return TIERS[2];
-  if (count >= 3) return TIERS[1];
-  return TIERS[0];
-}
+import { tierForPurchases, discountLabel } from '../data/loyaltyTiers';
+import { splitPurchases } from '../data/purchaseHelpers';
 
 export default function HeroAccount() {
   const { currentUser, login, signup, loginWithGoogle } = useAuth();
@@ -46,15 +34,8 @@ export default function HeroAccount() {
         const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
         if (alive && userDoc.exists()) {
           const data = userDoc.data();
-          setPurchasesCount(data.purchases ? data.purchases.length : 0);
-        }
-        const discountDoc = await getDoc(doc(db, 'global_settings', 'discounts'));
-        if (alive) {
-          setDiscountCode(
-            discountDoc.exists() && discountDoc.data().activeCode
-              ? discountDoc.data().activeCode
-              : 'VYBEZ2026'
-          );
+          setPurchasesCount(splitPurchases(data.purchases).beats.length);
+          setDiscountCode(data.vipCode || null);
         }
       } catch (e) {
         console.error('HeroAccount stats fetch failed', e);
@@ -104,14 +85,14 @@ export default function HeroAccount() {
 
   // --- Logged in: quick stats strip ---
   if (currentUser) {
-    const tier = tierFor(purchasesCount);
+    const { tier } = tierForPurchases(purchasesCount);
     const initial = currentUser.displayName ? currentUser.displayName.charAt(0).toUpperCase() : 'V';
     return (
       <Link to="/account" className="ha-stats" title="Πήγαινε στο προφίλ σου">
         <span className="ha-avatar">{initial}</span>
         <span className="ha-stat"><b>{tier.name}</b><i>tier</i></span>
         <span className="ha-sep" />
-        <span className="ha-stat"><b>{tier.discount}</b><i>vip</i></span>
+        <span className="ha-stat"><b>{discountLabel(tier)}</b><i>vip</i></span>
         <span className="ha-sep" />
         <span className="ha-stat"><b>{purchasesCount}</b><i>beats</i></span>
         {discountCode && <span className="ha-code">{discountCode}</span>}

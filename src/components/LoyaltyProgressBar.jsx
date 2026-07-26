@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { LOYALTY_TIERS, tierForPurchases, discountLabel } from '../data/loyaltyTiers';
+import { splitPurchases } from '../data/purchaseHelpers';
 
 const LoyaltyProgressBar = () => {
   const { currentUser } = useAuth();
@@ -20,7 +21,7 @@ const LoyaltyProgressBar = () => {
         const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
-          setPurchasesCount(data.purchases ? data.purchases.length : 0);
+          setPurchasesCount(splitPurchases(data.purchases).beats.length);
           setVipCode(data.vipCode || null);
         }
       } catch (err) {

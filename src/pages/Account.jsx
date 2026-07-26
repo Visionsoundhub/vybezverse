@@ -7,7 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
 import { tierForPurchases, discountLabel } from '../data/loyaltyTiers';
-import beatsData from '../data/beats.json';
+import { splitPurchases } from '../data/purchaseHelpers';
 import './Account.css';
 
 function Account() {
@@ -111,18 +111,7 @@ function Account() {
     }
   };
 
-  // The webhook records the Lemon Squeezy product name, so a purchase is an
-  // instrumental when that name matches one of the beats in the catalogue.
-  // (This used to filter on a `licenseType` field nothing ever wrote, which
-  // left both lists permanently empty.)
-  const beatTitles = (beatsData.beatslist || []).map(b => b.title.toLowerCase());
-  const isBeat = (p) => {
-    const name = (p.product || '').toLowerCase();
-    return beatTitles.some(t => name.includes(t));
-  };
-  const purchases = userData?.purchases || [];
-  const beats = purchases.filter(isBeat);
-  const songs = purchases.filter(p => !isBeat(p));
+  const { beats, releases: songs } = splitPurchases(userData?.purchases);
 
   if (!currentUser) {
     return (
@@ -162,7 +151,7 @@ function Account() {
     );
   }
 
-  const purchaseCount = userData?.purchases?.length || 0;
+  const purchaseCount = beats.length;
   const { tier: vipTier, next: vipNext } = tierForPurchases(purchaseCount);
   const vipCode = userData?.vipCode || null;
 
