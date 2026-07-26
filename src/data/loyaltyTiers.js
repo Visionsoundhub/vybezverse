@@ -1,17 +1,22 @@
 // Single source of truth for the VIP loyalty tiers.
 //
-// `code` must match a real, published discount in Lemon Squeezy - these are
-// the codes a customer types at checkout, so a typo here means a broken
-// promise to a paying customer.
-//
-// Used by both LoyaltyProgressBar (the progress card) and the Account page's
-// "VIP Έκπτωση" box, so the two can't drift apart.
+// There are deliberately no discount codes here. Codes used to be three
+// shared, unlimited-redemption codes in Lemon Squeezy, which meant one
+// customer posting theirs anywhere handed the discount to everyone,
+// permanently. Each customer now gets their own code, minted by the
+// purchase webhook when they reach a tier and stored on their user
+// document, so a leak burns exactly one traceable code.
 export const LOYALTY_TIERS = [
-  { key: 'starter', name: 'Starter', threshold: 0, discount: '-', code: null },
-  { key: 'bronze', name: 'Bronze', threshold: 3, discount: '10%', code: 'MZODIWMW' },
-  { key: 'silver', name: 'Silver', threshold: 6, discount: '20%', code: 'C5MTM5MQ' },
-  { key: 'gold', name: 'Gold', threshold: 10, discount: '30%', code: 'GYNDG5NQ' },
+  { key: 'starter', name: 'Starter', threshold: 0, percent: 0 },
+  { key: 'bronze', name: 'Bronze', threshold: 3, percent: 10 },
+  { key: 'silver', name: 'Silver', threshold: 6, percent: 20 },
+  { key: 'gold', name: 'Gold', threshold: 10, percent: 30 },
 ];
+
+// How a tier's discount reads in the UI.
+export function discountLabel(tier) {
+  return tier && tier.percent ? `${tier.percent}%` : '-';
+}
 
 // Resolves a purchase count to its tier, plus the next one to aim for
 // (null once the top tier is reached).

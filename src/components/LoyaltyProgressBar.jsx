@@ -4,11 +4,12 @@ import { Star, Award, Zap, Info, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
-import { LOYALTY_TIERS, tierForPurchases } from '../data/loyaltyTiers';
+import { LOYALTY_TIERS, tierForPurchases, discountLabel } from '../data/loyaltyTiers';
 
 const LoyaltyProgressBar = () => {
   const { currentUser } = useAuth();
   const [purchasesCount, setPurchasesCount] = useState(0);
+  const [vipCode, setVipCode] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showInfo, setShowInfo] = useState(false);
 
@@ -20,6 +21,7 @@ const LoyaltyProgressBar = () => {
         if (userDoc.exists()) {
           const data = userDoc.data();
           setPurchasesCount(data.purchases ? data.purchases.length : 0);
+          setVipCode(data.vipCode || null);
         }
       } catch (err) {
         console.error("Failed to fetch purchases", err);
@@ -64,16 +66,16 @@ const LoyaltyProgressBar = () => {
                 <Info size={16} />
               </button>
             </div>
-            <p>VIP Έκπτωση: {currentTier.discount}{currentTier.code ? ` — κωδικός ${currentTier.code}` : ''}</p>
+            <p>VIP Έκπτωση: {discountLabel(currentTier)}{vipCode ? ` — κωδικός ${vipCode}` : ''}</p>
           </div>
         </div>
         {nextTier ? (
           <div className="loyalty-status">
-            Αγόρασε <strong>{remaining}</strong> beats ακόμα για το <strong>{nextTier.name}</strong> ({nextTier.discount})
+            Αγόρασε <strong>{remaining}</strong> beats ακόμα για το <strong>{nextTier.name}</strong> ({discountLabel(nextTier)})
           </div>
         ) : (
           <div className="loyalty-status gold-status">
-            Έχεις φτάσει στο μέγιστο Level! ({currentTier.discount} OFF)
+            Έχεις φτάσει στο μέγιστο Level! ({discountLabel(currentTier)} OFF)
           </div>
         )}
       </div>
@@ -103,7 +105,7 @@ const LoyaltyProgressBar = () => {
                 return (
                   <li key={tier.key}>
                     <strong>{tier.name} ({range} Beats):</strong>{' '}
-                    {tier.code ? `Ξεκλειδώνεις -${tier.discount} μόνιμα.` : 'Η αρχή του ταξιδιού σου.'}
+                    {tier.percent ? `Ξεκλειδώνεις -${tier.percent}% μόνιμα.` : 'Η αρχή του ταξιδιού σου.'}
                   </li>
                 );
               })}

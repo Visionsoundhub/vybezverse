@@ -10,6 +10,10 @@
 //   FIREBASE_PROJECT_ID          - from the service account JSON
 //   FIREBASE_CLIENT_EMAIL        - from the service account JSON
 //   FIREBASE_PRIVATE_KEY         - the "private_key" field, as-is (with \n's)
+//   lemon_api_key                - Lemon Squeezy API key, used to mint the
+//                                  customer's personal VIP discount code
+
+import { tierForPurchases } from '../src/data/loyaltyTiers';
 
 async function verifySignature(rawBody, signatureHeader, secret) {
   if (!signatureHeader) return false;
@@ -136,8 +140,65 @@ async function appendPurchase(env, accessToken, docName, purchase) {
   }
 }
 
+// Writes plain top-level fields on a user document. Used for the VIP code,
+// which the client is not allowed to write itself (see firestore.rules).
+async function setUserFields(env, accessToken, docName, fields) {
+  const mask = Object.keys(fields).map((k) => `updateMask.fieldPaths=${k}`).join('&');
+  const url = `https://firestore.googleapis.com/v1/${docName}?${mask}`;
+  const res = await fetch(url, {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${accessToken}` },
+    body: JSON.stringify({ fields }),
+  });
+  if (!res.ok) throw new Error(`Firestore field update failed: ${res.status} ${await res.text()}`);
+}
+
+const LS_HEADERS = (key) => ({
+  Accept: 'application/vnd.api+json',
+  'Content-Type': 'application/vnd.api+json',
+  Authorization: `Bearer ${key}`,
+});
+
+// Lemon Squeezy only accepts uppercase letters and digits in a code.
+function randomCodeSuffix() {
+  const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no I/O/0/1, easier to retype
+  const bytes = crypto.getRandomValues(new Uint8Array(6));
+  return [...bytes].map((b) => alphabet[b % alphabet.length]).join('');
+}
+
+// Mints a discount code that belongs to one customer. Lemon Squeezy has no
+// "restrict to this buyer" flag, so uniqueness is what makes a leak
+// containable: the code is tied to a known user and can be revoked alone.
+async function createPersonalDiscount(apiKey, tier, email) {
+  const storesRes = await fetch('https://api.lemonsqueezy.com/v1/stores', { headers: LS_HEADERS(apiKey) });
+  const stores = await storesRes.json();
+  const storeId = stores?.data?.[0]?.id;
+  if (!storeId) throw new Error(`Could not resolve Lemon Squeezy store: ${JSON.stringify(stores).slice(0, 200)}`);
+
+  const code = `VIP${tier.name.toUpperCase()}${randomCodeSuffix()}`;
+  const res = await fetch('https://api.lemonsqueezy.com/v1/discounts', {
+    method: 'POST',
+    headers: LS_HEADERS(apiKey),
+    body: JSON.stringify({
+      data: {
+        type: 'discounts',
+        attributes: {
+          name: `VIP ${tier.name} — ${email}`,
+          code,
+          amount: tier.percent,
+          amount_type: 'percent',
+        },
+        relationships: { store: { data: { type: 'stores', id: String(storeId) } } },
+      },
+    }),
+  });
+  if (!res.ok) throw new Error(`Discount creation failed: ${res.status} ${(await res.text()).slice(0, 300)}`);
+  return code;
+}
+
 export async function onRequestPost(context) {
   const { request, env } = context;
+  const lsApiKey = env.LEMONSQUEEZY_API_KEY || env.lemon_api_key;
 
   if (!env.LEMONSQUEEZY_WEBHOOK_SECRET) {
     console.error('LEMONSQUEEZY_WEBHOOK_SECRET is not set');
@@ -178,12 +239,47 @@ export async function onRequestPost(context) {
       return new Response('No matching user', { status: 200 });
     }
 
+    const alreadyRecorded = (userDoc.fields?.purchases?.arrayValue?.values || [])
+      .some((v) => v.mapValue?.fields?.orderId?.stringValue === String(payload.data.id));
+
+    if (alreadyRecorded) {
+      // Lemon Squeezy retries a webhook until it gets a 2xx, so the same
+      // order can arrive more than once. Counting it twice would hand out
+      // tiers that were not earned.
+      console.log(`Order ${payload.data.id} already recorded for ${email}; skipping.`);
+      return new Response('Already recorded', { status: 200 });
+    }
+
     await appendPurchase(env, accessToken, userDoc.name, {
       orderId: String(payload.data.id),
       product: attrs.first_order_item?.product_name || 'Unknown',
       amount: (attrs.total ?? 0) / 100,
       createdAt: attrs.created_at || new Date().toISOString(),
     });
+
+    // Tier is based on the count *after* this purchase.
+    const newCount = (userDoc.fields?.purchases?.arrayValue?.values || []).length + 1;
+    const { tier } = tierForPurchases(newCount);
+    const currentVipTier = userDoc.fields?.vipTier?.stringValue || null;
+
+    if (tier.percent > 0 && currentVipTier !== tier.key) {
+      if (!lsApiKey) {
+        console.error('No Lemon Squeezy API key set; cannot mint VIP code for', email);
+      } else {
+        // A failure here must not fail the webhook: the purchase itself is
+        // already recorded, and a retry would then double-count it.
+        try {
+          const code = await createPersonalDiscount(lsApiKey, tier, email);
+          await setUserFields(env, accessToken, userDoc.name, {
+            vipCode: { stringValue: code },
+            vipTier: { stringValue: tier.key },
+          });
+          console.log(`Minted ${tier.name} code for ${email}`);
+        } catch (codeErr) {
+          console.error('VIP code minting failed (purchase still recorded):', codeErr);
+        }
+      }
+    }
 
     return new Response('OK', { status: 200 });
   } catch (err) {

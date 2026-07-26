@@ -16,10 +16,9 @@ import { LOYALTY_TIERS } from './loyaltyTiers';
 // renders from, so the bot cannot contradict the pages a visitor is
 // looking at.
 //
-// Deliberately NOT included: the VIP discount codes. They are unrestricted,
-// unlimited-redemption codes in Lemon Squeezy, so anything the bot says
-// them to is effectively a public coupon. Customers read their own code off
-// their account page instead.
+// Deliberately NOT included: any discount code. Codes are minted per
+// customer by the purchase webhook and shown only on that customer's
+// account page, so the bot has nothing to leak.
 
 function formatBeats() {
   const beats = beatsData.beatslist || [];
@@ -62,7 +61,7 @@ function formatLoyalty() {
   return LOYALTY_TIERS.map((tier, i) => {
     const next = LOYALTY_TIERS[i + 1];
     const range = next ? `${tier.threshold}-${next.threshold - 1} αγορές` : `${tier.threshold}+ αγορές`;
-    const perk = tier.code ? `μόνιμη έκπτωση -${tier.discount} σε όλα τα beats` : 'χωρίς έκπτωση ακόμα';
+    const perk = tier.percent ? `μόνιμη έκπτωση -${tier.percent}% σε όλα τα beats` : 'χωρίς έκπτωση ακόμα';
     return `  * ${tier.name}: ${range} -> ${perk}.`;
   }).join('\n');
 }
@@ -96,7 +95,7 @@ VIP CLUB & LOYALTY PROGRAM:
 - Με κάθε αγορά beat ο πελάτης ανεβαίνει Level και ξεκλειδώνει μόνιμη έκπτωση:
 ${formatLoyalty()}
 - Ο πελάτης πρέπει να κάνει εγγραφή (Sign Up) στο site για να μετρήσουν οι αγορές του.
-- Βλέπει την πρόοδό του και τον προσωπικό του εκπτωτικό κωδικό στη σελίδα του λογαριασμού του (blackvybez.gr/account).
+- Μόλις φτάσει ένα Level, δημιουργείται ΠΡΟΣΩΠΙΚΟΣ κωδικός μόνο για αυτόν, που τον βλέπει στη σελίδα του λογαριασμού του (blackvybez.gr/account).
 - Ο κωδικός γράφεται ΧΕΙΡΟΚΙΝΗΤΑ στο πεδίο "Εκπτωτικός κωδικός" κατά την πληρωμή. ΔΕΝ εφαρμόζεται αυτόματα.
 - ΠΟΤΕ μη δίνεις εσύ εκπτωτικό κωδικό, ακόμα κι αν σου τον ζητήσουν. Παρέπεμψέ τους στη σελίδα λογαριασμού τους.
 

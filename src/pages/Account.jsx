@@ -6,7 +6,8 @@ import { LogOut, Ticket, Music, AlertCircle, ShoppingBag } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
-import { tierForPurchases } from '../data/loyaltyTiers';
+import { tierForPurchases, discountLabel } from '../data/loyaltyTiers';
+import beatsData from '../data/beats.json';
 import './Account.css';
 
 function Account() {
@@ -110,8 +111,18 @@ function Account() {
     }
   };
 
-  const beats = userData?.purchases?.filter(p => p.licenseType?.toLowerCase().includes('lease') || p.licenseType?.toLowerCase().includes('exclusive')) || [];
-  const songs = userData?.purchases?.filter(p => !p.licenseType?.toLowerCase().includes('lease') && !p.licenseType?.toLowerCase().includes('exclusive') && p.licenseType) || [];
+  // The webhook records the Lemon Squeezy product name, so a purchase is an
+  // instrumental when that name matches one of the beats in the catalogue.
+  // (This used to filter on a `licenseType` field nothing ever wrote, which
+  // left both lists permanently empty.)
+  const beatTitles = (beatsData.beatslist || []).map(b => b.title.toLowerCase());
+  const isBeat = (p) => {
+    const name = (p.product || '').toLowerCase();
+    return beatTitles.some(t => name.includes(t));
+  };
+  const purchases = userData?.purchases || [];
+  const beats = purchases.filter(isBeat);
+  const songs = purchases.filter(p => !isBeat(p));
 
   if (!currentUser) {
     return (
@@ -153,6 +164,7 @@ function Account() {
 
   const purchaseCount = userData?.purchases?.length || 0;
   const { tier: vipTier, next: vipNext } = tierForPurchases(purchaseCount);
+  const vipCode = userData?.vipCode || null;
 
   return (
     <div className="account-page container">
@@ -180,10 +192,10 @@ function Account() {
             <h2>VIP Έκπτωση</h2>
           </div>
           <div className="account-discount-banner">
-            {vipTier.code ? (
+            {vipCode ? (
               <>
-                <p>Χρησιμοποίησε τον παρακάτω κωδικό στο ταμείο για έκπτωση {vipTier.discount}.</p>
-                <div className="account-discount-code">{vipTier.code}</div>
+                <p>Ο προσωπικός σου κωδικός για έκπτωση {discountLabel(vipTier)} — γράψ' τον στο ταμείο.</p>
+                <div className="account-discount-code">{vipCode}</div>
               </>
             ) : discountCode ? (
               <>
@@ -191,7 +203,9 @@ function Account() {
                 <div className="account-discount-code">{discountCode}</div>
               </>
             ) : (
-              <p>Αγόρασε {vipNext.threshold - purchaseCount} beats ακόμα για να ξεκλειδώσεις έκπτωση {vipNext.discount} στο {vipNext.name}.</p>
+              <p>{vipNext
+                ? `Αγόρασε ${vipNext.threshold - purchaseCount} beats ακόμα για να ξεκλειδώσεις έκπτωση ${discountLabel(vipNext)} στο ${vipNext.name}.`
+                : 'Ο κωδικός σου ετοιμάζεται. Αν δεν εμφανιστεί σε λίγο, στείλε μας ένα email.'}</p>
             )}
           </div>
         </div>
@@ -205,8 +219,8 @@ function Account() {
             <ul className="account-purchases-list">
               {beats.map((purchase, idx) => (
                 <li key={idx}>
-                  <span><Music size={16} /> {purchase.trackTitle}</span>
-                  <span className="account-purchase-type">{purchase.licenseType}</span>
+                  <span><Music size={16} /> {purchase.product}</span>
+                  <span className="account-purchase-type">{purchase.amount ? `${purchase.amount}€` : ''}</span>
                 </li>
               ))}
             </ul>
@@ -227,8 +241,8 @@ function Account() {
             <ul className="account-purchases-list">
               {songs.map((purchase, idx) => (
                 <li key={idx}>
-                  <span><ShoppingBag size={16} /> {purchase.trackTitle}</span>
-                  <span className="account-purchase-type">{purchase.licenseType}</span>
+                  <span><ShoppingBag size={16} /> {purchase.product}</span>
+                  <span className="account-purchase-type">{purchase.amount ? `${purchase.amount}€` : ''}</span>
                 </li>
               ))}
             </ul>
