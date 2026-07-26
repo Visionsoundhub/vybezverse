@@ -1,0 +1,49 @@
+rules_version = '2';
+
+// Firestore security rules for VybezVerse.
+//
+// The previous rules were the Firebase "test mode" default: everyone could
+// read and write everything, with a hard expiry date. That date passed on
+// 2026-07-24 and every client request started being denied, which is what
+// silently zeroed out the loyalty bar and the VIP discount code.
+//
+// Key constraint: `purchases` is what unlocks real discount codes, so a
+// signed-in user must never be able to write it themselves. Only the
+// Lemon Squeezy webhook may, and it uses the Admin SDK, which bypasses
+// these rules entirely.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // On signup the client creates its own profile, but may not seed a
+      // purchase history.
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && !('purchases' in request.resource.data);
+
+      // Profile edits (name, etc.) are fine; tampering with purchases is not.
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && request.resource.data.diff(resource.data)
+                         .affectedKeys()
+                         .hasOnly(['name', 'email', 'photoURL', 'updatedAt']);
+
+      allow delete: if false;
+    }
+
+    // Site-wide config (e.g. the active discount code) is public to read and
+    // only editable from the Firebase console / Admin SDK.
+    match /global_settings/{document} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // Anything not matched above is denied.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

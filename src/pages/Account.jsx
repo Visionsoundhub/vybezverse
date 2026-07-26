@@ -6,6 +6,7 @@ import { LogOut, Ticket, Music, AlertCircle, ShoppingBag } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
+import { tierForPurchases } from '../data/loyaltyTiers';
 import './Account.css';
 
 function Account() {
@@ -36,11 +37,12 @@ function Account() {
           setUserData(userDoc.data());
         }
 
+        // Optional site-wide promo code. No fallback: showing a made-up code
+        // would send customers to checkout with something Lemon Squeezy
+        // rejects.
         const discountDoc = await getDoc(doc(db, 'global_settings', 'discounts'));
         if (discountDoc.exists() && discountDoc.data().activeCode) {
           setDiscountCode(discountDoc.data().activeCode);
-        } else {
-          setDiscountCode('VYBEZ2026');
         }
       } catch (e) {
         console.error('Error fetching account data', e);
@@ -149,6 +151,9 @@ function Account() {
     );
   }
 
+  const purchaseCount = userData?.purchases?.length || 0;
+  const { tier: vipTier, next: vipNext } = tierForPurchases(purchaseCount);
+
   return (
     <div className="account-page container">
       <div className="account-header">
@@ -175,8 +180,19 @@ function Account() {
             <h2>VIP Έκπτωση</h2>
           </div>
           <div className="account-discount-banner">
-            <p>Χρησιμοποίησε τον παρακάτω κωδικό στο ταμείο για την έκπτωσή σου.</p>
-            <div className="account-discount-code">{discountCode}</div>
+            {vipTier.code ? (
+              <>
+                <p>Χρησιμοποίησε τον παρακάτω κωδικό στο ταμείο για έκπτωση {vipTier.discount}.</p>
+                <div className="account-discount-code">{vipTier.code}</div>
+              </>
+            ) : discountCode ? (
+              <>
+                <p>Χρησιμοποίησε τον παρακάτω κωδικό στο ταμείο για την έκπτωσή σου.</p>
+                <div className="account-discount-code">{discountCode}</div>
+              </>
+            ) : (
+              <p>Αγόρασε {vipNext.threshold - purchaseCount} beats ακόμα για να ξεκλειδώσεις έκπτωση {vipNext.discount} στο {vipNext.name}.</p>
+            )}
           </div>
         </div>
 
