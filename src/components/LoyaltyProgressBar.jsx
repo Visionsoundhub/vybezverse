@@ -33,10 +33,10 @@ const LoyaltyProgressBar = () => {
   if (loading) return <div className="loyalty-container glass skeleton-loader"></div>;
 
   const tiers = [
-    { name: 'Starter', threshold: 0, max: 2, discount: '-', icon: <Star color="#888" size={24} /> },
-    { name: 'Bronze', threshold: 3, max: 5, discount: '10%', icon: <Star color="#cd7f32" size={24} /> },
-    { name: 'Silver', threshold: 6, max: 9, discount: '20%', icon: <Award color="#c0c0c0" size={24} /> },
-    { name: 'Gold', threshold: 10, max: null, discount: '30%', icon: <Zap color="#ffd700" size={24} /> }
+    { name: 'Starter', threshold: 0, max: 2, discount: '-', code: null, icon: <Star color="#888" size={24} /> },
+    { name: 'Bronze', threshold: 3, max: 5, discount: '10%', code: 'MZODIWMW', icon: <Star color="#cd7f32" size={24} /> },
+    { name: 'Silver', threshold: 6, max: 9, discount: '20%', code: 'C5MTM5MQ', icon: <Award color="#c0c0c0" size={24} /> },
+    { name: 'Gold', threshold: 10, max: null, discount: '30%', code: 'GYNDG5NQ', icon: <Zap color="#ffd700" size={24} /> }
   ];
 
   let currentTierIndex = 0;
@@ -69,7 +69,7 @@ const LoyaltyProgressBar = () => {
                 <Info size={16} />
               </button>
             </div>
-            <p>VIP Έκπτωση: {currentTier.discount}</p>
+            <p>VIP Έκπτωση: {currentTier.discount}{currentTier.code ? ` — κωδικός ${currentTier.code}` : ''}</p>
           </div>
         </div>
         {nextTier ? (
