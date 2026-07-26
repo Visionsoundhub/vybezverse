@@ -4,6 +4,7 @@ import { Play, Pause, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import beatsDataRaw from '../data/beats.json';
 import homeData from '../data/home.json';
+import releasesData from '../data/releases.json';
 import genresData from '../data/genres.json';
 import { AudioContext } from '../context/AudioContext';
 import HeroAccount from '../components/HeroAccount';
@@ -41,6 +42,10 @@ function Home() {
   const { playTrack, currentTrack, isPlaying, openLicenseModal } = React.useContext(AudioContext);
   const [active, setActive] = useState('hero');
   const refs = useRef({});
+  // First entry in releases.json is the newest single, so the homepage
+  // section always shows whatever release was last added, cover included,
+  // with no per-release edits needed here.
+  const latestRelease = releasesData.releases?.[0];
 
   useEffect(() => {
     const obs = new IntersectionObserver(
@@ -141,18 +146,28 @@ function Home() {
           <div className="hm-drop">
             <Reveal>
               <div className="hm-sleeve">
-                <div className="disc" />
-                <span className="name">Jazz Bar</span>
+                {latestRelease?.cover ? (
+                  <img src={latestRelease.cover} alt={latestRelease.title} className="hm-sleeve-cover" />
+                ) : (
+                  <>
+                    <div className="disc" />
+                    <span className="name">{latestRelease?.title || 'Black Vybez'}</span>
+                  </>
+                )}
               </div>
             </Reveal>
             <Reveal delay={0.1}>
               <div>
-                <span className="hm-badge">Vintage Freq</span>
-                <h3 className="hm-statement" style={{ fontSize: 'clamp(2rem,6vw,4rem)' }}>{homeData.dropTitle || 'Jazz Bar των τεράτων'}</h3>
-                <p className="hm-lead">Το απόλυτο single από τη σειρά Vintage Freq. Συντονίσου.</p>
+                <span className="hm-badge">{latestRelease?.tag || 'New Single'}</span>
+                <h3 className="hm-statement" style={{ fontSize: 'clamp(2rem,6vw,4rem)' }}>{latestRelease?.title || homeData.dropTitle}</h3>
+                <p className="hm-lead">{latestRelease?.description}</p>
                 <div className="hm-hero-cta">
-                  <a href={homeData.dropStream || '#'} target="_blank" rel="noreferrer"><button className="btn-primary"><Play size={17} style={{ marginRight: 8, verticalAlign: -3 }} />Stream now</button></a>
-                  <a href={homeData.dropBuy || '#'} target="_blank" rel="noreferrer"><button className="btn-outline">View bundle</button></a>
+                  {latestRelease?.slug && (
+                    <Link to={`/releases/${latestRelease.slug}`}><button className="btn-primary"><Play size={17} style={{ marginRight: 8, verticalAlign: -3 }} />Stream now</button></Link>
+                  )}
+                  {latestRelease?.buy && (
+                    <a href={latestRelease.buy} target="_blank" rel="noreferrer"><button className="btn-outline">View bundle</button></a>
+                  )}
                 </div>
               </div>
             </Reveal>
