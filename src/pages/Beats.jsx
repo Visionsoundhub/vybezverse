@@ -4,9 +4,12 @@ import { motion } from 'framer-motion';
 import beatsDataRaw from '../data/beats.json';
 import { LICENSE_TIERS } from '../data/licenseTiers';
 import { AudioContext } from '../context/AudioContext';
+import { useAuth } from '../context/AuthContext';
+import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
 
 function Beats() {
   const { playTrack, currentTrack, isPlaying, openLicenseModal } = useContext(AudioContext);
+  const { currentUser } = useAuth();
   const [newsletterType, setNewsletterType] = useState('beats_news');
   const [viewMode, setViewMode] = useState('list'); // Default to list for beatstores
   const [selectedGenre, setSelectedGenre] = useState('All');
@@ -79,43 +82,16 @@ function Beats() {
       </motion.div>
 
       {/* 2. MEMBERSHIP CARD */}
-      <motion.div 
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-        className="glass-card"
-        style={{ padding: '30px', marginBottom: '60px', display: 'flex', flexDirection: 'column', gap: '20px' }}
-      >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <Star size={20} color="var(--text-secondary)" />
-            </div>
-            <div>
-              <h4 style={{ fontSize: '1.2rem', fontWeight: '800' }}>Starter Member</h4>
-              <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>VIP Έκπτωση: -</p>
-            </div>
-          </div>
-          <div style={{ textAlign: 'right', fontSize: '0.9rem', color: '#ccc' }}>
-            Αγόρασε <strong>3 beats</strong> ακόμα για το <strong style={{ color: '#cd7f32' }}>Bronze (10%)</strong>
-          </div>
-        </div>
-
-        {/* Progress Bar */}
-        <div style={{ width: '100%', height: '8px', background: 'rgba(255,255,255,0.05)', borderRadius: '100px', position: 'relative', overflow: 'hidden' }}>
-          <motion.div 
-            initial={{ width: 0 }}
-            animate={{ width: '10%' }}
-            transition={{ duration: 1.5, ease: 'easeOut', delay: 0.5 }}
-            style={{ position: 'absolute', top: 0, left: 0, height: '100%', background: 'linear-gradient(90deg, var(--accent-magenta), #cd7f32)', borderRadius: '100px' }} 
-          />
-        </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.7rem', color: 'var(--text-secondary)', fontWeight: '800', letterSpacing: '1px' }}>
-          <span>STARTER</span>
-          <span style={{ color: '#cd7f32' }}>BRONZE</span>
-        </div>
-      </motion.div>
-
+      {currentUser && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          style={{ marginBottom: '60px' }}
+        >
+          <LoyaltyProgressBar />
+        </motion.div>
+      )}
       {/* 3. VIBE SEARCH & GENRE FILTERS WITH VIEW TOGGLE */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', marginBottom: '40px' }}>
         
