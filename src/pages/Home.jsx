@@ -141,7 +141,7 @@ function Home() {
 
         {/* LATEST DROP */}
         <section id="latest" ref={set('latest')} className="hm-section">
-          <SectionBg src="/assets/uploads/section-jazzbar.webp" position="center 40%" />
+          <SectionBg src={latestRelease?.cover || '/assets/uploads/section-jazzbar.webp'} position="center 40%" />
           <div className="hm-eyebrow"><b>03</b> Latest drop</div>
           <div className="hm-drop">
             <Reveal>
