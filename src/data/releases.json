@@ -19,12 +19,10 @@
       "lyrics": "",
       "altVersions": [
         {
-          "label": "Slowed + Reverb",
-          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-slowed.mp3"
+          "label": "Slowed + Reverb"
         },
         {
-          "label": "Sped Up",
-          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-sped.mp3"
+          "label": "Sped Up"
         }
       ]
     },
@@ -44,12 +42,10 @@
       "lyrics": "",
       "altVersions": [
         {
-          "label": "Slowed + Reverb",
-          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-slowed.mp3"
+          "label": "Slowed + Reverb"
         },
         {
-          "label": "Sped Up",
-          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-sped.mp3"
+          "label": "Sped Up"
         }
       ]
     },
@@ -70,12 +66,10 @@
       "lyrics": "",
       "altVersions": [
         {
-          "label": "Slowed + Reverb",
-          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/hamogela-slowed.mp3"
+          "label": "Slowed + Reverb"
         },
         {
-          "label": "Sped Up",
-          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/hamogela-sped.mp3"
+          "label": "Sped Up"
         }
       ]
     },
@@ -119,12 +113,10 @@
       "lyrics": "",
       "altVersions": [
         {
-          "label": "Slowed + Reverb",
-          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/keno-slowed.mp3"
+          "label": "Slowed + Reverb"
         },
         {
-          "label": "Sped Up",
-          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/keno-sped.mp3"
+          "label": "Sped Up"
         }
       ]
     },
@@ -145,12 +137,10 @@
       "lyrics": "",
       "altVersions": [
         {
-          "label": "Slowed + Reverb",
-          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/selini-slowed.mp3"
+          "label": "Slowed + Reverb"
         },
         {
-          "label": "Sped Up",
-          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/selini-sped.mp3"
+          "label": "Sped Up"
         }
       ]
     },
@@ -171,12 +161,10 @@
       "lyrics": "",
       "altVersions": [
         {
-          "label": "Slowed + Reverb",
-          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/apothimeno-slowed.mp3"
+          "label": "Slowed + Reverb"
         },
         {
-          "label": "Sped Up",
-          "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/apothimeno-sped.mp3"
+          "label": "Sped Up"
         }
       ]
     }
