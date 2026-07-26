@@ -88,11 +88,19 @@
       "cover": "/assets/uploads/fiesta-cover.webp",
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/fiesta-preview.mp3",
       "localAudio": true,
-      "spotify": "https://open.spotify.com/track/52uDEhkr00wIAw3wz7xgz2",
+      "spotify": "https://open.spotify.com/album/3F2z2HsHNUnThEhUy2BfzG",
       "buy": "https://blackvybez.lemonsqueezy.com/checkout/buy/c334ab66-c40b-441a-aec9-4765b0816065",
       "price": "1.99€",
       "description": "Black Vybez x Michalis Megaloudis.",
-      "lyrics": ""
+      "lyrics": "",
+      "altVersions": [
+        {
+          "label": "Slowed + Reverb"
+        },
+        {
+          "label": "Sped Up"
+        }
+      ]
     },
     {
       "slug": "keno",
