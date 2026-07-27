@@ -1,30 +1,34 @@
-# Market Trends — 20/07/2026
+# Market Trends — 2026-07-27
 
 ## Ελλάδα: τι καίει τώρα
-- Το ελληνικό Spotify daily chart κυριαρχείται τώρα από το δίδυμο **Strat/Arab** με παραγωγό τον **BeTaf Beats** (4 από τα πρώτα 8: TETTEH, PHUKET, GAME OVER, GIA SENA). Σκληρό, σκοτεινό trap sound με πολλά feat μεταξύ τους. Το ότι το όνομα BeTaf Beats εμφανίζεται σχεδόν παντού δείχνει ότι αυτό το dark trap production στυλ είναι το πιο ζητούμενο αυτή τη στιγμή. [kworb.net/spotify/country/gr_daily.html]
-- Ο **Light** έχει τη μεγαλύτερη συνολική παρουσία στο chart (5 tracks: Baila, Adam & Eve, Katsiki, omw, Idi Amin). Ο ίδιος έχει δηλώσει ότι δεν θεωρεί τον εαυτό του «ράπερ» αλλά «μουσικό», και το sound του είναι πιο μελωδικό/party παρά καθαρό trap. Δείχνει ζήτηση για πιο τραγουδιστό, R&B-ish trap crossover. [el.wikipedia.org/wiki/Yung_Light]
-- Ο **TOQUEL** έχει επίσης πολύ ισχυρή παρουσία (6 tracks: Geitonia Kai Tilefono, Ximeroma, Vace Zela, Poios Na Sou To Pei, A$$AP) και υπάρχει ενεργή παραγωγή "Toquel type beat" στο YouTube, άρα υπάρχουν ήδη παραγωγοί που ψάχνουν να πιάσουν το δικό του ήχο, ένα mix νεανικού street και ρομαντικού trap. [YouTube search]
-- Ο **SNIK** με τον **Trannos** συνεχίζει να κρατάει θέσεις (KLEIDIA, GEN Z), δείχνοντας ότι το πιο κλασικό ελληνικό veteran trap sound έχει ακόμα ζήτηση παράλληλα με τα νεότερα ονόματα.
-- Γενικό συμπέρασμα: σκοτεινό, βαρύ trap (BeTaf Beats στυλ) και πιο μελωδικό, τραγουδιστό trap/party (Light στυλ) είναι τα δύο άκρα που κυριαρχούν τώρα στην Ελλάδα, με το TOQUEL sound να είναι κάπου στη μέση.
+- Το ελληνικό Spotify chart κυριαρχείται εντελώς από trap. Στην κορυφή αυτή τη βδομάδα: Strat, RACK, Light, SNIK, TOQUEL, FLY LO, με σταθερά features από Arab, Trannos, Beyond. (πηγή: kworb.net gr daily chart)
+- Ο BeTaf Beats είναι ο πιο hot παραγωγός στη σκηνή αυτή τη στιγμή, credited σε πολλά από τα κορυφαία tracks του Strat και του RACK (TETTEH, PHUKET, GAME OVER, GIORTES). Σκοτεινό, βαρύ trap production, το πιο ζητούμενο sound στο chart τώρα. (πηγή: rapnroll.gr, kworb.net)
+- Ενδιαφέρον crossover σήμα: το RACK κάνει feat με τον Κωνσταντίνο Αργυρό στο "CASINO" (Νο.20 στο chart). Δείχνει ζήτηση για λαϊκό/trap fusion, όχι μόνο καθαρό trap. (πηγή: kworb.net)
+- TOQUEL είναι από τα πιο ψαγμένα ονόματα για type beats αυτή τη στιγμή, με σταθερή ροή "TOQUEL type beat" uploads στο YouTube (trap, freestyle, ακόμα και West Coast/dancehall variations), και συνδυασμούς όπως TOQUEL x SNIK x FLY LO. (πηγή: YouTube search)
+- Το RACK type beat έχει λιγότερη άμεση προσφορά σε σχέση με τη ζήτηση, αφού οι περισσότερες αναφορές είναι δημοσιογραφικές (LiFO, rapnroll.gr) και όχι type-beat uploads. Κενό που αξίζει να καλυφθεί.
+- Boom bap δεν εμφανίζεται πουθενά στο ελληνικό chart αυτή τη στιγμή. Καθαρά dark/melodic trap και trap/drill υβρίδια είναι αυτό που ακούγεται.
 
 ## Διεθνώς: τι καίει τώρα
-- Ξεχωρίζει το **PluggnB**: συνδυασμός 90s R&B/soul chords με σύγχρονο plugg trap, δηλαδή jazzy μελωδίες πάνω σε επιθετικά hi-hats/808. Ταιριάζει αρκετά με την κατεύθυνση που παίρνει ήδη ο Light προς πιο μελωδικό sound, άρα έχει νόημα να δοκιμαστεί. [artistrack.com/2026-beatmaking-trends-lofi-hyperpop]
-- Στα type-beat keywords του YouTube ανεβαίνουν genre fusion συνδυασμοί (afro-rnb x brazilian funk, reggaeton, phonk, afrobeats) αντί για «καθαρό» genre. [output.com/blog/type-beat]
-- Μετά το κλείσιμο του Spotify Viral 50 τον Μάιο 2026, τα global charts δείχνουν μια «post-genre» φάση όπου hip-hop, Latin και afrobeats μπλέκονται συνέχεια. [hypenation.news/2026-music-trends]
+- PluggnB (plugg trap βάσεις + 90s R&B φωνητικό ύφος, μαλακά 808s) είναι το πιο γρήγορα αναπτυσσόμενο ήχο-trend διεθνώς, ήδη #1 σε ανάπτυξη στο Splice. Μπορεί να φτάσει και στην ελληνική σκηνή μέσα στους επόμενους μήνες μιας και το μελωδικό trap ήδη κυριαρχεί εδώ. (πηγή: artistrack.com, samplefocus.com)
+- Amapiano/Gqom cross-pollination συνεχίζει να μεγαλώνει διεθνώς. Ταιριάζει με το υπάρχον "Deep Pulse" genre του store, δεν χρειάζεται κάτι νέο εδώ, απλά επιβεβαιώνεται ότι αξίζει να συνεχιστεί.
+- Drill αναφέρεται σταθερά ως trending genre διεθνώς για το 2026, ευθυγραμμισμένο με το "Love Crime" (144bpm) που ήδη υπάρχει στο store.
+- Spotify Viral 50 Global καταργήθηκε τον Μάιο 2026, οπότε δεν υπάρχει πια αυτό το συγκεκριμένο σήμα διαθέσιμο για viral tracking.
 
 ## Προτάσεις για το beat store
-- Φτιάξε 1-2 beats σε dark/σκληρό trap στυλ (BeTaf Beats vibe, βαριά 808, σκοτεινή μελωδία) μέσα στις υπάρχουσες κατηγορίες "Overdrive" ή "Ether", μιας και είναι το πιο ζητούμενο sound στο ελληνικό chart τώρα.
-- Δοκίμασε κάτι πιο μελωδικό/PluggnB-flavored (90s R&B chords πάνω σε trap 808) μέσα στο "Neon Waves" ή σαν επέκταση του "Ether", για να πιάσεις το κοινό που ακολουθεί τη στροφή του Light προς πιο τραγουδιστό ήχο. Είναι και διεθνής τάση, όχι μόνο ελληνική.
-- Στα tags βάλε πιο συγκεκριμένους περιγραφικούς όρους στυλ (π.χ. "dark trap", "melodic trap") δίπλα στα ήδη υπάρχοντα mood tags ("love", "party", "dark"), ώστε Έλληνες ράπερς/παραγωγοί που ψάχνουν type beat να σε βρίσκουν πιο εύκολα.
+- Πρόσθεσε tags με ονόματα καλλιτεχνών στα beats που ταιριάζουν στο sound τους (π.χ. "RACK type beat", "TOQUEL type beat", "Strat type beat"), ειδικά στο "Love Crime" (dark drill) που ήδη ταιριάζει στο ύφος. Αυτά είναι τα ονόματα που ψάχνουν σήμερα Έλληνες ράπερς/παραγωγοί στο YouTube και θα βοηθήσουν στην ανακάλυψη.
+- Φτιάξε ένα beat με αναφορά στο BeTaf Beats sound (dark, heavy trap 808s) μιας και είναι ο πιο ζητούμενος ήχος στο ελληνικό chart αυτή τη στιγμή. Ταιριάζει με το υπάρχον "Overdrive" (Battle/Energy Trap) genre, θα μπορούσε να μπει σαν νέο κομμάτι εκεί.
+- Δοκίμασε ένα πειραματικό beat σε λαϊκό/trap fusion στυλ (μελωδικά στοιχεία λαϊκού πάνω σε trap 808 βάση), βασισμένο στο σήμα RACK x Κωνσταντίνος Αργυρός. Είναι νωρίς trend αλλά μπορεί να ξεχωρίσει το store αφού κανείς άλλος δεν το κάνει ακόμα.
 
 ## Πηγές
-- https://kworb.net/spotify/country/gr_daily.html
-- https://www.rapnroll.gr/
-- https://dev.urbangreece.com/track/3J7shJ3xgZu1qCHl7vkczn
-- https://el.wikipedia.org/wiki/Yung_Light
-- https://output.com/blog/type-beat
-- https://artistrack.com/2026-beatmaking-trends-lofi-hyperpop/
-- https://hypenation.news/2026-music-trends
+- [kworb.net Spotify GR Daily Chart](https://kworb.net/spotify/country/gr_daily.html)
+- [kworb.net Spotify Global Daily Chart](https://kworb.net/spotify/country/global_daily.html)
+- [rapnroll.gr](https://www.rapnroll.gr/)
+- YouTube search: "TOQUEL type beat", "RACK type beat ελληνικό BeTaf", "Strat Light type beat trap ελληνικά instrumental"
+- [artistrack.com — Beatmaking Trends 2026](https://artistrack.com/2026-beatmaking-trends-lofi-hyperpop/)
+- [samplefocus.com — 8 Genres and Revivals Defining 2026](https://samplefocus.com/blog/8-genres-and-revivals-defining-2026/)
+- [weraveyou.com — Spotify retires Viral 50 charts](https://weraveyou.com/2026/05/spotify-viral-50-charts-discontinued-2026/)
 
 ## Τι δεν βρέθηκε
-- Δεν βρέθηκαν αξιόπιστα, φρέσκα δεδομένα από BeatStars/Airbit trending charts ή TikTok trending sounds αυτή τη βδομάδα, οπότε παραλείφθηκαν αντί να εφευρεθούν.
+- Δεν υπάρχει πια Spotify Viral 50 Global chart (καταργήθηκε Μάιος 2026), οπότε δεν μπόρεσα να το χρησιμοποιήσω ως πηγή viral trends.
+- BeatStars/Airbit "trending" λίστες δεν έδωσαν κάτι συγκεκριμένο και επίκαιρο, μόνο γενικά blog posts για genre trends, όχι πραγματικά live trending δεδομένα.
+- TikTok trending sounds αυτή τη βδομάδα ήταν κυρίως meme formats (Kumar Method, anime summoning trend) χωρίς σαφές μουσικό/beat trend να αξίζει αναφοράς για beat store.
