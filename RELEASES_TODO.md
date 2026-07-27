@@ -10,5 +10,5 @@
 - Atmo
 - Rantevou sta vathia — masters στο Drive είναι μόνο "live edit", όχι studio master. Χρειάζεται το πραγματικό master πριν μπει.
 
-## Κάτι που παρατηρήθηκε στο schema
-Κάθε release στο `releases.json` έχει ήδη `altVersions: [{label:"Slowed + Reverb"}, {label:"Sped Up"}]` — αλλά **χωρίς `audioSrc`**. Δηλαδή η θέση για nightcore/slowed-reverb υπάρχει ήδη στο data model, απλά δεν έχει γεμίσει με πραγματικά αρχεία ούτε για τα 7 releases που είναι ήδη live. Άξιζε να το ξέρεις πριν ξεκινήσεις να τα φτιάχνεις ένα-ένα — ίσως χρειάζεται πρώτα να δεις πώς τα διαβάζει το UI (αν τα διαβάζει καθόλου ακόμα) πριν επενδύσεις χρόνο σε όλα τα κομμάτια.
+## altVersions (Slowed+Reverb / Sped Up) — σκόπιμα χωρίς audioSrc εδώ
+Κάθε release έχει `altVersions: [{label:"Slowed + Reverb"}, {label:"Sped Up"}]` χωρίς `audioSrc` — αυτό είναι **σωστό, όχι bug**. Το `releases.json` είναι public/client-side, άρα δεν μπαίνει εκεί direct link σε bonus αρχείο. Ο chatbot ξέρει ότι υπάρχουν (για να τα αναφέρει), αλλά τα ίδια τα αρχεία δίνονται μόνο μετά από αγορά, όχι δημόσια από το site. Delivery mechanism μετά την αγορά (Lemon Squeezy fulfillment/email) — δεν το ψάξαμε ακόμα, ίσως χρειάζεται να επιβεβαιωθεί ότι είναι στημένο.
