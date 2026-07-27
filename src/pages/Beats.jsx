@@ -61,23 +61,27 @@ function Beats() {
   return (
     <div className="container" style={{ paddingTop: '120px', paddingBottom: '100px' }}>
       
-      {/* 1. HERO BANNER - PRODUCER HUB */}
-      <motion.div 
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        style={{ 
-          background: 'radial-gradient(ellipse at center, rgba(224,144,47,0.22) 0%, rgba(124,43,37,0.28) 55%, var(--bg) 100%)',
+      {/* 1. HERO BANNER */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        style={{
+          marginBottom: '56px',
+          position: 'relative',
           borderRadius: 'var(--radius)',
-          padding: '80px 40px',
-          textAlign: 'center',
-          marginBottom: '40px',
+          overflow: 'hidden',
+          padding: '70px 40px',
           border: '1px solid var(--border-strong)',
-          boxShadow: 'var(--shadow-print)'
+          boxShadow: 'var(--shadow-print)',
+          backgroundImage: `linear-gradient(rgba(20,16,13,0.82), rgba(20,16,13,0.82)), url(/assets/uploads/beats-hero-desk.jpeg)`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center 40%'
         }}
       >
-        <h1 style={{ fontSize: 'clamp(3rem, 6vw, 5rem)', fontWeight: '900', letterSpacing: '-1px', margin: '0', lineHeight: 1.1 }}>
-          <span className="text-gradient">PRODUCER HUB.</span><br/>FIND YOUR SOUND.
+        <div style={{ fontFamily: 'var(--font-mono)', letterSpacing: '.2em', textTransform: 'uppercase', color: 'var(--accent)', fontSize: '.85rem', marginBottom: 16 }}>Producer hub</div>
+        <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2.8rem,9vw,6rem)', lineHeight: .9, letterSpacing: '-.02em', margin: 0, color: 'var(--bone-100)' }}>
+          Βρες τον <span style={{ color: 'var(--accent)' }}>ήχο</span> σου
         </h1>
       </motion.div>
 
