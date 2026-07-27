@@ -10,6 +10,9 @@ const DIST_DIR = path.resolve(__dirname, 'dist');
 const INDEX_HTML_PATH = path.join(DIST_DIR, 'index.html');
 const BLOG_JSON_PATH = path.resolve(__dirname, 'src/data/blog.json');
 const RELEASES_JSON_PATH = path.resolve(__dirname, 'src/data/releases.json');
+const PODCASTS_JSON_PATH = path.resolve(__dirname, 'src/data/podcasts.json');
+const SITEMAP_PATH = path.join(DIST_DIR, 'sitemap.xml');
+const SITE_URL = 'https://blackvybez.gr';
 const DEFAULT_IMAGE = '/assets/uploads/banner.png'; // Ή όποιο είναι το default σου
 
 // 2. Στατικές σελίδες και τα SEO στοιχεία τους
@@ -76,9 +79,12 @@ function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, p
   html = html.replace(/<meta name="twitter:image" content=".*?" \/>/, `<meta name="twitter:image" content="${finalImage}" />`);
 
   // Προσθήκη Canonical / URL στο Open Graph (προαιρετικό αλλά καλό για SEO)
-  const fullUrl = `https://blackvybez.gr/${urlPath}`;
+  const fullUrl = `${SITE_URL}/${urlPath}`;
   if (!html.includes('<meta property="og:url"')) {
       html = html.replace('</head>', `  <meta property="og:url" content="${fullUrl}" />\n  </head>`);
+  }
+  if (!html.includes('rel="canonical"')) {
+      html = html.replace('</head>', `  <link rel="canonical" href="${fullUrl}" />\n  </head>`);
   }
 
   // Αν πρόκειται για Blog Post, προσθέτουμε Article JSON-LD Schema
@@ -151,6 +157,15 @@ async function generatePages() {
 
   const baseHtml = fs.readFileSync(INDEX_HTML_PATH, 'utf-8');
 
+  // Ομάδα: canonical/og:url στην ίδια την αρχική σελίδα
+  const homeHtml = injectMetaTags(baseHtml, {
+    title: 'Black Vybez — Beats, Releases & Vybezverse',
+    description: 'Black Vybez (Vybezmadethis) — producer από τη Λάρισα. Άκου beats, releases, podcasts και γίνε μέλος του Vybezverse. Μουσική για κάθε διαφορετικό μυαλό.',
+    urlPath: ''
+  });
+  fs.writeFileSync(INDEX_HTML_PATH, homeHtml);
+  console.log('✅ Ενημερώθηκε: / (canonical)');
+
   // Α. Στατικές Σελίδες
   for (const route of staticRoutes) {
     // Generate e.g. dist/blog.html instead of dist/blog/index.html
@@ -217,7 +232,6 @@ async function generatePages() {
   }
 
   // Δ. Δυναμικές Σελίδες (Podcasts)
-  const PODCASTS_JSON_PATH = path.resolve(__dirname, 'src/data/podcasts.json');
   if (fs.existsSync(PODCASTS_JSON_PATH)) {
     const podcastsFile = JSON.parse(fs.readFileSync(PODCASTS_JSON_PATH, 'utf-8'));
     
@@ -249,7 +263,53 @@ async function generatePages() {
     }
   }
 
+  generateSitemap();
+
   console.log('✨ Η παραγωγή SEO σελίδων ολοκληρώθηκε!');
+}
+
+function generateSitemap() {
+  const today = new Date().toISOString().slice(0, 10);
+  const urls = [{ loc: `${SITE_URL}/`, priority: '1.0' }];
+
+  const priorities = { beats: '0.9', releases: '0.9', blog: '0.7' };
+  for (const route of staticRoutes) {
+    urls.push({ loc: `${SITE_URL}/${route.path}`, priority: priorities[route.path] || '0.6' });
+  }
+
+  if (fs.existsSync(BLOG_JSON_PATH)) {
+    const blogData = JSON.parse(fs.readFileSync(BLOG_JSON_PATH, 'utf-8'));
+    for (const post of blogData.posts || []) {
+      if (!post.slug) continue;
+      urls.push({ loc: `${SITE_URL}/blog/${post.slug}`, lastmod: post.date, priority: '0.6' });
+    }
+  }
+
+  if (fs.existsSync(RELEASES_JSON_PATH)) {
+    const releasesFile = JSON.parse(fs.readFileSync(RELEASES_JSON_PATH, 'utf-8'));
+    const allReleases = [...(releasesFile.releases || []), ...(releasesFile.upcoming || [])];
+    for (const release of allReleases) {
+      if (!release.slug) continue;
+      urls.push({ loc: `${SITE_URL}/releases/${release.slug}`, lastmod: release.date, priority: '0.8' });
+    }
+  }
+
+  if (fs.existsSync(PODCASTS_JSON_PATH)) {
+    const podcastsFile = JSON.parse(fs.readFileSync(PODCASTS_JSON_PATH, 'utf-8'));
+    for (const podcast of podcastsFile.podcasts || []) {
+      if (!podcast.slug) continue;
+      urls.push({ loc: `${SITE_URL}/podcasts/${podcast.slug}`, lastmod: podcast.date, priority: '0.5' });
+    }
+  }
+
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls
+    .map(
+      (u) => `  <url>\n    <loc>${u.loc}</loc>\n    <lastmod>${u.lastmod || today}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>${u.priority}</priority>\n  </url>`
+    )
+    .join('\n')}\n</urlset>\n`;
+
+  fs.writeFileSync(SITEMAP_PATH, xml);
+  console.log(`✅ sitemap.xml ενημερώθηκε (${urls.length} URLs)`);
 }
 
 generatePages().catch(console.error);
