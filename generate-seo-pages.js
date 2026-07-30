@@ -59,6 +59,41 @@ const staticRoutes = [
   }
 ];
 
+// Helpers για static body (ώστε bots χωρίς JS — AI crawlers, NotebookLM κλπ — να βλέπουν κείμενο)
+function esc(s) {
+  return String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+// Ίδιοι markdown-lite κανόνες με το BlogPost.jsx renderer
+function inlineMd(text) {
+  let out = esc(text);
+  out = out.replace(/\[([^\]]+)\]\(([^)]+)\)/g, (_, label, href) => `<a href="${href}">${label}</a>`);
+  out = out.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+  return out;
+}
+
+function mdToHtml(content) {
+  return String(content || '').split(/\n\n+/).map((block) => {
+    if (block.startsWith('### ')) return `<h3>${inlineMd(block.slice(4))}</h3>`;
+    if (block.startsWith('## ')) return `<h2>${inlineMd(block.slice(3))}</h2>`;
+    const lines = block.split('\n').filter(Boolean);
+    if (lines.length && lines.every((l) => l.startsWith('> ')))
+      return `<blockquote>${lines.map((l) => `<p>${inlineMd(l.slice(2))}</p>`).join('')}</blockquote>`;
+    if (lines.length && lines.every((l) => /^-\s/.test(l)))
+      return `<ul>${lines.map((l) => `<li>${inlineMd(l.replace(/^-\s/, ''))}</li>`).join('')}</ul>`;
+    if (lines.length && lines.every((l) => /^\d+\.\s/.test(l)))
+      return `<ol>${lines.map((l) => `<li>${inlineMd(l.replace(/^\d+\.\s/, ''))}</li>`).join('')}</ol>`;
+    return `<p>${inlineMd(block)}</p>`;
+  }).join('\n');
+}
+
+// Βάζει πραγματικό κείμενο μέσα στο #root. Το React createRoot().render()
+// αντικαθιστά το περιεχόμενο στο mount, οπότε οι χρήστες βλέπουν το κανονικό app.
+function injectStaticBody(html, bodyHtml) {
+  if (!bodyHtml) return html;
+  return html.replace('<div id="root"></div>', `<div id="root"><main>\n${bodyHtml}\n</main></div>`);
+}
+
 // 3. Helper συνάρτηση για να αντικαθιστά τα Meta Tags
 function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, postData, releaseData, podcastData }) {
   let html = htmlTemplate;
@@ -157,14 +192,73 @@ async function generatePages() {
 
   const baseHtml = fs.readFileSync(INDEX_HTML_PATH, 'utf-8');
 
-  // Ομάδα: canonical/og:url στην ίδια την αρχική σελίδα
-  const homeHtml = injectMetaTags(baseHtml, {
+  // Φόρτωση όλων των data για τα static bodies
+  const readJson = (p) => (fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf-8')) : null);
+  const blogData = readJson(BLOG_JSON_PATH) || { posts: [] };
+  const releasesFile = readJson(RELEASES_JSON_PATH) || { releases: [], upcoming: [] };
+  const podcastsFile = readJson(PODCASTS_JSON_PATH) || { podcasts: [] };
+  const bioData = readJson(path.resolve(__dirname, 'src/data/bio.json'));
+  const beatsFile = readJson(path.resolve(__dirname, 'src/data/beats.json')) || { beatslist: [] };
+  const pressFile = readJson(path.resolve(__dirname, 'src/data/press.json')) || { articles: [] };
+  const liveReleases = releasesFile.releases || [];
+
+  const releaseListHtml = liveReleases
+    .map((r) => `<li><a href="/releases/${r.slug}">${esc(r.title)}</a>${r.tag ? ` — ${esc(r.tag)}` : ''}</li>`)
+    .join('\n');
+  const blogListHtml = blogData.posts
+    .map((p) => `<li><a href="/blog/${p.slug}">${esc(p.title)}</a> — ${esc(p.excerpt || '')}</li>`)
+    .join('\n');
+  const podcastListHtml = (podcastsFile.podcasts || [])
+    .map((p) => `<li><a href="/podcasts/${p.slug}">${esc(p.title)}</a></li>`)
+    .join('\n');
+
+  // Static body ανά route (πραγματικό κείμενο για no-JS crawlers)
+  const staticBodies = {
+    beats: `<h1>Beats — Black Vybez Store</h1>
+<p>Αγόρασε premium beats από τον Black Vybez. Trap, Drill, Boombap, R&amp;B, Synthwave, Pop. Άδειες: Showcase, Premium, Unlimited.</p>
+<ul>${beatsFile.beatslist.map((b) => `<li>${esc(b.title)}${b.bpm ? ` — ${esc(b.bpm)} BPM` : ''}${b.price ? ` — ${esc(b.price)}` : ''}</li>`).join('\n')}</ul>`,
+    releases: `<h1>Releases — Black Vybez</h1>
+<p>Όλες οι επίσημες κυκλοφορίες του Black Vybez. Singles και το επερχόμενο album ΠΑΛΙΡΡΟΙΑ.</p>
+<ul>${releaseListHtml}</ul>`,
+    podcasts: `<h1>Podcast — Μπαμπάς των 2 &amp; Rapper</h1>
+<p>Το podcast του Black Vybez για τη ΔΕΠΥ, την πατρότητα και τη μουσική.</p>
+<ul>${podcastListHtml}</ul>`,
+    press: `<h1>Press &amp; Media — Black Vybez</h1>
+<ul>${pressFile.articles.map((a) => `<li>${esc(a.title)} (${esc(a.source)})</li>`).join('\n')}</ul>`,
+    bio: `<h1>${esc(bioData?.title || 'Βιογραφία — Black Vybez')}</h1>
+${mdToHtml(bioData?.content || '')}`,
+    store: `<h1>Store — Black Vybez</h1><p>Επίσημο merchandise Black Vybez. Coming soon.</p>`,
+    links: `<h1>Black Vybez — Links</h1>
+<ul>
+<li><a href="https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3">Spotify</a></li>
+<li><a href="https://music.apple.com/gr/artist/black-vybez/1510069891">Apple Music</a></li>
+<li><a href="https://www.youtube.com/@BlackVybezwiththeflow">YouTube</a></li>
+<li><a href="/releases">Κυκλοφορίες</a></li>
+<li><a href="/beats">Beats</a></li>
+</ul>`,
+    blog: `<h1>Journal — Black Vybez</h1>
+<p>Σκέψεις για τη μουσική, τη νευροδιαφορετικότητα και τη ζωή πίσω από τα beats.</p>
+<ul>${blogListHtml}</ul>`
+  };
+
+  const homeBody = `<h1>Black Vybez — Vybezmadethis</h1>
+<p>Ο Black Vybez (Θοδωρής Παρασχάκης) είναι Έλληνας rapper, μουσικός παραγωγός και τραγουδοποιός από τη Λάρισα. Δημιουργεί beats, κυκλοφορεί μουσική και μιλάει για τη νευροδιαφορετικότητα (ΔΕΠΥ) μέσα από το podcast «Μπαμπάς των 2 &amp; Rapper». Μουσική για κάθε διαφορετικό μυαλό.</p>
+<ul>
+<li><a href="/releases">Releases</a></li>
+<li><a href="/beats">Beats store</a></li>
+<li><a href="/blog">Journal</a></li>
+<li><a href="/podcasts">Podcast</a></li>
+<li><a href="/bio">Βιογραφία</a></li>
+</ul>`;
+
+  // Ομάδα: canonical/og:url + static body στην ίδια την αρχική σελίδα
+  const homeHtml = injectStaticBody(injectMetaTags(baseHtml, {
     title: 'Black Vybez — Beats, Releases & Vybezverse',
     description: 'Black Vybez (Vybezmadethis) — producer από τη Λάρισα. Άκου beats, releases, podcasts και γίνε μέλος του Vybezverse. Μουσική για κάθε διαφορετικό μυαλό.',
     urlPath: ''
-  });
+  }), homeBody);
   fs.writeFileSync(INDEX_HTML_PATH, homeHtml);
-  console.log('✅ Ενημερώθηκε: / (canonical)');
+  console.log('✅ Ενημερώθηκε: / (canonical + static body)');
 
   // Α. Στατικές Σελίδες
   for (const route of staticRoutes) {
@@ -172,60 +266,71 @@ async function generatePages() {
     const filePath = path.join(DIST_DIR, `${route.path}.html`);
     const dir = path.dirname(filePath);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    
-    const htmlContent = injectMetaTags(baseHtml, {
+
+    const htmlContent = injectStaticBody(injectMetaTags(baseHtml, {
       title: route.title,
       description: route.description,
       urlPath: route.path
-    });
+    }), staticBodies[route.path]);
     fs.writeFileSync(filePath, htmlContent);
     console.log(`✅ Δημιουργήθηκε: /${route.path}`);
   }
 
   // Β. Δυναμικές Σελίδες (Blog Posts)
-  if (fs.existsSync(BLOG_JSON_PATH)) {
-    const blogData = JSON.parse(fs.readFileSync(BLOG_JSON_PATH, 'utf-8'));
-    for (const post of blogData.posts) {
-      if (!post.slug) continue;
-      
-      const filePath = path.join(DIST_DIR, 'blog', `${post.slug}.html`);
-      const dir = path.dirname(filePath);
-      if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  for (const post of blogData.posts) {
+    if (!post.slug) continue;
 
-      // Καθαρισμός HTML tags από το excerpt (αν υπάρχουν) για το meta description
-      const cleanExcerpt = post.excerpt ? post.excerpt.replace(/<[^>]+>/g, '').substring(0, 155) : 'Διαβάστε το νέο άρθρο στο blog του Black Vybez.';
+    const filePath = path.join(DIST_DIR, 'blog', `${post.slug}.html`);
+    const dir = path.dirname(filePath);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
-      const htmlContent = injectMetaTags(baseHtml, {
-        title: `${post.title} | Black Vybez Blog`,
-        description: cleanExcerpt,
-        urlPath: `blog/${post.slug}`,
-        imageUrl: post.cover || DEFAULT_IMAGE,
-        postData: post
-      });
-      fs.writeFileSync(filePath, htmlContent);
-      console.log(`✅ Δημιουργήθηκε: /blog/${post.slug}`);
-    }
+    // Καθαρισμός HTML tags από το excerpt (αν υπάρχουν) για το meta description
+    const cleanExcerpt = post.excerpt ? post.excerpt.replace(/<[^>]+>/g, '').substring(0, 155) : 'Διαβάστε το νέο άρθρο στο blog του Black Vybez.';
+
+    const postBody = `<article><h1>${esc(post.title)}</h1>
+<p>${esc(post.date)}${post.tag ? ` · ${esc(post.tag)}` : ''}${post.author ? ` · ${esc(post.author)}` : ''}</p>
+${mdToHtml(post.content)}</article>`;
+
+    const htmlContent = injectStaticBody(injectMetaTags(baseHtml, {
+      title: `${post.title} | Black Vybez Blog`,
+      description: cleanExcerpt,
+      urlPath: `blog/${post.slug}`,
+      imageUrl: post.cover || DEFAULT_IMAGE,
+      postData: post
+    }), postBody);
+    fs.writeFileSync(filePath, htmlContent);
+    console.log(`✅ Δημιουργήθηκε: /blog/${post.slug}`);
   }
 
   // Γ. Δυναμικές Σελίδες (Releases)
-  if (fs.existsSync(RELEASES_JSON_PATH)) {
-    const releasesFile = JSON.parse(fs.readFileSync(RELEASES_JSON_PATH, 'utf-8'));
-    const allReleases = [...(releasesFile.releases || []), ...(releasesFile.upcoming || [])];
-    
+  {
+    const allReleases = [...liveReleases, ...(releasesFile.upcoming || [])];
+
     for (const release of allReleases) {
       if (!release.slug) continue;
-      
+
       const filePath = path.join(DIST_DIR, 'releases', `${release.slug}.html`);
       const dir = path.dirname(filePath);
       if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
-      const htmlContent = injectMetaTags(baseHtml, {
+      const relLinks = [
+        release.spotify ? `<li><a href="${release.spotify}">Spotify</a></li>` : '',
+        release.apple ? `<li><a href="${release.apple}">Apple Music</a></li>` : '',
+        release.youtube ? `<li><a href="${release.youtube}">YouTube</a></li>` : ''
+      ].filter(Boolean).join('\n');
+      const releaseBody = `<article><h1>${esc(release.title)} — Black Vybez</h1>
+<p>${esc(release.type || 'Single')}${release.tag ? ` · ${esc(release.tag)}` : ''}${release.date ? ` · ${esc(release.date)}` : ''}</p>
+<p>${esc(release.description || '')}</p>
+${relLinks ? `<ul>${relLinks}</ul>` : ''}
+${release.comingSoon ? '<p>Έρχεται σύντομα.</p>' : `<p><a href="/releases">Αγόρασε το στη σελίδα Releases${release.price ? ` (${esc(release.price)})` : ''}</a></p>`}</article>`;
+
+      const htmlContent = injectStaticBody(injectMetaTags(baseHtml, {
         title: `${release.title} - Black Vybez | Release`,
         description: release.description || `Ακούστε το ${release.title} από τον Black Vybez.`,
         urlPath: `releases/${release.slug}`,
         imageUrl: release.cover || DEFAULT_IMAGE,
         releaseData: release
-      });
+      }), releaseBody);
       fs.writeFileSync(filePath, htmlContent);
       console.log(`✅ Δημιουργήθηκε: /releases/${release.slug}`);
     }
@@ -251,13 +356,18 @@ async function generatePages() {
         season: podcast.season
       };
 
-      const htmlContent = injectMetaTags(baseHtml, {
+      const podcastBody = `<article><h1>${esc(podcast.title)} — Μπαμπάς των 2 &amp; Rapper</h1>
+<p>${esc(podcast.date || '')}${podcast.episode ? ` · Επεισόδιο ${esc(podcast.episode)}` : ''}</p>
+<p>${esc(podcast.description || '')}</p>
+<p><a href="/podcasts">Όλα τα επεισόδια</a></p></article>`;
+
+      const htmlContent = injectStaticBody(injectMetaTags(baseHtml, {
         title: `${podcast.title} | Black Vybez Podcast`,
         description: podcast.description || `Ακούστε το επεισόδιο ${podcast.title} από το podcast του Black Vybez.`,
         urlPath: `podcasts/${podcast.slug}`,
         imageUrl: DEFAULT_IMAGE,
         podcastData: podcastDataObj
-      });
+      }), podcastBody);
       fs.writeFileSync(filePath, htmlContent);
       console.log(`✅ Δημιουργήθηκε: /podcasts/${podcast.slug}`);
     }
