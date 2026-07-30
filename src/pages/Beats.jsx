@@ -74,7 +74,7 @@ function Beats() {
           padding: '70px 40px',
           border: '1px solid var(--border-strong)',
           boxShadow: 'var(--shadow-print)',
-          backgroundImage: `linear-gradient(rgba(20,16,13,0.82), rgba(20,16,13,0.82)), url(/assets/uploads/beats-hero-desk.jpeg)`,
+          backgroundImage: `linear-gradient(rgba(20,16,13,0.82), rgba(20,16,13,0.82)), url(/assets/uploads/beats-hero-desk.webp)`,
           backgroundSize: 'cover',
           backgroundPosition: 'center 40%'
         }}
