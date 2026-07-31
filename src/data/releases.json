@@ -1,6 +1,28 @@
 {
   "releases": [
     {
+      "slug": "exo-tabs-sto-mualo",
+      "title": "Έχω tabs στο μυαλό",
+      "tag": "Single",
+      "type": "Single",
+      "date": "2026-07-31",
+      "cover": "/assets/uploads/tabs-cover.webp",
+      "spotify": "https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3",
+      "apple": "https://music.apple.com/gr/album/%CE%AD%CF%87%CF%89-tabs-%CF%83%CF%84%CE%BF-%CE%BC%CF%85%CE%B1%CE%BB%CF%8C-single/6791818770",
+      "youtube": "",
+      "buy": "",
+      "price": "1.99€",
+      "localAudio": false,
+      "audioSrc": "",
+      "downloadSrc": "",
+      "description": "Παίρνω τη μεταφορά των ανοιχτών καρτελών σε browser για να περιγράψω πώς λειτουργεί το μυαλό όταν δουλεύει διαφορετικά από ό,τι συνήθως θεωρείται φυσιολογικό. Ένα single για τη ζωή με ΔΕΠΥ.",
+      "lyrics": "",
+      "altVersions": [
+        { "label": "Slowed + Reverb" },
+        { "label": "Sped Up" }
+      ]
+    },
+    {
       "slug": "jazz-bar-ton-teraton",
       "title": "Jazz Bar των τεράτων",
       "tag": "Vintage Freq",
