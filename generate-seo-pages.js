@@ -203,10 +203,10 @@ async function generatePages() {
   const liveReleases = releasesFile.releases || [];
 
   const releaseListHtml = liveReleases
-    .map((r) => `<li><a href="/releases/${r.slug}">${esc(r.title)}</a>${r.tag ? ` — ${esc(r.tag)}` : ''}</li>`)
+    .map((r) => `<li><a href="/releases/${r.slug}">${esc(r.title)}</a>${r.tag ? `, ${esc(r.tag)}` : ''}</li>`)
     .join('\n');
   const blogListHtml = blogData.posts
-    .map((p) => `<li><a href="/blog/${p.slug}">${esc(p.title)}</a> — ${esc(p.excerpt || '')}</li>`)
+    .map((p) => `<li><a href="/blog/${p.slug}">${esc(p.title)}</a>, ${esc(p.excerpt || '')}</li>`)
     .join('\n');
   const podcastListHtml = (podcastsFile.podcasts || [])
     .map((p) => `<li><a href="/podcasts/${p.slug}">${esc(p.title)}</a></li>`)
@@ -214,21 +214,21 @@ async function generatePages() {
 
   // Static body ανά route (πραγματικό κείμενο για no-JS crawlers)
   const staticBodies = {
-    beats: `<h1>Beats — Black Vybez Store</h1>
+    beats: `<h1>Beats | Black Vybez Store</h1>
 <p>Αγόρασε premium beats από τον Black Vybez. Trap, Drill, Boombap, R&amp;B, Synthwave, Pop. Άδειες: Showcase, Premium, Unlimited.</p>
-<ul>${beatsFile.beatslist.map((b) => `<li>${esc(b.title)}${b.bpm ? ` — ${esc(b.bpm)} BPM` : ''}${b.price ? ` — ${esc(b.price)}` : ''}</li>`).join('\n')}</ul>`,
-    releases: `<h1>Releases — Black Vybez</h1>
+<ul>${beatsFile.beatslist.map((b) => `<li>${esc(b.title)}${b.bpm ? `, ${esc(b.bpm)} BPM` : ''}${b.price ? `, ${esc(b.price)}` : ''}</li>`).join('\n')}</ul>`,
+    releases: `<h1>Releases | Black Vybez</h1>
 <p>Όλες οι επίσημες κυκλοφορίες του Black Vybez. Singles και το επερχόμενο album ΠΑΛΙΡΡΟΙΑ.</p>
 <ul>${releaseListHtml}</ul>`,
-    podcasts: `<h1>Podcast — Μπαμπάς των 2 &amp; Rapper</h1>
+    podcasts: `<h1>Podcast, Μπαμπάς των 2 &amp; Rapper</h1>
 <p>Το podcast του Black Vybez για τη ΔΕΠΥ, την πατρότητα και τη μουσική.</p>
 <ul>${podcastListHtml}</ul>`,
-    press: `<h1>Press &amp; Media — Black Vybez</h1>
+    press: `<h1>Press &amp; Media | Black Vybez</h1>
 <ul>${pressFile.articles.map((a) => `<li>${esc(a.title)} (${esc(a.source)})</li>`).join('\n')}</ul>`,
-    bio: `<h1>${esc(bioData?.title || 'Βιογραφία — Black Vybez')}</h1>
+    bio: `<h1>${esc(bioData?.title || 'Βιογραφία, Black Vybez')}</h1>
 ${mdToHtml(bioData?.content || '')}`,
-    store: `<h1>Store — Black Vybez</h1><p>Επίσημο merchandise Black Vybez. Coming soon.</p>`,
-    links: `<h1>Black Vybez — Links</h1>
+    store: `<h1>Store | Black Vybez</h1><p>Επίσημο merchandise Black Vybez. Coming soon.</p>`,
+    links: `<h1>Black Vybez Links</h1>
 <ul>
 <li><a href="https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3">Spotify</a></li>
 <li><a href="https://music.apple.com/gr/artist/black-vybez/1510069891">Apple Music</a></li>
@@ -236,12 +236,12 @@ ${mdToHtml(bioData?.content || '')}`,
 <li><a href="/releases">Κυκλοφορίες</a></li>
 <li><a href="/beats">Beats</a></li>
 </ul>`,
-    blog: `<h1>Journal — Black Vybez</h1>
+    blog: `<h1>Journal | Black Vybez</h1>
 <p>Σκέψεις για τη μουσική, τη νευροδιαφορετικότητα και τη ζωή πίσω από τα beats.</p>
 <ul>${blogListHtml}</ul>`
   };
 
-  const homeBody = `<h1>Black Vybez — Vybezmadethis</h1>
+  const homeBody = `<h1>Black Vybez, Vybezmadethis</h1>
 <p>Ο Black Vybez (Θοδωρής Παρασχάκης) είναι Έλληνας rapper, μουσικός παραγωγός και τραγουδοποιός από τη Λάρισα. Δημιουργεί beats, κυκλοφορεί μουσική και μιλάει για τη νευροδιαφορετικότητα (ΔΕΠΥ) μέσα από το podcast «Μπαμπάς των 2 &amp; Rapper». Μουσική για κάθε διαφορετικό μυαλό.</p>
 <ul>
 <li><a href="/releases">Releases</a></li>
@@ -253,8 +253,8 @@ ${mdToHtml(bioData?.content || '')}`,
 
   // Ομάδα: canonical/og:url + static body στην ίδια την αρχική σελίδα
   const homeHtml = injectStaticBody(injectMetaTags(baseHtml, {
-    title: 'Black Vybez — Beats, Releases & Vybezverse',
-    description: 'Black Vybez (Vybezmadethis) — producer από τη Λάρισα. Άκου beats, releases, podcasts και γίνε μέλος του Vybezverse. Μουσική για κάθε διαφορετικό μυαλό.',
+    title: 'Black Vybez | Beats, Releases & Vybezverse',
+    description: 'Black Vybez (Vybezmadethis), producer από τη Λάρισα. Άκου beats, releases, podcasts και γίνε μέλος του Vybezverse. Μουσική για κάθε διαφορετικό μυαλό.',
     urlPath: ''
   }), homeBody);
   fs.writeFileSync(INDEX_HTML_PATH, homeHtml);
@@ -318,7 +318,7 @@ ${mdToHtml(post.content)}</article>`;
         release.apple ? `<li><a href="${release.apple}">Apple Music</a></li>` : '',
         release.youtube ? `<li><a href="${release.youtube}">YouTube</a></li>` : ''
       ].filter(Boolean).join('\n');
-      const releaseBody = `<article><h1>${esc(release.title)} — Black Vybez</h1>
+      const releaseBody = `<article><h1>${esc(release.title)}, Black Vybez</h1>
 <p>${esc(release.type || 'Single')}${release.tag ? ` · ${esc(release.tag)}` : ''}${release.date ? ` · ${esc(release.date)}` : ''}</p>
 <p>${esc(release.description || '')}</p>
 ${relLinks ? `<ul>${relLinks}</ul>` : ''}
@@ -356,7 +356,7 @@ ${release.comingSoon ? '<p>Έρχεται σύντομα.</p>' : `<p><a href="/r
         season: podcast.season
       };
 
-      const podcastBody = `<article><h1>${esc(podcast.title)} — Μπαμπάς των 2 &amp; Rapper</h1>
+      const podcastBody = `<article><h1>${esc(podcast.title)}, Μπαμπάς των 2 &amp; Rapper</h1>
 <p>${esc(podcast.date || '')}${podcast.episode ? ` · Επεισόδιο ${esc(podcast.episode)}` : ''}</p>
 <p>${esc(podcast.description || '')}</p>
 <p><a href="/podcasts">Όλα τα επεισόδια</a></p></article>`;

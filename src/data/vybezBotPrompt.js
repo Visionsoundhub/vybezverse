@@ -24,7 +24,7 @@ function formatBeats() {
   const beats = beatsData.beatslist || [];
   if (!beats.length) return '(Δεν υπάρχουν διαθέσιμα beats αυτή τη στιγμή.)';
   return beats
-    .map((b) => `- "${b.title}" — Στυλ: ${b.category}, BPM: ${b.bpm}, Key: ${b.key}, από ${b.price}, Link: ${b.checkoutUrl}`)
+    .map((b) => `- "${b.title}", Στυλ: ${b.category}, BPM: ${b.bpm}, Key: ${b.key}, από ${b.price}, Link: ${b.checkoutUrl}`)
     .join('\n');
 }
 
@@ -37,7 +37,7 @@ function formatReleases() {
       const bits = [`- "${r.title}"`];
       if (r.tag) bits.push(`(${r.tag})`);
       if (year) bits.push(`${year}`);
-      bits.push('— Δωρεάν ακρόαση & λήψη MP3 από το site.');
+      bits.push('Δωρεάν ακρόαση & λήψη MP3 από το site.');
       if (r.price) {
         // Only promise the alternate versions for releases that actually have
         // them; not every track has a Slowed/Sped Up cut yet.
@@ -53,7 +53,7 @@ function formatReleases() {
 function formatLicenses() {
   return LICENSE_TIERS.map((t) => {
     const how = t.action === 'checkout' ? 'άμεση αγορά από το site' : 'κατόπιν συνεννόησης μέσω email';
-    return `- ${t.name}: ${t.price} (${how}) — ${t.features.join('. ')}.`;
+    return `- ${t.name}: ${t.price} (${how}), ${t.features.join('. ')}.`;
   }).join('\n');
 }
 

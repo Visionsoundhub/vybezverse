@@ -324,7 +324,6 @@ export async function onRequestPost(context) {
 
     const modelsToTry = [
       'gemini-2.5-flash',
-      'gemini-3.5-flash',
       'gemini-2.0-flash',
       'gemini-1.5-flash'
     ];
@@ -336,13 +335,23 @@ export async function onRequestPost(context) {
     for (const modelName of modelsToTry) {
       try {
         const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${geminiApiKey}`;
-        const geminiResponse = await fetch(geminiUrl, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(geminiPayload)
-        });
+        // Δίχως timeout, ένα κολλημένο upstream κρατάει ανοιχτό το request επ' αόριστον
+        // και το VybezBot μένει μόνιμα σε "typing" στο frontend.
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        let geminiResponse;
+        try {
+          geminiResponse = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(geminiPayload),
+            signal: controller.signal
+          });
+        } finally {
+          clearTimeout(timeoutId);
+        }
 
         const geminiData = await geminiResponse.json();
 

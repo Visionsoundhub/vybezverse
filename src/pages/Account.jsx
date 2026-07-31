@@ -183,7 +183,7 @@ function Account() {
           <div className="account-discount-banner">
             {vipCode ? (
               <>
-                <p>Ο προσωπικός σου κωδικός για έκπτωση {discountLabel(vipTier)} — γράψ' τον στο ταμείο.</p>
+                <p>Ο προσωπικός σου κωδικός για έκπτωση {discountLabel(vipTier)}, γράψ' τον στο ταμείο.</p>
                 <div className="account-discount-code">{vipCode}</div>
               </>
             ) : discountCode ? (

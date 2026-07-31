@@ -67,7 +67,7 @@ const LoyaltyProgressBar = () => {
                 <Info size={16} />
               </button>
             </div>
-            <p>VIP Έκπτωση: {discountLabel(currentTier)}{vipCode ? ` — κωδικός ${vipCode}` : ''}</p>
+            <p>VIP Έκπτωση: {discountLabel(currentTier)}{vipCode ? `, κωδικός ${vipCode}` : ''}</p>
           </div>
         </div>
         {nextTier ? (

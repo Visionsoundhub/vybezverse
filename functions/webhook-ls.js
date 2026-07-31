@@ -183,7 +183,7 @@ async function createPersonalDiscount(apiKey, tier, email) {
       data: {
         type: 'discounts',
         attributes: {
-          name: `VIP ${tier.name} — ${email}`,
+          name: `VIP ${tier.name}, ${email}`,
           code,
           amount: tier.percent,
           amount_type: 'percent',
