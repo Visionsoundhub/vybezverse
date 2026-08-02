@@ -1,6 +1,7 @@
 import React from 'react';
 import { Music, Play, ShoppingBag, Star, Globe, ExternalLink } from 'lucide-react';
 import linksData from '../data/links.json';
+import releasesData from '../data/releases.json';
 import './Links.css';
 
 const SPOTIFY = 'https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3';
@@ -11,6 +12,12 @@ const TIKTOK = 'https://www.tiktok.com/@blackvybez';
 const FACEBOOK = 'https://www.facebook.com/profile.php?id=61555325559295';
 
 function Links() {
+  // Same convention as Home.jsx: first entry in releases.json is the newest
+  // single, so this "new release" card follows whatever's actually current
+  // instead of the separate, easy-to-forget copy that used to live in
+  // links.json (it stayed pinned to Jazz Bar through two later releases).
+  const latestRelease = releasesData.releases?.[0];
+
   return (
     <div className="links-page">
       <div className="links-container">
@@ -23,10 +30,10 @@ function Links() {
           <p className="links-tagline">Music · Beats · Apparel</p>
         </div>
 
-        {linksData.showLatest && linksData.releaseCover && (
-          <a className="links-latest" href={linksData.streamLink || APPLE} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', display: 'block' }}>
-            <img className="links-release-cover" src={linksData.releaseCover} alt={linksData.latestTitle} />
-            <p className="links-release-title">New release: {linksData.latestTitle}</p>
+        {linksData.showLatest && latestRelease?.cover && (
+          <a className="links-latest" href={latestRelease.slug ? `https://blackvybez.gr/releases/${latestRelease.slug}` : (latestRelease.spotify || latestRelease.apple || APPLE)} target="_blank" rel="noreferrer" style={{ textDecoration: 'none', display: 'block' }}>
+            <img className="links-release-cover" src={latestRelease.cover} alt={latestRelease.title} />
+            <p className="links-release-title">New release: {latestRelease.title}</p>
           </a>
         )}
 
