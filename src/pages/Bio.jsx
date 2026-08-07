@@ -50,7 +50,7 @@ function Bio() {
         <span className="bio-ghost" aria-hidden="true">BLACK VYBEZ</span>
         <div className="bio-eyebrow">Bio · Producer · Λάρισα / Αθήνα → ∞</div>
         <h1 className="bio-title">BLACK VYBEZ</h1>
-        <div className="bio-realname">Θοδωρής Παρασχάκης «Ντόμας»</div>
+        <div className="bio-realname">Θοδωρής Παρασχάκης Νταμάς</div>
       </section>
 
       <div className="container bio-body">
