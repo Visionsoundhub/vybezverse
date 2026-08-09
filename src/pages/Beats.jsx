@@ -15,7 +15,7 @@ function Beats() {
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
 
-  const genres = ['All', 'Trap', 'Drill', 'Boombap', 'R&B', 'Synthwave', 'Pop'];
+  const genres = ['All', 'Trap', 'Drill', 'Boombap', 'Reggaeton', 'R&B', 'Synthwave', 'Pop'];
 
   // Beatstore live? Until the Lemon Squeezy products are ready, keep it in "coming soon"
   // (storeActive:false in beats.json) so no untested checkout is exposed. Audio preview stays on.

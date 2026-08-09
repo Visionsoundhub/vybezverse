@@ -29,6 +29,21 @@
       "category": "drill",
       "bpm": "144",
       "key": "Dminor"
+    },
+    {
+      "price": "14.99€",
+      "checkoutUrl": "https://blackvybez.lemonsqueezy.com/checkout/buy/491461ae-f0a0-4abd-9238-36fb6604c1dc",
+      "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/friday-preview.mp3",
+      "status": "available",
+      "cover": "/assets/uploads/friday-cover.webp",
+      "title": "Friday",
+      "tags": [
+        "reggaeton",
+        "party"
+      ],
+      "category": "reggaeton",
+      "bpm": "95",
+      "key": "Eminor"
     }
   ],
   "storeActive": true,
