@@ -1,8 +1,8 @@
 import React, { useState, useContext } from 'react';
-import { Play, Search, ShoppingCart, SlidersHorizontal, Music, Star, Send, LayoutGrid, List, Pause } from 'lucide-react';
+import { Play, Search, ShoppingCart, SlidersHorizontal, Music, Star, Send, LayoutGrid, List, Pause, Info, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 import beatsDataRaw from '../data/beats.json';
-import { LICENSE_TIERS } from '../data/licenseTiers';
+import { LICENSE_TIERS, LEASING_EXPLAINER } from '../data/licenseTiers';
 import { AudioContext } from '../context/AudioContext';
 import { useAuth } from '../context/AuthContext';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
@@ -14,6 +14,7 @@ function Beats() {
   const [viewMode, setViewMode] = useState('list'); // Default to list for beatstores
   const [selectedGenre, setSelectedGenre] = useState('All');
   const [currentPage, setCurrentPage] = useState(1);
+  const [showLeasingInfo, setShowLeasingInfo] = useState(false);
 
   const genres = ['All', 'Trap', 'Drill', 'Boombap', 'Reggaeton', 'R&B', 'Synthwave', 'Pop'];
 
@@ -302,8 +303,41 @@ function Beats() {
 
       {/* 5. LICENSING INFO */}
       <div style={{ textAlign: 'center', marginBottom: '60px' }}>
-        <h2 style={{ fontSize: '2.5rem', fontWeight: '900', marginBottom: '8px' }}>Licensing Info</h2>
-        <p style={{ color: 'var(--text-secondary)' }}>Επίλεξε την άδεια που καλύπτει τις ανάγκες σου.</p>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: '900', margin: 0 }}>Licensing Info</h2>
+          <button
+            onClick={() => setShowLeasingInfo((v) => !v)}
+            aria-expanded={showLeasingInfo}
+            style={{ width: '30px', height: '30px', borderRadius: '50%', border: '1px solid var(--border-strong)', background: 'transparent', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+            title="Τι είναι το Beat Leasing;"
+          >
+            <Info size={16} />
+          </button>
+        </div>
+        <p style={{ color: 'var(--text-secondary)', marginTop: '8px' }}>Επίλεξε την άδεια που καλύπτει τις ανάγκες σου.</p>
+
+        {showLeasingInfo && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            style={{ overflow: 'hidden' }}
+          >
+            <div className="glass-card" style={{ maxWidth: '640px', margin: '24px auto 0', padding: '28px 32px', textAlign: 'left', position: 'relative' }}>
+              <button
+                onClick={() => setShowLeasingInfo(false)}
+                aria-label="Κλείσιμο"
+                style={{ position: 'absolute', top: '14px', right: '14px', background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
+              >
+                <X size={18} />
+              </button>
+              <h3 style={{ fontSize: '1.3rem', fontWeight: '800', marginBottom: '14px' }}>{LEASING_EXPLAINER.title}</h3>
+              {LEASING_EXPLAINER.paragraphs.map((p, i) => (
+                <p key={i} style={{ color: 'var(--text-secondary)', lineHeight: 1.6, marginBottom: i < LEASING_EXPLAINER.paragraphs.length - 1 ? '14px' : 0 }}>{p}</p>
+              ))}
+            </div>
+          </motion.div>
+        )}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '20px', marginBottom: '100px' }}>

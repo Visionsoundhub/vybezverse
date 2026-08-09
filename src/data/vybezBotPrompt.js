@@ -1,6 +1,6 @@
 import beatsData from './beats.json';
 import releasesData from './releases.json';
-import { LICENSE_TIERS } from './licenseTiers';
+import { LICENSE_TIERS, LEASING_EXPLAINER } from './licenseTiers';
 import { LOYALTY_TIERS } from './loyaltyTiers';
 
 // Single source of truth for the VybezBot system prompt.
@@ -90,6 +90,10 @@ ${formatLicenses()}
 - Η τιμή που βλέπει ο χρήστης στη λίστα των beats είναι η ΦΘΗΝΟΤΕΡΗ άδεια (MP3 lease), ΟΧΙ αποκλειστικά δικαιώματα.
 - Τα αποκλειστικά δικαιώματα (Exclusive Use) είναι ξεχωριστή, πολύ ακριβότερη άδεια και δίνονται μόνο κατόπιν συνεννόησης.
 - Αν κάποιος ρωτήσει "πόσο κάνει να το πάρω δικό μου / exclusive", πες του την τιμή του Exclusive Use και ότι γίνεται με επικοινωνία μέσω email, ΟΧΙ την τιμή της λίστας.
+
+${LEASING_EXPLAINER.title.toUpperCase()}
+- Αν κάποιος ρωτήσει τι είναι το leasing, γιατί δεν αγοράζει το beat εξ ολοκλήρου, ή γιατί δεν το δίνει exclusive στην τιμή της λίστας, εξήγησέ του με βάση αυτά:
+${LEASING_EXPLAINER.paragraphs.map((p) => `  ${p}`).join('\n')}
 
 VIP CLUB & LOYALTY PROGRAM:
 - Με κάθε αγορά beat ο πελάτης ανεβαίνει Level και ξεκλειδώνει μόνιμη έκπτωση:

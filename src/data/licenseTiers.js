@@ -17,7 +17,7 @@ export const LICENSE_TIERS = [
     icon: FileMusic,
     name: 'WAV',
     price: '34,99€',
-    features: ['Ό,τι και το MP3', 'Uncompressed WAV αρχείο', 'Έως 3.000 πωλήσεις/διανομή', 'Έως 700.000 streams'],
+    features: ['Ό,τι και το MP3', 'Uncompressed WAV αρχείο', 'Έως 3.000 πωλήσεις/διανομή', 'Άδεια χρήσης 2 ετών'],
     action: 'checkout',
     featured: true,
   },
@@ -40,3 +40,15 @@ export const LICENSE_TIERS = [
     contactExtra: 'Θέλω το Exclusive Use license, τι τιμή θα έχει;',
   },
 ];
+
+// Shown from an info button next to "Licensing Info" on the Beats page, and
+// fed to VybezBot so it can explain the model the same way instead of
+// guessing. Single source of truth, same reasoning as LICENSE_TIERS above.
+export const LEASING_EXPLAINER = {
+  title: 'Τι είναι το Beat Leasing;',
+  paragraphs: [
+    'Όταν αγοράζεις ένα beat leasing εδώ, δεν αγοράζεις το beat, αγοράζεις την άδεια να το χρησιμοποιήσεις. Το beat παραμένει εξ ολοκλήρου ιδιοκτησία του Black Vybez.',
+    'Γιατί έτσι; Αν κάθε beat πουλιόταν μια φορά και για πάντα σε 15-40€, θα υποτιμούσε τη δουλειά πίσω από κάθε παραγωγή. Το leasing δίνει πρόσβαση σε ποιοτικό ήχο σε τιμή που βγάζει νόημα, χωρίς να χρειάζεται να ξεπουλήσει κανείς τη δουλειά του για να το πετύχει αυτό.',
+    'Αν θες το beat αποκλειστικά δικό σου, χωρίς κανέναν περιορισμό, υπάρχει το Exclusive Use tier.',
+  ],
+};
