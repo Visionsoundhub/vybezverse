@@ -53,7 +53,7 @@ export async function onRequestPost(context) {
     return json(400, { error: 'Body must be valid JSON' });
   }
 
-  const { title, slug, excerpt, body_html, cover_image_url, tags, published_at, category } = body || {};
+  const { title, slug, excerpt, body_html, cover_image_url, tags, published_at, category, author } = body || {};
 
   if (!title || typeof title !== 'string') return json(400, { error: '"title" is required' });
   if (!slug || typeof slug !== 'string') return json(400, { error: '"slug" is required' });
@@ -70,6 +70,7 @@ export async function onRequestPost(context) {
   if (category !== undefined && category !== 'news' && category !== 'blog') {
     return json(400, { error: '"category" must be "news" or "blog"' });
   }
+  if (author !== undefined && typeof author !== 'string') return json(400, { error: '"author" must be a string' });
 
   try {
     const accessToken = await getGoogleAccessToken(env);
@@ -82,6 +83,7 @@ export async function onRequestPost(context) {
       tags: tags || [],
       published_at: published_at || new Date().toISOString(),
       category: category || 'blog',
+      author: author || 'Black Vybez',
       source: 'alice',
       createdAt: new Date().toISOString(),
     });

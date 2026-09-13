@@ -65,6 +65,7 @@ function AliceBlogPost() {
 
         <div style={{ display: 'flex', gap: 14, alignItems: 'baseline', flexWrap: 'wrap', fontFamily: 'var(--font-mono)', fontSize: '.8rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 16 }}>
           <span>{fmt(post.published_at)}</span>
+          {post.author && <span>· {post.author}</span>}
           {(post.tags || []).map((t) => <span key={t} style={{ color: 'var(--accent)' }}>· {t}</span>)}
         </div>
 

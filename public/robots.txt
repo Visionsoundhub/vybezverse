@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://blackvybez.gr/sitemap.xml
+Sitemap: https://blackvybez.gr/sitemap-blogs.xml
