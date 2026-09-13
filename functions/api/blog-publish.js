@@ -81,7 +81,7 @@ export async function onRequestPost(context) {
       cover_image_url: cover_image_url || '',
       tags: tags || [],
       published_at: published_at || new Date().toISOString(),
-      category: category || 'news',
+      category: category || 'blog',
       source: 'alice',
       createdAt: new Date().toISOString(),
     });
