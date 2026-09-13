@@ -53,7 +53,7 @@ export async function onRequestPost(context) {
     return json(400, { error: 'Body must be valid JSON' });
   }
 
-  const { title, slug, excerpt, body_html, cover_image_url, tags, published_at } = body || {};
+  const { title, slug, excerpt, body_html, cover_image_url, tags, published_at, category } = body || {};
 
   if (!title || typeof title !== 'string') return json(400, { error: '"title" is required' });
   if (!slug || typeof slug !== 'string') return json(400, { error: '"slug" is required' });
@@ -67,6 +67,9 @@ export async function onRequestPost(context) {
   if (published_at !== undefined && Number.isNaN(Date.parse(published_at))) {
     return json(400, { error: '"published_at" must be a valid ISO date string' });
   }
+  if (category !== undefined && category !== 'news' && category !== 'blog') {
+    return json(400, { error: '"category" must be "news" or "blog"' });
+  }
 
   try {
     const accessToken = await getGoogleAccessToken(env);
@@ -78,6 +81,7 @@ export async function onRequestPost(context) {
       cover_image_url: cover_image_url || '',
       tags: tags || [],
       published_at: published_at || new Date().toISOString(),
+      category: category || 'news',
       source: 'alice',
       createdAt: new Date().toISOString(),
     });

@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowUpRight } from 'lucide-react';
+import { collection, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
 import blogData from '../data/blog.json';
 
 function fmt(d) {
@@ -18,10 +20,44 @@ const TABS = [
 function Blog() {
   const reduce = useReducedMotion();
   const [tab, setTab] = useState('news');
+  // Posts published live by ALICE via POST /api/blog-publish, on top of the
+  // static build-time blog.json ones. Fetched once; each has its own route
+  // (/blogs/:slug) since they live in Firestore, not the static bundle.
+  const [alicePosts, setAlicePosts] = useState([]);
+
+  useEffect(() => {
+    let alive = true;
+    getDocs(collection(db, 'external_blog_posts'))
+      .then((snap) => {
+        if (!alive) return;
+        setAlicePosts(snap.docs.map((d) => d.data()));
+      })
+      .catch((e) => console.error('Failed to load ALICE posts', e));
+    return () => { alive = false; };
+  }, []);
+
   // Older posts predate the news/blog split; default them to news since the
   // first post ever written here was a release announcement.
-  const posts = [...(blogData.posts || [])]
-    .filter((p) => (p.category || 'news') === tab)
+  const staticPosts = (blogData.posts || []).map((p) => ({
+    slug: p.slug,
+    date: p.date,
+    tag: p.tag,
+    title: p.title,
+    excerpt: p.excerpt,
+    category: p.category || 'news',
+    href: `/blog/${p.slug}`,
+  }));
+  const externalPosts = alicePosts.map((p) => ({
+    slug: p.slug,
+    date: p.published_at,
+    tag: (p.tags || [])[0],
+    title: p.title,
+    excerpt: p.excerpt,
+    category: p.category || 'news',
+    href: `/blogs/${p.slug}`,
+  }));
+  const posts = [...staticPosts, ...externalPosts]
+    .filter((p) => p.category === tab)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
 
   return (
@@ -60,7 +96,7 @@ function Blog() {
             whileInView={reduce ? {} : { opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
             transition={{ duration: 0.5, delay: reduce ? 0 : i * 0.05 }}>
-            <Link to={`/blog/${p.slug}`} style={{ textDecoration: 'none', color: 'inherit', display: 'block', borderTop: '1px solid var(--border)', padding: '30px 0' }}>
+            <Link to={p.href} style={{ textDecoration: 'none', color: 'inherit', display: 'block', borderTop: '1px solid var(--border)', padding: '30px 0' }}>
               <div style={{ display: 'flex', gap: 14, alignItems: 'baseline', fontFamily: 'var(--font-mono)', fontSize: '.78rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 12 }}>
                 <span>{fmt(p.date)}</span>
                 {p.tag && <span style={{ color: 'var(--accent)' }}>· {p.tag}</span>}
