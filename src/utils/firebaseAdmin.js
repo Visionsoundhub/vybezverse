@@ -100,3 +100,15 @@ export async function firestoreGet(env, accessToken, collection, docId) {
   if (!res.ok) throw new Error(`Firestore get failed: ${res.status} ${await res.text()}`);
   return res.json();
 }
+
+// Returns true if a document existed and was deleted, false if it was
+// already gone (Firestore's delete is idempotent either way).
+export async function firestoreDelete(env, accessToken, collection, docId) {
+  const res = await fetch(docPath(env, collection, docId), {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (res.status === 404) return false;
+  if (!res.ok) throw new Error(`Firestore delete failed: ${res.status} ${await res.text()}`);
+  return true;
+}

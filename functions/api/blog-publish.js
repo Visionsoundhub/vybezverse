@@ -1,4 +1,5 @@
-// POST /api/blog-publish
+// POST /api/blog-publish   - publish/update a post
+// DELETE /api/blog-publish?slug=<slug>  - remove one
 //
 // Lets an external system (ALICE) publish a blog post that goes live at
 // blackvybez.gr/blogs/<slug> immediately, no site rebuild needed. Posts land
@@ -6,7 +7,7 @@
 // static, build-time blog.json posts under /blog) and the /blogs/:slug page
 // reads that collection directly.
 //
-// Auth: Authorization: Bearer <BLOG_API_TOKEN>
+// Auth (both methods): Authorization: Bearer <BLOG_API_TOKEN>
 //
 // Requires these Cloudflare Pages env vars (Settings -> Environment
 // variables, never in the repo):
@@ -15,7 +16,7 @@
 //   FIREBASE_CLIENT_EMAIL   } already set for the Lemon Squeezy webhook
 //   FIREBASE_PRIVATE_KEY   /
 
-import { getGoogleAccessToken, firestoreSet } from '../../src/utils/firebaseAdmin';
+import { getGoogleAccessToken, firestoreSet, firestoreDelete } from '../../src/utils/firebaseAdmin';
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -32,19 +33,44 @@ function tokensMatch(a, b) {
   return diff === 0;
 }
 
-export async function onRequestPost(context) {
-  const { request, env } = context;
-
+function checkAuth(request, env) {
   if (!env.BLOG_API_TOKEN) {
     console.error('BLOG_API_TOKEN is not set');
     return json(500, { error: 'Server misconfigured' });
   }
-
   const authHeader = request.headers.get('Authorization') || '';
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : '';
   if (!tokensMatch(token, env.BLOG_API_TOKEN)) {
     return json(401, { error: 'Invalid or missing bearer token' });
   }
+  return null; // auth OK
+}
+
+export async function onRequestDelete(context) {
+  const { request, env } = context;
+
+  const authError = checkAuth(request, env);
+  if (authError) return authError;
+
+  const slug = new URL(request.url).searchParams.get('slug');
+  if (!slug || typeof slug !== 'string') return json(400, { error: '"slug" query param is required, e.g. ?slug=my-post-title' });
+
+  try {
+    const accessToken = await getGoogleAccessToken(env);
+    const existed = await firestoreDelete(env, accessToken, 'external_blog_posts', slug);
+    if (!existed) return json(404, { error: `No post found with slug "${slug}"` });
+    return json(200, { deleted: slug });
+  } catch (err) {
+    console.error('blog-publish delete error:', err);
+    return json(500, { error: 'Internal error while deleting' });
+  }
+}
+
+export async function onRequestPost(context) {
+  const { request, env } = context;
+
+  const authError = checkAuth(request, env);
+  if (authError) return authError;
 
   let body;
   try {
