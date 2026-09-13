@@ -61,6 +61,11 @@ export async function onRequestGet(context) {
       html = html.replace(/<meta property="og:image" content=".*?" \/>/, `<meta property="og:image" content="${esc(image)}" />`);
       html = html.replace(/<meta name="twitter:image" content=".*?" \/>/, `<meta name="twitter:image" content="${esc(image)}" />`);
     }
+    // The shell is the homepage's own prerendered index.html, which already
+    // carries its own og:url/canonical pointing at "/" — strip those before
+    // adding ours, or the page ends up with two of each.
+    html = html.replace(/<meta property="og:url" content=".*?" \/>\n?/g, '');
+    html = html.replace(/<link rel="canonical" href=".*?" \/>\n?/g, '');
     html = html.replace('</head>', `  <meta property="og:url" content="${fullUrl}" />\n  <link rel="canonical" href="${fullUrl}" />\n</head>`);
 
     const articleSchema = {
@@ -73,8 +78,11 @@ export async function onRequestGet(context) {
     };
     html = html.replace('</head>', `  <script type="application/ld+json">${JSON.stringify(articleSchema)}</script>\n</head>`);
 
+    // The shell already has homepage content prerendered inside #root (not
+    // an empty div), so don't rely on matching that exactly — just place the
+    // fallback right before </body>, where it's out of the way either way.
     const staticBody = `<noscript><article><h1>${esc(title)}</h1><p>${esc(description)}</p>${bodyHtml}</article></noscript>`;
-    html = html.replace('<div id="root"></div>', `<div id="root"></div>\n${staticBody}`);
+    html = html.replace('</body>', `${staticBody}\n</body>`);
 
     return new Response(html, { headers: { 'Content-Type': 'text/html; charset=utf-8' } });
   } catch (err) {
