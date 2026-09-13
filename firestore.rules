@@ -41,6 +41,15 @@ service cloud.firestore {
       allow write: if false;
     }
 
+    // Blog posts published by ALICE via POST /api/blog-publish. Public to
+    // read (they're published pages), writable only through that Function's
+    // Admin SDK access, which is authenticated by the bearer token, not by
+    // these rules.
+    match /external_blog_posts/{slug} {
+      allow read: if true;
+      allow write: if false;
+    }
+
     // Anything not matched above is denied.
     match /{document=**} {
       allow read, write: if false;

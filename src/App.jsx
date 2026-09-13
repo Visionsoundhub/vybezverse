@@ -25,6 +25,7 @@ const Releases = lazy(() => import('./pages/Releases'));
 const ReleasePost = lazy(() => import('./pages/ReleasePost'));
 const Blog = lazy(() => import('./pages/Blog'));
 const BlogPost = lazy(() => import('./pages/BlogPost'));
+const AliceBlogPost = lazy(() => import('./pages/AliceBlogPost'));
 
 // Fallback loader
 const PageLoader = () => (
@@ -59,6 +60,7 @@ function AppContent() {
             <Route path="/releases/:slug" element={<ReleasePost />} />
             <Route path="/blog" element={<Blog />} />
             <Route path="/blog/:slug" element={<BlogPost />} />
+            <Route path="/blogs/:slug" element={<AliceBlogPost />} />
           </Routes>
         </Suspense>
       </main>

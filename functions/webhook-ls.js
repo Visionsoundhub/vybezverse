@@ -14,6 +14,7 @@
 //                                  customer's personal VIP discount code
 
 import { tierForPurchases } from '../src/data/loyaltyTiers';
+import { getGoogleAccessToken } from '../src/utils/firebaseAdmin';
 
 async function verifySignature(rawBody, signatureHeader, secret) {
   if (!signatureHeader) return false;
@@ -25,54 +26,6 @@ async function verifySignature(rawBody, signatureHeader, secret) {
   let diff = 0;
   for (let i = 0; i < hex.length; i++) diff |= hex.charCodeAt(i) ^ signatureHeader.charCodeAt(i);
   return diff === 0;
-}
-
-function pemToArrayBuffer(pem) {
-  const b64 = pem
-    .replace(/-----BEGIN PRIVATE KEY-----/, '')
-    .replace(/-----END PRIVATE KEY-----/, '')
-    .replace(/\s/g, '');
-  const bin = atob(b64);
-  const bytes = new Uint8Array(bin.length);
-  for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
-  return bytes.buffer;
-}
-
-function b64url(input) {
-  const str = typeof input === 'string' ? input : String.fromCharCode(...new Uint8Array(input));
-  return btoa(str).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
-}
-
-async function getGoogleAccessToken(env) {
-  const now = Math.floor(Date.now() / 1000);
-  const header = { alg: 'RS256', typ: 'JWT' };
-  const claim = {
-    iss: env.FIREBASE_CLIENT_EMAIL,
-    scope: 'https://www.googleapis.com/auth/datastore',
-    aud: 'https://oauth2.googleapis.com/token',
-    iat: now,
-    exp: now + 3600,
-  };
-  const unsigned = `${b64url(JSON.stringify(header))}.${b64url(JSON.stringify(claim))}`;
-
-  const key = await crypto.subtle.importKey(
-    'pkcs8',
-    pemToArrayBuffer(env.FIREBASE_PRIVATE_KEY),
-    { name: 'RSASSA-PKCS1-v1_5', hash: 'SHA-256' },
-    false,
-    ['sign']
-  );
-  const sigBuf = await crypto.subtle.sign('RSASSA-PKCS1-v1_5', key, new TextEncoder().encode(unsigned));
-  const jwt = `${unsigned}.${b64url(sigBuf)}`;
-
-  const res = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`,
-  });
-  const data = await res.json();
-  if (!data.access_token) throw new Error(`Google token exchange failed: ${JSON.stringify(data)}`);
-  return data.access_token;
 }
 
 async function findUserByEmail(env, accessToken, email) {
