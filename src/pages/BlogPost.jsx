@@ -2,6 +2,7 @@ import React from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import blogData from '../data/blog.json';
+import ShareButtons from '../components/ShareButtons';
 
 function fmt(d) {
   try {
@@ -107,6 +108,10 @@ function BlogPost() {
         ) : null}
 
         <article>{renderBody(post.content)}</article>
+
+        <div style={{ marginTop: 50, paddingTop: 30, borderTop: '1px solid var(--border)' }}>
+          <ShareButtons url={`https://blackvybez.gr/blog/${post.slug}`} title={post.title} />
+        </div>
       </div>
     </div>
   );

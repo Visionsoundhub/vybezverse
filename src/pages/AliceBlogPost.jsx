@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
+import ShareButtons from '../components/ShareButtons';
 
 // Renders posts published via POST /api/blog-publish (the ALICE
 // integration). Separate from /blog/:slug on purpose: those come from the
@@ -83,6 +84,10 @@ function AliceBlogPost() {
           style={{ color: 'var(--text)', fontSize: '1.15rem', lineHeight: 1.75 }}
           dangerouslySetInnerHTML={{ __html: post.body_html }}
         />
+
+        <div style={{ marginTop: 50, paddingTop: 30, borderTop: '1px solid var(--border)' }}>
+          <ShareButtons url={`https://blackvybez.gr/blogs/${slug}`} title={post.title} />
+        </div>
       </div>
     </div>
   );
