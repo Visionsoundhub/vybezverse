@@ -27,7 +27,9 @@ export async function onRequestGet(context) {
   const { request, env, params } = context;
   const slug = params.slug;
 
-  const shellRes = await env.ASSETS.fetch(new Request(new URL('/index.html', request.url), request));
+  // Fetch '/', not '/index.html' directly — Pages redirects the latter (308)
+  // to '/', and reading a redirect response's body gives an empty string.
+  const shellRes = await env.ASSETS.fetch(new Request(new URL('/', request.url), request));
   let html = await shellRes.text();
 
   try {
