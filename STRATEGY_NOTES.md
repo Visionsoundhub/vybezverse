@@ -20,5 +20,5 @@
 
 ## 4. Vision Sound Hub (Context για μελλοντικό Redesign)
 - Το **Vision Sound Hub** θα λειτουργήσει ως η μητρική εταιρεία (Ομπρέλα) κάτω από το επαγγελματικό ΑΦΜ.
-- Θα στεγάζει projects όπως *Flawless Music*, *Flowsites*, *Audiloom* και το Κέντρο Νευροδιαφορετικότητας.
+- Θα στεγάζει projects όπως *Flawless Music*, *Flowsites και το Κέντρο Νευροδιαφορετικότητας.
 - *Σημείωση:* Το redesign του Vision Sound Hub θα γίνει σε **ξεχωριστό repository**, αλλά η λογική του SEO (Schema.org, SSG, Cross-linking) θα είναι απόλυτα εναρμονισμένη με ό,τι εφαρμόστηκε στο Vybezverse.
