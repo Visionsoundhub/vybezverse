@@ -17,6 +17,55 @@ const TABS = [
   { key: 'blog', label: 'Blog' },
 ];
 
+const DEFAULT_COVER = '/assets/uploads/banner.png';
+
+function CardMeta({ p }) {
+  return (
+    <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginBottom: 12 }}>
+      {p.tag && <span className="blog-tag">{p.tag}</span>}
+      <span style={{ fontFamily: 'var(--font-mono)', fontSize: '.75rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '.06em' }}>
+        {fmt(p.date)}
+      </span>
+    </div>
+  );
+}
+
+function FeaturedCard({ p }) {
+  return (
+    <Link to={p.href} className="blog-card blog-featured" style={{ marginBottom: 28 }}>
+      <img src={p.cover || DEFAULT_COVER} alt={p.title} className="blog-card-img" />
+      <div style={{ padding: '30px 32px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <CardMeta p={p} />
+        <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.6rem,3.2vw,2.4rem)', lineHeight: 1.08, letterSpacing: '-.02em', margin: '0 0 14px' }}>
+          <span className="blog-card-title">{p.title}</span>
+        </h2>
+        <p style={{ color: 'var(--text-dim)', fontSize: '1.05rem', lineHeight: 1.6, marginBottom: 18 }}>{p.excerpt}</p>
+        <span className="btn-primary" style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: '.85rem', padding: '10px 20px' }}>
+          Διάβασε <ArrowUpRight size={14} />
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+function PostCard({ p }) {
+  return (
+    <Link to={p.href} className="blog-card">
+      <img src={p.cover || DEFAULT_COVER} alt={p.title} className="blog-card-img" />
+      <div style={{ padding: '22px 22px 24px', display: 'flex', flexDirection: 'column', flex: 1 }}>
+        <CardMeta p={p} />
+        <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.25rem', letterSpacing: '-.01em', lineHeight: 1.15, margin: '0 0 10px' }}>
+          <span className="blog-card-title">{p.title}</span>
+        </h3>
+        <p style={{ color: 'var(--text-dim)', fontSize: '.92rem', lineHeight: 1.55, margin: '0 0 14px', flex: 1 }}>{p.excerpt}</p>
+        <span className="hm-more" style={{ display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+          Διάβασε <ArrowUpRight size={12} />
+        </span>
+      </div>
+    </Link>
+  );
+}
+
 function Blog() {
   const reduce = useReducedMotion();
   const [tab, setTab] = useState('news');
@@ -44,6 +93,7 @@ function Blog() {
     tag: p.tag,
     title: p.title,
     excerpt: p.excerpt,
+    cover: p.cover,
     category: p.category || 'news',
     href: `/blog/${p.slug}`,
   }));
@@ -53,12 +103,15 @@ function Blog() {
     tag: (p.tags || [])[0],
     title: p.title,
     excerpt: p.excerpt,
-    category: p.category || 'news',
+    cover: p.cover_image_url,
+    category: p.category || 'blog',
     href: `/blogs/${p.slug}`,
   }));
   const posts = [...staticPosts, ...externalPosts]
     .filter((p) => p.category === tab)
     .sort((a, b) => new Date(b.date) - new Date(a.date));
+
+  const [featured, ...rest] = posts;
 
   return (
     <div className="container" style={{ paddingTop: '130px', paddingBottom: '110px' }}>
@@ -84,29 +137,29 @@ function Blog() {
         initial={reduce ? false : { opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.28 }}
-        style={{ marginTop: 24, display: 'flex', flexDirection: 'column' }}>
+        style={{ marginTop: 32 }}>
         {posts.length === 0 && (
           <p style={{ color: 'var(--text-dim)', padding: '30px 0', borderTop: '1px solid var(--border)' }}>
             Δεν υπάρχουν άρθρα εδώ ακόμα.
           </p>
         )}
-        {posts.map((p, i) => (
-          <motion.div key={p.slug}
-            initial={reduce ? false : { opacity: 0, y: 20 }}
-            whileInView={reduce ? {} : { opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.5, delay: reduce ? 0 : i * 0.05 }}>
-            <Link to={p.href} style={{ textDecoration: 'none', color: 'inherit', display: 'block', borderTop: '1px solid var(--border)', padding: '30px 0' }}>
-              <div style={{ display: 'flex', gap: 14, alignItems: 'baseline', fontFamily: 'var(--font-mono)', fontSize: '.78rem', color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '.08em', marginBottom: 12 }}>
-                <span>{fmt(p.date)}</span>
-                {p.tag && <span style={{ color: 'var(--accent)' }}>· {p.tag}</span>}
-              </div>
-              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(1.5rem,4vw,2.4rem)', letterSpacing: '-.02em', lineHeight: 1.05, margin: 0, maxWidth: '20ch' }}>{p.title}</h2>
-              <p style={{ color: 'var(--text-dim)', fontSize: '1.05rem', lineHeight: 1.55, marginTop: 12, maxWidth: '60ch' }}>{p.excerpt}</p>
-              <span className="hm-more" style={{ display: 'inline-block', marginTop: 14 }}>Διάβασε <ArrowUpRight size={13} style={{ verticalAlign: -2 }} /></span>
-            </Link>
-          </motion.div>
-        ))}
+
+        {featured && <FeaturedCard p={featured} />}
+
+        {rest.length > 0 && (
+          <div className="blog-grid">
+            {rest.map((p, i) => (
+              <motion.div key={p.slug}
+                initial={reduce ? false : { opacity: 0, y: 20 }}
+                whileInView={reduce ? {} : { opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.5, delay: reduce ? 0 : i * 0.05 }}
+                style={{ height: '100%' }}>
+                <PostCard p={p} />
+              </motion.div>
+            ))}
+          </div>
+        )}
       </motion.div>
     </div>
   );

@@ -146,6 +146,74 @@ body {
   letter-spacing: .06em; }
 .hm-more:hover { color: var(--accent-hot); }
 
+/* Blog cards (journal listing) */
+.blog-tag {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: .7rem;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: var(--accent);
+  background: rgba(224, 144, 47, .12);
+  border: 1px solid rgba(224, 144, 47, .3);
+  border-radius: 999px;
+  padding: 3px 12px;
+}
+
+.blog-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  height: 100%;
+}
+.blog-card:hover {
+  transform: translate(-2px, -2px);
+  box-shadow: var(--shadow-print);
+  border-color: var(--border-strong);
+}
+
+.blog-card-img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  display: block;
+  border-bottom: 1px solid var(--border);
+}
+
+.blog-card-title {
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-position: left bottom;
+  background-repeat: no-repeat;
+  background-size: 0% 2px;
+  transition: background-size .35s ease;
+}
+.blog-card:hover .blog-card-title { background-size: 100% 2px; }
+
+.blog-featured {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0;
+}
+.blog-featured .blog-card-img { aspect-ratio: 16 / 9; }
+@media (min-width: 860px) {
+  .blog-featured { grid-template-columns: 1.1fr 1fr; align-items: stretch; }
+  .blog-featured .blog-card-img { height: 100%; aspect-ratio: auto; border-bottom: none; border-right: 1px solid var(--border); }
+}
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+@media (min-width: 640px) { .blog-grid { grid-template-columns: 1fr 1fr; } }
+@media (min-width: 1024px) { .blog-grid { grid-template-columns: 1fr 1fr 1fr; } }
+
 
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
