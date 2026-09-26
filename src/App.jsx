@@ -12,6 +12,7 @@ import './App.css';
 import ErrorBoundary from './components/ErrorBoundary';
 // Lazy loaded pages for code splitting
 const Home = lazy(() => import('./pages/Home'));
+const HomeV2 = lazy(() => import('./pages/HomeV2'));
 const Beats = lazy(() => import('./pages/Beats'));
 const Store = lazy(() => import('./pages/Store'));
 const Gallery = lazy(() => import('./pages/Gallery'));
@@ -47,6 +48,7 @@ function AppContent() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/test-home" element={<HomeV2 />} />
             <Route path="/beats" element={<Beats />} />
             <Route path="/store" element={<Store />} />
             <Route path="/gallery" element={<Gallery />} />
