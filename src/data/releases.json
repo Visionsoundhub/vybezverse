@@ -1,6 +1,23 @@
 {
   "releases": [
     {
+      "slug": "ase-me-na-apotyxo",
+      "title": "Άσε με να αποτύχω",
+      "tag": "Single",
+      "type": "Single",
+      "date": "2026-09-25",
+      "cover": "/assets/uploads/ase-me-na-apotyxo-cover.webp",
+      "spotify": "https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3",
+      "apple": "",
+      "youtube": "https://www.youtube.com/watch?v=B0XbqmYdtMg",
+      "buy": "",
+      "price": "",
+      "localAudio": true,
+      "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/ase-me-na-apotyxo-preview.mp3",
+      "description": "Ένα κομμάτι για την αποτυχία που δεν σε σταματάει. Από το άλμπουμ ΠΑΛΙΡΡΟΙΑ: μπορεί να αποτύχω σε όλα, μα όχι στο να ζω.",
+      "lyrics": ""
+    },
+    {
       "slug": "exo-tabs-sto-mualo",
       "title": "Έχω tabs στο μυαλό",
       "tag": "Single",
@@ -18,8 +35,12 @@
       "description": "Παίρνω τη μεταφορά των ανοιχτών καρτελών σε browser για να περιγράψω πώς λειτουργεί το μυαλό όταν δουλεύει διαφορετικά από ό,τι συνήθως θεωρείται φυσιολογικό. Ένα single για τη ζωή με ΔΕΠΥ.",
       "lyrics": "",
       "altVersions": [
-        { "label": "Slowed + Reverb" },
-        { "label": "Sped Up" }
+        {
+          "label": "Slowed + Reverb"
+        },
+        {
+          "label": "Sped Up"
+        }
       ]
     },
     {
