@@ -7,7 +7,7 @@
       "type": "Single",
       "date": "2026-09-25",
       "cover": "/assets/uploads/ase-me-na-apotyxo-cover.webp",
-      "spotify": "https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3",
+      "spotify": "https://open.spotify.com/album/1GBdafSJGfmF5IGbA2DjFA",
       "apple": "",
       "youtube": "https://www.youtube.com/watch?v=B0XbqmYdtMg",
       "buy": "",
@@ -15,7 +15,8 @@
       "localAudio": true,
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/ase-me-na-apotyxo-preview.mp3",
       "description": "Ένα κομμάτι για την αποτυχία που δεν σε σταματάει. Από το άλμπουμ ΠΑΛΙΡΡΟΙΑ: μπορεί να αποτύχω σε όλα, μα όχι στο να ζω.",
-      "lyrics": ""
+      "lyrics": "",
+      "hubId": "BLACK_VYBEZ:asemena"
     },
     {
       "slug": "exo-tabs-sto-mualo",
@@ -59,29 +60,6 @@
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-download.mp3",
       "downloadSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-download.mp3",
       "description": "Το απόλυτο single από τη σειρά Vintage Freq. Μια σκοτεινή, jazz-hop παραγωγή που παντρεύει την ατμόσφαιρα των παλιών καπνισμένων bar με τον σύγχρονο, βαρύ ήχο. Συντονίσου.",
-      "lyrics": "",
-      "altVersions": [
-        {
-          "label": "Slowed + Reverb"
-        },
-        {
-          "label": "Sped Up"
-        }
-      ]
-    },
-    {
-      "slug": "den-me-noiazei",
-      "title": "Den me noiazei oti kai an les",
-      "tag": "ft. Megaloudis",
-      "type": "Single",
-      "cover": "/assets/uploads/noiazei-cover.webp",
-      "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-preview.mp3",
-      "localAudio": true,
-      "spotify": "https://open.spotify.com/track/5KQtb5PRjUEKlb7fafBSaV",
-      "buy": "https://blackvybez.lemonsqueezy.com/checkout/buy/4cdf3b02-968a-495f-b57e-b85d9294692f",
-      "price": "1.99€",
-      "downloadSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-download.mp3",
-      "description": "Black Vybez ft. Megaloudis.",
       "lyrics": "",
       "altVersions": [
         {
@@ -201,6 +179,29 @@
       "price": "1.99€",
       "downloadSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/apothimeno-download.mp3",
       "description": "Fuji Latifudia x Black Vybez.",
+      "lyrics": "",
+      "altVersions": [
+        {
+          "label": "Slowed + Reverb"
+        },
+        {
+          "label": "Sped Up"
+        }
+      ]
+    },
+    {
+      "slug": "den-me-noiazei",
+      "title": "Den me noiazei oti kai an les",
+      "tag": "ft. Megaloudis",
+      "type": "Single",
+      "cover": "/assets/uploads/noiazei-cover.webp",
+      "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-preview.mp3",
+      "localAudio": true,
+      "spotify": "https://open.spotify.com/track/5KQtb5PRjUEKlb7fafBSaV",
+      "buy": "https://blackvybez.lemonsqueezy.com/checkout/buy/4cdf3b02-968a-495f-b57e-b85d9294692f",
+      "price": "1.99€",
+      "downloadSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/noiazei-download.mp3",
+      "description": "Black Vybez ft. Megaloudis.",
       "lyrics": "",
       "altVersions": [
         {
