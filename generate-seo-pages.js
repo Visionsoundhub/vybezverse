@@ -13,7 +13,17 @@ const RELEASES_JSON_PATH = path.resolve(__dirname, 'src/data/releases.json');
 const PODCASTS_JSON_PATH = path.resolve(__dirname, 'src/data/podcasts.json');
 const SITEMAP_PATH = path.join(DIST_DIR, 'sitemap.xml');
 const SITE_URL = 'https://blackvybez.gr';
-const DEFAULT_IMAGE = '/assets/uploads/banner.png'; // Ή όποιο είναι το default σου
+const DEFAULT_IMAGE = '/assets/uploads/og-default.jpg'; // 1200x630
+const abs = (u) => (!u ? u : /^https?:/.test(u) ? u : `${SITE_URL}${u.startsWith('/') ? '' : '/'}${u}`);
+
+// BreadcrumbList για σελίδες με ιεραρχία (π.χ. /blog/x)
+function breadcrumb(items) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: items.map(([name, url], i) => ({ '@type': 'ListItem', position: i + 1, name, item: `${SITE_URL}${url}` }))
+  };
+}
 
 // 2. Στατικές σελίδες και τα SEO στοιχεία τους
 const staticRoutes = [
@@ -109,7 +119,9 @@ function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, p
   html = html.replace(/<meta name="twitter:description" content=".*?" \/>/, `<meta name="twitter:description" content="${description}" />`);
 
   // Αντικατάσταση Image (Αν έχει συγκεκριμένο το post, αλλιώς default)
-  const finalImage = imageUrl || DEFAULT_IMAGE;
+  const finalImage = abs(imageUrl || DEFAULT_IMAGE);
+  // Οι διαστάσεις 1200x630 ισχύουν μόνο για την default εικόνα
+  if (imageUrl && imageUrl !== DEFAULT_IMAGE) html = html.replace(/\s*<meta property="og:image:(width|height)" content="\d+" \/>/g, '');
   html = html.replace(/<meta property="og:image" content=".*?" \/>/, `<meta property="og:image" content="${finalImage}" />`);
   html = html.replace(/<meta name="twitter:image" content=".*?" \/>/, `<meta name="twitter:image" content="${finalImage}" />`);
 
@@ -120,6 +132,14 @@ function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, p
   }
   if (!html.includes('rel="canonical"')) {
       html = html.replace('</head>', `  <link rel="canonical" href="${fullUrl}" />\n  </head>`);
+  }
+
+  // Breadcrumb σε κάθε σελίδα δεύτερου επιπέδου
+  const parts = String(urlPath || '').split('/').filter(Boolean);
+  if (parts.length === 2) {
+    const SECTION = { blog: 'Journal', releases: 'Releases', podcasts: 'Podcast' };
+    const bc = breadcrumb([['Αρχική', '/'], [SECTION[parts[0]] || parts[0], `/${parts[0]}`], [title.split(' | ')[0].split(' - ')[0], `/${urlPath}`]]);
+    html = html.replace('</head>', `  <script type="application/ld+json">${JSON.stringify(bc)}</script>\n</head>`);
   }
 
   // Αν πρόκειται για Blog Post, προσθέτουμε Article JSON-LD Schema
@@ -374,6 +394,7 @@ ${release.comingSoon ? '<p>Έρχεται σύντομα.</p>' : `<p><a href="/r
   }
 
   generateSitemap();
+  generateRss(blogData.posts || []);
 
   console.log('✨ Η παραγωγή SEO σελίδων ολοκληρώθηκε!');
 }
@@ -420,6 +441,34 @@ function generateSitemap() {
 
   fs.writeFileSync(SITEMAP_PATH, xml);
   console.log(`✅ sitemap.xml ενημερώθηκε (${urls.length} URLs)`);
+}
+
+// RSS του Journal, φτιάχνεται σε κάθε build
+function generateRss(posts) {
+  const items = posts.filter((p) => p.slug).map((p) => {
+    const d = new Date(p.date);
+    return `  <item>
+    <title>${esc(p.title)}</title>
+    <link>${SITE_URL}/blog/${p.slug}</link>
+    <guid>${SITE_URL}/blog/${p.slug}</guid>
+    ${isNaN(d) ? '' : `<pubDate>${d.toUTCString()}</pubDate>`}
+    <description>${esc(String(p.excerpt || '').replace(/<[^>]+>/g, ''))}</description>
+  </item>`;
+  }).join('\n');
+  const xml = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>Black Vybez Journal</title>
+  <link>${SITE_URL}/blog</link>
+  <atom:link href="${SITE_URL}/rss.xml" rel="self" type="application/rss+xml" />
+  <description>Σκέψεις για τη μουσική, τη νευροδιαφορετικότητα και τη ζωή πίσω από τα beats.</description>
+  <language>el</language>
+${items}
+</channel>
+</rss>
+`;
+  fs.writeFileSync(path.join(DIST_DIR, 'rss.xml'), xml);
+  console.log(`✅ rss.xml (${posts.length} άρθρα)`);
 }
 
 generatePages().catch(console.error);

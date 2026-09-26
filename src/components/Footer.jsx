@@ -58,7 +58,7 @@ export default function Footer() {
 
         <div className="ft-bottom">
           <span>{footer.copyright || '© Vybezone. All rights reserved.'}</span>
-          <span className="ft-mono">Vybezverse</span>
+          <span className="ft-mono">Site by <a href="https://flowsites.gr" target="_blank" rel="noopener">Flowsites</a></span>
         </div>
       </div>
     </footer>

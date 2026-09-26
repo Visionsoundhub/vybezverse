@@ -18,7 +18,7 @@ const Navbar = () => {
         </NavLink>
 
         {/* Mobile hamburger */}
-        <button className="mobile-toggle" onClick={() => setMobileOpen(!mobileOpen)}>
+        <button className="mobile-toggle" aria-label="Μενού" onClick={() => setMobileOpen(!mobileOpen)}>
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
 

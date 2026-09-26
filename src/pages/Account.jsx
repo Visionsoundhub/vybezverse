@@ -11,7 +11,7 @@ import { splitPurchases } from '../data/purchaseHelpers';
 import './Account.css';
 
 function Account() {
-  const { currentUser, logout, login, signup, loginWithGoogle } = useAuth();
+  const { currentUser, logout, login, signup, loginWithGoogle, authLoading } = useAuth();
   const navigate = useNavigate();
   const [userData, setUserData] = useState(null);
   const [discountCode, setDiscountCode] = useState(null);
@@ -113,6 +113,7 @@ function Account() {
 
   const { beats, releases: songs } = splitPurchases(userData?.purchases);
 
+  if (authLoading) return <div style={{ minHeight: "70vh" }} />;
   if (!currentUser) {
     return (
       <div className="account-page container">

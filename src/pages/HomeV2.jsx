@@ -42,14 +42,14 @@ function HomeV2() {
       <section className="h2-hero">
         <div className="h2-hero-bg" style={{ backgroundImage: `url(${single?.cover})` }} />
         <div className="h2-in h2-hero-grid">
-          <Reveal className="h2-hero-txt">
+          <div className="h2-hero-txt h2-rise">
             <div className="h2-kicker"><i /> Νέο single · {fmt(single?.date)}</div>
             <h1 className="h2-title">{single?.title}</h1>
             <p className="h2-lead">{single?.description}</p>
             <div className="h2-cta">
               {single?.audioSrc && (
                 <button className="h2-btn pri" onClick={playSingle}>
-                  {isOn(single) ? <Pause size={18} /> : <Play size={18} />} {isOn(single) ? 'Παύση' : 'Άκου τώρα'}
+                  {isOn(single) ? <span className="h2-eq"><i /><i /><i /><i /></span> : <Play size={18} />} {isOn(single) ? 'Παίζει' : 'Άκου τώρα'}
                 </button>
               )}
               {single?.spotify && <a className="h2-btn" href={single.spotify} target="_blank" rel="noreferrer">Spotify</a>}
@@ -57,21 +57,34 @@ function HomeV2() {
               {single?.buy && <a className="h2-btn" href={single.buy} target="_blank" rel="noreferrer">Αγόρασε</a>}
             </div>
             <div className="h2-who">Black Vybez · rapper και producer · Λάρισα</div>
-          </Reveal>
-          <Reveal delay={0.1} className="h2-sleeve-wrap">
+          </div>
+          <div className="h2-sleeve-wrap">
             <button className={'h2-sleeve' + (isOn(single) ? ' spin' : '')} onClick={playSingle} aria-label="Άκου">
               <span className="h2-disc" />
-              <img src={single?.cover} alt={single?.title} />
+              <img src={single?.cover} alt={single?.title} width="600" height="600" fetchpriority="high" />
             </button>
-          </Reveal>
+          </div>
         </div>
       </section>
+
+      {/* Ταινία που κυλάει: η υπογραφή της σελίδας */}
+      <div className="h2-marquee" aria-hidden="true">
+        <div className="h2-mq-track">
+          {Array.from({ length: 2 }).map((_, k) => (
+            <span key={k}>
+              {[single?.title, 'ΠΑΛΙΡΡΟΙΑ', 'Black Vybez', 'για κάθε διαφορετικό μυαλό', 'Vybezmadethis'].map((w, i) => (
+                <React.Fragment key={i}><b className={i % 2 ? 'o' : ''}>{w}</b><i>✱</i></React.Fragment>
+              ))}
+            </span>
+          ))}
+        </div>
+      </div>
 
       {/* 2. ΠΑΛΙΡΡΟΙΑ */}
       <section className="h2-sec">
         <div className="h2-in h2-album">
           <Reveal>
-            <img className="h2-album-art" src="/assets/uploads/palirroia-artwork.webp" alt="ΠΑΛΙΡΡΟΙΑ" loading="lazy" />
+            <img className="h2-album-art" src="/assets/uploads/palirroia-artwork.webp" alt="ΠΑΛΙΡΡΟΙΑ, το album του Black Vybez" loading="lazy" width="800" height="800" />
           </Reveal>
           <Reveal delay={0.08}>
             <div className="h2-eyebrow">Το album</div>
@@ -93,7 +106,7 @@ function HomeV2() {
             {more.map((r, i) => (
               <Reveal key={r.slug} delay={i * 0.04}>
                 <Link to={`/releases/${r.slug}`} className="h2-rel">
-                  <img src={r.cover} alt={r.title} loading="lazy" />
+                  <img src={r.cover} alt={r.title} loading="lazy" width="600" height="600" />
                   <b>{r.title}</b>
                   <span>{r.type || 'Single'} · {new Date(r.date).getFullYear() || ''}</span>
                 </Link>
@@ -113,7 +126,7 @@ function HomeV2() {
           <div className="h2-beats">
             {beats.map((b) => (
               <div key={b.title} className={'h2-beat' + (isOn(b) ? ' on' : '')} onClick={() => playTrack(b)}>
-                <img src={b.cover} alt="" loading="lazy" />
+                <img src={b.cover} alt="" loading="lazy" width="56" height="56" />
                 <button className="h2-play" aria-label="Play">{isOn(b) ? <Pause size={16} /> : <Play size={16} />}</button>
                 <div className="h2-beat-t">
                   <b>{b.title}</b>

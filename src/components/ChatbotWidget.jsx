@@ -44,7 +44,7 @@ const ChatbotWidget = () => {
   // Show tooltip after a small delay on first mount
   useEffect(() => {
     const hasSeenChat = sessionStorage.getItem('vybez_chat_seen');
-    if (!hasSeenChat) {
+    if (!hasSeenChat && false) {
       const timer = setTimeout(() => {
         setShowTooltip(true);
       }, 2000);
@@ -254,6 +254,7 @@ const ChatbotWidget = () => {
 
       {/* Floating Toggle Button */}
       <motion.button 
+        aria-label="VybezBot"
         className={`chat-toggle-btn ${isOpen ? 'active' : ''}`}
         onClick={handleOpenToggle}
         whileHover={{ scale: 1.05 }}

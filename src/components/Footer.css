@@ -103,3 +103,4 @@
   .ft-top { flex-direction: column; gap: 28px; }
   .ft-mid { gap: 32px; }
 }
+.ft-mono a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
