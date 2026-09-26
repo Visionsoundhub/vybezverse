@@ -102,3 +102,8 @@
 .h2-news-err { flex-basis: 100%; color: var(--vermilion); margin: 0; font-size: .9rem; }
 .h2-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 @media (max-width: 900px) { .h2-news { grid-template-columns: 1fr; gap: 20px; } }
+
+/* Reveal χωρίς framer-motion */
+.h2-rv { opacity: 0; transform: translateY(22px); transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1); }
+.h2-rv.on { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .h2-rv { opacity: 1; transform: none; transition: none; } }

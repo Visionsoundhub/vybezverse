@@ -1,11 +1,12 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { User, Menu } from 'lucide-react';
 import { AudioProvider } from './context/AudioContext';
 import { AuthProvider } from './context/AuthContext';
 import AudioPlayer from './components/AudioPlayer';
-import LicenseModal from './components/LicenseModal';
-import ChatbotWidget from './components/ChatbotWidget';
+// Modal αγοράς και bot φορτώνουν όταν ησυχάσει η σελίδα (μαζί τους και το framer-motion)
+const LicenseModal = lazy(() => import('./components/LicenseModal'));
+const ChatbotWidget = lazy(() => import('./components/ChatbotWidget'));
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import './App.css';
@@ -50,6 +51,12 @@ function NotFound() {
 function AppContent() {
   const location = useLocation();
   const isLinksPage = location.pathname === '/links';
+  const [idle, setIdle] = useState(false);
+  useEffect(() => {
+    const go = () => setIdle(true);
+    const id = window.requestIdleCallback ? window.requestIdleCallback(go, { timeout: 3000 }) : setTimeout(go, 2000);
+    return () => (window.cancelIdleCallback ? window.cancelIdleCallback(id) : clearTimeout(id));
+  }, []);
 
   return (
     <div className="app-container">
@@ -82,8 +89,12 @@ function AppContent() {
       {!isLinksPage && <Footer />}
 
       <AudioPlayer />
-      <LicenseModal />
-      <ChatbotWidget />
+      {idle && (
+        <Suspense fallback={null}>
+          <LicenseModal />
+          <ChatbotWidget />
+        </Suspense>
+      )}
     </div>
   );
 }

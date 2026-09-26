@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
 import { Play, Pause, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import beatsDataRaw from '../data/beats.json';
@@ -8,20 +7,18 @@ import { AudioContext } from '../context/AudioContext';
 import './HomeV2.css';
 
 // Δοκιμή νέας αρχικής: ένα θέμα ανά οθόνη, το νέο single πρώτο.
-function Reveal({ children, delay = 0, className }) {
-  const reduce = useReducedMotion();
-  if (reduce) return <div className={className}>{children}</div>;
-  return (
-    <motion.div
-      className={className}
-      initial={{ opacity: 0, y: 22 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
-  );
+// Εμφάνιση με το scroll χωρίς βιβλιοθήκη (IntersectionObserver + CSS)
+function Reveal({ children, delay = 0, className = '' }) {
+  const ref = useRef(null);
+  const [on, setOn] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !('IntersectionObserver' in window)) { setOn(true); return; }
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setOn(true); io.disconnect(); } }, { rootMargin: '0px 0px -60px 0px' });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return <div ref={ref} className={`h2-rv${on ? ' on' : ''} ${className}`} style={{ transitionDelay: `${delay}s` }}>{children}</div>;
 }
 
 function Newsletter() {
