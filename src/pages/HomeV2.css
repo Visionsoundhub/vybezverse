@@ -79,25 +79,26 @@
 }
 @media (prefers-reduced-motion: reduce) { .h2-sleeve.spin .h2-disc, .h2-kicker i { animation: none; } }
 
-/* Ταινία που κυλάει */
-.h2-marquee { overflow: hidden; border-block: 1px solid var(--border); background: var(--a); color: var(--ink-900); padding: 14px 0; transform: rotate(-1.2deg) scale(1.02); margin: -8px 0 8px; position: relative; z-index: 2; }
-.h2-mq-track { display: flex; width: max-content; animation: h2mq 38s linear infinite; }
-.h2-mq-track > span { display: flex; align-items: center; gap: 26px; padding-right: 26px; white-space: nowrap; }
-.h2-marquee b { font: 800 clamp(1.3rem, 2.6vw, 2rem) var(--gd); letter-spacing: -.01em; text-transform: uppercase; }
-.h2-marquee b.o { color: transparent; -webkit-text-stroke: 1.5px var(--ink-900); }
-.h2-marquee i { font-style: normal; font-size: 1.3rem; }
-.h2-marquee:hover .h2-mq-track { animation-play-state: paused; }
-@keyframes h2mq { to { transform: translateX(-50%); } }
 
 /* Μπάρες ισοσταθμιστή όταν παίζει */
 .h2-eq { display: inline-flex; align-items: flex-end; gap: 2px; height: 16px; }
 .h2-eq i { width: 3px; background: currentColor; border-radius: 2px; animation: h2eq .9s ease-in-out infinite; }
 .h2-eq i:nth-child(2) { animation-delay: -.3s; } .h2-eq i:nth-child(3) { animation-delay: -.6s; } .h2-eq i:nth-child(4) { animation-delay: -.15s; }
 @keyframes h2eq { 0%, 100% { height: 4px; } 50% { height: 16px; } }
-@media (prefers-reduced-motion: reduce) { .h2-mq-track, .h2-eq i { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .h2-eq i { animation: none; } }
 
 /* Το hero δεν περιμένει JS: μπαίνει με CSS, χωρίς opacity 0 (για γρήγορο LCP) */
 .h2-rise { animation: h2rise .7s cubic-bezier(.22,1,.36,1) both; }
 @keyframes h2rise { from { transform: translateY(18px); } }
 .h2-album-art { height: auto; aspect-ratio: 1; object-fit: cover; }
 .h2-sleeve img { height: auto; }
+
+/* Newsletter */
+.h2-news { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; }
+.h2-news-form { display: flex; flex-wrap: wrap; gap: 10px; }
+.h2-news-form input { flex: 1 1 220px; min-width: 0; padding: 13px 18px; border-radius: 999px; border: 1px solid var(--border-strong); background: var(--bg-2); color: var(--text); font: 500 1rem var(--font-main); }
+.h2-news-form input:focus { outline: none; border-color: var(--a); }
+.h2-news-ok { color: var(--a); font-weight: 600; font-size: 1.1rem; }
+.h2-news-err { flex-basis: 100%; color: var(--vermilion); margin: 0; font-size: .9rem; }
+.h2-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+@media (max-width: 900px) { .h2-news { grid-template-columns: 1fr; gap: 20px; } }
