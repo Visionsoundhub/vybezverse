@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { Play, Music, Disc3, ShoppingBag, ExternalLink } from 'lucide-react';
+import { Play, Music, Disc3, ShoppingBag, ExternalLink, Download } from 'lucide-react';
 
 // TODO: swap to the per-product Lemon Squeezy checkout once the Jazz Bar bundle is created.
 const BUY = 'https://blackvybez.lemonsqueezy.com';
@@ -12,6 +12,16 @@ const YOUTUBE = 'https://www.youtube.com/@BlackVybezwiththeflow';
 
 // Real releases only. Add new entries here as they drop (per-release streaming URLs).
 const singles = [
+  {
+    title: 'Άσε με να αποτύχω',
+    tag: 'Single · Hip Hop',
+    type: 'Single',
+    spotify: SPOTIFY,
+    apple: APPLE,
+    youtube: YOUTUBE,
+    buy: 'https://blackvybez.lemonsqueezy.com',
+    acapellaUrl: 'https://blackvybez.lemonsqueezy.com/checkout/buy/f3e92541-baa0-43ed-b03f-276a4fb7d216',
+  },
   { title: 'Jazz Bar των τεράτων', tag: 'Vintage Freq', type: 'Single', apple: 'https://music.apple.com/us/album/jazz-bar-ton-teraton-single/1874438406', youtube: 'https://www.youtube.com/watch?v=KNvq3idRHe8', noSpotify: true },
 ];
 const albums = [
@@ -80,7 +90,17 @@ function Releases() {
                     <a href={item.apple || APPLE} target="_blank" rel="noreferrer" title="Apple Music"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="Apple Music"><Music size={15} /></button></a>
                     <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" title="YouTube"><button className="btn-outline" style={{ width: '100%', padding: '9px' }} aria-label="YouTube"><ExternalLink size={15} /></button></a>
                   </div>
-                  <a href={item.buy || BUY} target="_blank" rel="noreferrer"><button className="btn-primary tip" data-tip={BUNDLE_TIP} style={{ width: '100%', padding: '10px' }}><ShoppingBag size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Αγόρασε</button></a>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 4 }}>
+                    {item.acapellaUrl && (
+                      <a href={item.acapellaUrl} target="_blank" rel="noreferrer">
+                        <button className="btn-outline" style={{ width: '100%', padding: '10px', borderColor: 'var(--accent)', color: 'var(--accent)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontWeight: 700 }}>
+                          <Download size={15} />
+                          Δωρεάν Acapella
+                        </button>
+                      </a>
+                    )}
+                    <a href={item.buy || BUY} target="_blank" rel="noreferrer"><button className="btn-primary tip" data-tip={BUNDLE_TIP} style={{ width: '100%', padding: '10px' }}><ShoppingBag size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Αγόρασε Single</button></a>
+                  </div>
                 </div>
               )}
             </div>

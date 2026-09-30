@@ -2,6 +2,12 @@
   "buyLink": "https://blackvybez.lemonsqueezy.com",
   "buttons": [
     {
+      "highlight": true,
+      "text": "Δωρεάν Acapella • Άσε με να αποτύχω",
+      "url": "https://blackvybez.lemonsqueezy.com/checkout/buy/f3e92541-baa0-43ed-b03f-276a4fb7d216",
+      "icon": "fa-solid fa-download"
+    },
+    {
       "highlight": false,
       "text": "Official Website",
       "url": "https://blackvybez.gr/",

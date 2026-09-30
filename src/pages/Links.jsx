@@ -1,5 +1,5 @@
 import React from 'react';
-import { Music, Play, ShoppingBag, Star, Globe, ExternalLink } from 'lucide-react';
+import { Music, Play, ShoppingBag, Star, Globe, ExternalLink, Download } from 'lucide-react';
 import linksData from '../data/links.json';
 import './Links.css';
 
@@ -9,6 +9,7 @@ const YOUTUBE = 'https://www.youtube.com/@BlackVybezwiththeflow';
 const INSTAGRAM = 'https://www.instagram.com/blackvybez_/';
 const TIKTOK = 'https://www.tiktok.com/@blackvybez';
 const FACEBOOK = 'https://www.facebook.com/profile.php?id=61555325559295';
+const ACAPELLA_LINK = 'https://blackvybez.lemonsqueezy.com/checkout/buy/f3e92541-baa0-43ed-b03f-276a4fb7d216';
 
 function Links() {
   return (
@@ -31,7 +32,10 @@ function Links() {
         )}
 
         <div className="links-actions">
-          <a className="links-btn links-btn-highlight" href={SPOTIFY} target="_blank" rel="noreferrer"><Play size={20} /> Spotify</a>
+          <a className="links-btn links-btn-highlight" href={ACAPELLA_LINK} target="_blank" rel="noreferrer" style={{ background: 'var(--accent)', color: 'var(--ink-900)', fontWeight: 800 }}>
+            <Download size={20} /> Δωρεάν Acapella · Άσε με να αποτύχω
+          </a>
+          <a className="links-btn" href={SPOTIFY} target="_blank" rel="noreferrer"><Play size={20} /> Spotify</a>
           <a className="links-btn" href={APPLE} target="_blank" rel="noreferrer"><Music size={20} /> Apple Music</a>
           <a className="links-btn" href={YOUTUBE} target="_blank" rel="noreferrer"><ExternalLink size={20} /> YouTube</a>
           <a className="links-btn" href="/beats"><Star size={20} /> Beats catalog</a>
