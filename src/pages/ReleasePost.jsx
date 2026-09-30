@@ -88,6 +88,13 @@ function ReleasePost() {
                           </button>
                         </a>
                       )}
+                      {item.acapella && (
+                        <a href={item.acapella} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                          <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}>
+                            <Download size={16} style={{ marginRight: 8 }} /> Δωρεάν Acapella
+                          </button>
+                        </a>
+                      )}
                     </>
                   ) : (
                     <>
