@@ -163,7 +163,11 @@ async function sendFilesEmail(env, origin, email, items) {
   <p>Ευχαριστώ για την αγορά. Πάτα για να κατεβάσεις τα αρχεία σου, χωρίς tag:</p>
   ${blocks.join('')}
   <p style="font-size:14px">Ανεβάζεις το κομμάτι σου σε Spotify, YouTube και παντού και κρατάς τα έσοδα. Στα credits γράφεις «prod. vybezmadethis».</p>
-  <p style="font-size:13px;color:#8A847C">Τα links ισχύουν 30 μέρες. Αν έχεις account στο blackvybez.gr με αυτό το email, τα αρχεία είναι πάντα και στο «Τα Beats μου».</p>
+  <div style="margin:22px 0;padding:16px;border:2px solid #FF6600;border-radius:12px">
+    <p style="margin:0 0 8px;font-size:16px;font-weight:700;color:#FF6600">Τα links λήψης λήγουν σε 30 μέρες</p>
+    <p style="margin:0 0 12px;font-size:14px">Κατέβασέ τα τώρα. Μετά τα βρίσκεις όποτε θες στο account σου στο blackvybez.gr, στο «Τα Beats μου». Αν δεν έχεις account, φτιάξε ένα με αυτό εδώ το email και τα beats σου εμφανίζονται μόνα τους.</p>
+    <a href="${origin}/account" style="display:inline-block;padding:10px 14px;border:1px solid #FF6600;color:#FF6600;border-radius:8px;text-decoration:none;font-weight:700">Τα beats μου στο site</a>
+  </div>
   <p style="font-size:13px;color:#8A847C">vybezmadethis · The Robe Producer</p></div>`;
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',

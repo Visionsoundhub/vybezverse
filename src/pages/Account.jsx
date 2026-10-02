@@ -56,6 +56,13 @@ function Account() {
     fetchAccountData();
   }, [currentUser]);
 
+  // Μετά τη σύνδεση γυρνάει εκεί που ήταν (π.χ. ?next=/beats-new από το beat store).
+  useEffect(() => {
+    if (!currentUser) return;
+    const next = new URLSearchParams(window.location.search).get('next') || '';
+    if (next.startsWith('/') && !next.startsWith('//')) navigate(next, { replace: true });
+  }, [currentUser, navigate]);
+
   const handleLogout = async () => {
     try {
       await logout();

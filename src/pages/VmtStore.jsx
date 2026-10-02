@@ -514,7 +514,14 @@ export default function VmtStore() {
         )}
       </header>
 
-      {currentUser && <div className="vmt-vip"><LoyaltyProgressBar /></div>}
+      {currentUser ? (
+        <div className="vmt-vip"><LoyaltyProgressBar /></div>
+      ) : (
+        <div className="vmt-login">
+          <p><strong>Μπες στο account σου</strong> και κάθε beat που παίρνεις μετράει για μόνιμη έκπτωση: 10% από τα 3 beats, 15% από τα 6, 30% από τα 10. Τα αρχεία σου μένουν εκεί για πάντα.</p>
+          <a className="vmt-ghost" href="/account?next=/beats-new">Σύνδεση ή εγγραφή</a>
+        </div>
+      )}
 
       {/* 2. Δύο πόρτες */}
       <section className="vmt-doors" ref={doorsRef}>
