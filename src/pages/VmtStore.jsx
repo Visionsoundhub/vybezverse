@@ -8,7 +8,7 @@ import { priceCart, licensesFor, slugOf, euro, PROMOS } from '../data/vmtPricing
 import './VmtStore.css';
 
 // VMT beat store: αγορές μέσω Polar (embedded checkout, ο πελάτης δεν φεύγει από το site).
-const CONTACT_EMAIL = 'studiovisionsound@gmail.com';
+const CONTACT_EMAIL = 'support@blackvybez.gr';
 const POLAR_EMBED = 'https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.4/dist/embed.global.js';
 
 const LICENSES = [
