@@ -210,7 +210,16 @@ function Account() {
               {beats.map((purchase, idx) => (
                 <li key={idx}>
                   <span><Music size={16} /> {purchase.product}</span>
-                  <span className="account-purchase-type">{purchase.amount ? `${purchase.amount}€` : ''}</span>
+                  <span className="account-purchase-type">
+                    {purchase.amount ? `${purchase.amount}€` : ''}
+                    {purchase.expiresAt && (() => {
+                      const days = Math.ceil((new Date(purchase.expiresAt) - Date.now()) / 864e5);
+                      return <> · {days > 0 ? `λήγει σε ${days} μέρες` : 'έληξε'}</>;
+                    })()}
+                    {purchase.source === 'polar' && (
+                      <> · <a href="https://polar.sh/visionsound/portal" target="_blank" rel="noopener noreferrer">Κατέβασε τα αρχεία</a></>
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>

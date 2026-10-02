@@ -279,3 +279,70 @@
   .vmt-skip { width: 32px; height: 32px; }
   .vmt-toast { bottom: 130px; }
 }
+
+/* ---- v5: διορθώσεις από τον έλεγχο (κινητό, στιλ, πωλήσεις) ---- */
+.vmt { --vmt-muted: #9A948B; }
+.vmt h3 { font-family: 'JetBrains Mono', Consolas, monospace; }
+body:has(.vmt-player) { padding-bottom: 110px; }
+.vmt-player { box-shadow: 0 -24px 24px #141210; }
+
+.vmt-trust { color: var(--vmt-text); opacity: .85; font-size: 14px; margin: -14px 0 20px; max-width: 640px; }
+.vmt-lic-note { color: var(--vmt-accent); font-size: 13px; font-weight: 700; margin: 0 0 4px; }
+.vmt-price { color: var(--vmt-text); }
+.vmt-lic-card.feat .vmt-price { color: var(--vmt-text); }
+.vmt-rec-hint { margin: 12px 0 0; font-size: 13px; }
+
+/* λιγότερο πορτοκαλί: γεμάτο μόνο το κύριο κουμπί */
+.vmt-price-btn { width: auto; color: var(--vmt-accent); border-color: var(--vmt-accent); padding: 10px 14px; min-height: 44px; }
+.vmt-door-tabs button.on, .vmt-moods button.on { background: rgba(255, 102, 0, .12); color: var(--vmt-accent); border-color: var(--vmt-accent); }
+.vmt-rack.live .vmt-rack-name, .vmt-rack-name { color: var(--vmt-muted); letter-spacing: .1em; }
+
+/* γραμμές ίδιου ύψους */
+.vmt-list li { min-height: 68px; }
+.vmt-row-main span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+/* newsletter ίδιο με τα άλλα κουτιά */
+.vmt-news { background: #1A1714; border: 1px solid rgba(244, 241, 236, .08); }
+.vmt-custom { border-style: solid; border-color: rgba(244, 241, 236, .08); background: #1A1714; }
+
+/* κουμπιά για αντίχειρα */
+.vmt-close { width: 44px; height: 44px; display: grid; place-items: center; top: 8px; right: 8px; }
+.vmt-skip { width: 44px; height: 44px; }
+.vmt-moods button { min-height: 40px; }
+.vmt-feed { grid-template-columns: minmax(0, 380px) minmax(0, 1fr); }
+.vmt-feed-body, .vmt-week-body { min-width: 0; }
+
+@media (max-width: 720px) {
+  .vmt-feed, .vmt-week { grid-template-columns: minmax(0, 1fr); }
+  .vmt-hero-brand { margin-bottom: 16px; }
+  .vmt-logo-xl { width: 64px; }
+  .vmt-hero-brand h1 { font-size: 46px; }
+  .vmt-hero-brand .vmt-kicker { font-size: 10px; }
+  .vmt-sub { text-wrap: balance; }
+  .vmt-week-cover { max-width: 160px; }
+  .vmt-week-body h2, .vmt-feed-body h2 { font-size: 34px; }
+  .vmt-rack { padding: 6px 8px; }
+  .vmt-rack-steps i { height: 9px; }
+  .vmt-rack-name { font-size: 10px; }
+  .vmt-rec-hint { display: none; }
+  .vmt-kicker, .vmt-door-tabs small { font-size: 12px; }
+  .vmt-door-tabs small { text-wrap: balance; }
+
+  .vmt-row-play, .vmt-row-mic { width: 44px; height: 44px; }
+  .vmt-list li { gap: 8px; }
+  .vmt-skip { width: 40px; height: 40px; }
+
+  /* παράθυρο αδειών πιο μαζεμένο, × πάντα ορατό */
+  .vmt-modal { place-items: start center; padding: 10px; }
+  .vmt-sheet { padding: 18px 14px; }
+  .vmt-close { position: sticky; top: 0; margin: -8px -6px 0 auto; float: right; background: var(--vmt-bg); border-radius: 50%; z-index: 3; }
+  .vmt-sheet h2 { font-size: 30px; margin-bottom: 18px; }
+  .vmt-trust { font-size: 13px; }
+  .vmt-modal .vmt-lic { gap: 10px; }
+  .vmt-modal .vmt-lic-card { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 4px 12px; padding: 14px; }
+  .vmt-modal .vmt-lic-card.feat { padding: 22px 14px 14px; }
+  .vmt-modal .vmt-lic-card h3, .vmt-modal .vmt-lic-note, .vmt-modal .vmt-lic-card ul { grid-column: 1; }
+  .vmt-modal .vmt-lic-card .vmt-price { grid-column: 2; grid-row: 1 / span 2; margin: 0; font-size: 26px; text-align: right; }
+  .vmt-modal .vmt-lic-card ul { margin: 4px 0 0; gap: 4px; font-size: 12px; }
+  .vmt-modal .vmt-lic-card > a, .vmt-modal .vmt-lic-card > .vmt-soon { grid-column: 1 / -1; margin-top: 8px; }
+}

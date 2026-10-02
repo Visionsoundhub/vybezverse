@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame } from 'lucide-react';
 import beatsData from '../data/beats.json';
+import { useAuth } from '../context/AuthContext';
 import './VmtStore.css';
 
 // VMT beat store: αγορές μέσω Polar (embedded checkout, ο πελάτης δεν φεύγει από το site).
@@ -8,8 +9,8 @@ const CONTACT_EMAIL = 'studiovisionsound@gmail.com';
 const POLAR_EMBED = 'https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.4/dist/embed.global.js';
 
 const LICENSES = [
-  { key: 'mp3', name: 'MP3', price: '19,99€', features: ['MP3 χωρίς tag', 'Έως 100.000 streams', 'Διάρκεια 1 έτος'] },
-  { key: 'wav', name: 'WAV', price: '24,99€', featured: true, features: ['WAV + MP3 χωρίς tag', 'Έως 500.000 streams', 'Μόνιμη άδεια'] },
+  { key: 'mp3', name: 'MP3', price: '19,99€', features: ['Λήγει σε 1 χρόνο', 'MP3 χωρίς tag', 'Έως 100.000 streams'] },
+  { key: 'wav', name: 'WAV', price: '24,99€', featured: true, note: 'Μόνο 5€ παραπάνω, και είναι δικό σου για πάντα', features: ['WAV + MP3 χωρίς tag', 'Έως 500.000 streams', 'Μόνιμη άδεια'] },
   { key: 'stems', name: 'Stems', price: '49,99€', features: ['WAV + MP3 + όλα τα κανάλια', 'Απεριόριστα streams', 'Μόνιμη άδεια'] },
 ];
 
@@ -163,7 +164,7 @@ function RecordOver({ beat, onStart }) {
   return (
     <div className="vmt-rec">
       <h3>Ράψε πάνω του</h3>
-      <p>Βάλε ακουστικά, γράψε 20″ με τη φωνή σου πάνω στο beat και άκου πώς κάθεται. Μένει μόνο στο κινητό σου.</p>
+      <p>Βάλε ακουστικά, γράψε 20 δευτερόλεπτα με τη φωνή σου πάνω στο beat και άκου αν κάθεται. Δεν ανεβαίνει πουθενά.</p>
       <div className="vmt-rec-row">
         {state === 'rec' || state === 'prep' ? (
           <><span className="vmt-rec-dot" /> <span>{state === 'prep' ? 'Ετοιμάζεται…' : `Γράφει… ${left}″`}</span></>
@@ -210,7 +211,7 @@ function Newsletter() {
       {msg ? <p>{msg}</p> : (
         <form onSubmit={submit}>
           <input type="email" placeholder="το email σου" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <button className="vmt-buy" type="submit">Γράψε με</button>
+          <button className="vmt-buy" type="submit">Στείλε μου τα νέα</button>
         </form>
       )}
     </section>
@@ -298,6 +299,7 @@ function SalesToast() {
 
 export default function VmtStore() {
   const all = beatsData.beatslist;
+  const { currentUser } = useAuth();
   const forSale = all.filter((b) => b.status !== 'sold');
   const hero = forSale.find((b) => b.featured) || forSale[0];
 
@@ -356,7 +358,9 @@ export default function VmtStore() {
     m.name = 'robots';
     m.content = 'noindex, nofollow';
     document.head.appendChild(m);
-    return () => m.remove();
+    const prevTitle = document.title;
+    document.title = 'VMT Beats | vybezmadethis';
+    return () => { m.remove(); document.title = prevTitle; };
   }, []);
 
   const listed = useMemo(() => {
@@ -403,13 +407,19 @@ export default function VmtStore() {
   };
 
   // Το checkout ανοίγει πάνω από τη σελίδα. Αν δεν φόρτωσε το script του Polar, πάει στο link κανονικά.
+  const openedAt = useRef(0);
+  const openLicenses = (b) => { openedAt.current = Date.now(); setLicenseBeat(b); };
   const openCheckout = (e, url) => {
+    if (Date.now() - openedAt.current < 450) { e.preventDefault(); return; }
     const embed = window.Polar?.EmbedCheckout;
     if (!embed) return;
     e.preventDefault();
     stop();
     setLicenseBeat(null);
-    embed.create(url, { theme: 'dark' });
+    // Αν έχει account, το checkout ανοίγει με το email του, για να πάει η αγορά στο σωστό account.
+    const u = new URL(url);
+    if (currentUser?.email) u.searchParams.set('customer_email', currentUser.email);
+    embed.create(u.toString(), { theme: 'dark' });
   };
 
   const isOn = (b) => current?.title === b.title && playing;
@@ -453,9 +463,10 @@ export default function VmtStore() {
               <Rack step={step} active={isOn(hero)} />
               <div className="vmt-desk"><Waveform peaks={hero.peaks} progress={current?.title === hero.title ? progress : 0} onSeek={(f) => seek(hero, f)} /></div>
               <div className="vmt-actions">
-                <button className="vmt-buy" onClick={() => setLicenseBeat(hero)}>Αγορά από 19,99€</button>
+                <button className="vmt-buy" onClick={() => openLicenses(hero)}>Αγορά από 19,99€</button>
                 <button className="vmt-ghost" onClick={() => { stop(); setRecBeat(hero); }}><Mic size={16} /> Ράψε πάνω του</button>
               </div>
+              <p className="vmt-hint vmt-rec-hint">Ράψε πάνω του: γράψε 20″ με τη φωνή σου και άκου αν κάθεται, πριν το πάρεις.</p>
             </div>
           </div>
         )}
@@ -488,7 +499,7 @@ export default function VmtStore() {
               <Waveform peaks={feedBeat.peaks} progress={current?.title === feedBeat.title ? progress : 0} onSeek={(f) => seek(feedBeat, f)} big />
               <p className="vmt-hint">Πάτα play και ακούς κατευθείαν το drop.</p>
               <div className="vmt-actions">
-                <button className="vmt-buy" onClick={() => setLicenseBeat(feedBeat)}>Αυτό θέλω</button>
+                <button className="vmt-buy" onClick={() => openLicenses(feedBeat)}>Αυτό θέλω</button>
                 <button className="vmt-ghost" onClick={nextInFeed}>Επόμενο <SkipForward size={16} /></button>
                 <button className="vmt-ghost" onClick={() => { stop(); setRecBeat(feedBeat); }}><Mic size={16} /> Ράψε</button>
               </div>
@@ -531,7 +542,7 @@ export default function VmtStore() {
                     ) : (
                       <>
                         <button className="vmt-row-mic" onClick={() => { stop(); setRecBeat(b); }} aria-label="Ράψε πάνω του"><Mic size={18} /></button>
-                        <button className="vmt-buy small" onClick={() => setLicenseBeat(b)}>19,99€</button>
+                        <button className="vmt-ghost vmt-price-btn" onClick={(e) => { e.stopPropagation(); openLicenses(b); }}>19,99€</button>
                       </>
                     )}
                   </li>
@@ -555,8 +566,9 @@ export default function VmtStore() {
         <div className="vmt-lic">
           {LICENSES.map((l) => (
             <div key={l.key} className={`vmt-lic-card ${l.featured ? 'feat' : ''}`}>
-              {l.featured && <span className="vmt-ribbon">Η ΕΠΙΛΟΓΗ ΤΩΝ ΠΕΡΙΣΣΟΤΕΡΩΝ</span>}
+              {l.featured && <span className="vmt-ribbon">Η ΠΡΟΤΑΣΗ ΤΟΥ ΠΑΡΑΓΩΓΟΥ</span>}
               <h3>{l.name}</h3>
+              {l.note && <p className="vmt-lic-note">{l.note}</p>}
               <p className="vmt-price">{l.price}</p>
               <ul>{l.features.map((f) => <li key={f}><Check size={14} /> {f}</li>)}</ul>
             </div>
@@ -565,11 +577,11 @@ export default function VmtStore() {
         <div className="vmt-custom">
           <div>
             <h2>Θες κάτι μόνο δικό σου;</h2>
-            <p>Exclusive σε έτοιμο beat ή custom beat φτιαγμένο για σένα. Τα λέμε και κλείνουμε τιμή.</p>
+            <p>Αποκλειστικότητα σε έτοιμο beat ή custom beat φτιαγμένο για σένα. Γράψε μου και τα λέμε.</p>
           </div>
           <div className="vmt-custom-btns">
-            <a href={mailto('Exclusive beat')} className="vmt-ghost"><Mail size={16} /> Exclusive από 100€</a>
-            <a href={mailto('Custom beat')} className="vmt-ghost"><Mail size={16} /> Custom από 80€</a>
+            <a href={mailto('Exclusive beat')} className="vmt-ghost"><Mail size={16} /> Επικοινωνία για αποκλειστικότητα</a>
+            <a href={mailto('Custom beat')} className="vmt-ghost"><Mail size={16} /> Custom beat από 100€</a>
           </div>
         </div>
       </section>
@@ -591,7 +603,7 @@ export default function VmtStore() {
             <span>{current.bpm} BPM · {current.key}</span>
           </div>
           <Waveform peaks={current.peaks} progress={progress} onSeek={(f) => seek(current, f)} />
-          <button className="vmt-buy small" onClick={() => setLicenseBeat(current)}>Αγορά</button>
+          <button className="vmt-buy small" onClick={() => openLicenses(current)}>Αγορά</button>
         </div>
       )}
 
@@ -601,7 +613,7 @@ export default function VmtStore() {
             <button className="vmt-close" onClick={() => setRecBeat(null)} aria-label="Κλείσιμο"><X /></button>
             <p className="vmt-kicker">{recBeat.title}</p>
             <RecordOver key={recBeat.title} beat={recBeat} />
-            <button className="vmt-buy" style={{ marginTop: 18 }} onClick={() => { setLicenseBeat(recBeat); setRecBeat(null); }}>
+            <button className="vmt-buy" style={{ marginTop: 18 }} onClick={() => { openLicenses(recBeat); setRecBeat(null); }}>
               Κάθεται; Πάρ' το από 19,99€
             </button>
           </div>
@@ -612,8 +624,9 @@ export default function VmtStore() {
         <div className="vmt-modal" onClick={() => setLicenseBeat(null)}>
           <div className="vmt-sheet" onClick={(e) => e.stopPropagation()}>
             <button className="vmt-close" onClick={() => setLicenseBeat(null)} aria-label="Κλείσιμο"><X /></button>
-            <p className="vmt-kicker">ΔΙΑΛΕΞΕ ΜΕΡΙΔΑ</p>
+            <p className="vmt-kicker">ΔΙΑΛΕΞΕ ΠΩΣ ΤΟ ΘΕΣ</p>
             <h2>{licenseBeat.title}</h2>
+            <p className="vmt-trust">Πληρώνεις, κατεβάζεις αμέσως. Χωρίς tag. Το ανεβάζεις σε Spotify, YouTube και παντού, κρατάς τα έσοδα και γράφεις «prod. vybezmadethis».</p>
             {licenseBeat.video && (
               <video className="vmt-video" src={licenseBeat.video} controls playsInline preload="metadata" />
             )}
@@ -622,8 +635,9 @@ export default function VmtStore() {
                 const url = licenseBeat.polar?.[l.key];
                 return (
                   <div key={l.key} className={`vmt-lic-card ${l.featured ? 'feat' : ''}`}>
-                    {l.featured && <span className="vmt-ribbon">Η ΕΠΙΛΟΓΗ ΤΩΝ ΠΕΡΙΣΣΟΤΕΡΩΝ</span>}
+                    {l.featured && <span className="vmt-ribbon">Η ΠΡΟΤΑΣΗ ΤΟΥ ΠΑΡΑΓΩΓΟΥ</span>}
                     <h3>{l.name}</h3>
+              {l.note && <p className="vmt-lic-note">{l.note}</p>}
                     <p className="vmt-price"><CountUp value={l.price} delay={l.featured ? 450 : 0} /></p>
                     <ul>{l.features.map((f) => <li key={f}><Check size={14} /> {f}</li>)}</ul>
                     {url ? (
@@ -638,7 +652,7 @@ export default function VmtStore() {
               })}
             </div>
             <p className="vmt-fine">
-              Τα αρχεία κατεβαίνουν αμέσως μετά την πληρωμή. Exclusive από 100€ και custom από 80€ με <a href={mailto(`Exclusive: ${licenseBeat.title}`)}>μήνυμα</a>.
+              Θες το {licenseBeat.title} μόνο για σένα; <a href={mailto(`Αποκλειστικότητα: ${licenseBeat.title}`)}>Επικοινωνία για αποκλειστικότητα</a>.
             </p>
           </div>
         </div>
