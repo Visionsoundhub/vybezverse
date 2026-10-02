@@ -94,7 +94,7 @@ function AppContent() {
       {idle && (
         <Suspense fallback={null}>
           <LicenseModal />
-          <ChatbotWidget />
+          {!location.pathname.startsWith("/beats-new") && <ChatbotWidget />}
         </Suspense>
       )}
     </div>

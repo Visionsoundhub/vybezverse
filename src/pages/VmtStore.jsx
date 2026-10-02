@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, Flame } from 'lucide-react';
+import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame } from 'lucide-react';
 import beatsData from '../data/beats.json';
 import './VmtStore.css';
 
@@ -40,12 +40,40 @@ function Waveform({ peaks = [], progress = 0, onSeek, big = false }) {
 // «Ράψε πάνω του»: γράφει 20″ φωνή από το μικρόφωνο ενώ παίζει το beat και τα ξαναπαίζει μαζί.
 // Η φωνή μένει μόνο στο browser του επισκέπτη, δεν ανεβαίνει πουθενά.
 const REC_SECONDS = 20;
+// Περιμένει ένα event του audio (με όριο χρόνου, για να μην κολλήσει ποτέ).
+const once = (el, ev, ms = 4000) => new Promise((res) => {
+  const done = () => { el.removeEventListener(ev, done); res(); };
+  el.addEventListener(ev, done);
+  setTimeout(done, ms);
+});
+// Πηγαίνει το audio σε σημείο και περιμένει να φτάσει εκεί (στο κινητό το seek δεν είναι άμεσο).
+async function seekTo(el, t) {
+  if (el.readyState < 1) await once(el, 'loadedmetadata');
+  el.currentTime = t;
+  await once(el, 'seeked', 3000);
+}
+// Καθυστέρηση ηχείου + μικροφώνου: όσο αργότερα ακούει ο ράπερ το beat, τόσο αργότερα γράφεται η φωνή.
+function estimateLatency() {
+  try {
+    const C = window.AudioContext || window.webkitAudioContext;
+    const c = new C();
+    const l = (c.outputLatency || 0) + (c.baseLatency || 0);
+    c.close();
+    return Math.min(0.4, l + 0.06); // + περίπου ό,τι κοστίζει το μικρόφωνο
+  } catch {
+    return 0.12;
+  }
+}
+
 function RecordOver({ beat, onStart }) {
-  const [state, setState] = useState('idle'); // idle | rec | done | denied
+  const [state, setState] = useState('idle'); // idle | prep | rec | done | denied
   const [left, setLeft] = useState(REC_SECONDS);
+  const [offset, setOffset] = useState(0); // διόρθωση από τα κουμπιά, σε δευτερόλεπτα
   const voiceUrl = useRef(null);
   const beatEl = useRef(null);
   const voiceEl = useRef(null);
+  const recAt = useRef(0);
+  const latency = useRef(0.12);
   const startAt = (beat.duration || 120) * 0.3;
 
   useEffect(() => () => {
@@ -57,33 +85,41 @@ function RecordOver({ beat, onStart }) {
   const record = async () => {
     // Το beat ξεκινάει μέσα στο ίδιο το κλικ: μετά το παράθυρο άδειας του μικροφώνου
     // ο browser δεν αφήνει πια αυτόματο play.
+    beatEl.current?.pause();
+    voiceEl.current?.pause();
     const b = new Audio(beat.audioSrc);
-    b.volume = 0.6;
+    b.preload = 'auto';
     b.muted = true;
     b.play().catch(() => {});
     beatEl.current = b;
     let stream;
     try {
-      stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true } });
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: { echoCancellation: true, noiseSuppression: false, autoGainControl: false },
+      });
     } catch {
       b.pause();
       setState('denied');
       return;
     }
     onStart?.();
+    setState('prep');
+    latency.current = estimateLatency();
+    await seekTo(b, startAt);
+    b.volume = 0.6;
+    b.muted = false;
+    if (b.paused) await b.play().catch(() => {});
     const chunks = [];
     const rec = new MediaRecorder(stream);
     rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    rec.onstart = () => { recAt.current = b.currentTime; };
     rec.onstop = () => {
       stream.getTracks().forEach((t) => t.stop());
       if (voiceUrl.current) URL.revokeObjectURL(voiceUrl.current);
       voiceUrl.current = URL.createObjectURL(new Blob(chunks, { type: rec.mimeType || 'audio/webm' }));
       setState('done');
     };
-    b.currentTime = startAt;
-    b.muted = false;
-    if (b.paused) b.play().catch(() => {});
-    rec.start(250);
+    rec.start();
     setState('rec');
     let s = REC_SECONDS;
     setLeft(s);
@@ -98,33 +134,52 @@ function RecordOver({ beat, onStart }) {
     }, 1000);
   };
 
-  const playback = () => {
+  const playback = async (extra = offset) => {
     beatEl.current?.pause();
     voiceEl.current?.pause();
     const b = new Audio(beat.audioSrc);
     const v = new Audio(voiceUrl.current);
-    b.currentTime = startAt;
     b.volume = 0.6;
     beatEl.current = b;
     voiceEl.current = v;
+    // Ξεκλείδωμα και των δύο μέσα στο κλικ, μετά στήσιμο στο σωστό σημείο και play μαζί.
+    b.muted = true; v.muted = true;
+    await Promise.all([b.play().catch(() => {}), v.play().catch(() => {})]);
+    b.pause(); v.pause();
+    const lag = Math.max(0, latency.current + extra);
+    await Promise.all([seekTo(b, recAt.current), seekTo(v, lag)]);
+    b.muted = false; v.muted = false;
     b.play();
     v.play();
-    setTimeout(() => b.pause(), REC_SECONDS * 1000);
+    setTimeout(() => { b.pause(); v.pause(); }, (REC_SECONDS - lag) * 1000);
+  };
+
+  const nudge = (d) => {
+    const o = Math.round((offset + d) * 100) / 100;
+    setOffset(o);
+    playback(o);
   };
 
   return (
     <div className="vmt-rec">
       <h3>Ράψε πάνω του</h3>
-      <p>Γράψε 20″ με τη φωνή σου πάνω στο beat και άκου πώς κάθεται. Μένει μόνο στο κινητό σου.</p>
+      <p>Βάλε ακουστικά, γράψε 20″ με τη φωνή σου πάνω στο beat και άκου πώς κάθεται. Μένει μόνο στο κινητό σου.</p>
       <div className="vmt-rec-row">
-        {state === 'rec' ? (
-          <><span className="vmt-rec-dot" /> <span>Γράφει… {left}″</span></>
+        {state === 'rec' || state === 'prep' ? (
+          <><span className="vmt-rec-dot" /> <span>{state === 'prep' ? 'Ετοιμάζεται…' : `Γράφει… ${left}″`}</span></>
         ) : (
           <button className="vmt-ghost" onClick={record}>{state === 'done' ? 'Ξαναγράψε' : 'Γράψε 20″'}</button>
         )}
-        {state === 'done' && <button className="vmt-buy" onClick={playback}>Άκου το</button>}
+        {state === 'done' && <button className="vmt-buy" onClick={() => playback()}>Άκου το</button>}
         {state === 'denied' && <span>Χρειάζεται άδεια για το μικρόφωνο.</span>}
       </div>
+      {state === 'done' && (
+        <div className="vmt-rec-sync">
+          <span>Δεν πέφτει στον ρυθμό;</span>
+          <button onClick={() => nudge(-0.05)}>Φωνή πιο αργά</button>
+          <button onClick={() => nudge(0.05)}>Φωνή πιο νωρίς</button>
+        </div>
+      )}
     </div>
   );
 }
@@ -246,7 +301,8 @@ export default function VmtStore() {
   const forSale = all.filter((b) => b.status !== 'sold');
   const hero = forSale.find((b) => b.featured) || forSale[0];
 
-  const [door, setDoor] = useState('feed'); // feed | list
+  const [door, setDoor] = useState('list'); // feed | list
+  const [showLic, setShowLic] = useState(false);
   const [feedIdx, setFeedIdx] = useState(0);
   const [query, setQuery] = useState('');
   const [mood, setMood] = useState('όλα');
@@ -357,6 +413,17 @@ export default function VmtStore() {
   };
 
   const isOn = (b) => current?.title === b.title && playing;
+  // Μόνο οι διαθέσεις που έχει έστω ένα beat.
+  const moods = ['όλα', ...MOODS.filter((m) => m !== 'όλα' && all.some((b) => (b.mood || []).includes(m)))];
+  // Επόμενο / προηγούμενο στον player: ακολουθεί τη λίστα που βλέπει ο επισκέπτης.
+  const queue = (door === 'list' ? listed : forSale).filter((b) => b.status !== 'sold');
+  const step2 = (d) => {
+    if (!queue.length) return;
+    const i = queue.findIndex((b) => b.title === current?.title);
+    const n = queue[(i + d + queue.length) % queue.length];
+    if (door === 'feed') setFeedIdx(forSale.indexOf(n));
+    play(n, true);
+  };
   const feedBeat = forSale[feedIdx];
 
   return (
@@ -384,7 +451,7 @@ export default function VmtStore() {
               <h2>{hero.title}</h2>
               <p className="vmt-specs">{hero.bpm} BPM · {hero.key} · {(hero.mood || []).join(' · ')}</p>
               <Rack step={step} active={isOn(hero)} />
-              <Waveform peaks={hero.peaks} progress={current?.title === hero.title ? progress : 0} onSeek={(f) => seek(hero, f)} />
+              <div className="vmt-desk"><Waveform peaks={hero.peaks} progress={current?.title === hero.title ? progress : 0} onSeek={(f) => seek(hero, f)} /></div>
               <div className="vmt-actions">
                 <button className="vmt-buy" onClick={() => setLicenseBeat(hero)}>Αγορά από 19,99€</button>
                 <button className="vmt-ghost" onClick={() => { stop(); setRecBeat(hero); }}><Mic size={16} /> Ράψε πάνω του</button>
@@ -394,39 +461,16 @@ export default function VmtStore() {
         )}
       </header>
 
-      {/* 2. Άδειες, πάντα ορατές */}
-      <section className="vmt-licenses">
-        <p className="vmt-kicker">ΟΙ ΑΔΕΙΕΣ, ΚΑΘΑΡΑ</p>
-        <div className="vmt-lic">
-          {LICENSES.map((l) => (
-            <div key={l.key} className={`vmt-lic-card ${l.featured ? 'feat' : ''}`}>
-              {l.featured && <span className="vmt-ribbon">Η ΕΠΙΛΟΓΗ ΤΩΝ ΠΕΡΙΣΣΟΤΕΡΩΝ</span>}
-              <h3>{l.name}</h3>
-              <p className="vmt-price">{l.price}</p>
-              <ul>{l.features.map((f) => <li key={f}><Check size={14} /> {f}</li>)}</ul>
-            </div>
-          ))}
-        </div>
-        <div className="vmt-custom">
-          <div>
-            <h2>Θες κάτι μόνο δικό σου;</h2>
-            <p>Exclusive σε έτοιμο beat ή custom beat φτιαγμένο για σένα. Τα λέμε και κλείνουμε τιμή.</p>
-          </div>
-          <div className="vmt-custom-btns">
-            <a href={mailto('Exclusive beat')} className="vmt-ghost"><Mail size={16} /> Exclusive από 100€</a>
-            <a href={mailto('Custom beat')} className="vmt-ghost"><Mail size={16} /> Custom από 80€</a>
-          </div>
-        </div>
-      </section>
-
-      {/* 3. Δύο πόρτες */}
+      {/* 2. Δύο πόρτες */}
       <section className="vmt-doors" ref={doorsRef}>
         <div className="vmt-door-tabs" role="tablist">
-          <button className={door === 'feed' ? 'on' : ''} onClick={() => setDoor('feed')}>
-            <Shuffle size={18} /> Δεν ξέρω τι ψάχνω
-          </button>
           <button className={door === 'list' ? 'on' : ''} onClick={() => { stop(); setDoor('list'); }}>
-            <ListIcon size={18} /> Ξέρω τι θέλω
+            <span className="vmt-door-title"><ListIcon size={18} /> Ξέρω τι θέλω</span>
+            <small>Ψάξε με όνομα, κλειδί ή BPM</small>
+          </button>
+          <button className={door === 'feed' ? 'on' : ''} onClick={() => setDoor('feed')}>
+            <span className="vmt-door-title"><Shuffle size={18} /> Δεν ξέρω τι ψάχνω</span>
+            <small>Ένα ένα, ακούς κατευθείαν το drop</small>
           </button>
         </div>
 
@@ -462,7 +506,7 @@ export default function VmtStore() {
                 onChange={(e) => { setQuery(e.target.value); setLimit(8); }}
               />
               <div className="vmt-moods">
-                {MOODS.map((m) => (
+                {moods.map((m) => (
                   <button key={m} className={m === mood ? 'on' : ''} onClick={() => { setMood(m); setLimit(8); }}>{m}</button>
                 ))}
               </div>
@@ -502,14 +546,46 @@ export default function VmtStore() {
         )}
       </section>
 
+      {/* 3. Άδειες: στο desktop ανοιχτές, στο κινητό με κουμπί */}
+      <section className={`vmt-licenses ${showLic ? 'open' : ''}`}>
+        <p className="vmt-kicker">ΟΙ ΑΔΕΙΕΣ, ΚΑΘΑΡΑ</p>
+        <button className="vmt-ghost vmt-lic-toggle" onClick={() => setShowLic(!showLic)}>
+          {showLic ? 'Κλείσε τις άδειες' : 'Δες όλες τις άδειες'}
+        </button>
+        <div className="vmt-lic">
+          {LICENSES.map((l) => (
+            <div key={l.key} className={`vmt-lic-card ${l.featured ? 'feat' : ''}`}>
+              {l.featured && <span className="vmt-ribbon">Η ΕΠΙΛΟΓΗ ΤΩΝ ΠΕΡΙΣΣΟΤΕΡΩΝ</span>}
+              <h3>{l.name}</h3>
+              <p className="vmt-price">{l.price}</p>
+              <ul>{l.features.map((f) => <li key={f}><Check size={14} /> {f}</li>)}</ul>
+            </div>
+          ))}
+        </div>
+        <div className="vmt-custom">
+          <div>
+            <h2>Θες κάτι μόνο δικό σου;</h2>
+            <p>Exclusive σε έτοιμο beat ή custom beat φτιαγμένο για σένα. Τα λέμε και κλείνουμε τιμή.</p>
+          </div>
+          <div className="vmt-custom-btns">
+            <a href={mailto('Exclusive beat')} className="vmt-ghost"><Mail size={16} /> Exclusive από 100€</a>
+            <a href={mailto('Custom beat')} className="vmt-ghost"><Mail size={16} /> Custom από 80€</a>
+          </div>
+        </div>
+      </section>
+
       <Newsletter />
       <SalesToast />
 
       {current && (
         <div className="vmt-player">
-          <button className="vmt-pp" onClick={() => play(current)}>
-            {playing ? <Pause size={20} /> : <Play size={20} />}
-          </button>
+          <div className="vmt-pp-group">
+            <button className="vmt-skip" onClick={() => step2(-1)} aria-label="Προηγούμενο"><SkipBack size={18} /></button>
+            <button className="vmt-pp" onClick={() => play(current)} aria-label="Play">
+              {playing ? <Pause size={20} /> : <Play size={20} />}
+            </button>
+            <button className="vmt-skip" onClick={() => step2(1)} aria-label="Επόμενο"><SkipForward size={18} /></button>
+          </div>
           <div className="vmt-player-info">
             <strong>{current.title}</strong>
             <span>{current.bpm} BPM · {current.key}</span>
