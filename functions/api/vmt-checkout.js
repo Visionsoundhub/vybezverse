@@ -43,7 +43,7 @@ export async function onRequestPost({ request, env }) {
     body: JSON.stringify({
       products: [CART_PRODUCT],
       prices: { [CART_PRODUCT]: [{ amount_type: 'fixed', price_amount: cart.total, price_currency: 'eur' }] },
-      allow_discount_codes: true, // ΠΡΟΣΩΡΙΝΟ για τη δοκιμή με VMTFREE, ξανά false μετά
+      allow_discount_codes: false,
       embed_origin: origin,
       customer_email: email || undefined,
       metadata: {

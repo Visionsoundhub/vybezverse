@@ -206,3 +206,7 @@
   font-style: italic;
   margin-bottom: 0;
 }
+
+/* Το παράθυρο ανοίγει πάνω από όλα (portal στο body), με συμπαγές φόντο και scroll στο κινητό. */
+.loyalty-info-modal-overlay { z-index: 2000; padding: 16px; }
+.loyalty-info-modal { background: #221d1a; max-height: calc(100vh - 32px); overflow-y: auto; }

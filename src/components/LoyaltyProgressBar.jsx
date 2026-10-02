@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import './LoyaltyProgressBar.css';
 import { Star, Award, Zap, Info, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -70,7 +71,7 @@ const LoyaltyProgressBar = () => {
         <span>{nextTier ? nextTier.name : 'Max Level'}</span>
       </div>
 
-      {showInfo && (
+      {showInfo && createPortal(
         <div className="loyalty-info-modal-overlay" onClick={() => setShowInfo(false)}>
           <div className="loyalty-info-modal glass" onClick={e => e.stopPropagation()}>
             <button className="btn-close-modal" onClick={() => setShowInfo(false)}><X size={20}/></button>
@@ -91,7 +92,7 @@ const LoyaltyProgressBar = () => {
             <p className="note">* Η έκπτωση VIP εφαρμόζεται πάνω στην αρχική τιμή του Beat (δεν συνδυάζεται με χρονόμετρα προσφορών).</p>
           </div>
         </div>
-      )}
+      , document.body)}
     </div>
   );
 };

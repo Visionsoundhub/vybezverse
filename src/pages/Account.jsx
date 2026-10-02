@@ -187,7 +187,7 @@ function Account() {
           <div className="account-discount-banner">
             {vipCode ? (
               <>
-                <p>Ο προσωπικός σου κωδικός για έκπτωση {discountLabel(vipTier)}, γράψ' τον στο ταμείο.</p>
+                <p>Έκπτωση {discountLabel(vipTier)} για πάντα στα beats. Στο store μπαίνει μόνη της στο σύνολο, δεν χρειάζεται να γράψεις τον κωδικό.</p>
                 <div className="account-discount-code">{vipCode}</div>
               </>
             ) : discountCode ? (
