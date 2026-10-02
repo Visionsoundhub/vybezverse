@@ -260,3 +260,5 @@
   .account-form-inline { flex-wrap: wrap; }
   .account-form-inline > * { min-width: 0; max-width: 100%; }
 }
+
+.account-verify-btn { background: none; border: 0; color: var(--accent); text-decoration: underline; cursor: pointer; font: inherit; padding: 0; }

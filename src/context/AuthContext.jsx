@@ -32,8 +32,10 @@ export function AuthProvider({ children }) {
   };
 
   async function signup(email, password, name) {
-    const { auth, db, createUserWithEmailAndPassword, updateProfile, doc, setDoc } = await loadFirebase();
+    const { auth, db, createUserWithEmailAndPassword, updateProfile, sendEmailVerification, doc, setDoc } = await loadFirebase();
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    // Επιβεβαίωση email: χωρίς αυτή δεν εμφανίζονται στο account οι αγορές beats με αυτό το email.
+    try { await sendEmailVerification(userCredential.user, { url: `${window.location.origin}/account` }); } catch (e) { console.error(e); }
     // Update profile with name
     await updateProfile(userCredential.user, {
       displayName: name

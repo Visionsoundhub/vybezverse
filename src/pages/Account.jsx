@@ -183,6 +183,18 @@ function Account() {
         </button>
       </div>
 
+      {!currentUser.emailVerified && (
+        <div className="account-alert account-alert-error">
+          Επιβεβαίωσε το email σου για να εμφανιστούν εδώ τα beats που αγόρασες με αυτό το email. Σου στείλαμε link.{' '}
+          <button className="account-verify-btn" onClick={async () => {
+            try {
+              const { sendEmailVerification } = await import('firebase/auth');
+              await sendEmailVerification(currentUser, { url: `${window.location.origin}/account` });
+              setUpdateMessage('Σου ξαναστείλαμε το email επιβεβαίωσης.');
+            } catch { setUpdateError('Δεν στάλθηκε, δοκίμασε σε λίγο.'); }
+          }}>Στείλε το ξανά</button>
+        </div>
+      )}
       <LoyaltyProgressBar />
 
       <div className="account-grid">
