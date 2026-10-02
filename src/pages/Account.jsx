@@ -7,7 +7,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
 import { tierForPurchases, discountLabel } from '../data/loyaltyTiers';
-import { splitPurchases } from '../data/purchaseHelpers';
+import useBeatPurchases from '../utils/useBeatPurchases';
 import './Account.css';
 
 function Account() {
@@ -28,18 +28,8 @@ function Account() {
   const [updateMessage, setUpdateMessage] = useState('');
   const [updateError, setUpdateError] = useState('');
 
-  // Άδειες beats από το Polar με το email του χρήστη (και όσες αγόρασε πριν φτιάξει account).
-  const [polarLicenses, setPolarLicenses] = useState([]);
-  useEffect(() => {
-    if (!currentUser) return;
-    let alive = true;
-    currentUser.getIdToken()
-      .then((t) => fetch('/api/my-licenses', { headers: { Authorization: `Bearer ${t}` } }))
-      .then((r) => (r.ok ? r.json() : { licenses: [] }))
-      .then((d) => alive && setPolarLicenses(d.licenses || []))
-      .catch(() => {});
-    return () => { alive = false; };
-  }, [currentUser]);
+  // Αγορές από account + Polar (ίδια πηγή με τη μπάρα VIP).
+  const merged = useBeatPurchases();
 
   useEffect(() => {
     if (!currentUser) return;
@@ -124,11 +114,7 @@ function Account() {
     }
   };
 
-  const known = new Set((userData?.purchases || []).map((p) => p.orderId));
-  const { beats, releases: songs } = splitPurchases([
-    ...(userData?.purchases || []),
-    ...polarLicenses.filter((l) => !known.has(l.orderId)),
-  ]);
+  const { beats, releases: songs } = merged;
 
   if (authLoading) return <div style={{ minHeight: "70vh" }} />;
   if (!currentUser) {
@@ -171,7 +157,7 @@ function Account() {
 
   const purchaseCount = beats.length;
   const { tier: vipTier, next: vipNext } = tierForPurchases(purchaseCount);
-  const vipCode = userData?.vipCode || null;
+  const vipCode = merged.vipCode || userData?.vipCode || null;
 
   return (
     <div className="account-page container">

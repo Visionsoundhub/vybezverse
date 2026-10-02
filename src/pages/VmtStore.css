@@ -346,3 +346,5 @@ body:has(.vmt-player) { padding-bottom: 110px; }
   .vmt-modal .vmt-lic-card ul { margin: 4px 0 0; gap: 4px; font-size: 12px; }
   .vmt-modal .vmt-lic-card > a, .vmt-modal .vmt-lic-card > .vmt-soon { grid-column: 1 / -1; margin-top: 8px; }
 }
+
+.vmt-vip { max-width: 1100px; margin: -32px auto 40px; }

@@ -2,6 +2,8 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame } from 'lucide-react';
 import beatsData from '../data/beats.json';
 import { useAuth } from '../context/AuthContext';
+import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
+import useBeatPurchases from '../utils/useBeatPurchases';
 import './VmtStore.css';
 
 // VMT beat store: αγορές μέσω Polar (embedded checkout, ο πελάτης δεν φεύγει από το site).
@@ -300,6 +302,7 @@ function SalesToast() {
 export default function VmtStore() {
   const all = beatsData.beatslist;
   const { currentUser } = useAuth();
+  const { vipCode } = useBeatPurchases();
   const forSale = all.filter((b) => b.status !== 'sold');
   const hero = forSale.find((b) => b.featured) || forSale[0];
 
@@ -420,6 +423,8 @@ export default function VmtStore() {
     // Αν έχει account, το checkout ανοίγει με το email του, για να πάει η αγορά στο σωστό account.
     const u = new URL(url);
     if (currentUser?.email) u.searchParams.set('customer_email', currentUser.email);
+    // Ο προσωπικός κωδικός VIP μπαίνει μόνος του στο ταμείο.
+    if (vipCode) u.searchParams.set('discount_code', vipCode);
     const beat = licenseBeat;
     embed.create(u.toString(), { theme: 'dark' }).then((checkout) => {
       // Μετά την πληρωμή κλείνει το παράθυρο του Polar και μένει στο site με δικό μας μήνυμα.
@@ -480,6 +485,8 @@ export default function VmtStore() {
           </div>
         )}
       </header>
+
+      {currentUser && <div className="vmt-vip"><LoyaltyProgressBar /></div>}
 
       {/* 2. Δύο πόρτες */}
       <section className="vmt-doors" ref={doorsRef}>

@@ -1,37 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import './LoyaltyProgressBar.css';
 import { Star, Award, Zap, Info, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { doc, getDoc } from 'firebase/firestore';
-import { db } from '../firebase';
 import { LOYALTY_TIERS, tierForPurchases, discountLabel } from '../data/loyaltyTiers';
-import { splitPurchases } from '../data/purchaseHelpers';
+import useBeatPurchases from '../utils/useBeatPurchases';
 
 const LoyaltyProgressBar = () => {
   const { currentUser } = useAuth();
-  const [purchasesCount, setPurchasesCount] = useState(0);
-  const [vipCode, setVipCode] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { loading, beatCount: purchasesCount, vipCode } = useBeatPurchases();
   const [showInfo, setShowInfo] = useState(false);
-
-  useEffect(() => {
-    if (!currentUser) return;
-    const fetchPurchases = async () => {
-      try {
-        const userDoc = await getDoc(doc(db, 'users', currentUser.uid));
-        if (userDoc.exists()) {
-          const data = userDoc.data();
-          setPurchasesCount(splitPurchases(data.purchases).beats.length);
-          setVipCode(data.vipCode || null);
-        }
-      } catch (err) {
-        console.error("Failed to fetch purchases", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchPurchases();
-  }, [currentUser]);
 
   if (!currentUser) return null;
   if (loading) return <div className="loyalty-container glass skeleton-loader"></div>;

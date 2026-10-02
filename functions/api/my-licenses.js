@@ -2,6 +2,8 @@
 // Έτσι βλέπει τις αγορές του στο account ακόμα κι αν αγόρασε πριν φτιάξει account,
 // ή με email και κωδικό αντί για Google. Ο χρήστης στέλνει το Firebase ID token του.
 import { getGoogleAccessToken } from '../../src/utils/firebaseAdmin';
+import { tierForPurchases } from '../../src/data/loyaltyTiers';
+import { isBeatPurchase } from '../../src/data/purchaseHelpers';
 
 const JWKS_URL = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
 
@@ -60,5 +62,44 @@ export async function onRequestGet({ request, env }) {
         source: 'polar',
       };
     });
-  return json({ licenses });
+  // VIP: μετράμε όλα τα beats (account + Polar χωρίς διπλά) και αν ανέβηκε επίπεδο
+  // φτιάχνουμε προσωπικό κωδικό στο Polar, ακόμα κι αν οι αγορές έγιναν πριν το account.
+  let vipCode = null;
+  let vipTier = null;
+  try {
+    const userDoc = await fetch(`https://firestore.googleapis.com/v1/projects/${env.FIREBASE_PROJECT_ID}/databases/(default)/documents/users/${user.user_id || user.sub}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    }).then((r) => (r.ok ? r.json() : null));
+    const docPurchases = (userDoc?.fields?.purchases?.arrayValue?.values || []).map((v) => ({
+      orderId: v.mapValue?.fields?.orderId?.stringValue,
+      product: v.mapValue?.fields?.product?.stringValue,
+    }));
+    const known = new Set(docPurchases.map((p) => p.orderId));
+    const beats = [...docPurchases, ...licenses.filter((l) => !known.has(l.orderId))].filter(isBeatPurchase);
+    const { tier } = tierForPurchases(beats.length);
+    vipCode = userDoc?.fields?.vipCode?.stringValue || null;
+    vipTier = userDoc?.fields?.vipTier?.stringValue || null;
+    if (userDoc && tier.percent > 0 && vipTier !== tier.key && env.POLAR_TOKEN) {
+      const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      const code = `VIP${tier.name.toUpperCase()}${[...crypto.getRandomValues(new Uint8Array(6))].map((b) => alphabet[b % alphabet.length]).join('')}`;
+      const pr = await fetch('https://api.polar.sh/v1/discounts/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.POLAR_TOKEN}` },
+        body: JSON.stringify({ name: `VIP ${tier.name}, ${user.email}`, code, type: 'percentage', basis_points: tier.percent * 100, duration: 'once' }),
+      });
+      if (pr.ok) {
+        await fetch(`https://firestore.googleapis.com/v1/${userDoc.name}?updateMask.fieldPaths=vipCode&updateMask.fieldPaths=vipTier`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ fields: { vipCode: { stringValue: code }, vipTier: { stringValue: tier.key } } }),
+        });
+        vipCode = code;
+        vipTier = tier.key;
+      }
+    }
+  } catch (e) {
+    console.error('VIP check failed:', e);
+  }
+
+  return json({ licenses, vipCode, vipTier });
 }
