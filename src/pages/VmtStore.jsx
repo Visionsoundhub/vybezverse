@@ -408,6 +408,7 @@ export default function VmtStore() {
 
   // Το checkout ανοίγει πάνω από τη σελίδα. Αν δεν φόρτωσε το script του Polar, πάει στο link κανονικά.
   const openedAt = useRef(0);
+  const [thanks, setThanks] = useState(null);
   const openLicenses = (b) => { openedAt.current = Date.now(); setLicenseBeat(b); };
   const openCheckout = (e, url) => {
     if (Date.now() - openedAt.current < 450) { e.preventDefault(); return; }
@@ -419,7 +420,15 @@ export default function VmtStore() {
     // Αν έχει account, το checkout ανοίγει με το email του, για να πάει η αγορά στο σωστό account.
     const u = new URL(url);
     if (currentUser?.email) u.searchParams.set('customer_email', currentUser.email);
-    embed.create(u.toString(), { theme: 'dark' });
+    const beat = licenseBeat;
+    embed.create(u.toString(), { theme: 'dark' }).then((checkout) => {
+      // Μετά την πληρωμή κλείνει το παράθυρο του Polar και μένει στο site με δικό μας μήνυμα.
+      checkout.addEventListener('success', (ev) => {
+        ev.preventDefault();
+        setTimeout(() => checkout.close(), 1200);
+        setThanks(beat);
+      });
+    }).catch(() => {});
   };
 
   const isOn = (b) => current?.title === b.title && playing;
@@ -616,6 +625,21 @@ export default function VmtStore() {
             <button className="vmt-buy" style={{ marginTop: 18 }} onClick={() => { openLicenses(recBeat); setRecBeat(null); }}>
               Κάθεται; Πάρ' το από 19,99€
             </button>
+          </div>
+        </div>
+      )}
+
+      {thanks && (
+        <div className="vmt-modal" onClick={() => setThanks(null)}>
+          <div className="vmt-sheet narrow" onClick={(e) => e.stopPropagation()}>
+            <button className="vmt-close" onClick={() => setThanks(null)} aria-label="Κλείσιμο"><X /></button>
+            <p className="vmt-kicker">ΕΤΟΙΜΟ</p>
+            <h2>Το {thanks.title} είναι δικό σου</h2>
+            <p className="vmt-trust">Σου στείλαμε email με τα αρχεία και την απόδειξη. Αν έχεις account εδώ με το ίδιο email, η αγορά φαίνεται και στο «Τα Beats μου».</p>
+            <div className="vmt-actions">
+              <a className="vmt-buy" href="https://polar.sh/visionsound/portal" target="_blank" rel="noopener noreferrer">Κατέβασε τώρα</a>
+              <button className="vmt-ghost" onClick={() => setThanks(null)}>Πίσω στα beats</button>
+            </div>
           </div>
         </div>
       )}

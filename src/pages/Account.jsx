@@ -28,6 +28,19 @@ function Account() {
   const [updateMessage, setUpdateMessage] = useState('');
   const [updateError, setUpdateError] = useState('');
 
+  // Άδειες beats από το Polar με το email του χρήστη (και όσες αγόρασε πριν φτιάξει account).
+  const [polarLicenses, setPolarLicenses] = useState([]);
+  useEffect(() => {
+    if (!currentUser) return;
+    let alive = true;
+    currentUser.getIdToken()
+      .then((t) => fetch('/api/my-licenses', { headers: { Authorization: `Bearer ${t}` } }))
+      .then((r) => (r.ok ? r.json() : { licenses: [] }))
+      .then((d) => alive && setPolarLicenses(d.licenses || []))
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [currentUser]);
+
   useEffect(() => {
     if (!currentUser) return;
 
@@ -111,7 +124,11 @@ function Account() {
     }
   };
 
-  const { beats, releases: songs } = splitPurchases(userData?.purchases);
+  const known = new Set((userData?.purchases || []).map((p) => p.orderId));
+  const { beats, releases: songs } = splitPurchases([
+    ...(userData?.purchases || []),
+    ...polarLicenses.filter((l) => !known.has(l.orderId)),
+  ]);
 
   if (authLoading) return <div style={{ minHeight: "70vh" }} />;
   if (!currentUser) {
