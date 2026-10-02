@@ -9,7 +9,7 @@
 export const LOYALTY_TIERS = [
   { key: 'starter', name: 'Starter', threshold: 0, percent: 0 },
   { key: 'bronze', name: 'Bronze', threshold: 3, percent: 10 },
-  { key: 'silver', name: 'Silver', threshold: 6, percent: 20 },
+  { key: 'silver', name: 'Silver', threshold: 6, percent: 15 },
   { key: 'gold', name: 'Gold', threshold: 10, percent: 30 },
 ];
 
