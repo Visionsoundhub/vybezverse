@@ -48,7 +48,10 @@ export async function onRequestGet({ request, env }) {
   const s = u.searchParams.get('s') || '';
   if (!l || !f || !e || !s) return fail('Λάθος link.', 400);
   if (e < Date.now() / 1000) return fail('Το link έληξε. Μπες στο account σου στο blackvybez.gr για νέο link λήψης.', 410);
-  if ((await sign(env.VMT_DOWNLOAD_SECRET, `${l}|${f}|${e}`)) !== s) return fail('Λάθος link.');
+  const expected = await sign(env.VMT_DOWNLOAD_SECRET, `${l}|${f}|${e}`);
+  let diff = expected.length ^ s.length;
+  for (let i = 0; i < Math.min(expected.length, s.length); i++) diff |= expected.charCodeAt(i) ^ s.charCodeAt(i);
+  if (diff !== 0) return fail('Λάθος link.');
 
   const token = await firestoreToken(env);
   const r = await fetch(`https://firestore.googleapis.com/v1/projects/${env.FIREBASE_PROJECT_ID}/databases/(default)/documents/vmt_licenses/${encodeURIComponent(l)}`, {
@@ -59,6 +62,8 @@ export async function onRequestGet({ request, env }) {
   const beatTitle = fields.beat?.stringValue || '';
   const lic = (fields.license?.stringValue || '').toLowerCase();
   const slug = fields.slug?.stringValue || slugOf(beatTitle);
+  const expiresAt = fields.expiresAt?.stringValue;
+  if (expiresAt && new Date(expiresAt) < new Date()) return fail('Η άδεια MP3 έληξε. Ανανέωσέ την ή πάρε τον WAV στο blackvybez.gr/beats-new.', 410);
   if (!(FILES_FOR_LICENSE[lic] || []).includes(f)) return fail('Αυτό το αρχείο δεν ανήκει στην άδειά σου.');
 
   const beat = (beatsData.beatslist || []).find((b) => slugOf(b.title) === slug);

@@ -204,10 +204,10 @@ function Account() {
             <h2>VIP Έκπτωση</h2>
           </div>
           <div className="account-discount-banner">
-            {vipCode ? (
+            {vipTier.percent > 0 ? (
               <>
-                <p>Έκπτωση {discountLabel(vipTier)} για πάντα στα beats. Στο store μπαίνει μόνη της στο σύνολο, δεν χρειάζεται να γράψεις τον κωδικό.</p>
-                <div className="account-discount-code">{vipCode}</div>
+                <p>Έκπτωση για πάντα σε κάθε beat. Μπαίνει μόνη της στο σύνολο του καλαθιού, δεν χρειάζεται κωδικός.</p>
+                <div className="account-discount-code">−{discountLabel(vipTier)}</div>
               </>
             ) : discountCode ? (
               <>

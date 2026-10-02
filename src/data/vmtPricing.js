@@ -44,7 +44,9 @@ export function discountPercent(beatCount = 0, now = new Date()) {
 
 // items: [{ slug, license }]. Επιστρέφει γραμμές, δώρα, έκπτωση και σύνολο σε λεπτά.
 export function priceCart(items, beatCount = 0, now = new Date()) {
-  const lines = items
+  // Ένα beat μία φορά: αν έρθει δύο φορές, κρατάμε την τελευταία άδεια.
+  const unique = [...new Map(items.map((it) => [it.slug, it])).values()];
+  const lines = unique
     .map((it) => {
       const beat = beatBySlug(it.slug);
       if (!beat || beat.status === 'sold' || !licensesFor(beat).includes(it.license)) return null;

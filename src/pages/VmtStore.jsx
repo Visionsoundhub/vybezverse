@@ -428,6 +428,21 @@ export default function VmtStore() {
   };
   const removeFromCart = (slug) => setCart((c) => c.filter((x) => x.slug !== slug));
   const priced = priceCart(cart, beatCount);
+  // Ό,τι δεν είναι πια διαθέσιμο (πουλήθηκε, άλλαξε) φεύγει μόνο του από το καλάθι.
+  useEffect(() => {
+    const ok = new Set(priced.lines.map((l) => `${l.slug}:${l.license}`));
+    if (cart.some((c) => !ok.has(`${c.slug}:${c.license}`))) {
+      setCart((c) => c.filter((x) => ok.has(`${x.slug}:${x.license}`)));
+    }
+  }, [cart, priced.lines]);
+  // Επιστροφή από τη σελίδα του Polar (όταν δεν φόρτωσε το παράθυρο): άδειασμα καλαθιού.
+  useEffect(() => {
+    if (new URLSearchParams(window.location.search).get('paid') === '1') {
+      setCart([]);
+      setThanks(['', '']);
+      window.history.replaceState(null, '', window.location.pathname);
+    }
+  }, []);
 
   const openedAt = useRef(0);
   const [thanks, setThanks] = useState(null);
@@ -640,9 +655,9 @@ export default function VmtStore() {
       <Newsletter />
       <SalesToast />
 
-      {cart.length > 0 && (
+      {priced.lines.length > 0 && (
         <button className={`vmt-cart-fab ${current ? 'up' : ''}`} onClick={() => setCartOpen(true)} aria-label="Καλάθι">
-          <ShoppingCart size={20} /> <span>{cart.length}</span>
+          <ShoppingCart size={20} /> <span>{priced.lines.length}</span>
         </button>
       )}
 
@@ -752,7 +767,7 @@ export default function VmtStore() {
                     {l.featured && <span className="vmt-ribbon">Η ΠΡΟΤΑΣΗ ΤΟΥ ΠΑΡΑΓΩΓΟΥ</span>}
                     <h3>{l.name}</h3>
               {l.note && <p className="vmt-lic-note">{l.note}</p>}
-                    <p className="vmt-price"><CountUp value={l.price} delay={l.featured ? 450 : 0} /></p>
+                    <p className="vmt-price">{l.price}</p>
                     <ul>{l.features.map((f) => <li key={f}><Check size={14} /> {f}</li>)}</ul>
                     {can ? (
                       <div className="vmt-lic-btns">

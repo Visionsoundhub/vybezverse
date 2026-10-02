@@ -45,6 +45,7 @@ export async function onRequestPost({ request, env }) {
       prices: { [CART_PRODUCT]: [{ amount_type: 'fixed', price_amount: cart.total, price_currency: 'eur' }] },
       allow_discount_codes: false,
       embed_origin: origin,
+      success_url: `${origin}/beats-new?paid=1`,
       customer_email: email || undefined,
       metadata: {
         brand: 'vmt',

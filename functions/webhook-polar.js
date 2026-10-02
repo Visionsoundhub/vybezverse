@@ -137,7 +137,13 @@ function itemsOf(o) {
       return { slug, beat: beat?.title || slug, license: LICENSE_NAMES[lic] || lic, price: free === '1' ? 0 : LICENSE_PRICES[lic] || 0 };
     });
     const sum = raw.reduce((a, r) => a + r.price, 0) || 1;
-    return raw.map((r, i) => ({ id: `${o.id}-${i}`, ...r, amount: Math.round((total * r.price) / sum * 100) / 100 }));
+    const totalCents = Math.round(total * 100);
+    let given = 0;
+    return raw.map((r, i) => {
+      const cents = i === raw.length - 1 ? totalCents - given : Math.round((totalCents * r.price) / sum);
+      given += cents;
+      return { id: `${o.id}-${i}`, ...r, amount: cents / 100 };
+    });
   }
   const pm = o.product?.metadata || {};
   const beat = pm.beat || (o.product?.name || '').split(' · ')[0];
@@ -190,6 +196,8 @@ export async function onRequestPost({ request, env }) {
   if (payload.type !== 'order.paid') return new Response('Ignored', { status: 202 });
 
   const o = payload.data || {};
+  // Μόνο παραγγελίες του VMT (καλάθι ή προϊόν beat). Ό,τι άλλο πουληθεί από τον ίδιο λογαριασμό Polar αγνοείται.
+  if (o.metadata?.brand !== 'vmt' && o.product?.metadata?.brand !== 'vmt') return new Response('Not VMT', { status: 202 });
   const email = (o.customer?.email || '').toLowerCase();
   if (!email) return new Response('No email', { status: 202 });
   const createdAt = o.created_at || new Date().toISOString();
@@ -216,18 +224,19 @@ export async function onRequestPost({ request, env }) {
       });
       if (isNew) fresh.push(it);
     }
-    if (!fresh.length) return new Response('Already recorded', { status: 202 });
-
-    try {
-      await sendFilesEmail(env, origin, email, fresh);
-    } catch (e) {
-      console.error('Files email failed:', e);
+    // Email μόνο για καινούργιες άδειες. Σε retry του Polar συνεχίζουμε για το account (η προσθήκη είναι idempotent).
+    if (fresh.length) {
+      try {
+        await sendFilesEmail(env, origin, email, fresh);
+      } catch (e) {
+        console.error('Files email failed:', e);
+      }
     }
 
     const userDoc = await findUserByEmail(env, token, email);
     if (!userDoc) return new Response('Recorded, no site account', { status: 202 });
 
-    for (const it of fresh) {
+    for (const it of items) {
       await appendPurchase(env, token, userDoc.name, {
         orderId: it.id,
         product: `${it.beat} · ${it.license}`,
@@ -238,17 +247,6 @@ export async function onRequestPost({ request, env }) {
       });
     }
 
-    const newCount = (userDoc.fields?.purchases?.arrayValue?.values || []).length + fresh.length;
-    const { tier } = tierForPurchases(newCount);
-    const polarTier = userDoc.fields?.vipSource?.stringValue === 'polar' ? userDoc.fields?.vipTier?.stringValue : null;
-    if (tier.percent > 0 && polarTier !== tier.key && env.POLAR_TOKEN) {
-      try {
-        const code = await createPolarDiscount(env.POLAR_TOKEN, tier, email);
-        await setUserFields(token, userDoc.name, { vipCode: { stringValue: code }, vipTier: { stringValue: tier.key }, vipSource: { stringValue: 'polar' } });
-      } catch (e) {
-        console.error('VIP code failed (purchase still recorded):', e);
-      }
-    }
     return new Response('OK', { status: 202 });
   } catch (err) {
     console.error('Polar webhook error:', err);

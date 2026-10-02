@@ -374,3 +374,5 @@ body:has(.vmt-player) { padding-bottom: 110px; }
 .vmt-login strong { color: var(--vmt-text); }
 .vmt-login a { width: auto; border-color: var(--vmt-accent); color: var(--vmt-accent); }
 @media (max-width: 720px) { .vmt-login { margin: -16px auto 28px; } .vmt-login a { width: 100%; } }
+
+@media (max-width: 420px) { .vmt-list .vmt-row-mic { display: none; } .vmt-price-btn { padding: 10px 8px; font-size: 13px; } }
