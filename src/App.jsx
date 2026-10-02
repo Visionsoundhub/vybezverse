@@ -14,6 +14,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import HomeV2 from './pages/HomeV2'; // η αρχική φορτώνει μαζί με το app, όχι lazy
 // Lazy loaded pages for code splitting
 const Beats = lazy(() => import('./pages/Beats'));
+const VmtStore = lazy(() => import('./pages/VmtStore'));
 const Store = lazy(() => import('./pages/Store'));
 const Gallery = lazy(() => import('./pages/Gallery'));
 const Podcasts = lazy(() => import('./pages/Podcasts'));
@@ -68,6 +69,7 @@ function AppContent() {
           <Routes>
             <Route path="/" element={<HomeV2 />} />
             <Route path="/beats" element={<Beats />} />
+            <Route path="/beats-new" element={<VmtStore />} />
             <Route path="/store" element={<Store />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/podcasts" element={<Podcasts />} />
