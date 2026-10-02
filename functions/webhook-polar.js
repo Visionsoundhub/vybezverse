@@ -172,7 +172,8 @@ async function sendFilesEmail(env, origin, email, items) {
   const r = await fetch('https://api.resend.com/emails', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.RESEND_API_KEY}` },
-    body: JSON.stringify({ from: 'VMT Beats <beats@blackvybez.gr>', to: [email], subject: `Τα beats σου είναι έτοιμα: ${items.map((i) => i.beat).join(', ')}`, html }),
+    // Οι απαντήσεις του πελάτη πάνε στο Gmail του Θοδωρή (το διαβάζει το Κέντρο).
+    body: JSON.stringify({ from: 'VMT Beats <beats@blackvybez.gr>', reply_to: 'studiovisionsound@gmail.com', bcc: ['studiovisionsound@gmail.com'], to: [email], subject: `Τα beats σου είναι έτοιμα: ${items.map((i) => i.beat).join(', ')}`, html }),
   });
   if (!r.ok) console.error('Resend failed:', r.status, await r.text());
 }
