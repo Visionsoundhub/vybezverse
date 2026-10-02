@@ -676,6 +676,9 @@ export default function VmtStore() {
               })}
             </div>
             <p className="vmt-fine">
+              Η πληρωμή γίνεται με ασφάλεια μέσω Polar και η σελίδα της είναι στα αγγλικά: γράφεις email και κάρτα και πατάς «Pay now». Τα αρχεία σού έρχονται αμέσως στο email.
+            </p>
+            <p className="vmt-fine">
               Θες το {licenseBeat.title} μόνο για σένα; <a href={mailto(`Αποκλειστικότητα: ${licenseBeat.title}`)}>Επικοινωνία για αποκλειστικότητα</a>.
             </p>
           </div>

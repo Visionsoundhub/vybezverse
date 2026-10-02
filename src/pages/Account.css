@@ -244,3 +244,19 @@
   .account-header { flex-direction: column; gap: 20px; text-align: center; }
   .account-profile { flex-direction: column; }
 }
+
+/* Αγορές: στο κινητό τα στοιχεία πάνε σε δεύτερη γραμμή αντί να κόβονται δεξιά */
+.account-purchases-list li { flex-wrap: wrap; gap: 4px 12px; min-width: 0; }
+.account-purchases-list li span { min-width: 0; overflow-wrap: anywhere; }
+.account-purchase-type a { color: var(--accent); text-transform: none; }
+@media (max-width: 600px) {
+  .account-card { padding: 18px; min-width: 0; }
+  .account-purchases-list li { flex-direction: column; align-items: flex-start; }
+}
+.account-grid > * { min-width: 0; }
+.account-profile p, .account-profile h1 { overflow-wrap: anywhere; }
+@media (max-width: 600px) {
+  .account-discount-code { font-size: 1.3rem; overflow-wrap: anywhere; }
+  .account-form-inline { flex-wrap: wrap; }
+  .account-form-inline > * { min-width: 0; max-width: 100%; }
+}
