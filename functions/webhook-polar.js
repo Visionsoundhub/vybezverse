@@ -174,10 +174,11 @@ export async function onRequestPost({ request, env }) {
 
     const newCount = (userDoc.fields?.purchases?.arrayValue?.values || []).length + 1;
     const { tier } = tierForPurchases(newCount);
-    if (tier.percent > 0 && userDoc.fields?.vipTier?.stringValue !== tier.key && env.POLAR_TOKEN) {
+    const polarTier = userDoc.fields?.vipSource?.stringValue === 'polar' ? userDoc.fields?.vipTier?.stringValue : null;
+    if (tier.percent > 0 && polarTier !== tier.key && env.POLAR_TOKEN) {
       try {
         const code = await createPolarDiscount(env.POLAR_TOKEN, tier, email);
-        await setUserFields(token, userDoc.name, { vipCode: { stringValue: code }, vipTier: { stringValue: tier.key } });
+        await setUserFields(token, userDoc.name, { vipCode: { stringValue: code }, vipTier: { stringValue: tier.key }, vipSource: { stringValue: 'polar' } });
       } catch (e) {
         console.error('VIP code failed (purchase still recorded):', e);
       }

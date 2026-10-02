@@ -30,7 +30,7 @@ export default function useBeatPurchases() {
       const own = data.purchases || [];
       const known = new Set(own.map((p) => p.orderId));
       const purchases = [...own, ...(polar.licenses || []).filter((l) => !known.has(l.orderId))];
-      if (alive) setState({ loading: false, purchases, vipCode: polar.vipCode || data.vipCode || null });
+      if (alive) setState({ loading: false, purchases, vipCode: polar.vipCode || null });
     })();
     return () => { alive = false; };
   }, [currentUser]);

@@ -79,6 +79,9 @@ export async function onRequestGet({ request, env }) {
     const { tier } = tierForPurchases(beats.length);
     vipCode = userDoc?.fields?.vipCode?.stringValue || null;
     vipTier = userDoc?.fields?.vipTier?.stringValue || null;
+    // Οι παλιοί κωδικοί του Lemon δεν ισχύουν στο Polar: μετράει μόνο κωδικός με vipSource = polar.
+    const isPolar = userDoc?.fields?.vipSource?.stringValue === 'polar';
+    if (!isPolar) { vipCode = null; vipTier = null; }
     if (userDoc && tier.percent > 0 && vipTier !== tier.key && env.POLAR_TOKEN) {
       const alphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
       const code = `VIP${tier.name.toUpperCase()}${[...crypto.getRandomValues(new Uint8Array(6))].map((b) => alphabet[b % alphabet.length]).join('')}`;
@@ -88,10 +91,10 @@ export async function onRequestGet({ request, env }) {
         body: JSON.stringify({ name: `VIP ${tier.name}, ${user.email}`, code, type: 'percentage', basis_points: tier.percent * 100, duration: 'once' }),
       });
       if (pr.ok) {
-        await fetch(`https://firestore.googleapis.com/v1/${userDoc.name}?updateMask.fieldPaths=vipCode&updateMask.fieldPaths=vipTier`, {
+        await fetch(`https://firestore.googleapis.com/v1/${userDoc.name}?updateMask.fieldPaths=vipCode&updateMask.fieldPaths=vipTier&updateMask.fieldPaths=vipSource`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-          body: JSON.stringify({ fields: { vipCode: { stringValue: code }, vipTier: { stringValue: tier.key } } }),
+          body: JSON.stringify({ fields: { vipCode: { stringValue: code }, vipTier: { stringValue: tier.key }, vipSource: { stringValue: 'polar' } } }),
         });
         vipCode = code;
         vipTier = tier.key;
