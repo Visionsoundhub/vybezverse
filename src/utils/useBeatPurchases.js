@@ -3,6 +3,7 @@ import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { useAuth } from '../context/AuthContext';
 import { splitPurchases } from '../data/purchaseHelpers';
+import { tierForPurchases } from '../data/loyaltyTiers';
 
 // Όλες οι αγορές του χρήστη σε ένα σημείο: όσες είναι γραμμένες στο account του
 // και οι άδειες beats του Polar με το email του (χωρίς διπλά). Από εδώ διαβάζουν
@@ -35,5 +36,8 @@ export default function useBeatPurchases() {
   }, [currentUser]);
 
   const { beats, releases } = splitPurchases(state.purchases);
-  return { ...state, beats, releases, beatCount: beats.length };
+  // Κωδικός VIP μόνο όταν το επίπεδο δίνει έκπτωση (όχι παλιοί κωδικοί πριν τα 3 beats).
+  const { tier } = tierForPurchases(beats.length);
+  const vipCode = tier.percent > 0 ? state.vipCode : null;
+  return { ...state, vipCode, beats, releases, beatCount: beats.length };
 }

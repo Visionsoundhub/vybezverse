@@ -157,7 +157,7 @@ function Account() {
 
   const purchaseCount = beats.length;
   const { tier: vipTier, next: vipNext } = tierForPurchases(purchaseCount);
-  const vipCode = merged.vipCode || userData?.vipCode || null;
+  const vipCode = merged.vipCode;
 
   return (
     <div className="account-page container">
