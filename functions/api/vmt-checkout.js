@@ -51,13 +51,13 @@ export async function onRequestPost({ request, env }) {
         kind: 'cart',
         items: meta,
         percent: String(cart.percent),
-        reason: cart.reason,
+        reason: cart.reason || 'none',
       },
     }),
   });
   if (!res.ok) {
     console.error('Polar checkout failed:', res.status, await res.text());
-    return json({ error: 'Η πληρωμή δεν άνοιξε, δοκίμασε ξανά.' }, 502);
+    return json({ error: 'Η πληρωμή δεν άνοιξε, δοκίμασε ξανά.' }, 400);
   }
   const co = await res.json();
   return json({ url: co.url, cart });
