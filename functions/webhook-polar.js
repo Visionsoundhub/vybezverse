@@ -22,16 +22,22 @@ async function verifySignature(request, rawBody, secret) {
   if (!id || !ts) return false;
   if (Math.abs(Date.now() / 1000 - Number(ts)) > 300) return false; // παλιό ή ξαναπαιγμένο αίτημα
   const enc = new TextEncoder();
-  const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
-  const sig = await crypto.subtle.sign('HMAC', key, enc.encode(`${id}.${ts}.${rawBody}`));
-  const expected = btoa(String.fromCharCode(...new Uint8Array(sig)));
-  return sigHeader.split(' ').some((part) => {
+  // «whsec_...» = Standard Webhooks (το κλειδί είναι το base64 μετά το πρόθεμα). Αλλιώς το secret ως έχει.
+  const keys = [enc.encode(secret)];
+  if (secret.startsWith('whsec_')) keys.unshift(Uint8Array.from(atob(secret.slice(6)), (c) => c.charCodeAt(0)));
+  const expectedAll = [];
+  for (const raw of keys) {
+    const key = await crypto.subtle.importKey('raw', raw, { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+    const sig = await crypto.subtle.sign('HMAC', key, enc.encode(`${id}.${ts}.${rawBody}`));
+    expectedAll.push(btoa(String.fromCharCode(...new Uint8Array(sig))));
+  }
+  return expectedAll.some((expected) => sigHeader.split(' ').some((part) => {
     const [, value] = part.split(',');
     if (!value || value.length !== expected.length) return false;
     let diff = 0;
     for (let i = 0; i < value.length; i++) diff |= value.charCodeAt(i) ^ expected.charCodeAt(i);
     return diff === 0;
-  });
+  }));
 }
 
 const fsBase = (env) => `https://firestore.googleapis.com/v1/projects/${env.FIREBASE_PROJECT_ID}/databases/(default)/documents`;
