@@ -12,6 +12,8 @@
 
 import { tierForPurchases } from '../src/data/loyaltyTiers';
 import { getGoogleAccessToken } from '../src/utils/firebaseAdmin';
+import { beatBySlug, LICENSE_PRICES, LICENSE_NAMES, slugOf } from '../src/data/vmtPricing';
+import { downloadLink, FILES_FOR_LICENSE, FILE_LABEL } from '../src/utils/vmtServer';
 
 const MP3_DAYS = 365;
 
@@ -124,6 +126,53 @@ async function createPolarDiscount(polarToken, tier, email) {
   return code;
 }
 
+// Ποιες άδειες περιέχει η παραγγελία: ένα προϊόν ανά beat (παλιός τρόπος) ή καλάθι (metadata.items).
+function itemsOf(o) {
+  const total = (o.total_amount ?? 0) / 100;
+  const meta = o.metadata || {};
+  if (meta.kind === 'cart' && meta.items) {
+    const raw = String(meta.items).split(',').map((x) => {
+      const [slug, lic, free] = x.split(':');
+      const beat = beatBySlug(slug);
+      return { slug, beat: beat?.title || slug, license: LICENSE_NAMES[lic] || lic, price: free === '1' ? 0 : LICENSE_PRICES[lic] || 0 };
+    });
+    const sum = raw.reduce((a, r) => a + r.price, 0) || 1;
+    return raw.map((r, i) => ({ id: `${o.id}-${i}`, ...r, amount: Math.round((total * r.price) / sum * 100) / 100 }));
+  }
+  const pm = o.product?.metadata || {};
+  const beat = pm.beat || (o.product?.name || '').split(' · ')[0];
+  return [{ id: String(o.id), slug: slugOf(beat), beat, license: pm.license || '', amount: total }];
+}
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+// Ελληνικό email με τα links λήψης (μέσω Resend, από το blackvybez.gr).
+async function sendFilesEmail(env, origin, email, items) {
+  if (!env.RESEND_API_KEY) return;
+  const blocks = [];
+  for (const it of items) {
+    const files = FILES_FOR_LICENSE[it.license.toLowerCase()] || [];
+    const links = [];
+    for (const f of files) links.push(`<a href="${await downloadLink(env, origin, it.id, f)}" style="display:inline-block;margin:4px 8px 4px 0;padding:10px 14px;background:#FF6600;color:#000;border-radius:8px;text-decoration:none;font-weight:700">${FILE_LABEL[f]}</a>`);
+    const exp = it.expiresAt ? `<br><span style="color:#8A847C;font-size:13px">Η άδεια MP3 ισχύει έναν χρόνο, μέχρι ${new Date(it.expiresAt).toLocaleDateString('el-GR')}.</span>` : '';
+    blocks.push(`<div style="margin:0 0 22px"><strong style="font-size:18px">${esc(it.beat)}</strong> · ${esc(it.license)}<br>${links.join('')}${exp}</div>`);
+  }
+  const html = `<div style="background:#141210;color:#F4F1EC;padding:28px;font-family:Arial,sans-serif;line-height:1.5">
+  <p style="color:#FF6600;letter-spacing:2px;font-size:12px;margin:0">VMT BEATS</p>
+  <h1 style="margin:6px 0 16px;font-size:26px">Είναι δικά σου</h1>
+  <p>Ευχαριστώ για την αγορά. Πάτα για να κατεβάσεις τα αρχεία σου, χωρίς tag:</p>
+  ${blocks.join('')}
+  <p style="font-size:14px">Ανεβάζεις το κομμάτι σου σε Spotify, YouTube και παντού και κρατάς τα έσοδα. Στα credits γράφεις «prod. vybezmadethis».</p>
+  <p style="font-size:13px;color:#8A847C">Τα links ισχύουν 30 μέρες. Αν έχεις account στο blackvybez.gr με αυτό το email, τα αρχεία είναι πάντα και στο «Τα Beats μου».</p>
+  <p style="font-size:13px;color:#8A847C">vybezmadethis · The Robe Producer</p></div>`;
+  const r = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${env.RESEND_API_KEY}` },
+    body: JSON.stringify({ from: 'VMT Beats <beats@blackvybez.gr>', to: [email], subject: `Τα beats σου είναι έτοιμα: ${items.map((i) => i.beat).join(', ')}`, html }),
+  });
+  if (!r.ok) console.error('Resend failed:', r.status, await r.text());
+}
+
 export async function onRequestPost({ request, env }) {
   if (!env.POLAR_WEBHOOK_SECRET) return new Response('Server misconfigured', { status: 500 });
   const rawBody = await request.text();
@@ -137,42 +186,54 @@ export async function onRequestPost({ request, env }) {
 
   const o = payload.data || {};
   const email = (o.customer?.email || '').toLowerCase();
-  const meta = o.product?.metadata || {};
-  const license = meta.license || '';
-  const beat = meta.beat || (o.product?.name || '').split(' · ')[0];
-  const createdAt = o.created_at || new Date().toISOString();
-  const expiresAt = license === 'MP3'
-    ? new Date(new Date(createdAt).getTime() + MP3_DAYS * 864e5).toISOString()
-    : '';
   if (!email) return new Response('No email', { status: 202 });
+  const createdAt = o.created_at || new Date().toISOString();
+  const origin = new URL(request.url).origin;
+  const items = itemsOf(o).map((it) => ({
+    ...it,
+    expiresAt: it.license === 'MP3' ? new Date(new Date(createdAt).getTime() + MP3_DAYS * 864e5).toISOString() : '',
+  }));
 
   try {
     const token = await getGoogleAccessToken(env);
-    const isNew = await saveLicense(env, token, String(o.id), {
-      email: { stringValue: email },
-      beat: { stringValue: beat },
-      license: { stringValue: license },
-      amount: { doubleValue: (o.total_amount ?? 0) / 100 },
-      createdAt: { stringValue: createdAt },
-      expiresAt: { stringValue: expiresAt },
-      productId: { stringValue: o.product_id || '' },
-      reminded: { booleanValue: false },
-    });
-    if (!isNew) return new Response('Already recorded', { status: 202 });
+    const fresh = [];
+    for (const it of items) {
+      const isNew = await saveLicense(env, token, it.id, {
+        email: { stringValue: email },
+        beat: { stringValue: it.beat },
+        slug: { stringValue: it.slug },
+        license: { stringValue: it.license },
+        amount: { doubleValue: it.amount },
+        createdAt: { stringValue: createdAt },
+        expiresAt: { stringValue: it.expiresAt },
+        orderId: { stringValue: String(o.id) },
+        reminded: { booleanValue: false },
+      });
+      if (isNew) fresh.push(it);
+    }
+    if (!fresh.length) return new Response('Already recorded', { status: 202 });
+
+    try {
+      await sendFilesEmail(env, origin, email, fresh);
+    } catch (e) {
+      console.error('Files email failed:', e);
+    }
 
     const userDoc = await findUserByEmail(env, token, email);
     if (!userDoc) return new Response('Recorded, no site account', { status: 202 });
 
-    await appendPurchase(env, token, userDoc.name, {
-      orderId: String(o.id),
-      product: o.product?.name || beat,
-      amount: (o.total_amount ?? 0) / 100,
-      createdAt,
-      license,
-      expiresAt,
-    });
+    for (const it of fresh) {
+      await appendPurchase(env, token, userDoc.name, {
+        orderId: it.id,
+        product: `${it.beat} · ${it.license}`,
+        amount: it.amount,
+        createdAt,
+        license: it.license,
+        expiresAt: it.expiresAt,
+      });
+    }
 
-    const newCount = (userDoc.fields?.purchases?.arrayValue?.values || []).length + 1;
+    const newCount = (userDoc.fields?.purchases?.arrayValue?.values || []).length + fresh.length;
     const { tier } = tierForPurchases(newCount);
     const polarTier = userDoc.fields?.vipSource?.stringValue === 'polar' ? userDoc.fields?.vipTier?.stringValue : null;
     if (tier.percent > 0 && polarTier !== tier.key && env.POLAR_TOKEN) {

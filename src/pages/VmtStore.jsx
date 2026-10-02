@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame } from 'lucide-react';
+import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame, ShoppingCart, Trash2 } from 'lucide-react';
 import beatsData from '../data/beats.json';
 import { useAuth } from '../context/AuthContext';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
 import useBeatPurchases from '../utils/useBeatPurchases';
+import { priceCart, licensesFor, slugOf, euro, PROMOS } from '../data/vmtPricing';
 import './VmtStore.css';
 
 // VMT beat store: αγορές μέσω Polar (embedded checkout, ο πελάτης δεν φεύγει από το site).
@@ -302,7 +303,7 @@ function SalesToast() {
 export default function VmtStore() {
   const all = beatsData.beatslist;
   const { currentUser } = useAuth();
-  const { vipCode } = useBeatPurchases();
+  const { beatCount } = useBeatPurchases();
   const forSale = all.filter((b) => b.status !== 'sold');
   const hero = forSale.find((b) => b.featured) || forSale[0];
 
@@ -409,31 +410,58 @@ export default function VmtStore() {
     play(forSale[i], true);
   };
 
-  // Το checkout ανοίγει πάνω από τη σελίδα. Αν δεν φόρτωσε το script του Polar, πάει στο link κανονικά.
+  // Καλάθι: μένει στο κινητό του επισκέπτη (localStorage) μέχρι να πληρώσει.
+  const [cart, setCart] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('vmt-cart') || '[]'); } catch { return []; }
+  });
+  const [cartOpen, setCartOpen] = useState(false);
+  const [paying, setPaying] = useState(false);
+  const [payError, setPayError] = useState('');
+  useEffect(() => {
+    try { localStorage.setItem('vmt-cart', JSON.stringify(cart)); } catch { /* ιδιωτική περιήγηση */ }
+  }, [cart]);
+  const inCart = (slug, license) => cart.some((c) => c.slug === slug && c.license === license);
+  const addToCart = (beat, license) => {
+    const slug = slugOf(beat.title);
+    // Ένα beat μπαίνει μία φορά: αν αλλάξει άδεια, αντικαθίσταται.
+    setCart((c) => [...c.filter((x) => x.slug !== slug), { slug, license }]);
+  };
+  const removeFromCart = (slug) => setCart((c) => c.filter((x) => x.slug !== slug));
+  const priced = priceCart(cart, beatCount);
+
   const openedAt = useRef(0);
   const [thanks, setThanks] = useState(null);
   const openLicenses = (b) => { openedAt.current = Date.now(); setLicenseBeat(b); };
-  const openCheckout = (e, url) => {
-    if (Date.now() - openedAt.current < 450) { e.preventDefault(); return; }
-    const embed = window.Polar?.EmbedCheckout;
-    if (!embed) return;
-    e.preventDefault();
-    stop();
-    setLicenseBeat(null);
-    // Αν έχει account, το checkout ανοίγει με το email του, για να πάει η αγορά στο σωστό account.
-    const u = new URL(url);
-    if (currentUser?.email) u.searchParams.set('customer_email', currentUser.email);
-    // Ο προσωπικός κωδικός VIP μπαίνει μόνος του στο ταμείο.
-    if (vipCode) u.searchParams.set('discount_code', vipCode);
-    const beat = licenseBeat;
-    embed.create(u.toString(), { theme: 'dark' }).then((checkout) => {
-      // Μετά την πληρωμή κλείνει το παράθυρο του Polar και μένει στο site με δικό μας μήνυμα.
-      checkout.addEventListener('success', (ev) => {
+
+  // Πληρωμή: ο server υπολογίζει το σύνολο (2+1, VIP, Black Friday) και ανοίγει το Polar πάνω από τη σελίδα.
+  const checkout = async (items, fromCart) => {
+    if (Date.now() - openedAt.current < 450 || paying) return;
+    setPaying(true);
+    setPayError('');
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (currentUser) headers.Authorization = `Bearer ${await currentUser.getIdToken()}`;
+      const r = await fetch('/api/vmt-checkout', { method: 'POST', headers, body: JSON.stringify({ items }) });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.url) throw new Error(d.error || 'Η πληρωμή δεν άνοιξε, δοκίμασε ξανά.');
+      stop();
+      setLicenseBeat(null);
+      setCartOpen(false);
+      const embed = window.Polar?.EmbedCheckout;
+      if (!embed) { window.location.href = d.url; return; }
+      const co = await embed.create(d.url, { theme: 'dark' });
+      co.addEventListener('success', (ev) => {
+        // Μετά την πληρωμή κλείνει το Polar και μένει στο site με δικό μας μήνυμα.
         ev.preventDefault();
-        setTimeout(() => checkout.close(), 1200);
-        setThanks(beat);
+        setTimeout(() => co.close(), 1200);
+        setThanks(d.cart.lines.map((l) => l.title));
+        if (fromCart) setCart([]);
       });
-    }).catch(() => {});
+    } catch (err) {
+      setPayError(err.message);
+    } finally {
+      setPaying(false);
+    }
   };
 
   const isOn = (b) => current?.title === b.title && playing;
@@ -605,6 +633,53 @@ export default function VmtStore() {
       <Newsletter />
       <SalesToast />
 
+      {cart.length > 0 && (
+        <button className={`vmt-cart-fab ${current ? 'up' : ''}`} onClick={() => setCartOpen(true)} aria-label="Καλάθι">
+          <ShoppingCart size={20} /> <span>{cart.length}</span>
+        </button>
+      )}
+
+      {cartOpen && (
+        <div className="vmt-modal" onClick={() => setCartOpen(false)}>
+          <div className="vmt-sheet narrow" onClick={(e) => e.stopPropagation()}>
+            <button className="vmt-close" onClick={() => setCartOpen(false)} aria-label="Κλείσιμο"><X /></button>
+            <p className="vmt-kicker">ΤΟ ΚΑΛΑΘΙ ΣΟΥ</p>
+            {priced.lines.length === 0 ? (
+              <p className="vmt-trust">Άδειο ακόμα. Διάλεξε ένα beat και πάτα «Στο καλάθι».</p>
+            ) : (
+              <>
+                <ul className="vmt-cart-list">
+                  {priced.lines.map((l) => (
+                    <li key={l.slug}>
+                      <div>
+                        <strong>{l.title}</strong>
+                        <span>{l.license.toUpperCase()}</span>
+                      </div>
+                      <span className={l.free ? 'vmt-free' : ''}>{l.free ? 'ΔΩΡΟ' : euro(l.price)}</span>
+                      <button onClick={() => removeFromCart(l.slug)} aria-label="Αφαίρεση"><Trash2 size={16} /></button>
+                    </li>
+                  ))}
+                </ul>
+                {PROMOS.bundle.active && priced.lines.length % 3 === 2 && (
+                  <p className="vmt-promo">Βάλε 1 beat ακόμα και το φθηνότερο είναι δώρο.</p>
+                )}
+                <div className="vmt-cart-sum">
+                  {priced.bundleSaving > 0 && <p><span>{PROMOS.bundle.label}</span><span>−{euro(priced.bundleSaving)}</span></p>}
+                  {priced.discount > 0 && <p><span>{priced.reason} {priced.percent}%</span><span>−{euro(priced.discount)}</span></p>}
+                  <p className="total"><span>Σύνολο</span><span>{euro(priced.total)}</span></p>
+                  {(priced.bundleSaving + priced.discount) > 0 && <p className="vmt-save">Κερδίζεις {euro(priced.bundleSaving + priced.discount)}</p>}
+                </div>
+                {payError && <p className="vmt-error">{payError}</p>}
+                <button className="vmt-buy" disabled={paying} onClick={() => { openedAt.current = 0; checkout(cart, true); }}>
+                  {paying ? 'Ανοίγει η πληρωμή…' : `Πληρωμή ${euro(priced.total)}`}
+                </button>
+                <p className="vmt-fine">Πληρώνεις με ασφάλεια μέσω Polar (η σελίδα του είναι στα αγγλικά). Τα αρχεία σού έρχονται αμέσως στο email.</p>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {current && (
         <div className="vmt-player">
           <div className="vmt-pp-group">
@@ -641,10 +716,10 @@ export default function VmtStore() {
           <div className="vmt-sheet narrow" onClick={(e) => e.stopPropagation()}>
             <button className="vmt-close" onClick={() => setThanks(null)} aria-label="Κλείσιμο"><X /></button>
             <p className="vmt-kicker">ΕΤΟΙΜΟ</p>
-            <h2>Το {thanks.title} είναι δικό σου</h2>
-            <p className="vmt-trust">Σου στείλαμε email με τα αρχεία και την απόδειξη. Αν έχεις account εδώ με το ίδιο email, η αγορά φαίνεται και στο «Τα Beats μου».</p>
+            <h2>{thanks.length > 1 ? 'Είναι δικά σου' : `Το ${thanks[0]} είναι δικό σου`}</h2>
+            <p className="vmt-trust">Σου στείλαμε email με τα links λήψης. Αν έχεις account εδώ με το ίδιο email, τα αρχεία είναι πάντα και στο «Τα Beats μου».</p>
             <div className="vmt-actions">
-              <a className="vmt-buy" href="https://polar.sh/visionsound/portal" target="_blank" rel="noopener noreferrer">Κατέβασε τώρα</a>
+              <a className="vmt-buy" href="/account">Πήγαινε στα beats μου</a>
               <button className="vmt-ghost" onClick={() => setThanks(null)}>Πίσω στα beats</button>
             </div>
           </div>
@@ -663,7 +738,8 @@ export default function VmtStore() {
             )}
             <div className="vmt-lic">
               {LICENSES.map((l) => {
-                const url = licenseBeat.polar?.[l.key];
+                const can = licensesFor(licenseBeat).includes(l.key);
+                const slug = slugOf(licenseBeat.title);
                 return (
                   <div key={l.key} className={`vmt-lic-card ${l.featured ? 'feat' : ''}`}>
                     {l.featured && <span className="vmt-ribbon">Η ΠΡΟΤΑΣΗ ΤΟΥ ΠΑΡΑΓΩΓΟΥ</span>}
@@ -671,10 +747,15 @@ export default function VmtStore() {
               {l.note && <p className="vmt-lic-note">{l.note}</p>}
                     <p className="vmt-price"><CountUp value={l.price} delay={l.featured ? 450 : 0} /></p>
                     <ul>{l.features.map((f) => <li key={f}><Check size={14} /> {f}</li>)}</ul>
-                    {url ? (
-                      <a href={url} onClick={(e) => openCheckout(e, url)} className={l.featured ? 'vmt-buy' : 'vmt-ghost'}>
-                        Πάρ' το
-                      </a>
+                    {can ? (
+                      <div className="vmt-lic-btns">
+                        <button className={l.featured ? 'vmt-buy' : 'vmt-ghost'} disabled={paying} onClick={() => checkout([{ slug, license: l.key }], false)}>
+                          Πάρ' το
+                        </button>
+                        <button className="vmt-ghost vmt-addcart" onClick={() => { addToCart(licenseBeat, l.key); setLicenseBeat(null); setCartOpen(true); }}>
+                          {inCart(slug, l.key) ? <><Check size={14} /> Στο καλάθι</> : <><ShoppingCart size={14} /> Στο καλάθι</>}
+                        </button>
+                      </div>
                     ) : (
                       <span className="vmt-soon">Σύντομα</span>
                     )}
@@ -682,6 +763,8 @@ export default function VmtStore() {
                 );
               })}
             </div>
+            {payError && <p className="vmt-error">{payError}</p>}
+            {PROMOS.bundle.active && <p className="vmt-fine vmt-promo">{PROMOS.bundle.label}: βάλε 3 beats στο καλάθι και το φθηνότερο είναι δώρο.</p>}
             <p className="vmt-fine">
               Η πληρωμή γίνεται με ασφάλεια μέσω Polar και η σελίδα της είναι στα αγγλικά: γράφεις email και κάρτα και πατάς «Pay now». Τα αρχεία σού έρχονται αμέσως στο email.
             </p>

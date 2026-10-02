@@ -219,7 +219,11 @@ function Account() {
                       const days = Math.ceil((new Date(purchase.expiresAt) - Date.now()) / 864e5);
                       return <> · {days > 0 ? `λήγει σε ${days} μέρες` : 'έληξε'}</>;
                     })()}
-                    {purchase.source === 'polar' && (
+                    {purchase.downloads?.length > 0 ? (
+                      purchase.downloads.map((d) => (
+                        <React.Fragment key={d.label}> · <a href={d.url}>{d.label}</a></React.Fragment>
+                      ))
+                    ) : purchase.source === 'polar' && (
                       <> · <a href="https://polar.sh/visionsound/portal" target="_blank" rel="noopener noreferrer">Κατέβασε τα αρχεία</a></>
                     )}
                   </span>

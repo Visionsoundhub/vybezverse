@@ -185,7 +185,12 @@
         0.08,
         0.03
       ],
-      "duration": 150.4
+      "duration": 150.4,
+      "files": {
+        "mp3": "beats/lonely-road/mp3.mp3",
+        "wav": "beats/lonely-road/wav.wav",
+        "stems": "beats/lonely-road/stems.zip"
+      }
     },
     {
       "price": "14.99€",
@@ -372,6 +377,11 @@
         "mp3": "https://buy.polar.sh/polar_cl_DlxIwMmFdUCDsfml61Ksd7oOo27nbUxujgTm93ESW3w",
         "wav": "https://buy.polar.sh/polar_cl_kCVzgHNuJWfQwOe0MixDOuhTDXI4SNwp7wS0G4XuYNW",
         "stems": "https://buy.polar.sh/polar_cl_qvxsCWC39nphcNpC8hw1sQuO2jT7VZOY9Urk4130hMq"
+      },
+      "files": {
+        "mp3": "beats/love-crime/mp3.mp3",
+        "wav": "beats/love-crime/wav.wav",
+        "stems": "beats/love-crime/stems.zip"
       }
     },
     {
@@ -558,6 +568,10 @@
       "polar": {
         "mp3": "https://buy.polar.sh/polar_cl_4jKu7Ji7wbhlmIJK2xU6s6uJLdw6R6IhGELwF3SD4wz",
         "wav": "https://buy.polar.sh/polar_cl_fVaAsffyiIs8ZfpKIQ1QIa4GURTjCZBISwwoL2WZHRh"
+      },
+      "files": {
+        "mp3": "beats/friday/mp3.mp3",
+        "wav": "beats/friday/wav.wav"
       }
     }
   ],

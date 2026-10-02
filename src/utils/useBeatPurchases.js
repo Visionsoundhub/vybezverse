@@ -27,7 +27,9 @@ export default function useBeatPurchases() {
           .catch(() => ({})),
       ]);
       const data = docSnap?.exists() ? docSnap.data() : {};
-      const own = data.purchases || [];
+      const lic = new Map((polar.licenses || []).map((l) => [l.orderId, l]));
+      // Οι αγορές του account παίρνουν τα links λήψης από την αντίστοιχη άδεια.
+      const own = (data.purchases || []).map((p) => (lic.has(p.orderId) ? { ...p, downloads: lic.get(p.orderId).downloads } : p));
       const known = new Set(own.map((p) => p.orderId));
       const purchases = [...own, ...(polar.licenses || []).filter((l) => !known.has(l.orderId))];
       if (alive) setState({ loading: false, purchases, vipCode: polar.vipCode || null });

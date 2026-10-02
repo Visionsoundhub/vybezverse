@@ -4,6 +4,7 @@
 import { getGoogleAccessToken } from '../../src/utils/firebaseAdmin';
 import { tierForPurchases } from '../../src/data/loyaltyTiers';
 import { isBeatPurchase } from '../../src/data/purchaseHelpers';
+import { downloadLink, FILES_FOR_LICENSE, FILE_LABEL } from '../../src/utils/vmtServer';
 
 const JWKS_URL = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
 
@@ -102,6 +103,16 @@ export async function onRequestGet({ request, env }) {
     }
   } catch (e) {
     console.error('VIP check failed:', e);
+  }
+
+  // Links λήψης (ισχύουν 1 μέρα, φτιάχνονται ξανά κάθε φορά που ανοίγει το account).
+  const origin = new URL(request.url).origin;
+  if (env.VMT_DOWNLOAD_SECRET) {
+    for (const l of licenses) {
+      const files = FILES_FOR_LICENSE[(l.license || '').toLowerCase()] || [];
+      l.downloads = [];
+      for (const f of files) l.downloads.push({ label: FILE_LABEL[f], url: await downloadLink(env, origin, l.orderId, f, 1) });
+    }
   }
 
   return json({ licenses, vipCode, vipTier });
