@@ -1,7 +1,7 @@
 // Τρέχει πριν από κάθε σελίδα:
 // 1. www.blackvybez.gr -> blackvybez.gr (301)
 // 2. Άγνωστες διαδρομές παίρνουν status 404 (το React δείχνει τη σελίδα «δεν βρέθηκε»)
-const KNOWN = /^\/(?:|beats|store|gallery|podcasts|press|account|bio|links|releases|blog)\/?$|^\/(?:podcasts|releases|blog|blogs)\/[^/]+\/?$|^\/(?:api|admin|auth)(?:\/|$)/;
+const KNOWN = /^\/(?:|beats|store|gallery|podcasts|press|account|bio|links|releases|blog)\/?$|^\/beats\/oroi\/?$|^\/(?:podcasts|releases|blog|blogs)\/[^/]+\/?$|^\/(?:api|admin|auth)(?:\/|$)/;
 
 export async function onRequest(ctx) {
   const url = new URL(ctx.request.url);
