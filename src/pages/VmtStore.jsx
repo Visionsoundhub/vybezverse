@@ -17,7 +17,7 @@ const LICENSES = [
   { key: 'stems', name: 'Stems', price: '49,99€', features: ['WAV + MP3 + όλα τα κανάλια', 'Απεριόριστα streams', 'Μόνιμη άδεια'] },
 ];
 
-const MOODS = ['όλα', 'σκοτεινό', 'συναισθηματικό', 'επιθετικό', 'καλοκαιρινό', 'για χορό'];
+const MOODS = ['όλα', 'σκοτεινό', 'συναισθηματικό', 'επιθετικό', 'bouncy', 'καλοκαιρινό', 'για χορό'];
 
 const mailto = (subject) => `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(subject)}`;
 
