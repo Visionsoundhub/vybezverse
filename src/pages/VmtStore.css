@@ -536,3 +536,9 @@ body:has(.vmt-player) { padding-bottom: 110px; }
 .vmt-offer { margin-top: 10px; display: grid; gap: 4px; }
 .vmt-offer button { width: 100%; font-size: 14px; padding: 10px 12px; }
 .vmt-offer small { color: var(--vmt-accent); font-size: 12px; font-family: var(--mono); }
+
+/* κινητό: η κυματομορφή να μη φουσκώνει το παράθυρο */
+.vmt-sheet { max-width: 100%; min-width: 0; }
+.vmt-wave { min-width: 0; overflow: hidden; }
+.vmt-wave span { min-width: 0; }
+.vmt-mini-player .vmt-wave { flex: 1 1 0; gap: 1px; }
