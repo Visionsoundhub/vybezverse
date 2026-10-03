@@ -3,6 +3,18 @@
 // assets: { regular, bold, logo } σε bytes (Noto Sans για τα ελληνικά, λογότυπο VMT λευκό).
 import { PDFDocument, rgb } from 'pdf-lib';
 import fontkit from '@pdf-lib/fontkit';
+import { AFTER, LICENSE_PRICES, beatBySlug, euro } from '../data/vmtPricing';
+
+// Τα σκαλοπάτια της τιμής για stems, με ημερομηνίες, για MP3 και WAV (μόνο αν το beat έχει stems).
+function stemsSteps(kind, createdAt, slug) {
+  if (!['mp3', 'wav'].includes(kind) || !beatBySlug(slug)?.files?.stems) return null;
+  const diff = LICENSE_PRICES.stems - LICENSE_PRICES[kind];
+  const t0 = new Date(createdAt || Date.now()).getTime();
+  return {
+    steps: AFTER.stemsSteps.map((st) => ({ price: euro(Math.round(diff * (1 - st.off / 100)) - 1), until: new Date(t0 + st.days * 864e5) })),
+    full: euro(diff),
+  };
+}
 
 // Σύντομος, «δικός μας» αριθμός άδειας από το id του Polar: VMT-ΕΕΜΜ-XXXXX.
 export async function licenseNumber(id, createdAt) {
@@ -25,7 +37,7 @@ const T = {
     },
     until: (d) => `, ισχύει έως ${d}`,
     termsTitle: 'Τι ισχύει',
-    terms: (lic) => [
+    terms: (lic, st) => [
       'Ο κάτοχος μπορεί να γράψει ένα νέο τραγούδι πάνω στο beat, να το ανεβάσει σε όλες τις πλατφόρμες, να το πουλήσει και να το παίξει live, μέσα στα όρια αυτής της άδειας. Τα έσοδα του τραγουδιού είναι δικά του.',
       'Τα πνευματικά δικαιώματα του beat μένουν στον παραγωγό. Η άδεια δεν είναι αποκλειστική: το beat μπορεί να το πάρει και άλλος καλλιτέχνης.',
       'Στον τίτλο ή στην περιγραφή του τραγουδιού γράφεται «prod. vybezmadethis».',
@@ -33,6 +45,7 @@ const T = {
       lic === 'mp3'
         ? 'Η άδεια MP3 ισχύει έναν χρόνο. Ανανεώνεται ή γίνεται WAV για πάντα στο blackvybez.gr/beats.'
         : lic === 'wav' ? 'Αν το τραγούδι περάσει τα 500.000 streams, χρειάζεται άδεια Stems (απεριόριστα streams). Την παίρνεις πληρώνοντας μόνο τη διαφορά, στο «Τα beats μου» στο blackvybez.gr/beats.' : null,
+      st && `Δικαίωμα αγοράς των stems με μειωμένη τιμή: ${st.steps.map((x) => `${x.price} έως ${x.until.toLocaleDateString('el-GR', { timeZone: 'Europe/Athens' })}`).join(', ')}. Μετά πληρώνεις την κανονική διαφορά, ${st.full}. Από το «Τα beats μου» στο blackvybez.gr/beats.`,
       'Αν το beat πουληθεί αργότερα αποκλειστικά, αυτή η άδεια συνεχίζει να ισχύει κανονικά.',
       'Η πληρωμή έγινε μέσω Polar Software Inc. (merchant of record). Όλοι οι όροι: blackvybez.gr/beats/oroi',
     ].filter(Boolean),
@@ -50,7 +63,7 @@ const T = {
     },
     until: (d) => `, valid until ${d}`,
     termsTitle: 'Terms',
-    terms: (lic) => [
+    terms: (lic, st) => [
       'The Licensee may record one new song using the beat, distribute it on all platforms, sell it and perform it live, within the limits of this license. The income from the song belongs to the Licensee.',
       'The Producer keeps full ownership and copyright of the beat. This license is non-exclusive: the beat may be licensed to other artists.',
       'The song must credit "prod. vybezmadethis" in its title or description.',
@@ -58,6 +71,7 @@ const T = {
       lic === 'mp3'
         ? 'The MP3 license is valid for one year. It can be renewed or turned into a perpetual WAV license at blackvybez.gr/beats.'
         : lic === 'wav' ? 'If the song passes 500,000 streams, a Stems license (unlimited streams) is required. It is available for the price difference under "My beats" at blackvybez.gr/beats.' : null,
+      st && `Right to buy the stems at a reduced price: ${st.steps.map((x) => `${x.price} until ${x.until.toLocaleDateString('en-GB', { timeZone: 'Europe/Athens' })}`).join(', ')}. After that, the regular price difference of ${st.full} applies. Available under "My beats" at blackvybez.gr/beats.`,
       'If the beat is later sold exclusively, this license stays valid under its terms.',
       'Payment processed by Polar Software Inc. (merchant of record). Full terms: blackvybez.gr/beats/oroi',
     ].filter(Boolean),
@@ -121,7 +135,7 @@ export async function licensePdf(lic, assets) {
     y -= 14;
     page.drawText(t.termsTitle, { x: 48, y, size: 14, font: bold, color: ink });
     y -= 22;
-    for (const p of t.terms(kind)) {
+    for (const p of t.terms(kind, stemsSteps(kind, lic.createdAt, lic.slug))) {
       const words = p.split(' ');
       let cur = '';
       let first = true;

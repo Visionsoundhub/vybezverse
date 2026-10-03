@@ -73,7 +73,7 @@ export async function onRequestGet({ request, env }) {
     ]);
     const pdf = await licensePdf({
       id: l, email: fields.email?.stringValue, beat: beatTitle, license: fields.license?.stringValue,
-      createdAt: fields.createdAt?.stringValue, expiresAt, orderId: fields.orderId?.stringValue,
+      createdAt: fields.createdAt?.stringValue, expiresAt, orderId: fields.orderId?.stringValue, slug,
     }, { regular, bold, logo });
     return new Response(pdf, { headers: {
       'Content-Type': 'application/pdf',
