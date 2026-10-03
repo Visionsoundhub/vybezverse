@@ -324,6 +324,37 @@ ${mdToHtml(bioData?.content || '')}`,
     console.log(`✅ Δημιουργήθηκε: /${route.path}`);
   }
 
+  // Α2. Μία σελίδα ανά beat: /beats/<slug>
+  const beatSlug = (t) => t.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  for (const b of beatsFile.beatslist.filter((x) => x.status !== 'sold')) {
+    const slug = beatSlug(b.title);
+    const t = [...(b.tags || []), ...(b.mood || [])];
+    const style = (b.tags || [])[0] || 'beat';
+    const title = `${b.title}, ${style} beat ${b.bpm} BPM | vybezmadethis`;
+    const description = `${b.title}: ${t.join(', ')} beat στα ${b.bpm} BPM σε ${b.key}, από τον παραγωγό vybezmadethis. Άκου το, γράψε πάνω του και πάρ' το από 19,99€ με άμεση λήψη.`;
+    let html = injectStaticBody(injectMetaTags(baseHtml, { title, description, urlPath: `beats/${slug}`, imageUrl: b.cover }),
+      `<h1>${esc(b.title)}</h1>
+<p>${esc(t.join(', '))} beat, ${esc(b.bpm)} BPM, ${esc(b.key)}. Παραγωγή vybezmadethis.</p>
+<p>Άδειες: MP3 19,99€, WAV 24,99€, Stems 49,99€. Άμεση λήψη χωρίς tag.</p>
+<p><a href="/beats">Όλα τα beats</a> · <a href="/beats/oroi">Όροι και άδειες</a></p>`);
+    const product = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: `${b.title} (beat)`,
+      image: abs(b.cover),
+      description,
+      keywords: [...t, 'beat', 'instrumental', `${b.bpm} bpm`].join(', '),
+      category: style,
+      brand: { '@type': 'Brand', name: 'vybezmadethis' },
+      offers: { '@type': 'AggregateOffer', priceCurrency: 'EUR', lowPrice: '19.99', highPrice: '49.99', offerCount: 3, availability: 'https://schema.org/InStock', url: `${SITE_URL}/beats/${slug}` },
+    };
+    html = html.replace('</head>', `  <script type="application/ld+json">${JSON.stringify(product)}</script>\n</head>`);
+    const fp = path.join(DIST_DIR, 'beats', `${slug}.html`);
+    fs.mkdirSync(path.dirname(fp), { recursive: true });
+    fs.writeFileSync(fp, html);
+    console.log(`✅ Δημιουργήθηκε: /beats/${slug}`);
+  }
+
   // Β. Δυναμικές Σελίδες (Blog Posts)
   for (const post of blogData.posts) {
     if (!post.slug) continue;
@@ -434,6 +465,10 @@ function generateSitemap() {
   const priorities = { beats: '0.9', releases: '0.9', blog: '0.7' };
   for (const route of staticRoutes) {
     urls.push({ loc: `${SITE_URL}/${route.path}`, priority: priorities[route.path] || '0.6' });
+  }
+  const beatsForMap = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'src/data/beats.json'), 'utf-8'));
+  for (const b of beatsForMap.beatslist.filter((x) => x.status !== 'sold')) {
+    urls.push({ loc: `${SITE_URL}/beats/${b.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`, priority: '0.8' });
   }
 
   if (fs.existsSync(BLOG_JSON_PATH)) {

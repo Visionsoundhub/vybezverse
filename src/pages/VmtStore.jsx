@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame, ShoppingCart, Trash2, Lock, ArrowLeft, LogOut, Download } from 'lucide-react';
+import { useParams } from 'react-router-dom';
+import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame, ShoppingCart, Trash2, Lock, ArrowLeft, LogOut, Download, Share2 } from 'lucide-react';
 import beatsData from '../data/beats.json';
 import { useAuth } from '../context/AuthContext';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
@@ -56,6 +57,40 @@ function MiniWave({ peaks = [], progress = 0 }) {
   );
 }
 const pad = (n) => String(n).padStart(2, '0');
+
+// Κοινοποίηση: στο κινητό ανοίγει το μενού του κινητού (Instagram, Viber, WhatsApp...),
+// αλλιώς αντιγράφει το link της σελίδας του beat.
+function ShareButton({ beat, small = false }) {
+  const [done, setDone] = useState(false);
+  const url = `${window.location.origin}/beats/${slugOf(beat.title)}`;
+  const share = async (e) => {
+    e.stopPropagation();
+    const text = `${beat.title}, beat ${beat.bpm} BPM από τον vybezmadethis`;
+    if (navigator.share) {
+      try { await navigator.share({ title: beat.title, text, url }); return; } catch { /* έκλεισε το μενού */ return; }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+    } catch {
+      // Παλιός τρόπος για browsers που δεν δίνουν clipboard.
+      const ta = document.createElement('textarea');
+      ta.value = url;
+      ta.style.cssText = 'position:fixed;opacity:0';
+      document.body.appendChild(ta);
+      ta.select();
+      const ok = document.execCommand('copy');
+      ta.remove();
+      if (!ok) { window.prompt('Αντέγραψε το link:', url); return; }
+    }
+    setDone(true);
+    setTimeout(() => setDone(false), 2000);
+  };
+  return small ? (
+    <button className="vmt-row-mic" onClick={share} aria-label="Στείλ' το">{done ? <Check size={18} /> : <Share2 size={18} />}</button>
+  ) : (
+    <button className="vmt-ghost" onClick={share}>{done ? <><Check size={16} /> Αντιγράφηκε</> : <><Share2 size={16} /> Στείλ' το</>}</button>
+  );
+}
 
 // «Τα beats μου»: πλαϊνό παράθυρο μέσα στο store, για να μη φεύγει ο πελάτης (η μουσική συνεχίζει).
 function MyBeats({ onClose, onUpgrade, busy }) {
@@ -377,7 +412,9 @@ export default function VmtStore() {
   const { currentUser } = useAuth();
   const { beatCount } = useBeatPurchases();
   const forSale = all.filter((b) => b.status !== 'sold');
-  const hero = forSale.find((b) => b.featured) || forSale[0];
+  const { slug: linkSlug } = useParams();
+  const linked = linkSlug ? all.find((b) => slugOf(b.title) === linkSlug) : null;
+  const hero = linked || forSale.find((b) => b.featured) || forSale[0];
 
   const [door, setDoor] = useState('list'); // feed | list
   const [showLic, setShowLic] = useState(false);
@@ -430,9 +467,11 @@ export default function VmtStore() {
 
   useEffect(() => {
     const prevTitle = document.title;
-    document.title = 'Beats για rap και trap | vybezmadethis';
+    document.title = linked
+      ? `${linked.title}, ${(linked.tags || [])[0] || 'beat'} beat ${linked.bpm} BPM | vybezmadethis`
+      : 'Beats για rap και trap | vybezmadethis';
     return () => { document.title = prevTitle; };
-  }, []);
+  }, [linked]);
 
   const listed = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -643,7 +682,7 @@ export default function VmtStore() {
               <button className="vmt-play show" aria-label="Play">{isOn(hero) ? <Pause size={30} /> : <Play size={30} />}</button>
             </div>
             <div className="vmt-week-body">
-              <p className="vmt-kicker">BEAT ΤΗΣ ΕΒΔΟΜΑΔΑΣ</p>
+              <p className="vmt-kicker">{linked ? `${(linked.tags || [])[0] || ''} BEAT · VYBEZMADETHIS`.trim().toUpperCase() : 'BEAT ΤΗΣ ΕΒΔΟΜΑΔΑΣ'}</p>
               <h2>{hero.title}</h2>
               <p className="vmt-specs">{hero.bpm} BPM · {hero.key} · {(hero.mood || []).join(' · ')}</p>
               <Rack step={step} active={isOn(hero)} />
@@ -651,6 +690,7 @@ export default function VmtStore() {
               <div className="vmt-actions">
                 <button className="vmt-buy" onClick={() => openLicenses(hero)}>Αγορά από 19,99€</button>
                 <button className="vmt-ghost" onClick={() => { stop(); setRecBeat(hero); }}><Mic size={16} /> Ράψε πάνω του</button>
+                <ShareButton beat={hero} />
               </div>
               <p className="vmt-hint vmt-rec-hint">Ράψε πάνω του: γράψε 20″ με τη φωνή σου και άκου αν κάθεται, πριν το πάρεις.</p>
             </div>
@@ -745,6 +785,7 @@ export default function VmtStore() {
                     ) : (
                       <>
                         <button className="vmt-row-mic" onClick={() => { stop(); setRecBeat(b); }} aria-label="Ράψε πάνω του"><Mic size={18} /></button>
+                        <ShareButton beat={b} small />
                         <button className="vmt-ghost vmt-price-btn" onClick={(e) => { e.stopPropagation(); openLicenses(b); }}>19,99€</button>
                       </>
                     )}
