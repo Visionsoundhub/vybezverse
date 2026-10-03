@@ -242,7 +242,7 @@ async function generatePages() {
   const staticBodies = {
     beats: `<h1>VMT Beats | vybezmadethis</h1>
 <p>Beats από τον παραγωγό vybezmadethis, The Robe Producer. Άδειες MP3 19,99€, WAV 24,99€, Stems 49,99€, με άμεση λήψη χωρίς tag.</p>
-<ul>${beatsFile.beatslist.map((b) => `<li>${esc(b.title)}${b.bpm ? `, ${esc(b.bpm)} BPM` : ''}${b.key ? `, ${esc(b.key)}` : ''}</li>`).join('\n')}</ul>
+<ul>${beatsFile.beatslist.map((b) => { const t = [...(b.tags || []), ...(b.mood || [])]; return `<li><strong>${esc(b.title)}</strong>${b.bpm ? `, ${esc(b.bpm)} BPM` : ''}${b.key ? `, ${esc(b.key)}` : ''}${t.length ? `, ${t.map(esc).join(', ')} beat` : ''}</li>`; }).join('\n')}</ul>
 <p><a href="/beats/oroi">Όροι, άδειες και απόρρητο</a></p>`,
     releases: `<h1>Releases | Black Vybez</h1>
 <p>Όλες οι επίσημες κυκλοφορίες του Black Vybez. Singles και το επερχόμενο album ΠΑΛΙΡΡΟΙΑ.</p>
@@ -310,7 +310,9 @@ ${mdToHtml(bioData?.content || '')}`,
             '@type': 'Product',
             name: `${b.title} (beat)`,
             image: abs(b.cover),
-            description: `Beat ${b.bpm || ''} BPM ${b.key || ''} από τον παραγωγό vybezmadethis.`.replace(/\s+/g, ' '),
+            description: `${[...(b.tags || []), ...(b.mood || [])].join(', ')} beat ${b.bpm || ''} BPM ${b.key || ''} από τον παραγωγό vybezmadethis.`.replace(/\s+/g, ' ').trim(),
+            keywords: [...(b.tags || []), ...(b.mood || []), 'beat', 'instrumental', `${b.bpm} bpm`].join(', '),
+            category: (b.tags || [])[0] || 'beat',
             brand: { '@type': 'Brand', name: 'vybezmadethis' },
             offers: { '@type': 'AggregateOffer', priceCurrency: 'EUR', lowPrice: '19.99', highPrice: '49.99', offerCount: 3, availability: 'https://schema.org/InStock', url: `${SITE_URL}/beats` }
           }
