@@ -531,3 +531,8 @@ body:has(.vmt-player) { padding-bottom: 110px; }
 .vmt-legal td:first-child { color: var(--vmt-muted); font-family: var(--mono); font-size: 12px; }
 .vmt-legal ul { margin: 0 0 16px; }
 .vmt-legal p { margin: 0 0 14px; }
+
+/* ---- μετά την αγορά: ανανέωση, WAV, stems ---- */
+.vmt-offer { margin-top: 10px; display: grid; gap: 4px; }
+.vmt-offer button { width: 100%; font-size: 14px; padding: 10px 12px; }
+.vmt-offer small { color: var(--vmt-accent); font-size: 12px; font-family: var(--mono); }

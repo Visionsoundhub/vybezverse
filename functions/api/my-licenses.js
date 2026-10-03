@@ -58,6 +58,7 @@ export async function onRequestGet({ request, env }) {
         createdAt: v('createdAt'),
         expiresAt: v('expiresAt'),
         license: v('license'),
+        slug: v('slug'),
         source: 'polar',
       };
     });
@@ -69,6 +70,7 @@ export async function onRequestGet({ request, env }) {
       const files = FILES_FOR_LICENSE[(l.license || '').toLowerCase()] || [];
       l.downloads = [];
       for (const f of files) l.downloads.push({ label: FILE_LABEL[f], url: await downloadLink(env, origin, l.orderId, f, 1) });
+      l.pdf = await downloadLink(env, origin, l.orderId, 'pdf', 1);
     }
   }
 

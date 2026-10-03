@@ -4,7 +4,7 @@ import beatsData from '../data/beats.json';
 import { useAuth } from '../context/AuthContext';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
 import useBeatPurchases from '../utils/useBeatPurchases';
-import { priceCart, licensesFor, slugOf, euro, PROMOS } from '../data/vmtPricing';
+import { priceCart, licensesFor, slugOf, euro, PROMOS, afterOffers } from '../data/vmtPricing';
 import './VmtStore.css';
 
 // VMT beat store: αγορές μέσω Polar (embedded checkout, ο πελάτης δεν φεύγει από το site).
@@ -58,7 +58,7 @@ function MiniWave({ peaks = [], progress = 0 }) {
 const pad = (n) => String(n).padStart(2, '0');
 
 // «Τα beats μου»: πλαϊνό παράθυρο μέσα στο store, για να μη φεύγει ο πελάτης (η μουσική συνεχίζει).
-function MyBeats({ onClose }) {
+function MyBeats({ onClose, onUpgrade, busy }) {
   const { currentUser, logout } = useAuth();
   const { loading, beats } = useBeatPurchases();
   return (
@@ -80,12 +80,24 @@ function MyBeats({ onClose }) {
                 <li key={b.orderId || i} className="vmt-mine">
                   <div>
                     <strong>{b.product}</strong>
-                    {days !== null && <span>{days > 0 ? `MP3 · λήγει σε ${days} μέρες` : 'MP3 · έληξε'}</span>}
+                    {days !== null && <span>{days > 0 ? `MP3 · λήγει σε ${days} μέρες` : 'MP3 · έληξε, ανανέωσέ το για να το κατεβάσεις'}</span>}
                     <div className="vmt-dl">
                       {b.downloads?.length > 0 ? b.downloads.map((d) => (
                         <a key={d.label} href={d.url}><Download size={13} /> {d.label}</a>
-                      )) : <a href="https://polar.sh/visionsound/portal" target="_blank" rel="noopener noreferrer"><Download size={13} /> Κατέβασε τα αρχεία</a>}
+                      )) : !b.expired && <a href="https://polar.sh/visionsound/portal" target="_blank" rel="noopener noreferrer"><Download size={13} /> Κατέβασε τα αρχεία</a>}
+                      {b.pdf && <a href={b.pdf}><Download size={13} /> Άδεια PDF</a>}
                     </div>
+                    {b.source === 'polar' && b.slug && afterOffers(b).map((o) => {
+                      const left = o.until ? Math.max(1, Math.ceil((new Date(o.until) - Date.now()) / 864e5)) : 0;
+                      return (
+                        <div key={o.kind} className="vmt-offer">
+                          <button className={o.kind === 'stems' ? 'vmt-buy' : 'vmt-ghost'} disabled={busy} onClick={() => onUpgrade(b, o.kind)}>
+                            {o.label} {euro(o.price)}
+                          </button>
+                          {o.off > 0 && <small>Αντί για {euro(o.full)}. Η τιμή ανεβαίνει σε {left} {left === 1 ? 'μέρα' : 'μέρες'}.</small>}
+                        </div>
+                      );
+                    })}
                   </div>
                 </li>
               );
@@ -537,6 +549,34 @@ export default function VmtStore() {
     }
   };
 
+  // Ανανέωση / WAV / stems για άδεια που έχει ήδη: ο server βγάζει την τιμή, πληρωμή στο ίδιο παράθυρο του Polar.
+  const upgrade = async (lic, kind) => {
+    if (paying) return;
+    setPaying(true);
+    try {
+      const r = await fetch('/api/vmt-upgrade', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${await currentUser.getIdToken()}` },
+        body: JSON.stringify({ licenseId: lic.orderId, kind }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (!r.ok || !d.url) throw new Error(d.error || 'Η πληρωμή δεν άνοιξε, δοκίμασε ξανά.');
+      setMineOpen(false);
+      const embed = window.Polar?.EmbedCheckout;
+      if (!embed) { window.location.href = d.url; return; }
+      const co = await embed.create(d.url, { theme: 'dark' });
+      co.addEventListener('success', (ev) => {
+        ev.preventDefault();
+        setTimeout(() => co.close(), 1200);
+        setThanks([d.beat]);
+      });
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setPaying(false);
+    }
+  };
+
   const isOn = (b) => current?.title === b.title && playing;
   // Μόνο οι διαθέσεις που έχει έστω ένα beat.
   const moods = ['όλα', ...MOODS.filter((m) => m !== 'όλα' && all.some((b) => (b.mood || []).includes(m)))];
@@ -753,7 +793,7 @@ export default function VmtStore() {
         </button>
       )}
 
-      {mineOpen && currentUser && <MyBeats onClose={() => setMineOpen(false)} />}
+      {mineOpen && currentUser && <MyBeats onClose={() => setMineOpen(false)} onUpgrade={upgrade} busy={paying} />}
 
       {cartOpen && (
         <div className="vmt-modal" onClick={() => setCartOpen(false)}>

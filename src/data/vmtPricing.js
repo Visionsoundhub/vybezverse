@@ -77,3 +77,34 @@ export function priceCart(items, beatCount = 0, now = new Date()) {
 }
 
 export const euro = (cents) => `${(cents / 100).toFixed(2).replace('.', ',')}€`;
+
+// ---- Μετά την αγορά: ανανέωση MP3, «Κάν' το WAV», «Πάρε και τα stems» ----
+// Τιμές σε λεπτά. Τα σκαλοπάτια των stems: έκπτωση στη διαφορά τιμής, ανάλογα με τις μέρες από την αγορά.
+export const AFTER = {
+  renewMp3: 500,
+  toWav: 999,
+  stemsSteps: [{ days: 7, off: 50 }, { days: 30, off: 25 }],
+};
+const DAY = 864e5;
+
+// Τι μπορεί να πάρει ακόμα ο κάτοχος μιας άδειας. license: 'MP3' | 'WAV' | 'Stems'.
+export function afterOffers({ license, createdAt, expiresAt, slug }, now = new Date()) {
+  const lic = String(license || '').toLowerCase();
+  const beat = beatBySlug(slug);
+  const out = [];
+  if (lic === 'mp3') {
+    const left = expiresAt ? (new Date(expiresAt) - now) / DAY : 0;
+    if (left < 60) out.push({ kind: 'renew', price: AFTER.renewMp3, label: 'Ανανέωση για 1 χρόνο' });
+    if (beat?.files?.wav) out.push({ kind: 'wav', price: AFTER.toWav, label: "Κάν' το WAV για πάντα" });
+  }
+  if ((lic === 'mp3' || lic === 'wav') && beat?.files?.stems) {
+    const diff = LICENSE_PRICES.stems - LICENSE_PRICES[lic];
+    const age = (now - new Date(createdAt || now)) / DAY;
+    const step = AFTER.stemsSteps.find((s) => age < s.days);
+    const off = step ? step.off : 0;
+    const price = off ? Math.round(diff * (1 - off / 100)) - 1 : diff; // 14,99 αντί για 15,00
+    const until = step ? new Date(new Date(createdAt).getTime() + step.days * DAY).toISOString() : null;
+    out.push({ kind: 'stems', price, full: diff, off, until, label: 'Πάρε και τα stems' });
+  }
+  return out;
+}

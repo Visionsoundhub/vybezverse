@@ -153,19 +153,20 @@ function itemsOf(o) {
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
 // Ελληνικό email με τα links λήψης (μέσω Resend, από το blackvybez.gr).
-async function sendFilesEmail(env, origin, email, items) {
+async function sendFilesEmail(env, origin, email, items, heading = 'Είναι δικά σου') {
   if (!env.RESEND_API_KEY) return;
   const blocks = [];
   for (const it of items) {
     const files = FILES_FOR_LICENSE[it.license.toLowerCase()] || [];
     const links = [];
     for (const f of files) links.push(`<a href="${await downloadLink(env, origin, it.id, f)}" style="display:inline-block;margin:4px 8px 4px 0;padding:10px 14px;background:#FF6600;color:#000;border-radius:8px;text-decoration:none;font-weight:700">${FILE_LABEL[f]}</a>`);
+    links.push(`<a href="${await downloadLink(env, origin, it.id, 'pdf')}" style="display:inline-block;margin:4px 8px 4px 0;padding:10px 14px;border:1px solid #FF6600;color:#FF6600;border-radius:8px;text-decoration:none;font-weight:700">Άδεια PDF</a>`);
     const exp = it.expiresAt ? `<br><span style="color:#8A847C;font-size:13px">Η άδεια MP3 ισχύει έναν χρόνο, μέχρι ${new Date(it.expiresAt).toLocaleDateString('el-GR')}.</span>` : '';
     blocks.push(`<div style="margin:0 0 22px"><strong style="font-size:18px">${esc(it.beat)}</strong> · ${esc(it.license)}<br>${links.join('')}${exp}</div>`);
   }
   const html = `<div style="background:#141210;color:#F4F1EC;padding:28px;font-family:Arial,sans-serif;line-height:1.5">
   <p style="color:#FF6600;letter-spacing:2px;font-size:12px;margin:0">VMT BEATS</p>
-  <h1 style="margin:6px 0 16px;font-size:26px">Είναι δικά σου</h1>
+  <h1 style="margin:6px 0 16px;font-size:26px">${esc(heading)}</h1>
   <p>Ευχαριστώ για την αγορά. Πάτα για να κατεβάσεις τα αρχεία σου, χωρίς tag:</p>
   ${blocks.join('')}
   <p style="font-size:14px">Ανεβάζεις το κομμάτι σου σε Spotify, YouTube και παντού και κρατάς τα έσοδα. Στα credits γράφεις «prod. vybezmadethis».</p>
@@ -182,6 +183,57 @@ async function sendFilesEmail(env, origin, email, items) {
     body: JSON.stringify({ from: 'VMT Beats <beats@blackvybez.gr>', reply_to: 'support@blackvybez.gr', bcc: ['support@blackvybez.gr'], to: [email], subject: `Τα beats σου είναι έτοιμα: ${items.map((i) => i.beat).join(', ')}`, html }),
   });
   if (!r.ok) console.error('Resend failed:', r.status, await r.text());
+}
+
+// Ανανέωση / WAV / stems σε άδεια που υπάρχει. Μία φορά ανά παραγγελία (vmt_upgrades/<order id>).
+async function applyUpgrade(env, origin, o, email) {
+  const meta = o.metadata || {};
+  const token = await getGoogleAccessToken(env);
+  const isNew = await fetch(`${fsBase(env)}/vmt_upgrades?documentId=${encodeURIComponent(String(o.id))}`, {
+    method: 'POST',
+    headers: authJson(token),
+    body: JSON.stringify({ fields: {
+      license: { stringValue: String(meta.license || '') },
+      to: { stringValue: String(meta.to || '') },
+      email: { stringValue: email },
+      amount: { doubleValue: (o.total_amount ?? 0) / 100 },
+      createdAt: { stringValue: o.created_at || new Date().toISOString() },
+    } }),
+  });
+  if (isNew.status === 409) return new Response('Already applied', { status: 202 });
+  if (!isNew.ok) throw new Error(`vmt_upgrades write failed: ${isNew.status} ${await isNew.text()}`);
+
+  const docUrl = `${fsBase(env)}/vmt_licenses/${encodeURIComponent(String(meta.license || ''))}`;
+  const cur = await fetch(docUrl, { headers: authJson(token) });
+  if (!cur.ok) throw new Error(`license not found: ${meta.license}`);
+  const f = (await cur.json()).fields || {};
+  if ((f.email?.stringValue || '') !== email) throw new Error('upgrade email mismatch');
+
+  let fields;
+  if (meta.to === 'renew') {
+    const base = Math.max(Date.now(), new Date(f.expiresAt?.stringValue || 0).getTime());
+    fields = { expiresAt: { stringValue: new Date(base + MP3_DAYS * 864e5).toISOString() }, reminded: { booleanValue: false } };
+  } else if (meta.to === 'wav' || meta.to === 'stems') {
+    fields = { license: { stringValue: meta.to === 'wav' ? 'WAV' : 'Stems' }, expiresAt: { stringValue: '' } };
+  } else {
+    return new Response('Unknown upgrade', { status: 202 });
+  }
+  const mask = Object.keys(fields).map((k) => `updateMask.fieldPaths=${k}`).join('&');
+  const up = await fetch(`${docUrl}?${mask}`, { method: 'PATCH', headers: authJson(token), body: JSON.stringify({ fields }) });
+  if (!up.ok) throw new Error(`license update failed: ${up.status} ${await up.text()}`);
+
+  const it = {
+    id: String(meta.license),
+    beat: f.beat?.stringValue || '',
+    license: fields.license?.stringValue || f.license?.stringValue || 'MP3',
+    expiresAt: fields.expiresAt.stringValue,
+  };
+  try {
+    await sendFilesEmail(env, origin, email, [it], meta.to === 'renew' ? 'Η άδεια ανανεώθηκε' : 'Τα νέα αρχεία σου');
+  } catch (e) {
+    console.error('Upgrade email failed:', e);
+  }
+  return new Response('Upgraded', { status: 202 });
 }
 
 export async function onRequestPost({ request, env }) {
@@ -202,6 +254,14 @@ export async function onRequestPost({ request, env }) {
   if (!email) return new Response('No email', { status: 202 });
   const createdAt = o.created_at || new Date().toISOString();
   const origin = new URL(request.url).origin;
+  if (o.metadata?.kind === 'upgrade') {
+    try {
+      return await applyUpgrade(env, origin, o, email);
+    } catch (err) {
+      console.error('Polar upgrade error:', err);
+      return new Response('Internal error', { status: 500 });
+    }
+  }
   const items = itemsOf(o).map((it) => ({
     ...it,
     expiresAt: it.license === 'MP3' ? new Date(new Date(createdAt).getTime() + MP3_DAYS * 864e5).toISOString() : '',

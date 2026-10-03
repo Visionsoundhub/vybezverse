@@ -3,6 +3,7 @@
 import beatsData from '../../src/data/beats.json';
 import { slugOf } from '../../src/data/vmtPricing';
 import { sign, firestoreToken, FILES_FOR_LICENSE } from '../../src/utils/vmtServer';
+import { licensePdf } from '../../src/utils/vmtLicensePdf';
 
 const ACCOUNT = 'f7d28ec453b9575198167b587adcb84b';
 const BUCKET = 'vmt-files';
@@ -64,6 +65,17 @@ export async function onRequestGet({ request, env }) {
   const slug = fields.slug?.stringValue || slugOf(beatTitle);
   const expiresAt = fields.expiresAt?.stringValue;
   if (expiresAt && new Date(expiresAt) < new Date()) return fail('Η άδεια MP3 έληξε. Ανανέωσέ την ή πάρε τον WAV στο blackvybez.gr/beats.', 410);
+  if (f === 'pdf') {
+    const pdf = await licensePdf({
+      id: l, email: fields.email?.stringValue, beat: beatTitle, license: fields.license?.stringValue,
+      createdAt: fields.createdAt?.stringValue, expiresAt, orderId: fields.orderId?.stringValue,
+    });
+    return new Response(pdf, { headers: {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="Vybezmadethis - ${beatTitle.replace(/[^\w .-]/g, '')} license.pdf"`,
+      'Cache-Control': 'no-store',
+    } });
+  }
   if (!(FILES_FOR_LICENSE[lic] || []).includes(f)) return fail('Αυτό το αρχείο δεν ανήκει στην άδειά σου.');
 
   const beat = (beatsData.beatslist || []).find((b) => slugOf(b.title) === slug);
