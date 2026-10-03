@@ -415,6 +415,13 @@ export default function VmtStore() {
   const { slug: linkSlug } = useParams();
   const linked = linkSlug ? all.find((b) => slugOf(b.title) === linkSlug) : null;
   const hero = linked || forSale.find((b) => b.featured) || forSale[0];
+  // Παρόμοια με το beat της σελίδας (κοινά tags ή διάθεση). Αν δεν υπάρχει κανένα, δείχνουμε απλά άλλα beats.
+  const similar = linked
+    ? forSale
+      .filter((b) => b.title !== linked.title)
+      .map((b) => ({ b, score: [...(b.tags || []), ...(b.mood || [])].filter((t) => [...(linked.tags || []), ...(linked.mood || [])].includes(t)).length }))
+      .sort((x, y) => y.score - x.score)
+    : [];
   // Όταν ανοίγει σελίδα beat από τη λίστα, ανεβαίνει πάνω να το δεις (η μουσική δεν σταματάει).
   useEffect(() => { if (linkSlug) window.scrollTo({ top: 0, behavior: 'smooth' }); }, [linkSlug]);
 
@@ -720,12 +727,9 @@ export default function VmtStore() {
 
       {linked && (
         <section className="vmt-similar">
-          <Bar>ΚΙ ΑΛΛΑ ΣΑΝ ΑΥΤΟ</Bar>
+          <Bar>{similar.some((x) => x.score > 0) ? 'ΚΙ ΑΛΛΑ ΣΑΝ ΑΥΤΟ' : 'ΔΕΣ ΚΑΙ ΑΥΤΑ'}</Bar>
           <div className="vmt-similar-grid">
-            {forSale
-              .filter((b) => b.title !== linked.title)
-              .map((b) => ({ b, score: [...(b.tags || []), ...(b.mood || [])].filter((t) => [...(linked.tags || []), ...(linked.mood || [])].includes(t)).length }))
-              .sort((x, y) => y.score - x.score)
+            {(similar.some((x) => x.score > 0) ? similar.filter((x) => x.score > 0) : similar)
               .slice(0, 4)
               .map(({ b }) => (
                 <Link key={b.title} to={`/beats/${slugOf(b.title)}`} className="vmt-similar-card">
