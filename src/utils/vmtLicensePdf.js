@@ -32,7 +32,7 @@ const T = {
       'Δεν επιτρέπεται να πουληθεί, να μοιραστεί ή να ανέβει το beat σκέτο, να περάσει το beat ή το τραγούδι σε Content ID ή παρόμοιο σύστημα, ούτε να δοθεί η άδεια σε άλλον.',
       lic === 'mp3'
         ? 'Η άδεια MP3 ισχύει έναν χρόνο. Ανανεώνεται ή γίνεται WAV για πάντα στο blackvybez.gr/beats.'
-        : lic === 'wav' ? 'Αν το τραγούδι περάσει τα 500.000 streams, η άδεια γίνεται Stems στο blackvybez.gr/beats.' : null,
+        : lic === 'wav' ? 'Αν το τραγούδι περάσει τα 500.000 streams, χρειάζεται άδεια Stems (απεριόριστα streams). Την παίρνεις πληρώνοντας μόνο τη διαφορά, στο «Τα beats μου» στο blackvybez.gr/beats.' : null,
       'Αν το beat πουληθεί αργότερα αποκλειστικά, αυτή η άδεια συνεχίζει να ισχύει κανονικά.',
       'Η πληρωμή έγινε μέσω Polar Software Inc. (merchant of record). Όλοι οι όροι: blackvybez.gr/beats/oroi',
     ].filter(Boolean),
@@ -57,7 +57,7 @@ const T = {
       'The beat may not be resold, shared or distributed on its own, registered (alone or in the song) in Content ID or similar systems, and this license may not be transferred.',
       lic === 'mp3'
         ? 'The MP3 license is valid for one year. It can be renewed or turned into a perpetual WAV license at blackvybez.gr/beats.'
-        : lic === 'wav' ? 'If the song passes 500,000 streams, the license can be moved to Stems at blackvybez.gr/beats.' : null,
+        : lic === 'wav' ? 'If the song passes 500,000 streams, a Stems license (unlimited streams) is required. It is available for the price difference under "My beats" at blackvybez.gr/beats.' : null,
       'If the beat is later sold exclusively, this license stays valid under its terms.',
       'Payment processed by Polar Software Inc. (merchant of record). Full terms: blackvybez.gr/beats/oroi',
     ].filter(Boolean),
