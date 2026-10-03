@@ -432,6 +432,7 @@ export default function VmtStore() {
   const [feedIdx, setFeedIdx] = useState(0);
   const [query, setQuery] = useState('');
   const [mood, setMood] = useState('όλα');
+  const [genre, setGenre] = useState('όλα');
   const [limit, setLimit] = useState(8);
   const [current, setCurrent] = useState(null);
   const [playing, setPlaying] = useState(false);
@@ -488,9 +489,10 @@ export default function VmtStore() {
     const q = query.trim().toLowerCase();
     return all.filter((b) =>
       (mood === 'όλα' || (b.mood || []).includes(mood)) &&
+      (genre === 'όλα' || genreOf(b) === genre) &&
       (!q || [b.title, b.key, String(b.bpm), ...(b.mood || []), ...(b.tags || [])].join(' ').toLowerCase().includes(q))
     );
-  }, [all, mood, query]);
+  }, [all, mood, genre, query]);
 
   const stop = () => {
     audio.current?.pause();
@@ -646,6 +648,9 @@ export default function VmtStore() {
 
   const isOn = (b) => current?.title === b.title && playing;
   // Μόνο οι διαθέσεις που έχει έστω ένα beat.
+  // Είδη: μόνο όσα έχουν διαθέσιμο beat, με σειρά από το πιο γεμάτο.
+  const genreCount = forSale.reduce((m, b) => { const g = genreOf(b); if (g) m[g] = (m[g] || 0) + 1; return m; }, {});
+  const genres = Object.keys(genreCount).sort((a, b) => genreCount[b] - genreCount[a]);
   const moods = ['όλα', ...MOODS.filter((m) => m !== 'όλα' && all.some((b) => (b.mood || []).includes(m)))];
   // Επόμενο / προηγούμενο στον player: ακολουθεί τη λίστα που βλέπει ο επισκέπτης.
   const queue = (door === 'list' ? listed : forSale).filter((b) => b.status !== 'sold');
@@ -805,7 +810,18 @@ export default function VmtStore() {
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setLimit(8); }}
               />
+              {genres.length > 1 && (
+                <div className="vmt-moods vmt-genres">
+                  <span>Είδος</span>
+                  {['όλα', ...genres].map((g) => (
+                    <button key={g} className={g === genre ? 'on' : ''} onClick={() => { setGenre(g); setLimit(8); }}>
+                      {g}{g !== 'όλα' && <small> {genreCount[g]}</small>}
+                    </button>
+                  ))}
+                </div>
+              )}
               <div className="vmt-moods">
+                <span>Διάθεση</span>
                 {moods.map((m) => (
                   <button key={m} className={m === mood ? 'on' : ''} onClick={() => { setMood(m); setLimit(8); }}>{m}</button>
                 ))}
