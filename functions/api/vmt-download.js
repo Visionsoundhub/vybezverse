@@ -66,10 +66,15 @@ export async function onRequestGet({ request, env }) {
   const expiresAt = fields.expiresAt?.stringValue;
   if (expiresAt && new Date(expiresAt) < new Date()) return fail('Η άδεια MP3 έληξε. Ανανέωσέ την ή πάρε τον WAV στο blackvybez.gr/beats.', 410);
   if (f === 'pdf') {
+    const origin = new URL(request.url).origin;
+    const get = (p) => fetch(`${origin}${p}`).then((r) => (r.ok ? r.arrayBuffer() : null));
+    const [regular, bold, logo] = await Promise.all([
+      get('/assets/vmt/fonts/NotoSans-Regular.ttf'), get('/assets/vmt/fonts/NotoSans-Bold.ttf'), get('/assets/vmt/vmt-logo-white.png'),
+    ]);
     const pdf = await licensePdf({
       id: l, email: fields.email?.stringValue, beat: beatTitle, license: fields.license?.stringValue,
       createdAt: fields.createdAt?.stringValue, expiresAt, orderId: fields.orderId?.stringValue,
-    });
+    }, { regular, bold, logo });
     return new Response(pdf, { headers: {
       'Content-Type': 'application/pdf',
       'Content-Disposition': `attachment; filename="Vybezmadethis - ${beatTitle.replace(/[^\w .-]/g, '')} license.pdf"`,
