@@ -515,12 +515,29 @@ export default function VmtStore() {
 
   const openedAt = useRef(0);
   const [thanks, setThanks] = useState(null);
+  const [needAgree, setNeedAgree] = useState(false);
+  const consentRef = useRef(null);
+  // Όσο είναι ανοιχτό παράθυρο, η σελίδα από πίσω δεν κουνιέται.
+  const modalOpen = !!(licenseBeat || cartOpen || recBeat || thanks || mineOpen);
+  useEffect(() => {
+    if (!modalOpen) return;
+    const y = window.scrollY;
+    const b = document.body.style;
+    const prev = { position: b.position, top: b.top, width: b.width, overflow: b.overflow };
+    Object.assign(b, { position: 'fixed', top: `-${y}px`, width: '100%', overflow: 'hidden' });
+    return () => { Object.assign(b, prev); window.scrollTo(0, y); };
+  }, [modalOpen]);
   const openLicenses = (b) => { openedAt.current = Date.now(); setLicenseBeat(b); };
 
   // Πληρωμή: ο server υπολογίζει το σύνολο (2+1, VIP, Black Friday) και ανοίγει το Polar πάνω από τη σελίδα.
   const checkout = async (items, fromCart) => {
     if (Date.now() - openedAt.current < 450 || paying) return;
-    if (!agree) { setPayError('Τσέκαρε πρώτα το κουτάκι με τους όρους.'); return; }
+    if (!agree) {
+      setPayError('Αποδέξου τους όρους για να συνεχίσεις.');
+      setNeedAgree(true);
+      consentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
     setPaying(true);
     setPayError('');
     try {
@@ -825,8 +842,8 @@ export default function VmtStore() {
                   <p className="total"><span>Σύνολο <small>με ΦΠΑ</small></span><span>{euro(priced.total)}</span></p>
                   {(priced.bundleSaving + priced.discount) > 0 && <p className="vmt-save">Κερδίζεις {euro(priced.bundleSaving + priced.discount)}</p>}
                 </div>
-                <label className="vmt-consent">
-                  <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setPayError(''); }} />
+                <label className={`vmt-consent ${needAgree ? 'need' : ''}`} ref={consentRef}>
+                  <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setPayError(''); setNeedAgree(false); }} />
                   <span>Θέλω τα αρχεία αμέσως και ξέρω ότι μετά τη λήψη δεν γίνεται υπαναχώρηση. Δέχομαι τους <a href="/beats/oroi" target="_blank" rel="noopener">όρους και τις άδειες</a>.</span>
                 </label>
                 {payError && <p className="vmt-error">{payError}</p>}
@@ -904,10 +921,11 @@ export default function VmtStore() {
                 <span className="vmt-lcd">{licenseBeat.bpm}<small>BPM</small></span>
               </div>
             )}
-            <label className="vmt-consent">
-              <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setPayError(''); }} />
+            <label className={`vmt-consent ${needAgree ? 'need' : ''}`} ref={consentRef}>
+              <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setPayError(''); setNeedAgree(false); }} />
               <span>Θέλω τα αρχεία αμέσως και ξέρω ότι μετά τη λήψη δεν γίνεται υπαναχώρηση. Δέχομαι τους <a href="/beats/oroi" target="_blank" rel="noopener">όρους και τις άδειες</a>.</span>
             </label>
+            {payError && <p className="vmt-error">{payError}</p>}
             <div className="vmt-lic">
               {LICENSES.map((l) => {
                 const can = licensesFor(licenseBeat).includes(l.key);
@@ -935,7 +953,6 @@ export default function VmtStore() {
                 );
               })}
             </div>
-            {payError && <p className="vmt-error">{payError}</p>}
             {PROMOS.bundle.active && <p className="vmt-fine vmt-promo">{PROMOS.bundle.label}: βάλε 3 beats στο καλάθι και το φθηνότερο είναι δώρο.</p>}
             <p className="vmt-fine vmt-secure"><Lock size={13} /> Τιμές με ΦΠΑ. Ασφαλής πληρωμή μέσω Polar (στα αγγλικά, πατάς «Pay now»). Τα αρχεία έρχονται αμέσως στο email σου.</p>
             <p className="vmt-fine">
