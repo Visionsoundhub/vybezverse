@@ -6,7 +6,7 @@
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
 # Το «Ράψε πάνω του» του beat store χρειάζεται μικρόφωνο, μόνο σε αυτή τη σελίδα.
-/beats-new
+/beats
   ! Permissions-Policy
   Permissions-Policy: camera=(), microphone=(self), geolocation=()
 

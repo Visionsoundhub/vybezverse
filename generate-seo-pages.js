@@ -29,8 +29,14 @@ function breadcrumb(items) {
 const staticRoutes = [
   {
     path: 'beats',
-    title: 'Beats | Black Vybez Store',
-    description: 'Αγόρασε premium beats από τον Black Vybez. Rap, Trap, Boom Bap, Amapiano. Βρες τον ήχο σου.'
+    title: 'Beats για rap και trap | vybezmadethis',
+    description: 'Beats από τον παραγωγό vybezmadethis. Άκου, γράψε τη φωνή σου πάνω τους και πάρ\' τα από 19,99€ με άμεση λήψη. MP3, WAV και stems.',
+    schema: 'beats'
+  },
+  {
+    path: 'beats/oroi',
+    title: 'Όροι, άδειες και απόρρητο | vybezmadethis',
+    description: 'Οι όροι πώλησης, οι άδειες χρήσης των beats, η υπαναχώρηση και το απόρρητο του vybezmadethis.'
   },
   {
     path: 'releases',
@@ -234,9 +240,10 @@ async function generatePages() {
 
   // Static body ανά route (πραγματικό κείμενο για no-JS crawlers)
   const staticBodies = {
-    beats: `<h1>Beats | Black Vybez Store</h1>
-<p>Αγόρασε premium beats από τον Black Vybez. Trap, Drill, Boombap, R&amp;B, Synthwave, Pop. Άδειες: Showcase, Premium, Unlimited.</p>
-<ul>${beatsFile.beatslist.map((b) => `<li>${esc(b.title)}${b.bpm ? `, ${esc(b.bpm)} BPM` : ''}${b.price ? `, ${esc(b.price)}` : ''}</li>`).join('\n')}</ul>`,
+    beats: `<h1>VMT Beats | vybezmadethis</h1>
+<p>Beats από τον παραγωγό vybezmadethis, The Robe Producer. Άδειες MP3 19,99€, WAV 24,99€, Stems 49,99€, με άμεση λήψη χωρίς tag.</p>
+<ul>${beatsFile.beatslist.map((b) => `<li>${esc(b.title)}${b.bpm ? `, ${esc(b.bpm)} BPM` : ''}${b.key ? `, ${esc(b.key)}` : ''}</li>`).join('\n')}</ul>
+<p><a href="/beats/oroi">Όροι, άδειες και απόρρητο</a></p>`,
     releases: `<h1>Releases | Black Vybez</h1>
 <p>Όλες οι επίσημες κυκλοφορίες του Black Vybez. Singles και το επερχόμενο album ΠΑΛΙΡΡΟΙΑ.</p>
 <ul>${releaseListHtml}</ul>`,
@@ -287,11 +294,30 @@ ${mdToHtml(bioData?.content || '')}`,
     const dir = path.dirname(filePath);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 
-    const htmlContent = injectStaticBody(injectMetaTags(baseHtml, {
+    let htmlContent = injectStaticBody(injectMetaTags(baseHtml, {
       title: route.title,
       description: route.description,
       urlPath: route.path
     }), staticBodies[route.path]);
+    if (route.schema === 'beats') {
+      const list = {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        itemListElement: beatsFile.beatslist.filter((b) => b.status !== 'sold').map((b, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          item: {
+            '@type': 'Product',
+            name: `${b.title} (beat)`,
+            image: abs(b.cover),
+            description: `Beat ${b.bpm || ''} BPM ${b.key || ''} από τον παραγωγό vybezmadethis.`.replace(/\s+/g, ' '),
+            brand: { '@type': 'Brand', name: 'vybezmadethis' },
+            offers: { '@type': 'AggregateOffer', priceCurrency: 'EUR', lowPrice: '19.99', highPrice: '49.99', offerCount: 3, availability: 'https://schema.org/InStock', url: `${SITE_URL}/beats` }
+          }
+        }))
+      };
+      htmlContent = htmlContent.replace('</head>', `  <script type="application/ld+json">${JSON.stringify(list)}</script>\n</head>`);
+    }
     fs.writeFileSync(filePath, htmlContent);
     console.log(`✅ Δημιουργήθηκε: /${route.path}`);
   }

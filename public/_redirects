@@ -1,2 +1,4 @@
+/beats-new  /beats  301
+/beats-new/oroi  /beats/oroi  301
 /assets/*  /assets/:splat  200
 /*  /index.html  200

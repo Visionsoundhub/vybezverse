@@ -1,5 +1,5 @@
 import { Suspense, lazy, useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { User, Menu } from 'lucide-react';
 import { AudioProvider } from './context/AudioContext';
 import { AuthProvider } from './context/AuthContext';
@@ -13,8 +13,8 @@ import './App.css';
 import ErrorBoundary from './components/ErrorBoundary';
 import HomeV2 from './pages/HomeV2'; // η αρχική φορτώνει μαζί με το app, όχι lazy
 // Lazy loaded pages for code splitting
-const Beats = lazy(() => import('./pages/Beats'));
 const VmtStore = lazy(() => import('./pages/VmtStore'));
+const VmtLegal = lazy(() => import('./pages/VmtLegal'));
 const Store = lazy(() => import('./pages/Store'));
 const Gallery = lazy(() => import('./pages/Gallery'));
 const Podcasts = lazy(() => import('./pages/Podcasts'));
@@ -53,7 +53,7 @@ function AppContent() {
   const location = useLocation();
   const isLinksPage = location.pathname === '/links';
   // Το VMT store έχει δικό του header/footer (άλλο brand).
-  const isVmt = location.pathname.startsWith('/beats-new');
+  const isVmt = /^\/beats(\/|$)/.test(location.pathname) || location.pathname.startsWith('/beats-new');
   const [idle, setIdle] = useState(false);
   useEffect(() => {
     const go = () => setIdle(true);
@@ -70,8 +70,10 @@ function AppContent() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<HomeV2 />} />
-            <Route path="/beats" element={<Beats />} />
-            <Route path="/beats-new" element={<VmtStore />} />
+            <Route path="/beats" element={<VmtStore />} />
+            <Route path="/beats/oroi" element={<VmtLegal />} />
+            <Route path="/beats-new" element={<Navigate to="/beats" replace />} />
+            <Route path="/beats-new/oroi" element={<Navigate to="/beats/oroi" replace />} />
             <Route path="/store" element={<Store />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/podcasts" element={<Podcasts />} />
@@ -96,7 +98,7 @@ function AppContent() {
       {idle && (
         <Suspense fallback={null}>
           <LicenseModal />
-          {!location.pathname.startsWith("/beats-new") && <ChatbotWidget />}
+          {!isVmt && <ChatbotWidget />}
         </Suspense>
       )}
     </div>

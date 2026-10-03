@@ -63,7 +63,7 @@ export async function onRequestGet({ request, env }) {
   const lic = (fields.license?.stringValue || '').toLowerCase();
   const slug = fields.slug?.stringValue || slugOf(beatTitle);
   const expiresAt = fields.expiresAt?.stringValue;
-  if (expiresAt && new Date(expiresAt) < new Date()) return fail('Η άδεια MP3 έληξε. Ανανέωσέ την ή πάρε τον WAV στο blackvybez.gr/beats-new.', 410);
+  if (expiresAt && new Date(expiresAt) < new Date()) return fail('Η άδεια MP3 έληξε. Ανανέωσέ την ή πάρε τον WAV στο blackvybez.gr/beats.', 410);
   if (!(FILES_FOR_LICENSE[lic] || []).includes(f)) return fail('Αυτό το αρχείο δεν ανήκει στην άδειά σου.');
 
   const beat = (beatsData.beatslist || []).find((b) => slugOf(b.title) === slug);

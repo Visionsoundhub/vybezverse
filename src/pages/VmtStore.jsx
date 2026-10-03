@@ -416,15 +416,10 @@ export default function VmtStore() {
 
   useEffect(() => () => audio.current?.pause(), []);
 
-  // Κρυφή σελίδα μέχρι να εγκριθεί: να μη μπει στη Google.
   useEffect(() => {
-    const m = document.createElement('meta');
-    m.name = 'robots';
-    m.content = 'noindex, nofollow';
-    document.head.appendChild(m);
     const prevTitle = document.title;
-    document.title = 'VMT Beats | vybezmadethis';
-    return () => { m.remove(); document.title = prevTitle; };
+    document.title = 'Beats για rap και trap | vybezmadethis';
+    return () => { document.title = prevTitle; };
   }, []);
 
   const listed = useMemo(() => {
@@ -476,6 +471,7 @@ export default function VmtStore() {
   });
   const [cartOpen, setCartOpen] = useState(false);
   const [mineOpen, setMineOpen] = useState(false);
+  const [agree, setAgree] = useState(false);
   const [paying, setPaying] = useState(false);
   const [payError, setPayError] = useState('');
   useEffect(() => {
@@ -512,6 +508,7 @@ export default function VmtStore() {
   // Πληρωμή: ο server υπολογίζει το σύνολο (2+1, VIP, Black Friday) και ανοίγει το Polar πάνω από τη σελίδα.
   const checkout = async (items, fromCart) => {
     if (Date.now() - openedAt.current < 450 || paying) return;
+    if (!agree) { setPayError('Τσέκαρε πρώτα το κουτάκι με τους όρους.'); return; }
     setPaying(true);
     setPayError('');
     try {
@@ -558,12 +555,12 @@ export default function VmtStore() {
     <div className="vmt" ref={rootRef}>
       <div className="vmt-grain" aria-hidden="true" />
       <nav className="vmt-top">
-        <a href="/beats-new" className="vmt-top-brand"><img src="/assets/vmt/vmt-logo-white.png" alt="" /> vybezmadethis</a>
+        <a href="/beats" className="vmt-top-brand"><img src="/assets/vmt/vmt-logo-white.png" alt="" /> vybezmadethis</a>
         <div className="vmt-top-right">
           <a href="/" className="vmt-top-back"><ArrowLeft size={14} /><span>blackvybez.gr</span></a>
           {currentUser
             ? <button className="vmt-top-link" onClick={() => setMineOpen(true)}>Τα beats μου</button>
-            : <a href="/account?next=/beats-new" className="vmt-top-link">Σύνδεση</a>}
+            : <a href="/account?next=/beats" className="vmt-top-link">Σύνδεση</a>}
           <button className="vmt-top-cart" onClick={() => setCartOpen(true)} aria-label="Καλάθι">
             <ShoppingCart size={18} />{priced.lines.length > 0 && <span>{priced.lines.length}</span>}
           </button>
@@ -609,7 +606,7 @@ export default function VmtStore() {
       ) : (
         <div className="vmt-login">
           <p><strong>Μπες στο account σου</strong> και κάθε beat που παίρνεις μετράει για μόνιμη έκπτωση: 10% από τα 3 beats, 15% από τα 6, 30% από τα 10. Τα αρχεία σου μένουν εκεί για πάντα.</p>
-          <a className="vmt-ghost" href="/account?next=/beats-new">Σύνδεση ή εγγραφή</a>
+          <a className="vmt-ghost" href="/account?next=/beats">Σύνδεση ή εγγραφή</a>
         </div>
       )}
 
@@ -746,6 +743,7 @@ export default function VmtStore() {
       <footer className="vmt-foot">
         <span>vybezmadethis · The Robe Producer</span>
         <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        <a href="/beats/oroi">Όροι, άδειες και απόρρητο</a>
         <a href="/" className="vmt-foot-bv">part of Black Vybez</a>
       </footer>
 
@@ -784,9 +782,13 @@ export default function VmtStore() {
                 <div className="vmt-cart-sum">
                   {priced.bundleSaving > 0 && <p><span>{PROMOS.bundle.label}</span><span>−{euro(priced.bundleSaving)}</span></p>}
                   {priced.discount > 0 && <p><span>{priced.reason} {priced.percent}%</span><span>−{euro(priced.discount)}</span></p>}
-                  <p className="total"><span>Σύνολο</span><span>{euro(priced.total)}</span></p>
+                  <p className="total"><span>Σύνολο <small>με ΦΠΑ</small></span><span>{euro(priced.total)}</span></p>
                   {(priced.bundleSaving + priced.discount) > 0 && <p className="vmt-save">Κερδίζεις {euro(priced.bundleSaving + priced.discount)}</p>}
                 </div>
+                <label className="vmt-consent">
+                  <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setPayError(''); }} />
+                  <span>Θέλω τα αρχεία αμέσως και ξέρω ότι μετά τη λήψη δεν γίνεται υπαναχώρηση. Δέχομαι τους <a href="/beats/oroi" target="_blank" rel="noopener">όρους και τις άδειες</a>.</span>
+                </label>
                 {payError && <p className="vmt-error">{payError}</p>}
                 <button className="vmt-buy" disabled={paying} onClick={() => { openedAt.current = 0; checkout(cart, true); }}>
                   {paying ? 'Ανοίγει η πληρωμή…' : `Πληρωμή ${euro(priced.total)}`}
@@ -862,6 +864,10 @@ export default function VmtStore() {
                 <span className="vmt-lcd">{licenseBeat.bpm}<small>BPM</small></span>
               </div>
             )}
+            <label className="vmt-consent">
+              <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setPayError(''); }} />
+              <span>Θέλω τα αρχεία αμέσως και ξέρω ότι μετά τη λήψη δεν γίνεται υπαναχώρηση. Δέχομαι τους <a href="/beats/oroi" target="_blank" rel="noopener">όρους και τις άδειες</a>.</span>
+            </label>
             <div className="vmt-lic">
               {LICENSES.map((l) => {
                 const can = licensesFor(licenseBeat).includes(l.key);
@@ -891,7 +897,7 @@ export default function VmtStore() {
             </div>
             {payError && <p className="vmt-error">{payError}</p>}
             {PROMOS.bundle.active && <p className="vmt-fine vmt-promo">{PROMOS.bundle.label}: βάλε 3 beats στο καλάθι και το φθηνότερο είναι δώρο.</p>}
-            <p className="vmt-fine vmt-secure"><Lock size={13} /> Ασφαλής πληρωμή μέσω Polar (στα αγγλικά, πατάς «Pay now»). Τα αρχεία έρχονται αμέσως στο email σου.</p>
+            <p className="vmt-fine vmt-secure"><Lock size={13} /> Τιμές με ΦΠΑ. Ασφαλής πληρωμή μέσω Polar (στα αγγλικά, πατάς «Pay now»). Τα αρχεία έρχονται αμέσως στο email σου.</p>
             <p className="vmt-fine">
               Θες το {licenseBeat.title} μόνο για σένα; <a href={mailto(`Αποκλειστικότητα: ${licenseBeat.title}`)}>Επικοινωνία για αποκλειστικότητα</a>.
             </p>

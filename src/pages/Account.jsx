@@ -56,7 +56,7 @@ function Account() {
     fetchAccountData();
   }, [currentUser]);
 
-  // Μετά τη σύνδεση γυρνάει εκεί που ήταν (π.χ. ?next=/beats-new από το beat store).
+  // Μετά τη σύνδεση γυρνάει εκεί που ήταν (π.χ. ?next=/beats από το beat store).
   useEffect(() => {
     if (!currentUser) return;
     const next = new URLSearchParams(window.location.search).get('next') || '';
@@ -253,7 +253,7 @@ function Account() {
             <div className="account-empty-state">
               <AlertCircle size={36} opacity={0.5} />
               <p>Δεν έχεις πάρει beat ακόμα.</p>
-              <a href="/beats-new" className="btn-outline" style={{ marginTop: 16, display: 'inline-block' }}>Δες τα beats</a>
+              <a href="/beats" className="btn-outline" style={{ marginTop: 16, display: 'inline-block' }}>Δες τα beats</a>
             </div>
           )}
         </div>
