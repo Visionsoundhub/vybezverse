@@ -580,3 +580,11 @@ body:has(.vmt-player) { padding-bottom: 110px; }
   .vmt-similar { padding: 36px 10px 12px; }
   .vmt-similar-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+/* κινητό οριζόντια: όχι μεγάλωμα γραμμάτων από το iPhone, και η λίστα χωράει πάντα */
+html:has(.vmt) { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+.vmt-list li { min-width: 0; }
+.vmt-list li > * { flex-shrink: 0; }
+.vmt-list li > .vmt-row-main { flex: 1 1 0; min-width: 0; flex-shrink: 1; }
+@media (max-width: 1000px) { .vmt-list .vmt-row-n, .vmt-list .vmt-lcd-key { display: none; } }
+@media (max-width: 900px) and (orientation: landscape) { .vmt-list .vmt-lcd { display: none; } }
