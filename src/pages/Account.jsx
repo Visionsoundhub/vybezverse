@@ -252,7 +252,8 @@ function Account() {
           ) : (
             <div className="account-empty-state">
               <AlertCircle size={36} opacity={0.5} />
-              <p>Δεν έχεις αγοράσει Instrumentals ακόμα.</p>
+              <p>Δεν έχεις πάρει beat ακόμα.</p>
+              <a href="/beats-new" className="btn-outline" style={{ marginTop: 16, display: 'inline-block' }}>Δες τα beats</a>
             </div>
           )}
         </div>

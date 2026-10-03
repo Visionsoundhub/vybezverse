@@ -52,6 +52,8 @@ function NotFound() {
 function AppContent() {
   const location = useLocation();
   const isLinksPage = location.pathname === '/links';
+  // Το VMT store έχει δικό του header/footer (άλλο brand).
+  const isVmt = location.pathname.startsWith('/beats-new');
   const [idle, setIdle] = useState(false);
   useEffect(() => {
     const go = () => setIdle(true);
@@ -62,7 +64,7 @@ function AppContent() {
   return (
     <div className="app-container">
       {/* Sticky Navbar */}
-      {!isLinksPage && <Navbar />}
+      {!isLinksPage && !isVmt && <Navbar />}
 
       <main>
         <Suspense fallback={<PageLoader />}>
@@ -88,7 +90,7 @@ function AppContent() {
         </Suspense>
       </main>
 
-      {!isLinksPage && <Footer />}
+      {!isLinksPage && !isVmt && <Footer />}
 
       <AudioPlayer />
       {idle && (
