@@ -57,6 +57,8 @@ function MiniWave({ peaks = [], progress = 0 }) {
   );
 }
 const pad = (n) => String(n).padStart(2, '0');
+// Το είδος του beat: category, αλλιώς το πρώτο tag.
+const genreOf = (b) => String(b?.category || (b?.tags || [])[0] || '').toLowerCase();
 
 // Κοινοποίηση: στο κινητό ανοίγει το μενού του κινητού (Instagram, Viber, WhatsApp...),
 // αλλιώς αντιγράφει το link της σελίδας του beat.
@@ -415,11 +417,11 @@ export default function VmtStore() {
   const { slug: linkSlug } = useParams();
   const linked = linkSlug ? all.find((b) => slugOf(b.title) === linkSlug) : null;
   const hero = linked || forSale.find((b) => b.featured) || forSale[0];
-  // Παρόμοια με το beat της σελίδας (κοινά tags ή διάθεση). Αν δεν υπάρχει κανένα, δείχνουμε απλά άλλα beats.
+  // Παρόμοια με το beat της σελίδας = ίδιο είδος (afrotrap, boom bap, drill...). Αν δεν υπάρχει κανένα, δείχνουμε απλά άλλα beats.
   const similar = linked
     ? forSale
       .filter((b) => b.title !== linked.title)
-      .map((b) => ({ b, score: [...(b.tags || []), ...(b.mood || [])].filter((t) => [...(linked.tags || []), ...(linked.mood || [])].includes(t)).length }))
+      .map((b) => ({ b, score: genreOf(b) === genreOf(linked) ? 1 : 0 }))
       .sort((x, y) => y.score - x.score)
     : [];
   // Όταν ανοίγει σελίδα beat από τη λίστα, ανεβαίνει πάνω να το δεις (η μουσική δεν σταματάει).
@@ -477,7 +479,7 @@ export default function VmtStore() {
   useEffect(() => {
     const prevTitle = document.title;
     document.title = linked
-      ? `${linked.title}, ${(linked.tags || [])[0] || 'beat'} beat ${linked.bpm} BPM | vybezmadethis`
+      ? `${linked.title}, ${genreOf(linked) || 'beat'} beat ${linked.bpm} BPM | vybezmadethis`
       : 'Beats για rap και trap | vybezmadethis';
     return () => { document.title = prevTitle; };
   }, [linked]);
@@ -695,7 +697,7 @@ export default function VmtStore() {
               <button className="vmt-play show" aria-label="Play">{isOn(hero) ? <Pause size={30} /> : <Play size={30} />}</button>
             </div>
             <div className="vmt-week-body">
-              <p className="vmt-kicker">{linked ? `${(linked.tags || [])[0] || ''} BEAT · VYBEZMADETHIS`.trim().toUpperCase() : 'BEAT ΤΗΣ ΕΒΔΟΜΑΔΑΣ'}</p>
+              <p className="vmt-kicker">{linked ? `${genreOf(linked)} BEAT · VYBEZMADETHIS`.trim().toUpperCase() : 'BEAT ΤΗΣ ΕΒΔΟΜΑΔΑΣ'}</p>
               <h2><Link to={`/beats/${slugOf(hero.title)}`} className="vmt-title-link">{hero.title}</Link></h2>
               <p className="vmt-specs">{hero.bpm} BPM · {hero.key} · {(hero.mood || []).join(' · ')}</p>
               <Rack step={step} active={isOn(hero)} />

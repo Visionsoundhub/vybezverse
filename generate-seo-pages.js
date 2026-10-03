@@ -329,7 +329,7 @@ ${mdToHtml(bioData?.content || '')}`,
   for (const b of beatsFile.beatslist.filter((x) => x.status !== 'sold')) {
     const slug = beatSlug(b.title);
     const t = [...(b.tags || []), ...(b.mood || [])];
-    const style = (b.tags || [])[0] || 'beat';
+    const style = b.category || (b.tags || [])[0] || 'beat';
     const title = `${b.title}, ${style} beat ${b.bpm} BPM | vybezmadethis`;
     const description = `${b.title}: ${t.join(', ')} beat στα ${b.bpm} BPM σε ${b.key}, από τον παραγωγό vybezmadethis. Άκου το, γράψε πάνω του και πάρ' το από 19,99€ με άμεση λήψη.`;
     let html = injectStaticBody(injectMetaTags(baseHtml, { title, description, urlPath: `beats/${slug}`, imageUrl: b.cover }),
