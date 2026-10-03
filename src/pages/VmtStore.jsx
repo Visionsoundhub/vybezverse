@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame, ShoppingCart, Trash2, Lock, ArrowLeft, LogOut, Download, Share2 } from 'lucide-react';
 import beatsData from '../data/beats.json';
 import { useAuth } from '../context/AuthContext';
@@ -415,6 +415,8 @@ export default function VmtStore() {
   const { slug: linkSlug } = useParams();
   const linked = linkSlug ? all.find((b) => slugOf(b.title) === linkSlug) : null;
   const hero = linked || forSale.find((b) => b.featured) || forSale[0];
+  // Όταν ανοίγει σελίδα beat από τη λίστα, ανεβαίνει πάνω να το δεις (η μουσική δεν σταματάει).
+  useEffect(() => { if (linkSlug) window.scrollTo({ top: 0, behavior: 'smooth' }); }, [linkSlug]);
 
   const [door, setDoor] = useState('list'); // feed | list
   const [showLic, setShowLic] = useState(false);
@@ -683,7 +685,7 @@ export default function VmtStore() {
             </div>
             <div className="vmt-week-body">
               <p className="vmt-kicker">{linked ? `${(linked.tags || [])[0] || ''} BEAT · VYBEZMADETHIS`.trim().toUpperCase() : 'BEAT ΤΗΣ ΕΒΔΟΜΑΔΑΣ'}</p>
-              <h2>{hero.title}</h2>
+              <h2><Link to={`/beats/${slugOf(hero.title)}`} className="vmt-title-link">{hero.title}</Link></h2>
               <p className="vmt-specs">{hero.bpm} BPM · {hero.key} · {(hero.mood || []).join(' · ')}</p>
               <Rack step={step} active={isOn(hero)} />
               <div className="vmt-desk"><Waveform peaks={hero.peaks} progress={current?.title === hero.title ? progress : 0} onSeek={(f) => seek(hero, f)} /></div>
@@ -774,7 +776,7 @@ export default function VmtStore() {
                     </button>
                     <img src={b.cover} alt="" loading="lazy" className={`vmt-tone ${isOn(b) ? 'spin' : ''}`} />
                     <div className="vmt-row-main">
-                      <strong>{b.title}</strong>
+                      <strong><Link to={`/beats/${slugOf(b.title)}`} className="vmt-title-link" title="Η σελίδα του beat">{b.title}</Link></strong>
                       <span>{(b.mood || []).join(' · ')}</span>
                     </div>
                     <MiniWave peaks={b.peaks} progress={current?.title === b.title ? progress : 0} />

@@ -548,3 +548,7 @@ body:has(.vmt-player) { padding-bottom: 110px; }
 .vmt-consent.need { color: var(--vmt-text); outline: 1px solid #ff6b6b; outline-offset: 6px; border-radius: 4px; animation: vmtshake .35s; }
 @keyframes vmtshake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
 .vmt-consent + .vmt-error { margin: -6px 0 14px; }
+
+/* τίτλος beat = link στη σελίδα του */
+.vmt-title-link { color: inherit; text-decoration: none; }
+.vmt-title-link:hover { color: var(--vmt-accent); text-decoration: underline; text-underline-offset: 4px; }

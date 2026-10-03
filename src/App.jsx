@@ -70,9 +70,8 @@ function AppContent() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<HomeV2 />} />
-            <Route path="/beats" element={<VmtStore />} />
             <Route path="/beats/oroi" element={<VmtLegal />} />
-            <Route path="/beats/:slug" element={<VmtStore />} />
+            <Route path="/beats/:slug?" element={<VmtStore />} />
             <Route path="/beats-new" element={<Navigate to="/beats" replace />} />
             <Route path="/beats-new/oroi" element={<Navigate to="/beats/oroi" replace />} />
             <Route path="/store" element={<Store />} />
