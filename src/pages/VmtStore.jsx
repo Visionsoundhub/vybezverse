@@ -665,7 +665,10 @@ export default function VmtStore() {
         </div>
       </nav>
       {/* 1. Μεγάλο VMT + beat της εβδομάδας */}
-      <header className="vmt-hero">
+      <header className={`vmt-hero ${linked ? 'vmt-hero-beat' : ''}`}>
+        {linked ? (
+          <Link to="/beats" className="vmt-back"><ArrowLeft size={16} /> Όλα τα beats</Link>
+        ) : (
         <div className="vmt-hero-brand">
           <img src="/assets/vmt/vmt-logo-white.png" alt="VMT" className={`vmt-logo-xl ${playing ? 'live' : ''}`} />
           <div>
@@ -674,6 +677,7 @@ export default function VmtStore() {
             <p className="vmt-sub">Cooking heat in my wife's robe.</p>
           </div>
         </div>
+        )}
 
         {hero && (
           <div className="vmt-week">
@@ -695,12 +699,47 @@ export default function VmtStore() {
                 <ShareButton beat={hero} />
               </div>
               <p className="vmt-hint vmt-rec-hint">Ράψε πάνω του: γράψε 20″ με τη φωνή σου και άκου αν κάθεται, πριν το πάρεις.</p>
+              {linked && (linked.tags || []).length > 0 && (
+                <div className="vmt-chips">{[...(linked.tags || []), ...(linked.mood || [])].map((t) => <span key={t}>#{t}</span>)}</div>
+              )}
             </div>
+          </div>
+        )}
+        {linked && (
+          <div className="vmt-beat-lic">
+            {LICENSES.filter((l) => licensesFor(linked).includes(l.key)).map((l) => (
+              <button key={l.key} className={`vmt-beat-lic-card ${l.featured ? 'feat' : ''}`} onClick={() => openLicenses(linked)}>
+                <span className="vmt-beat-lic-name">{l.name}</span>
+                <strong>{l.price}</strong>
+                <small>{l.features[1]}</small>
+              </button>
+            ))}
           </div>
         )}
       </header>
 
-      {currentUser ? (
+      {linked && (
+        <section className="vmt-similar">
+          <Bar>ΚΙ ΑΛΛΑ ΣΑΝ ΑΥΤΟ</Bar>
+          <div className="vmt-similar-grid">
+            {forSale
+              .filter((b) => b.title !== linked.title)
+              .map((b) => ({ b, score: [...(b.tags || []), ...(b.mood || [])].filter((t) => [...(linked.tags || []), ...(linked.mood || [])].includes(t)).length }))
+              .sort((x, y) => y.score - x.score)
+              .slice(0, 4)
+              .map(({ b }) => (
+                <Link key={b.title} to={`/beats/${slugOf(b.title)}`} className="vmt-similar-card">
+                  <img src={b.cover} alt="" className="vmt-tone" loading="lazy" />
+                  <strong>{b.title}</strong>
+                  <span>{b.bpm} BPM · {b.key}</span>
+                </Link>
+              ))}
+          </div>
+          <Link to="/beats" className="vmt-ghost vmt-more">Δες όλα τα beats</Link>
+        </section>
+      )}
+
+      {linked ? null : currentUser ? (
         <div className="vmt-vip"><LoyaltyProgressBar /></div>
       ) : (
         <div className="vmt-login">
@@ -709,6 +748,7 @@ export default function VmtStore() {
         </div>
       )}
 
+      {!linked && <>
       <div className="vmt-marquee" aria-hidden="true">
         <div>{[0, 1].map((k) => <span key={k}>{forSale.map((b) => `COOKING HEAT · ${b.title} · ${b.bpm} BPM · ${b.key} · `).join('')}</span>)}</div>
       </div>
@@ -802,6 +842,7 @@ export default function VmtStore() {
           </div>
         )}
       </section>
+      </>}
 
       <Divider />
 

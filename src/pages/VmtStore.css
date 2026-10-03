@@ -552,3 +552,31 @@ body:has(.vmt-player) { padding-bottom: 110px; }
 /* τίτλος beat = link στη σελίδα του */
 .vmt-title-link { color: inherit; text-decoration: none; }
 .vmt-title-link:hover { color: var(--vmt-accent); text-decoration: underline; text-underline-offset: 4px; }
+
+/* ---- σελίδα beat ---- */
+.vmt-back { display: inline-flex; align-items: center; gap: 6px; color: var(--vmt-muted); text-decoration: none; font-family: var(--mono); font-size: 13px; margin: 0 0 18px; }
+.vmt-back:hover { color: var(--vmt-accent); }
+.vmt-hero-beat { margin-bottom: 40px; }
+.vmt-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 14px; }
+.vmt-chips span { font-family: var(--mono); font-size: 12px; color: var(--vmt-muted); border: 1px solid var(--vmt-line); border-radius: 3px; padding: 4px 8px; }
+.vmt-beat-lic { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 14px; }
+.vmt-beat-lic-card { display: grid; gap: 4px; text-align: left; background: #1d1a17; border: 1px solid var(--vmt-line); border-radius: 4px; padding: 14px; color: var(--vmt-text); cursor: pointer; font: inherit; }
+.vmt-beat-lic-card:hover { border-color: var(--vmt-soft); }
+.vmt-beat-lic-card.feat { border-color: var(--vmt-accent); background: linear-gradient(180deg, rgba(255,102,0,.10), #1d1a17); }
+.vmt-beat-lic-name { font-family: var(--mono); font-size: 12px; letter-spacing: .12em; color: var(--vmt-muted); }
+.vmt-beat-lic-card strong { font-family: 'TheBoldFont', sans-serif; font-size: 28px; }
+.vmt-beat-lic-card small { color: var(--vmt-muted); font-size: 12px; }
+.vmt-similar { max-width: 1100px; margin: 0 auto 64px; position: relative; background: #181513; border: 1px solid var(--vmt-line); border-radius: 4px; padding: 42px 16px 16px; }
+.vmt-similar-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+.vmt-similar-card { display: grid; gap: 4px; text-decoration: none; color: var(--vmt-text); }
+.vmt-similar-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 3px; }
+.vmt-similar-card strong { font-family: 'TheBoldFont', sans-serif; font-size: 18px; text-transform: uppercase; }
+.vmt-similar-card span { font-family: var(--mono); font-size: 11px; color: var(--vmt-muted); }
+.vmt-similar-card:hover strong { color: var(--vmt-accent); }
+@media (max-width: 720px) {
+  .vmt-beat-lic { grid-template-columns: 1fr; }
+  .vmt-beat-lic-card { grid-template-columns: auto 1fr auto; align-items: center; }
+  .vmt-beat-lic-card small { grid-column: 1 / -1; }
+  .vmt-similar { padding: 36px 10px 12px; }
+  .vmt-similar-grid { grid-template-columns: repeat(2, 1fr); }
+}
