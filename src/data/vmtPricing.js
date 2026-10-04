@@ -8,6 +8,13 @@ import { tierForPurchases } from './loyaltyTiers';
 // Τιμές σε λεπτά.
 export const LICENSE_PRICES = { mp3: 1999, wav: 2499, stems: 4999 };
 export const LICENSE_NAMES = { mp3: 'MP3', wav: 'WAV', stems: 'Stems' };
+// «Από το αρχείο»: παλιότερα beats χωρίς stems ή με πιο πρόχειρη μίξη (στο beats.json: "tier": "archive").
+export const ARCHIVE_PRICES = { mp3: 1499, wav: 1799 };
+export const isArchive = (beat) => beat?.tier === 'archive';
+// Η τιμή μιας άδειας για ένα συγκεκριμένο beat.
+export function priceFor(beat, lic) {
+  return (isArchive(beat) && ARCHIVE_PRICES[lic]) || LICENSE_PRICES[lic];
+}
 
 export const PROMOS = {
   // Πάρε 2, το 3ο (το φθηνότερο) δωρεάν. Ισχύει για κάθε τριάδα στο καλάθι.
@@ -50,7 +57,7 @@ export function priceCart(items, beatCount = 0, now = new Date()) {
     .map((it) => {
       const beat = beatBySlug(it.slug);
       if (!beat || beat.status === 'sold' || !licensesFor(beat).includes(it.license)) return null;
-      return { slug: it.slug, title: beat.title, license: it.license, price: LICENSE_PRICES[it.license], free: false };
+      return { slug: it.slug, title: beat.title, license: it.license, price: priceFor(beat, it.license), free: false };
     })
     .filter(Boolean);
 
@@ -95,7 +102,7 @@ export function afterOffers({ license, createdAt, expiresAt, slug }, now = new D
   if (lic === 'mp3') {
     const left = expiresAt ? (new Date(expiresAt) - now) / DAY : 0;
     if (left < 60) out.push({ kind: 'renew', price: AFTER.renewMp3, label: 'Ανανέωση για 1 χρόνο' });
-    if (beat?.files?.wav) out.push({ kind: 'wav', price: AFTER.toWav, label: "Κάν' το WAV για πάντα" });
+    if (beat?.files?.wav) out.push({ kind: 'wav', price: Math.min(AFTER.toWav, priceFor(beat, 'wav') - priceFor(beat, 'mp3')), label: "Κάν' το WAV για πάντα" });
   }
   if ((lic === 'mp3' || lic === 'wav') && beat?.files?.stems) {
     const diff = LICENSE_PRICES.stems - LICENSE_PRICES[lic];

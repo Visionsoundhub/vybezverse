@@ -331,11 +331,11 @@ ${mdToHtml(bioData?.content || '')}`,
     const t = [...(b.tags || []), ...(b.mood || [])];
     const style = b.category || (b.tags || [])[0] || 'beat';
     const title = `${b.title}, ${style} beat ${b.bpm} BPM | vybezmadethis`;
-    const description = `${b.title}: ${t.join(', ')} beat στα ${b.bpm} BPM σε ${b.key}, από τον παραγωγό vybezmadethis. Άκου το, γράψε πάνω του και πάρ' το από 19,99€ με άμεση λήψη.`;
+    const description = `${b.title}: ${t.join(', ')} beat στα ${b.bpm} BPM σε ${b.key}, από τον παραγωγό vybezmadethis. Άκου το, γράψε πάνω του και πάρ' το από ${b.tier === 'archive' ? '14,99' : '19,99'}€ με άμεση λήψη.`;
     let html = injectStaticBody(injectMetaTags(baseHtml, { title, description, urlPath: `beats/${slug}`, imageUrl: b.cover }),
       `<h1>${esc(b.title)}</h1>
 <p>${esc(t.join(', '))} beat, ${esc(b.bpm)} BPM, ${esc(b.key)}. Παραγωγή vybezmadethis.</p>
-<p>Άδειες: MP3 19,99€, WAV 24,99€, Stems 49,99€. Άμεση λήψη χωρίς tag.</p>
+<p>Άδειες: ${b.tier === 'archive' ? 'MP3 14,99€, WAV 17,99€' : `MP3 19,99€, WAV 24,99€${b.files?.stems ? ', Stems 49,99€' : ''}`}. Άμεση λήψη χωρίς tag.</p>
 <p><a href="/beats">Όλα τα beats</a> · <a href="/beats/oroi">Όροι και άδειες</a></p>`);
     const product = {
       '@context': 'https://schema.org',
@@ -346,7 +346,7 @@ ${mdToHtml(bioData?.content || '')}`,
       keywords: [...t, 'beat', 'instrumental', `${b.bpm} bpm`].join(', '),
       category: style,
       brand: { '@type': 'Brand', name: 'vybezmadethis' },
-      offers: { '@type': 'AggregateOffer', priceCurrency: 'EUR', lowPrice: '19.99', highPrice: '49.99', offerCount: 3, availability: 'https://schema.org/InStock', url: `${SITE_URL}/beats/${slug}` },
+      offers: { '@type': 'AggregateOffer', priceCurrency: 'EUR', lowPrice: b.tier === 'archive' ? '14.99' : '19.99', highPrice: b.tier === 'archive' ? '17.99' : (b.files?.stems ? '49.99' : '24.99'), offerCount: b.files?.stems ? 3 : 2, availability: 'https://schema.org/InStock', url: `${SITE_URL}/beats/${slug}` },
     };
     html = html.replace('</head>', `  <script type="application/ld+json">${JSON.stringify(product)}</script>\n</head>`);
     const fp = path.join(DIST_DIR, 'beats', `${slug}.html`);

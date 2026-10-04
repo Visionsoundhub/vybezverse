@@ -12,7 +12,7 @@
 
 import { tierForPurchases } from '../src/data/loyaltyTiers';
 import { getGoogleAccessToken } from '../src/utils/firebaseAdmin';
-import { beatBySlug, LICENSE_PRICES, LICENSE_NAMES, slugOf } from '../src/data/vmtPricing';
+import { beatBySlug, LICENSE_NAMES, slugOf, priceFor } from '../src/data/vmtPricing';
 import { downloadLink, FILES_FOR_LICENSE, FILE_LABEL } from '../src/utils/vmtServer';
 
 const MP3_DAYS = 365;
@@ -134,7 +134,7 @@ function itemsOf(o) {
     const raw = String(meta.items).split(',').map((x) => {
       const [slug, lic, free] = x.split(':');
       const beat = beatBySlug(slug);
-      return { slug, beat: beat?.title || slug, license: LICENSE_NAMES[lic] || lic, price: free === '1' ? 0 : LICENSE_PRICES[lic] || 0 };
+      return { slug, beat: beat?.title || slug, license: LICENSE_NAMES[lic] || lic, price: free === '1' ? 0 : priceFor(beat, lic) || 0 };
     });
     const sum = raw.reduce((a, r) => a + r.price, 0) || 1;
     const totalCents = Math.round(total * 100);

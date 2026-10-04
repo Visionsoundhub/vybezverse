@@ -5,7 +5,9 @@ import beatsData from '../data/beats.json';
 import { useAuth } from '../context/AuthContext';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
 import useBeatPurchases from '../utils/useBeatPurchases';
-import { priceCart, licensesFor, slugOf, euro, PROMOS, afterOffers } from '../data/vmtPricing';
+import { priceCart, licensesFor, slugOf, euro, PROMOS, afterOffers, priceFor, isArchive } from '../data/vmtPricing';
+// «από 19,99€» ή «από 14,99€» για beat από το αρχείο
+const fromPrice = (b) => euro(priceFor(b, 'mp3'));
 import './VmtStore.css';
 
 // VMT beat store: αγορές μέσω Polar (embedded checkout, ο πελάτης δεν φεύγει από το site).
@@ -706,10 +708,11 @@ export default function VmtStore() {
               <p className="vmt-kicker">{linked ? `${genreOf(linked)} BEAT · VYBEZMADETHIS`.trim().toUpperCase() : 'BEAT ΤΗΣ ΕΒΔΟΜΑΔΑΣ'}</p>
               <h2><Link to={`/beats/${slugOf(hero.title)}`} className="vmt-title-link">{hero.title}</Link></h2>
               <p className="vmt-specs">{hero.bpm} BPM · {hero.key} · {(hero.mood || []).join(' · ')}</p>
+              {isArchive(hero) && <p className="vmt-archive-note">Από το αρχείο: παλιότερο beat, σε χαμηλότερη τιμή.</p>}
               <Rack step={step} active={isOn(hero)} />
               <div className="vmt-desk"><Waveform peaks={hero.peaks} progress={current?.title === hero.title ? progress : 0} onSeek={(f) => seek(hero, f)} /></div>
               <div className="vmt-actions">
-                <button className="vmt-buy" onClick={() => openLicenses(hero)}>Αγορά από 19,99€</button>
+                <button className="vmt-buy" onClick={() => openLicenses(hero)}>Αγορά από {fromPrice(hero)}</button>
                 <button className="vmt-ghost" onClick={() => { stop(); setRecBeat(hero); }}><Mic size={16} /> Ράψε πάνω του</button>
                 <ShareButton beat={hero} />
               </div>
@@ -725,7 +728,7 @@ export default function VmtStore() {
             {LICENSES.filter((l) => licensesFor(linked).includes(l.key)).map((l) => (
               <button key={l.key} className={`vmt-beat-lic-card ${l.featured ? 'feat' : ''}`} onClick={() => openLicenses(linked)}>
                 <span className="vmt-beat-lic-name">{l.name}</span>
-                <strong>{l.price}</strong>
+                <strong>{euro(priceFor(linked, l.key))}</strong>
                 <small>{l.features[1]}</small>
               </button>
             ))}
@@ -849,6 +852,7 @@ export default function VmtStore() {
                     </button>
                     <img src={b.cover} alt="" loading="lazy" className={`vmt-tone ${isOn(b) ? 'spin' : ''}`} />
                     <div className="vmt-row-main">
+                      {isArchive(b) && <em className="vmt-archive">ΑΠΟ ΤΟ ΑΡΧΕΙΟ</em>}
                       <strong><Link to={`/beats/${slugOf(b.title)}`} className="vmt-title-link" title="Η σελίδα του beat">{b.title}</Link></strong>
                       <span>{(b.mood || []).join(' · ')}</span>
                     </div>
@@ -861,7 +865,7 @@ export default function VmtStore() {
                       <>
                         <button className="vmt-row-mic" onClick={() => { stop(); setRecBeat(b); }} aria-label="Ράψε πάνω του"><Mic size={18} /></button>
                         <ShareButton beat={b} small />
-                        <button className="vmt-ghost vmt-price-btn" onClick={(e) => { e.stopPropagation(); openLicenses(b); }}>19,99€</button>
+                        <button className="vmt-ghost vmt-price-btn" onClick={(e) => { e.stopPropagation(); openLicenses(b); }}>{fromPrice(b)}</button>
                       </>
                     )}
                   </li>
@@ -999,7 +1003,7 @@ export default function VmtStore() {
             <p className="vmt-kicker">{recBeat.title}</p>
             <RecordOver key={recBeat.title} beat={recBeat} />
             <button className="vmt-buy" style={{ marginTop: 18 }} onClick={() => { openLicenses(recBeat); setRecBeat(null); }}>
-              Κάθεται; Πάρ' το από 19,99€
+              Κάθεται; Πάρ' το από {fromPrice(recBeat)}
             </button>
           </div>
         </div>
@@ -1051,8 +1055,8 @@ export default function VmtStore() {
                   <div key={l.key} className={`vmt-lic-card ${l.featured ? 'feat' : ''}`}>
                     {l.featured && <span className="vmt-ribbon">Η ΠΡΟΤΑΣΗ ΤΟΥ ΠΑΡΑΓΩΓΟΥ</span>}
                     <h3>{l.name}</h3>
-              {l.note && <p className="vmt-lic-note">{l.note}</p>}
-                    <p className="vmt-price">{l.price}</p>
+              {l.note && <p className="vmt-lic-note">{isArchive(licenseBeat) ? `Μόνο ${euro(priceFor(licenseBeat, 'wav') - priceFor(licenseBeat, 'mp3'))} παραπάνω, και είναι δικό σου για πάντα` : l.note}</p>}
+                    <p className="vmt-price">{euro(priceFor(licenseBeat, l.key))}</p>
                     <ul>{l.features.map((f) => <li key={f}><Check size={14} /> {f}</li>)}</ul>
                     {can ? (
                       <div className="vmt-lic-btns">
