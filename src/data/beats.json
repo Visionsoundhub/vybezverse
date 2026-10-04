@@ -183,7 +183,8 @@
       "files": {
         "mp3": "beats/ahyoka/mp3.mp3",
         "wav": "beats/ahyoka/wav.wav"
-      }
+      },
+      "tier": "archive"
     },
     {
       "title": "LOST",
