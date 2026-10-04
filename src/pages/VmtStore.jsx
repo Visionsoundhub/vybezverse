@@ -418,7 +418,12 @@ export default function VmtStore() {
   const forSale = all.filter((b) => b.status !== 'sold');
   const { slug: linkSlug } = useParams();
   const linked = linkSlug ? all.find((b) => slugOf(b.title) === linkSlug) : null;
-  const hero = linked || forSale.find((b) => b.featured) || forSale[0];
+  // Beat της εβδομάδας: αυτό με το πιο πρόσφατο weekOf (ΕΕΕΕ-ΜΜ-ΔΔ, Τρίτη) που έχει ήδη φτάσει. Αλλιώς featured, αλλιώς το πρώτο.
+  const todayIso = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Athens' });
+  const ofWeek = forSale
+    .filter((b) => b.weekOf && b.weekOf <= todayIso)
+    .sort((a, b) => (a.weekOf < b.weekOf ? 1 : -1))[0];
+  const hero = linked || ofWeek || forSale.find((b) => b.featured) || forSale[0];
   // Παρόμοια με το beat της σελίδας = ίδιο είδος (afrotrap, boom bap, drill...). Αν δεν υπάρχει κανένα, δείχνουμε απλά άλλα beats.
   const similar = linked
     ? forSale
