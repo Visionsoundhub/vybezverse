@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame, ShoppingCart, Trash2, Lock, ArrowLeft, LogOut, Download, Share2 } from 'lucide-react';
+import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame, ShoppingCart, Trash2, Lock, ArrowLeft, LogOut, Download, Share2, ChevronDown } from 'lucide-react';
 import beatsData from '../data/beats.json';
 import { useAuth } from '../context/AuthContext';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
@@ -433,6 +433,7 @@ export default function VmtStore() {
   const [query, setQuery] = useState('');
   const [mood, setMood] = useState('όλα');
   const [genre, setGenre] = useState('όλα');
+  const [openF, setOpenF] = useState(null); // κινητό: ποιο φίλτρο είναι ανοιχτό
   const [limit, setLimit] = useState(8);
   const [current, setCurrent] = useState(null);
   const [playing, setPlaying] = useState(false);
@@ -810,20 +811,30 @@ export default function VmtStore() {
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setLimit(8); }}
               />
+              <div className="vmt-ftoggles">
+                {genres.length > 1 && (
+                  <button className={`${openF === 'genre' ? 'open' : ''} ${genre !== 'όλα' ? 'set' : ''}`} onClick={() => setOpenF(openF === 'genre' ? null : 'genre')}>
+                    Είδος: <b>{genre}</b> <ChevronDown size={14} />
+                  </button>
+                )}
+                <button className={`${openF === 'mood' ? 'open' : ''} ${mood !== 'όλα' ? 'set' : ''}`} onClick={() => setOpenF(openF === 'mood' ? null : 'mood')}>
+                  Διάθεση: <b>{mood}</b> <ChevronDown size={14} />
+                </button>
+              </div>
               {genres.length > 1 && (
-                <div className="vmt-moods vmt-genres">
+                <div className={`vmt-moods vmt-genres vmt-fold ${openF === 'genre' ? 'open' : ''}`}>
                   <span>Είδος</span>
                   {['όλα', ...genres].map((g) => (
-                    <button key={g} className={g === genre ? 'on' : ''} onClick={() => { setGenre(g); setLimit(8); }}>
+                    <button key={g} className={g === genre ? 'on' : ''} onClick={() => { setGenre(g); setLimit(8); setOpenF(null); }}>
                       {g}{g !== 'όλα' && <small> {genreCount[g]}</small>}
                     </button>
                   ))}
                 </div>
               )}
-              <div className="vmt-moods">
+              <div className={`vmt-moods vmt-fold ${openF === 'mood' ? 'open' : ''}`}>
                 <span>Διάθεση</span>
                 {moods.map((m) => (
-                  <button key={m} className={m === mood ? 'on' : ''} onClick={() => { setMood(m); setLimit(8); }}>{m}</button>
+                  <button key={m} className={m === mood ? 'on' : ''} onClick={() => { setMood(m); setLimit(8); setOpenF(null); }}>{m}</button>
                 ))}
               </div>
             </div>
