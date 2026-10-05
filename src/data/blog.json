@@ -1,6 +1,17 @@
 {
   "posts": [
     {
+      "slug": "ase-me-na-apotyxo",
+      "title": "Άσε με να αποτύχω",
+      "date": "2026-09-25",
+      "author": "Black Vybez",
+      "category": "news",
+      "tag": "Release",
+      "cover": "/assets/uploads/ase-me-na-apotyxo-cover.webp",
+      "excerpt": "Ένα κομμάτι για την αποτυχία που δεν σε σταματάει. Το νέο μου single κυκλοφόρησε.",
+      "content": "Κυκλοφόρησε το «Άσε με να αποτύχω». Είναι ένα κομμάτι για την αποτυχία που δεν σε σταματάει. Δεν μιλάει για το πώς αποφεύγεις να πέσεις, μιλάει για το ότι έχεις δικαίωμα να πέσεις και να συνεχίσεις.\n\n> Μπορεί να αποτύχω σε όλα, μα όχι στο να ζω.\n\n- Άκουσέ το: [Spotify](https://open.spotify.com/album/1GBdafSJGfmF5IGbA2DjFA) · [Apple Music](https://music.apple.com/gr/album/%CE%AC%CF%83%CE%B5-%CE%BC%CE%B5-%CE%BD%CE%B1-%CE%B1%CF%80%CE%BF%CF%84%CF%8D%CF%87%CF%89-single/6813441042?l=el) · [YouTube](https://www.youtube.com/watch?v=B0XbqmYdtMg)\n- Κάθε stream στο Spotify πάει σε φιλανθρωπικό σκοπό\n- Από το άλμπουμ [ΠΑΛΙΡΡΟΙΑ](/releases)\n- Αγορά και download: [Κυκλοφορίες](/releases)\n\nΑν σε βρίσκει σε φάση που όλα στραβώνουν, αυτό είναι για σένα."
+    },
+    {
       "slug": "spasmeno-roloi-time-blindness-podcast",
       "title": "Το σπασμένο ρολόι και το time blindness",
       "date": "2026-09-20",
