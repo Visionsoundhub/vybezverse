@@ -1850,6 +1850,7 @@
     },
     {
       "title": "FEUER & RAUCH",
+      "weekOf": "2026-10-26",
       "status": "available",
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/feuer-rauch-preview.mp3",
       "cover": "/assets/uploads/feuer-rauch-cover.webp",
@@ -2036,6 +2037,7 @@
     },
     {
       "title": "BOTA",
+      "weekOf": "2026-10-12",
       "status": "available",
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/bota-preview.mp3",
       "cover": "/assets/uploads/bota-cover.webp",
@@ -2405,6 +2407,7 @@
     },
     {
       "title": "DAKAR",
+      "weekOf": "2026-10-19",
       "status": "available",
       "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/dakar-preview.mp3",
       "cover": "/assets/uploads/dakar-cover.webp",
