@@ -2,7 +2,8 @@
 // Έτσι βλέπει τις αγορές του στο account ακόμα κι αν αγόρασε πριν φτιάξει account,
 // ή με email και κωδικό αντί για Google. Ο χρήστης στέλνει το Firebase ID token του.
 import { getGoogleAccessToken } from '../../src/utils/firebaseAdmin';
-import { downloadLink, FILES_FOR_LICENSE, FILE_LABEL } from '../../src/utils/vmtServer';
+import { downloadLink, FILES_FOR_LICENSE, FILE_LABEL, noPaidPolarOrders } from '../../src/utils/vmtServer';
+import { firstOrderActive } from '../../src/data/vmtPricing';
 
 const JWKS_URL = 'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com';
 
@@ -75,5 +76,6 @@ export async function onRequestGet({ request, env }) {
   }
 
   // Η έκπτωση VIP μπαίνει πλέον μόνη της στο καλάθι, δεν υπάρχουν κωδικοί.
-  return json({ licenses, vipCode: null, vipTier: null });
+  const firstEligible = licenses.length === 0 && firstOrderActive() ? await noPaidPolarOrders(env, user.email.toLowerCase()) : false;
+  return json({ licenses, vipCode: null, vipTier: null, firstEligible });
 }

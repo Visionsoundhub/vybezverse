@@ -86,6 +86,25 @@ export function countBeats(doc, licenses) {
   return [...own, ...licenses.filter((l) => !known.has(l.orderId))].filter(isBeatPurchase).length;
 }
 
+// Πρώτη αγορά: το email δεν έχει καμία πληρωμένη παραγγελία στο Polar. Αν το Polar δεν απαντήσει,
+// επιστρέφει false (καλύτερα να μη δοθεί η έκπτωση παρά να δοθεί δεύτερη φορά).
+export async function noPaidPolarOrders(env, email) {
+  try {
+    const h = { Authorization: `Bearer ${env.POLAR_TOKEN}` };
+    const c = await fetch(`https://api.polar.sh/v1/customers/?email=${encodeURIComponent(email)}&limit=10`, { headers: h });
+    if (!c.ok) return false;
+    const customers = ((await c.json()).items || []).filter((x) => (x.email || '').toLowerCase() === email);
+    for (const cu of customers) {
+      const o = await fetch(`https://api.polar.sh/v1/orders/?customer_id=${cu.id}&limit=50`, { headers: h });
+      if (!o.ok) return false;
+      if (((await o.json()).items || []).some((x) => x.paid || x.status === 'paid' || x.status === 'refunded' || x.status === 'partially_refunded')) return false;
+    }
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 // Υπογραφή για links λήψης: ποιος, ποιο αρχείο, μέχρι πότε.
 export async function sign(secret, data) {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);

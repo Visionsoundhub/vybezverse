@@ -21,6 +21,12 @@ export const PROMOS = {
   bundle: { active: true, buy: 2, free: 1, label: 'Πάρε 2, το 3ο δώρο' },
   // Black Friday: όλοι παίρνουν percent. Οι VIP παίρνουν το μεγαλύτερο από τα δύο συν vipBonus.
   // Ημερομηνίες σε ώρα Ελλάδας (ISO με +02:00 / +03:00).
+  // -20% στην πρώτη αγορά (MP3, WAV, Stems), μία φορά ανά πελάτη. Μόνο για συνδεδεμένο χρήστη με
+  // επιβεβαιωμένο email, χωρίς προηγούμενη πληρωμένη παραγγελία στο Polar και χωρίς άδεια VMT.
+  // end = η πρώτη στιγμή που ΔΕΝ ισχύει (20/10 00:00 ώρα Ελλάδας = ισχύει μέχρι και 19/10).
+  firstOrder: { start: '2026-10-05T00:00:00+03:00', end: '2026-10-20T00:00:00+03:00', percent: 20, label: 'Πρώτη αγορά', until: '19/10' },
+  // ΣΗΜΕΙΩΣΗ: για τη Black Friday 2026 ο Θοδωρής αποφάσισε -50% (27/11 και Cyber Monday 30/11).
+  // Όταν έρθει η ώρα, αλλάζεις εδώ percent και ημερομηνίες (δες PROJECT.md).
   blackFriday: { start: '2026-11-27T00:00:00+02:00', end: '2026-12-01T00:00:00+02:00', percent: 20, vipBonus: 5, label: 'Black Friday' },
 };
 
@@ -34,6 +40,11 @@ export function licensesFor(beat) {
   return Object.keys(LICENSE_PRICES).filter((k) => beat?.files?.[k]);
 }
 
+export function firstOrderActive(now = new Date()) {
+  const f = PROMOS.firstOrder;
+  return now >= new Date(f.start) && now < new Date(f.end);
+}
+
 export function blackFridayActive(now = new Date()) {
   const bf = PROMOS.blackFriday;
   return now >= new Date(bf.start) && now < new Date(bf.end);
@@ -41,8 +52,15 @@ export function blackFridayActive(now = new Date()) {
 
 // Ποσοστό έκπτωσης για όλο το καλάθι (VIP και Black Friday δεν αθροίζονται,
 // εκτός από το μπόνους των VIP στη Black Friday).
-export function discountPercent(beatCount = 0, now = new Date()) {
+export function discountPercent(beatCount = 0, now = new Date(), firstEligible = false) {
   const vip = tierForPurchases(beatCount).tier.percent;
+  // Πρώτη αγορά: μόνο χωρίς καμία προηγούμενη αγορά (άρα ποτέ μαζί με VIP). Αν τρέχει και άλλη
+  // προσφορά (π.χ. Black Friday), κρατάμε τη μεγαλύτερη, ποτέ και τις δύο.
+  if (firstEligible && beatCount === 0 && firstOrderActive(now)) {
+    const f = PROMOS.firstOrder;
+    const bf = blackFridayActive(now) ? PROMOS.blackFriday.percent : 0;
+    if (f.percent >= bf) return { percent: f.percent, reason: `${f.label} -${f.percent}%, ως ${f.until}` };
+  }
   if (!blackFridayActive(now)) return { percent: vip, reason: vip ? 'VIP' : '' };
   const bf = PROMOS.blackFriday;
   if (!vip) return { percent: bf.percent, reason: bf.label };
@@ -50,7 +68,7 @@ export function discountPercent(beatCount = 0, now = new Date()) {
 }
 
 // items: [{ slug, license }]. Επιστρέφει γραμμές, δώρα, έκπτωση και σύνολο σε λεπτά.
-export function priceCart(items, beatCount = 0, now = new Date()) {
+export function priceCart(items, beatCount = 0, now = new Date(), firstEligible = false) {
   // Ένα beat μία φορά: αν έρθει δύο φορές, κρατάμε την τελευταία άδεια.
   const unique = [...new Map(items.map((it) => [it.slug, it])).values()];
   const lines = unique
@@ -70,7 +88,7 @@ export function priceCart(items, beatCount = 0, now = new Date()) {
 
   const subtotal = lines.reduce((s, l) => s + l.price, 0);
   const afterBundle = lines.reduce((s, l) => s + (l.free ? 0 : l.price), 0);
-  const { percent, reason } = discountPercent(beatCount, now);
+  const { percent, reason } = discountPercent(beatCount, now, firstEligible);
   const discount = Math.round((afterBundle * percent) / 100);
   return {
     lines,

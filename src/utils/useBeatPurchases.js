@@ -14,7 +14,7 @@ export default function useBeatPurchases() {
 
   useEffect(() => {
     if (!currentUser) {
-      setState({ loading: false, purchases: [], vipCode: null });
+      setState({ loading: false, purchases: [], vipCode: null, firstEligible: false });
       return;
     }
     let alive = true;
@@ -32,7 +32,9 @@ export default function useBeatPurchases() {
       const own = (data.purchases || []).map((p) => (lic.has(p.orderId) ? { ...p, ...lic.get(p.orderId) } : p));
       const known = new Set(own.map((p) => p.orderId));
       const purchases = [...own, ...(polar.licenses || []).filter((l) => !known.has(l.orderId))];
-      if (alive) setState({ loading: false, purchases, vipCode: polar.vipCode || null });
+      // Πρώτη αγορά: μόνο αν δεν υπάρχει καμία αγορά ούτε στο account
+      const firstEligible = !!polar.firstEligible && purchases.length === 0;
+      if (alive) setState({ loading: false, purchases, vipCode: polar.vipCode || null, firstEligible });
     })();
     return () => { alive = false; };
   }, [currentUser]);

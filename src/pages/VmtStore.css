@@ -595,9 +595,9 @@ html:has(.vmt) { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .vmt-list-tools .vmt-moods span { font-family: var(--mono); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; min-width: 64px; }
 
 /* κινητό: είδος και διάθεση ανοίγουν με πάτημα */
-.vmt-ftoggles { display: none; }
-@media (max-width: 720px) {
-  .vmt-ftoggles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+/* (από 05/10 και στον υπολογιστή) */
+@media all {
+  .vmt-ftoggles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; max-width: 520px; }
   .vmt-ftoggles button { display: flex; align-items: center; justify-content: space-between; gap: 6px; background: #1d1a17; border: 1px solid var(--vmt-line); border-radius: 4px; color: var(--vmt-muted); font: inherit; font-size: 13px; padding: 10px 12px; min-height: 44px; cursor: pointer; text-align: left; }
   .vmt-ftoggles button b { color: var(--vmt-text); font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex: 1; }
   .vmt-ftoggles button.set { border-color: var(--vmt-soft); }
@@ -612,3 +612,12 @@ html:has(.vmt) { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 /* «Από το αρχείο» */
 .vmt-archive { font-style: normal; font-family: var(--mono); font-size: 9px; letter-spacing: .14em; color: var(--vmt-accent); border: 1px solid var(--vmt-soft); border-radius: 3px; padding: 1px 5px; align-self: flex-start; margin-bottom: 3px; }
 .vmt-archive-note { font-family: var(--mono); font-size: 12px; color: var(--vmt-accent); margin: -4px 0 10px; }
+
+/* προσφορά πρώτης αγοράς */
+.vmt-first { max-width: 1100px; margin: -32px auto 24px; display: flex; flex-wrap: wrap; gap: 6px 14px; align-items: center; border: 1px solid var(--vmt-accent); background: linear-gradient(90deg, rgba(255,102,0,.14), #1d1a17 70%); border-radius: 4px; padding: 14px 16px; }
+.vmt-first strong { font-family: 'TheBoldFont', sans-serif; font-size: 22px; text-transform: uppercase; color: var(--vmt-accent); }
+.vmt-first span { font-size: 14px; color: var(--vmt-text); flex: 1 1 260px; }
+.vmt-first a { width: auto; border-color: var(--vmt-accent); color: var(--vmt-accent); }
+.vmt-first + .vmt-login, .vmt-first + .vmt-vip { margin-top: 0; }
+.vmt-was { color: var(--vmt-muted); font-weight: 400; font-size: 14px; margin-right: 8px; }
+@media (max-width: 720px) { .vmt-first { margin: -16px auto 20px; } .vmt-first a { width: 100%; } }

@@ -2,7 +2,8 @@
 // Ο server ξαναϋπολογίζει τα πάντα (τιμές, 2+1, VIP, Black Friday): ό,τι στέλνει το site
 // είναι μόνο η λίστα beats και αδειών.
 import { priceCart } from '../../src/data/vmtPricing';
-import { json, userFromRequest, firestoreToken, licensesByEmail, userDoc, countBeats } from '../../src/utils/vmtServer';
+import { json, userFromRequest, firestoreToken, licensesByEmail, userDoc, countBeats, noPaidPolarOrders } from '../../src/utils/vmtServer';
+import { firstOrderActive } from '../../src/data/vmtPricing';
 
 const CART_PRODUCT = '6fe3890a-0cde-4fe0-9068-b62c4c3ef61c'; // «VMT Beats» στο Polar
 const MAX_ITEMS = 20;
@@ -18,6 +19,7 @@ export async function onRequestPost({ request, env }) {
   // VIP μόνο για συνδεδεμένο χρήστη με επιβεβαιωμένο email.
   let beatCount = 0;
   let email = '';
+  let firstEligible = false;
   const user = await userFromRequest(request, env);
   if (user?.email && user.email_verified) {
     email = user.email.toLowerCase();
@@ -25,12 +27,13 @@ export async function onRequestPost({ request, env }) {
       const token = await firestoreToken(env);
       const [doc, licenses] = await Promise.all([userDoc(env, token, user.user_id || user.sub), licensesByEmail(env, token, email)]);
       beatCount = countBeats(doc, licenses);
+      if (beatCount === 0 && licenses.length === 0 && firstOrderActive()) firstEligible = await noPaidPolarOrders(env, email);
     } catch (e) {
       console.error('VIP lookup failed:', e);
     }
   }
 
-  const cart = priceCart(items, beatCount);
+  const cart = priceCart(items, beatCount, new Date(), firstEligible);
   if (!cart.lines.length) return json({ error: 'Κανένα διαθέσιμο beat στο καλάθι.' }, 400);
   if (cart.total < 50) return json({ error: 'Το σύνολο είναι πολύ μικρό.' }, 400);
 

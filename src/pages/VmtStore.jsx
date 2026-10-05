@@ -5,7 +5,7 @@ import beatsData from '../data/beats.json';
 import { useAuth } from '../context/AuthContext';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
 import useBeatPurchases from '../utils/useBeatPurchases';
-import { priceCart, licensesFor, slugOf, euro, PROMOS, afterOffers, priceFor, isArchive } from '../data/vmtPricing';
+import { priceCart, licensesFor, slugOf, euro, PROMOS, afterOffers, priceFor, isArchive, firstOrderActive } from '../data/vmtPricing';
 // «από 19,99€» ή «από 14,99€» για beat από το αρχείο
 const fromPrice = (b) => euro(priceFor(b, 'mp3'));
 import './VmtStore.css';
@@ -414,7 +414,7 @@ function SalesToast() {
 export default function VmtStore() {
   const all = beatsData.beatslist;
   const { currentUser } = useAuth();
-  const { beatCount } = useBeatPurchases();
+  const { beatCount, firstEligible } = useBeatPurchases();
   const forSale = all.filter((b) => b.status !== 'sold');
   const { slug: linkSlug } = useParams();
   const linked = linkSlug ? all.find((b) => slugOf(b.title) === linkSlug) : null;
@@ -556,7 +556,7 @@ export default function VmtStore() {
     setCart((c) => [...c.filter((x) => x.slug !== slug), { slug, license }]);
   };
   const removeFromCart = (slug) => setCart((c) => c.filter((x) => x.slug !== slug));
-  const priced = priceCart(cart, beatCount);
+  const priced = priceCart(cart, beatCount, new Date(), firstEligible);
   // Ό,τι δεν είναι πια διαθέσιμο (πουλήθηκε, άλλαξε) φεύγει μόνο του από το καλάθι.
   useEffect(() => {
     const ok = new Set(priced.lines.map((l) => `${l.slug}:${l.license}`));
@@ -759,7 +759,15 @@ export default function VmtStore() {
         </section>
       )}
 
-      {linked ? null : currentUser ? (
+      {firstOrderActive() && (!currentUser || firstEligible) && !linked && (
+        <div className="vmt-first">
+          <strong>-20% στην πρώτη σου αγορά</strong>
+          <span>{currentUser ? 'Η έκπτωση μπαίνει μόνη της στο καλάθι. Μέχρι 19/10.' : 'Μέχρι 19/10. Κάνε λογαριασμό και η έκπτωση μπαίνει μόνη της στο καλάθι.'}</span>
+          {!currentUser && <a className="vmt-ghost" href="/account?next=/beats">Σύνδεση ή εγγραφή</a>}
+        </div>
+      )}
+
+      {linked || (!currentUser && firstOrderActive()) ? null : currentUser ? (
         <div className="vmt-vip"><LoyaltyProgressBar /></div>
       ) : (
         <div className="vmt-login">
@@ -964,8 +972,8 @@ export default function VmtStore() {
                 )}
                 <div className="vmt-cart-sum">
                   {priced.bundleSaving > 0 && <p><span>{PROMOS.bundle.label}</span><span>−{euro(priced.bundleSaving)}</span></p>}
-                  {priced.discount > 0 && <p><span>{priced.reason} {priced.percent}%</span><span>−{euro(priced.discount)}</span></p>}
-                  <p className="total"><span>Σύνολο <small>με ΦΠΑ</small></span><span>{euro(priced.total)}</span></p>
+                  {priced.discount > 0 && <p><span>{priced.reason.includes("%") ? priced.reason : `${priced.reason} ${priced.percent}%`}</span><span>−{euro(priced.discount)}</span></p>}
+                  <p className="total"><span>Σύνολο <small>με ΦΠΑ</small></span><span>{priced.total < priced.subtotal && <s className="vmt-was">{euro(priced.subtotal)}</s>}{euro(priced.total)}</span></p>
                   {(priced.bundleSaving + priced.discount) > 0 && <p className="vmt-save">Κερδίζεις {euro(priced.bundleSaving + priced.discount)}</p>}
                 </div>
                 <label className={`vmt-consent ${needAgree ? 'need' : ''}`} ref={consentRef}>
