@@ -25,9 +25,17 @@ export const PROMOS = {
   // επιβεβαιωμένο email, χωρίς προηγούμενη πληρωμένη παραγγελία στο Polar και χωρίς άδεια VMT.
   // end = η πρώτη στιγμή που ΔΕΝ ισχύει (20/10 00:00 ώρα Ελλάδας = ισχύει μέχρι και 19/10).
   firstOrder: { start: '2026-10-05T00:00:00+03:00', end: '2026-10-20T00:00:00+03:00', percent: 20, label: 'Πρώτη αγορά', until: '19/10' },
-  // ΣΗΜΕΙΩΣΗ: για τη Black Friday 2026 ο Θοδωρής αποφάσισε -50% (27/11 και Cyber Monday 30/11).
-  // Όταν έρθει η ώρα, αλλάζεις εδώ percent και ημερομηνίες (δες PROJECT.md).
-  blackFriday: { start: '2026-11-27T00:00:00+02:00', end: '2026-12-01T00:00:00+02:00', percent: 20, vipBonus: 5, label: 'Black Friday' },
+  // Black Friday 2026 (απόφαση Θοδωρή 05/10): εβδομάδα Black Friday 50%, Σαββατοκύριακο 30%,
+  // Cyber Monday τριήμερο 20%. Ώρα Ελλάδας (+02:00 τον Νοέμβριο). end = πρώτη στιγμή που ΔΕΝ ισχύει.
+  // Οι VIP παίρνουν το μεγαλύτερο από VIP και προσφορά, συν vipBonus.
+  blackFriday: {
+    vipBonus: 5,
+    windows: [
+      { start: '2026-11-23T00:00:00+02:00', end: '2026-11-28T00:00:00+02:00', percent: 50, label: 'Black Friday' },
+      { start: '2026-11-28T00:00:00+02:00', end: '2026-11-30T00:00:00+02:00', percent: 30, label: 'Black Weekend' },
+      { start: '2026-11-30T00:00:00+02:00', end: '2026-12-03T00:00:00+02:00', percent: 20, label: 'Cyber Monday' },
+    ],
+  },
 };
 
 export const slugOf = (title) => title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
@@ -45,9 +53,9 @@ export function firstOrderActive(now = new Date()) {
   return now >= new Date(f.start) && now < new Date(f.end);
 }
 
+// Το παράθυρο της Black Friday που τρέχει τώρα ({ percent, label }), ή null.
 export function blackFridayActive(now = new Date()) {
-  const bf = PROMOS.blackFriday;
-  return now >= new Date(bf.start) && now < new Date(bf.end);
+  return PROMOS.blackFriday.windows.find((w) => now >= new Date(w.start) && now < new Date(w.end)) || null;
 }
 
 // Ποσοστό έκπτωσης για όλο το καλάθι (VIP και Black Friday δεν αθροίζονται,
@@ -58,13 +66,13 @@ export function discountPercent(beatCount = 0, now = new Date(), firstEligible =
   // προσφορά (π.χ. Black Friday), κρατάμε τη μεγαλύτερη, ποτέ και τις δύο.
   if (firstEligible && beatCount === 0 && firstOrderActive(now)) {
     const f = PROMOS.firstOrder;
-    const bf = blackFridayActive(now) ? PROMOS.blackFriday.percent : 0;
+    const bf = blackFridayActive(now)?.percent || 0;
     if (f.percent >= bf) return { percent: f.percent, reason: `${f.label} -${f.percent}%, ως ${f.until}` };
   }
-  if (!blackFridayActive(now)) return { percent: vip, reason: vip ? 'VIP' : '' };
-  const bf = PROMOS.blackFriday;
+  const bf = blackFridayActive(now);
+  if (!bf) return { percent: vip, reason: vip ? 'VIP' : '' };
   if (!vip) return { percent: bf.percent, reason: bf.label };
-  return { percent: Math.max(vip, bf.percent) + bf.vipBonus, reason: `${bf.label} + VIP` };
+  return { percent: Math.max(vip, bf.percent) + PROMOS.blackFriday.vipBonus, reason: `${bf.label} + VIP` };
 }
 
 // items: [{ slug, license }]. Επιστρέφει γραμμές, δώρα, έκπτωση και σύνολο σε λεπτά.
