@@ -9,6 +9,7 @@ import { priceCart, licensesFor, slugOf, euro, PROMOS, afterOffers, priceFor, is
 // «από 19,99€» ή «από 14,99€» για beat από το αρχείο
 const fromPrice = (b) => euro(priceFor(b, 'mp3'));
 import './VmtStore.css';
+import StatsStrip from '../components/StatsStrip';
 
 // VMT beat store: αγορές μέσω Polar (embedded checkout, ο πελάτης δεν φεύγει από το site).
 const CONTACT_EMAIL = 'support@blackvybez.gr';
@@ -780,6 +781,8 @@ export default function VmtStore() {
       <div className="vmt-marquee" aria-hidden="true">
         <div>{[0, 1].map((k) => <span key={k}>{forSale.map((b) => `COOKING HEAT · ${b.title} · ${b.bpm} BPM · ${b.key} · `).join('')}</span>)}</div>
       </div>
+
+      {!linked && <StatsStrip who="vmt" only="streams" accent="#FF6600" />}
 
       {/* 2. Δύο πόρτες */}
       <section className="vmt-doors" ref={doorsRef}>
