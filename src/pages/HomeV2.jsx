@@ -3,6 +3,7 @@ import { Play, Pause, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import beatsDataRaw from '../data/beats.json';
 import releasesData from '../data/releases.json';
+import StatsStrip from '../components/StatsStrip';
 import { AudioContext } from '../context/AudioContext';
 import './HomeV2.css';
 
@@ -105,6 +106,8 @@ function HomeV2() {
       </section>
 
       {/* 2. ΠΑΛΙΡΡΟΙΑ */}
+      <StatsStrip who="blackvybez" />
+
       <section className="h2-sec">
         <div className="h2-in h2-album">
           <Reveal>

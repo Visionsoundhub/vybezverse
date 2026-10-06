@@ -1,0 +1,15 @@
+{
+  "updated": "2026-10-06",
+  "blackvybez": [
+    { "label": "μηνιαίοι ακροατές στο Spotify", "value": 216 },
+    { "label": "streams τον τελευταίο μήνα", "value": 624 },
+    { "label": "συνδρομητές στο YouTube", "value": 1460 },
+    { "label": "προβολές στο YouTube", "value": 216154 }
+  ],
+  "vmt": [
+    { "label": "μηνιαίοι ακροατές στο Spotify", "value": 349 },
+    { "label": "streams τον τελευταίο μήνα", "value": 1306 },
+    { "label": "followers στο Instagram", "value": 1757 },
+    { "label": "προβολές στο YouTube", "value": 22467 }
+  ]
+}
