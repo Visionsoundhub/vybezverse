@@ -19,7 +19,11 @@ function Count({ to, run }) {
 }
 
 export default function StatsStrip({ who = 'blackvybez', accent = '#E89827', only = '', inline = false }) {
-  const rows = (stats[who] || []).filter((r) => !only || new RegExp(only, 'i').test(r.label));
+  // who: 'blackvybez' ή λίστα [['blackvybez', 'Black Vybez'], ['vmt', 'VMT']] (τότε μπαίνει και το όνομα)
+  const list = Array.isArray(who) ? who : [[who, '']];
+  const rows = list.flatMap(([k, name]) => (stats[k] || [])
+    .filter((r) => !only || new RegExp(only, 'i').test(r.label))
+    .map((r) => ({ ...r, name })));
   const ref = useRef(null);
   const [seen, setSeen] = useState(false);
   useEffect(() => {
@@ -33,11 +37,12 @@ export default function StatsStrip({ who = 'blackvybez', accent = '#E89827', onl
     <section ref={ref} style={{ padding: inline ? '8px 0 26px' : '28px 0' }} aria-label="Νούμερα">
       <div style={{ maxWidth: inline ? 560 : 1180, margin: inline ? '0' : '0 auto', padding: inline ? 0 : '0 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 14 }}>
         {rows.map((r) => (
-          <div key={r.label} style={{ border: '1px solid rgba(255,255,255,.08)', borderRadius: 14, padding: '16px 18px', background: 'rgba(255,255,255,.02)' }}>
+          <div key={r.name + r.label} style={{ border: '1px solid rgba(255,255,255,.08)', borderRadius: 14, padding: '16px 18px', background: 'rgba(255,255,255,.02)' }}>
             <div style={{ fontSize: 'clamp(26px, 4vw, 36px)', fontWeight: 800, color: accent, lineHeight: 1, fontVariantNumeric: 'tabular-nums' }}>
               <Count to={r.value} run={seen} />{r.plus ? '+' : ''}
             </div>
-            <div style={{ marginTop: 8, fontSize: 13, opacity: 0.7 }}>{r.label}</div>
+            {r.name && <div style={{ marginTop: 10, fontSize: 15, fontWeight: 700 }}>{r.name}</div>}
+            <div style={{ marginTop: r.name ? 2 : 8, fontSize: 13, opacity: 0.7 }}>{r.label}</div>
           </div>
         ))}
       </div>

@@ -174,7 +174,7 @@ function HomeV2() {
             <div className="h2-eyebrow">Κάθε stream μετράει</div>
             <h2 className="h2-h2 sm">Όλα τα έσοδα από το Spotify πάνε σε φιλανθρωπικό σκοπό.</h2>
             <p className="h2-lead">Ακούγοντας, βοηθάς. Τόσο απλό.</p>
-            <StatsStrip who="blackvybez" only="streams" inline />
+            <StatsStrip who={[['blackvybez', 'Black Vybez'], ['vmt', 'VMT']]} only="streams" inline />
             <a className="h2-btn pri" href="https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3" target="_blank" rel="noreferrer"><Play size={18} /> Άκου στο Spotify</a>
           </Reveal>
         </div>
