@@ -106,8 +106,6 @@ function HomeV2() {
       </section>
 
       {/* 2. ΠΑΛΙΡΡΟΙΑ */}
-      <StatsStrip who="blackvybez" />
-
       <section className="h2-sec">
         <div className="h2-in h2-album">
           <Reveal>
@@ -176,6 +174,7 @@ function HomeV2() {
             <div className="h2-eyebrow">Κάθε stream μετράει</div>
             <h2 className="h2-h2 sm">Όλα τα έσοδα από το Spotify πάνε σε φιλανθρωπικό σκοπό.</h2>
             <p className="h2-lead">Ακούγοντας, βοηθάς. Τόσο απλό.</p>
+            <StatsStrip who="blackvybez" only="Spotify|streams" inline />
             <a className="h2-btn pri" href="https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3" target="_blank" rel="noreferrer"><Play size={18} /> Άκου στο Spotify</a>
           </Reveal>
         </div>
