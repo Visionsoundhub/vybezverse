@@ -1,23 +1,30 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame, ShoppingCart, Trash2, Lock, ArrowLeft, LogOut, Download, Share2, ChevronDown } from 'lucide-react';
 import beatsData from '../data/beats.json';
 import { useAuth } from '../context/AuthContext';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
 import useBeatPurchases from '../utils/useBeatPurchases';
-import { priceCart, licensesFor, slugOf, euro, PROMOS, afterOffers, priceFor, isArchive, firstOrderActive } from '../data/vmtPricing';
-// «από 19,99€» ή «από 14,99€» για beat από το αρχείο
-const fromPrice = (b) => euro(priceFor(b, 'mp3'));
+import { priceCart, licensesFor, slugOf, PROMOS, afterOffers, priceFor, isArchive, firstOrderActive } from '../data/vmtPricing';
+import { VMT_TEXT, langFromPath, beatsBase, otherLangPath } from '../data/vmtI18n';
+
+// Γλώσσα από το URL: /en/beats = αγγλικά, /beats = ελληνικά.
+function useVmt() {
+  const { pathname } = useLocation();
+  const lang = langFromPath(pathname);
+  return { lang, t: VMT_TEXT[lang], base: beatsBase(lang), pathname };
+}
 import './VmtStore.css';
 
 // VMT beat store: αγορές μέσω Polar (embedded checkout, ο πελάτης δεν φεύγει από το site).
 const CONTACT_EMAIL = 'support@blackvybez.gr';
 const POLAR_EMBED = 'https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.4/dist/embed.global.js';
 
+// Κείμενα (features, note) ανά γλώσσα στο vmtI18n.
 const LICENSES = [
-  { key: 'mp3', name: 'MP3', price: '19,99€', features: ['Λήγει σε 1 χρόνο', 'MP3 χωρίς tag', 'Έως 100.000 streams'] },
-  { key: 'wav', name: 'WAV', price: '24,99€', featured: true, note: 'Μόνο 5€ παραπάνω, και είναι δικό σου για πάντα', features: ['WAV + MP3 χωρίς tag', 'Έως 500.000 streams', 'Μόνιμη άδεια'] },
-  { key: 'stems', name: 'Stems', price: '49,99€', features: ['WAV + MP3 + όλα τα κανάλια', 'Απεριόριστα streams', 'Μόνιμη άδεια'] },
+  { key: 'mp3', name: 'MP3' },
+  { key: 'wav', name: 'WAV', featured: true, note: true },
+  { key: 'stems', name: 'Stems' },
 ];
 
 const MOODS = ['όλα', 'σκοτεινό', 'συναισθηματικό', 'επιθετικό', 'bouncy', 'καλοκαιρινό', 'για χορό'];
@@ -65,11 +72,12 @@ const genreOf = (b) => String(b?.category || (b?.tags || [])[0] || '').toLowerCa
 // Κοινοποίηση: στο κινητό ανοίγει το μενού του κινητού (Instagram, Viber, WhatsApp...),
 // αλλιώς αντιγράφει το link της σελίδας του beat.
 function ShareButton({ beat, small = false }) {
+  const { t, base } = useVmt();
   const [done, setDone] = useState(false);
-  const url = `${window.location.origin}/beats/${slugOf(beat.title)}`;
+  const url = `${window.location.origin}${base}/${slugOf(beat.title)}`;
   const share = async (e) => {
     e.stopPropagation();
-    const text = `${beat.title}, beat ${beat.bpm} BPM από τον vybezmadethis`;
+    const text = t.shareText(beat);
     if (navigator.share) {
       try { await navigator.share({ title: beat.title, text, url }); return; } catch { /* έκλεισε το μενού */ return; }
     }
@@ -84,33 +92,34 @@ function ShareButton({ beat, small = false }) {
       ta.select();
       const ok = document.execCommand('copy');
       ta.remove();
-      if (!ok) { window.prompt('Αντέγραψε το link:', url); return; }
+      if (!ok) { window.prompt(t.copyPrompt, url); return; }
     }
     setDone(true);
     setTimeout(() => setDone(false), 2000);
   };
   return small ? (
-    <button className="vmt-row-mic" onClick={share} aria-label="Στείλ' το">{done ? <Check size={18} /> : <Share2 size={18} />}</button>
+    <button className="vmt-row-mic" onClick={share} aria-label={t.shareLabel}>{done ? <Check size={18} /> : <Share2 size={18} />}</button>
   ) : (
-    <button className="vmt-ghost" onClick={share}>{done ? <><Check size={16} /> Αντιγράφηκε</> : <><Share2 size={16} /> Στείλ' το</>}</button>
+    <button className="vmt-ghost" onClick={share}>{done ? <><Check size={16} /> {t.copied}</> : <><Share2 size={16} /> {t.shareLabel}</>}</button>
   );
 }
 
 // «Τα beats μου»: πλαϊνό παράθυρο μέσα στο store, για να μη φεύγει ο πελάτης (η μουσική συνεχίζει).
 function MyBeats({ onClose, onUpgrade, busy }) {
+  const { lang, t } = useVmt();
   const { currentUser, logout } = useAuth();
   const { loading, beats } = useBeatPurchases();
   return (
     <div className="vmt-modal vmt-drawer-wrap" onClick={onClose}>
       <aside className="vmt-drawer" onClick={(e) => e.stopPropagation()}>
-        <button className="vmt-close" onClick={onClose} aria-label="Κλείσιμο"><X /></button>
-        <p className="vmt-kicker">ΤΑ BEATS ΜΟΥ</p>
+        <button className="vmt-close" onClick={onClose} aria-label={t.close}><X /></button>
+        <p className="vmt-kicker">{t.myBeats}</p>
         <p className="vmt-drawer-mail">{currentUser?.email}</p>
-        <LoyaltyProgressBar />
+        <LoyaltyProgressBar lang={lang} />
         {loading ? (
-          <p className="vmt-hint">Φορτώνει…</p>
+          <p className="vmt-hint">{t.loading}</p>
         ) : beats.length === 0 ? (
-          <p className="vmt-trust">Δεν έχεις πάρει beat ακόμα. Ό,τι πάρεις θα είναι εδώ για πάντα, με τα αρχεία του.</p>
+          <p className="vmt-trust">{t.noBeats}</p>
         ) : (
           <ul className="vmt-cart-list">
             {beats.map((b, i) => {
@@ -119,21 +128,21 @@ function MyBeats({ onClose, onUpgrade, busy }) {
                 <li key={b.orderId || i} className="vmt-mine">
                   <div>
                     <strong>{b.product}</strong>
-                    {days !== null && <span>{days > 0 ? `MP3 · λήγει σε ${days} μέρες` : 'MP3 · έληξε, ανανέωσέ το για να το κατεβάσεις'}</span>}
+                    {days !== null && <span>{days > 0 ? t.expiresIn(days) : t.expired}</span>}
                     <div className="vmt-dl">
                       {b.downloads?.length > 0 ? b.downloads.map((d) => (
                         <a key={d.label} href={d.url}><Download size={13} /> {d.label}</a>
-                      )) : !b.expired && <a href="https://polar.sh/visionsound/portal" target="_blank" rel="noopener noreferrer"><Download size={13} /> Κατέβασε τα αρχεία</a>}
-                      {b.pdf && <a href={b.pdf}><Download size={13} /> Άδεια PDF</a>}
+                      )) : !b.expired && <a href="https://polar.sh/visionsound/portal" target="_blank" rel="noopener noreferrer"><Download size={13} /> {t.downloadFiles}</a>}
+                      {b.pdf && <a href={b.pdf}><Download size={13} /> {t.licensePdf}</a>}
                     </div>
                     {b.source === 'polar' && b.slug && afterOffers(b).map((o) => {
                       const left = o.until ? Math.max(1, Math.ceil((new Date(o.until) - Date.now()) / 864e5)) : 0;
                       return (
                         <div key={o.kind} className="vmt-offer">
                           <button className={o.kind === 'stems' ? 'vmt-buy' : 'vmt-ghost'} disabled={busy} onClick={() => onUpgrade(b, o.kind)}>
-                            {o.label} {euro(o.price)}
+                            {t.offer[o.kind] || o.label} {t.money(o.price)}
                           </button>
-                          {o.off > 0 && <small>Αντί για {euro(o.full)}. Η τιμή ανεβαίνει σε {left} {left === 1 ? 'μέρα' : 'μέρες'}.</small>}
+                          {o.off > 0 && <small>{t.offerUntil(t.money(o.full), left)}</small>}
                         </div>
                       );
                     })}
@@ -144,7 +153,7 @@ function MyBeats({ onClose, onUpgrade, busy }) {
           </ul>
         )}
         <button className="vmt-ghost vmt-logout" onClick={async () => { await logout(); onClose(); }}>
-          <LogOut size={16} /> Αποσύνδεση
+          <LogOut size={16} /> {t.logout}
         </button>
       </aside>
     </div>
@@ -180,6 +189,7 @@ function estimateLatency() {
 }
 
 function RecordOver({ beat, onStart }) {
+  const { t: { rec: t } } = useVmt();
   const [state, setState] = useState('idle'); // idle | prep | rec | done | denied
   const [left, setLeft] = useState(REC_SECONDS);
   const [offset, setOffset] = useState(0); // διόρθωση από τα κουμπιά, σε δευτερόλεπτα
@@ -276,22 +286,22 @@ function RecordOver({ beat, onStart }) {
 
   return (
     <div className="vmt-rec">
-      <h3>Ράψε πάνω του</h3>
-      <p>Βάλε ακουστικά, γράψε 20 δευτερόλεπτα με τη φωνή σου πάνω στο beat και άκου αν κάθεται. Δεν ανεβαίνει πουθενά.</p>
+      <h3>{t.title}</h3>
+      <p>{t.text}</p>
       <div className="vmt-rec-row">
         {state === 'rec' || state === 'prep' ? (
-          <><span className="vmt-rec-dot" /> <span>{state === 'prep' ? 'Ετοιμάζεται…' : `Γράφει… ${left}″`}</span></>
+          <><span className="vmt-rec-dot" /> <span>{state === 'prep' ? t.prep : t.recording(left)}</span></>
         ) : (
-          <button className="vmt-ghost" onClick={record}>{state === 'done' ? 'Ξαναγράψε' : 'Γράψε 20″'}</button>
+          <button className="vmt-ghost" onClick={record}>{state === 'done' ? t.again : t.start}</button>
         )}
-        {state === 'done' && <button className="vmt-buy" onClick={() => playback()}>Άκου το</button>}
-        {state === 'denied' && <span>Χρειάζεται άδεια για το μικρόφωνο.</span>}
+        {state === 'done' && <button className="vmt-buy" onClick={() => playback()}>{t.listen}</button>}
+        {state === 'denied' && <span>{t.denied}</span>}
       </div>
       {state === 'done' && (
         <div className="vmt-rec-sync">
-          <span>Δεν πέφτει στον ρυθμό;</span>
-          <button onClick={() => nudge(-0.05)}>Φωνή πιο αργά</button>
-          <button onClick={() => nudge(0.05)}>Φωνή πιο νωρίς</button>
+          <span>{t.offBeat}</span>
+          <button onClick={() => nudge(-0.05)}>{t.later}</button>
+          <button onClick={() => nudge(0.05)}>{t.earlier}</button>
         </div>
       )}
     </div>
@@ -299,6 +309,7 @@ function RecordOver({ beat, onStart }) {
 }
 
 function Newsletter() {
+  const { lang, t: { news: t } } = useVmt();
   const [email, setEmail] = useState('');
   const [msg, setMsg] = useState('');
   const submit = async (e) => {
@@ -311,21 +322,21 @@ function Newsletter() {
         body: JSON.stringify({ email, preference: 'beats_news', source: 'vmt_store' }),
       });
       const d = await r.json().catch(() => ({}));
-      setMsg(r.ok && (d.success || d.emailCaptured) ? 'Μέσα είσαι. Θα ακούς πρώτος τα νέα beats.' : (d.error || 'Κάτι πήγε στραβά, δοκίμασε ξανά.'));
+      setMsg(r.ok && (d.success || d.emailCaptured) ? t.ok : (lang === 'en' ? t.fail : (d.error || t.fail)));
       if (r.ok) setEmail('');
     } catch {
-      setMsg('Σφάλμα σύνδεσης.');
+      setMsg(t.net);
     }
   };
   return (
     <section className="vmt-news">
       <Bar>NEWSLETTER</Bar>
-      <h2>Άκου πρώτος τα νέα πιάτα</h2>
-      <p>Κάθε εβδομάδα κάτι βγαίνει από την κουζίνα. Γράψου και σου το στέλνω ζεστό, πριν ανέβει παντού.</p>
+      <h2>{t.title}</h2>
+      <p>{t.text}</p>
       {msg ? <p>{msg}</p> : (
         <form onSubmit={submit}>
-          <input type="email" placeholder="το email σου" value={email} onChange={(e) => setEmail(e.target.value)} required />
-          <button className="vmt-buy" type="submit">Στείλε μου τα νέα</button>
+          <input type="email" placeholder={t.placeholder} value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <button className="vmt-buy" type="submit">{t.button}</button>
         </form>
       )}
     </section>
@@ -376,15 +387,9 @@ function CountUp({ value, delay = 0 }) {
 }
 
 // Πραγματικές αγορές από το Polar (μέσω /api/vmt-sales). Αν δεν υπάρχουν, δεν δείχνει τίποτα.
-const COUNTRY = { GR: 'Ελλάδα', CY: 'Κύπρο', DE: 'Γερμανία', GB: 'Αγγλία', US: 'Αμερική', FR: 'Γαλλία', IT: 'Ιταλία', NL: 'Ολλανδία' };
-function ago(iso) {
-  const m = Math.round((Date.now() - new Date(iso)) / 60000);
-  if (m < 60) return `πριν ${Math.max(1, m)}′`;
-  const h = Math.round(m / 60);
-  if (h < 48) return `πριν ${h} ώρ${h === 1 ? 'α' : 'ες'}`;
-  return `πριν ${Math.round(h / 24)} μέρες`;
-}
+const minsAgo = (iso) => Math.round((Date.now() - new Date(iso)) / 60000);
 function SalesToast() {
+  const { t } = useVmt();
   const [sales, setSales] = useState([]);
   const [i, setI] = useState(-1);
   useEffect(() => {
@@ -406,12 +411,16 @@ function SalesToast() {
   return (
     <div className="vmt-toast">
       <Flame size={16} />
-      <span>Κάποιος{s.country ? ` από ${COUNTRY[s.country] || s.country}` : ''} πήρε το <strong>{s.beat}</strong>{s.license ? ` (${s.license})` : ''} · {ago(s.at)}</span>
+      <span>{t.sale(s.country)} <strong>{s.beat}</strong>{s.license ? ` (${s.license})` : ''} · {t.ago(minsAgo(s.at))}</span>
     </div>
   );
 }
 
 export default function VmtStore() {
+  const { lang, t, base, pathname } = useVmt();
+  const money = t.money;
+  // «από 19,99€» ή «από 14,99€» για beat από το αρχείο
+  const fromPrice = (b) => money(priceFor(b, 'mp3'));
   const all = beatsData.beatslist;
   const { currentUser } = useAuth();
   const { beatCount, firstEligible } = useBeatPurchases();
@@ -487,11 +496,14 @@ export default function VmtStore() {
 
   useEffect(() => {
     const prevTitle = document.title;
-    document.title = linked
-      ? `${linked.title}, ${genreOf(linked) || 'beat'} beat ${linked.bpm} BPM | vybezmadethis`
-      : 'Beats για rap και trap | vybezmadethis';
+    document.title = linked ? t.titleBeat(linked, genreOf(linked)) : t.titleStore;
     return () => { document.title = prevTitle; };
-  }, [linked]);
+  }, [linked, t]);
+  // Το <html lang> ακολουθεί τη γλώσσα της σελίδας (για Google και αναγνώστες οθόνης).
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    return () => { document.documentElement.lang = 'el'; };
+  }, [lang]);
 
   const listed = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -593,7 +605,7 @@ export default function VmtStore() {
   const checkout = async (items, fromCart) => {
     if (Date.now() - openedAt.current < 450 || paying) return;
     if (!agree) {
-      setPayError('Αποδέξου τους όρους για να συνεχίσεις.');
+      setPayError(t.agreeFirst);
       setNeedAgree(true);
       consentRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
       return;
@@ -605,7 +617,7 @@ export default function VmtStore() {
       if (currentUser) headers.Authorization = `Bearer ${await currentUser.getIdToken()}`;
       const r = await fetch('/api/vmt-checkout', { method: 'POST', headers, body: JSON.stringify({ items }) });
       const d = await r.json().catch(() => ({}));
-      if (!r.ok || !d.url) throw new Error(d.error || 'Η πληρωμή δεν άνοιξε, δοκίμασε ξανά.');
+      if (!r.ok || !d.url) throw new Error(lang === 'en' ? t.payFail : (d.error || t.payFail));
       stop();
       setLicenseBeat(null);
       setCartOpen(false);
@@ -637,7 +649,7 @@ export default function VmtStore() {
         body: JSON.stringify({ licenseId: lic.orderId, kind }),
       });
       const d = await r.json().catch(() => ({}));
-      if (!r.ok || !d.url) throw new Error(d.error || 'Η πληρωμή δεν άνοιξε, δοκίμασε ξανά.');
+      if (!r.ok || !d.url) throw new Error(lang === 'en' ? t.payFail : (d.error || t.payFail));
       setMineOpen(false);
       const embed = window.Polar?.EmbedCheckout;
       if (!embed) { window.location.href = d.url; return; }
@@ -675,13 +687,16 @@ export default function VmtStore() {
     <div className="vmt" ref={rootRef}>
       <div className="vmt-grain" aria-hidden="true" />
       <nav className="vmt-top">
-        <a href="/beats" className="vmt-top-brand"><img src="/assets/vmt/vmt-logo-white.png" alt="" /> vybezmadethis</a>
+        <a href={base} className="vmt-top-brand"><img src="/assets/vmt/vmt-logo-white.png" alt="" /> vybezmadethis</a>
         <div className="vmt-top-right">
           <a href="/" className="vmt-top-back"><ArrowLeft size={14} /><span>blackvybez.gr</span></a>
+          <Link to={otherLangPath(pathname, lang)} className="vmt-top-link vmt-lang" hrefLang={lang === 'en' ? 'el' : 'en'} aria-label={lang === 'en' ? 'Ελληνικά' : 'English'}>
+            {lang === 'en' ? 'EL' : 'EN'}
+          </Link>
           {currentUser
-            ? <button className="vmt-top-link" onClick={() => setMineOpen(true)}>Τα beats μου</button>
-            : <a href="/account?next=/beats" className="vmt-top-link">Σύνδεση</a>}
-          <button className="vmt-top-cart" onClick={() => setCartOpen(true)} aria-label="Καλάθι">
+            ? <button className="vmt-top-link" onClick={() => setMineOpen(true)}>{t.myBeatsLink}</button>
+            : <a href={`/account?next=${base}`} className="vmt-top-link">{t.login}</a>}
+          <button className="vmt-top-cart" onClick={() => setCartOpen(true)} aria-label={t.cart}>
             <ShoppingCart size={18} />{priced.lines.length > 0 && <span>{priced.lines.length}</span>}
           </button>
         </div>
@@ -689,7 +704,7 @@ export default function VmtStore() {
       {/* 1. Μεγάλο VMT + beat της εβδομάδας */}
       <header className={`vmt-hero ${linked ? 'vmt-hero-beat' : ''}`}>
         {linked ? (
-          <Link to="/beats" className="vmt-back"><ArrowLeft size={16} /> Όλα τα beats</Link>
+          <Link to={base} className="vmt-back"><ArrowLeft size={16} /> {t.allBeats}</Link>
         ) : (
         <div className="vmt-hero-brand">
           <img src="/assets/vmt/vmt-logo-white.png" alt="VMT" className={`vmt-logo-xl ${playing ? 'live' : ''}`} />
@@ -710,20 +725,20 @@ export default function VmtStore() {
               <button className="vmt-play show" aria-label="Play">{isOn(hero) ? <Pause size={30} /> : <Play size={30} />}</button>
             </div>
             <div className="vmt-week-body">
-              <p className="vmt-kicker">{linked ? `${genreOf(linked)} BEAT · VYBEZMADETHIS`.trim().toUpperCase() : 'BEAT ΤΗΣ ΕΒΔΟΜΑΔΑΣ'}</p>
-              <h2><Link to={`/beats/${slugOf(hero.title)}`} className="vmt-title-link">{hero.title}</Link></h2>
-              <p className="vmt-specs">{hero.bpm} BPM · {hero.key} · {(hero.mood || []).join(' · ')}</p>
-              {isArchive(hero) && <p className="vmt-archive-note">Από το αρχείο: παλιότερο beat, σε χαμηλότερη τιμή.</p>}
+              <p className="vmt-kicker">{linked ? t.beatGenre(genreOf(linked)).trim().toUpperCase() : t.beatOfWeek}</p>
+              <h2><Link to={`${base}/${slugOf(hero.title)}`} className="vmt-title-link">{hero.title}</Link></h2>
+              <p className="vmt-specs">{hero.bpm} BPM · {hero.key} · {(hero.mood || []).map(t.mood).join(' · ')}</p>
+              {isArchive(hero) && <p className="vmt-archive-note">{t.archiveNote}</p>}
               <Rack step={step} active={isOn(hero)} />
               <div className="vmt-desk"><Waveform peaks={hero.peaks} progress={current?.title === hero.title ? progress : 0} onSeek={(f) => seek(hero, f)} /></div>
               <div className="vmt-actions">
-                <button className="vmt-buy" onClick={() => openLicenses(hero)}>Αγορά από {fromPrice(hero)}</button>
-                <button className="vmt-ghost" onClick={() => { stop(); setRecBeat(hero); }}><Mic size={16} /> Ράψε πάνω του</button>
+                <button className="vmt-buy" onClick={() => openLicenses(hero)}>{t.buyFrom(fromPrice(hero))}</button>
+                <button className="vmt-ghost" onClick={() => { stop(); setRecBeat(hero); }}><Mic size={16} /> {t.rec.title}</button>
                 <ShareButton beat={hero} />
               </div>
-              <p className="vmt-hint vmt-rec-hint">Ράψε πάνω του: γράψε 20″ με τη φωνή σου και άκου αν κάθεται, πριν το πάρεις.</p>
+              <p className="vmt-hint vmt-rec-hint">{t.rec.hint}</p>
               {linked && (linked.tags || []).length > 0 && (
-                <div className="vmt-chips">{[...(linked.tags || []), ...(linked.mood || [])].map((t) => <span key={t}>#{t}</span>)}</div>
+                <div className="vmt-chips">{[...(linked.tags || []), ...(linked.mood || []).map(t.mood)].map((x) => <span key={x}>#{x}</span>)}</div>
               )}
             </div>
           </div>
@@ -733,8 +748,8 @@ export default function VmtStore() {
             {LICENSES.filter((l) => licensesFor(linked).includes(l.key)).map((l) => (
               <button key={l.key} className={`vmt-beat-lic-card ${l.featured ? 'feat' : ''}`} onClick={() => openLicenses(linked)}>
                 <span className="vmt-beat-lic-name">{l.name}</span>
-                <strong>{euro(priceFor(linked, l.key))}</strong>
-                <small>{l.features[1]}</small>
+                <strong>{money(priceFor(linked, l.key))}</strong>
+                <small>{t.lic[l.key][1]}</small>
               </button>
             ))}
           </div>
@@ -743,36 +758,36 @@ export default function VmtStore() {
 
       {linked && (
         <section className="vmt-similar">
-          <Bar>{similar.some((x) => x.score > 0) ? 'ΚΙ ΑΛΛΑ ΣΑΝ ΑΥΤΟ' : 'ΔΕΣ ΚΑΙ ΑΥΤΑ'}</Bar>
+          <Bar>{similar.some((x) => x.score > 0) ? t.similar : t.seeAlso}</Bar>
           <div className="vmt-similar-grid">
             {(similar.some((x) => x.score > 0) ? similar.filter((x) => x.score > 0) : similar)
               .slice(0, 4)
               .map(({ b }) => (
-                <Link key={b.title} to={`/beats/${slugOf(b.title)}`} className="vmt-similar-card">
+                <Link key={b.title} to={`${base}/${slugOf(b.title)}`} className="vmt-similar-card">
                   <img src={b.cover} alt="" className="vmt-tone" loading="lazy" />
                   <strong>{b.title}</strong>
                   <span>{b.bpm} BPM · {b.key}</span>
                 </Link>
               ))}
           </div>
-          <Link to="/beats" className="vmt-ghost vmt-more">Δες όλα τα beats</Link>
+          <Link to={base} className="vmt-ghost vmt-more">{t.seeAll}</Link>
         </section>
       )}
 
       {firstOrderActive() && (!currentUser || firstEligible) && !linked && (
         <div className="vmt-first">
-          <strong>-20% στην πρώτη σου αγορά</strong>
-          <span>{currentUser ? 'Η έκπτωση μπαίνει μόνη της στο καλάθι. Μέχρι 19/10.' : 'Μέχρι 19/10. Κάνε λογαριασμό και η έκπτωση μπαίνει μόνη της στο καλάθι.'}</span>
-          {!currentUser && <a className="vmt-ghost" href="/account?next=/beats">Σύνδεση ή εγγραφή</a>}
+          <strong>{t.firstTitle}</strong>
+          <span>{currentUser ? t.firstIn : t.firstOut}</span>
+          {!currentUser && <a className="vmt-ghost" href={`/account?next=${base}`}>{t.loginOrSignup}</a>}
         </div>
       )}
 
       {linked || (!currentUser && firstOrderActive()) ? null : currentUser ? (
-        <div className="vmt-vip"><LoyaltyProgressBar /></div>
+        <div className="vmt-vip"><LoyaltyProgressBar lang={lang} /></div>
       ) : (
         <div className="vmt-login">
-          <p><strong>Μπες στο account σου</strong> και κάθε beat που παίρνεις μετράει για μόνιμη έκπτωση: 10% από τα 3 beats, 15% από τα 6, 30% από τα 10. Τα αρχεία σου μένουν εκεί για πάντα.</p>
-          <a className="vmt-ghost" href="/account?next=/beats">Σύνδεση ή εγγραφή</a>
+          <p><strong>{t.loginPitchStrong}</strong>{t.loginPitch}</p>
+          <a className="vmt-ghost" href={`/account?next=${base}`}>{t.loginOrSignup}</a>
         </div>
       )}
 
@@ -786,12 +801,12 @@ export default function VmtStore() {
         <Bar>PLAYLIST · {all.length} BEATS</Bar>
         <div className="vmt-door-tabs" role="tablist">
           <button className={door === 'list' ? 'on' : ''} onClick={() => { stop(); setDoor('list'); }}>
-            <span className="vmt-door-title"><ListIcon size={18} /> Ξέρω τι θέλω</span>
-            <small>Ψάξε με όνομα, κλειδί ή BPM</small>
+            <span className="vmt-door-title"><ListIcon size={18} /> {t.knowTitle}</span>
+            <small>{t.knowSub}</small>
           </button>
           <button className={door === 'feed' ? 'on' : ''} onClick={() => setDoor('feed')}>
-            <span className="vmt-door-title"><Shuffle size={18} /> Δεν ξέρω τι ψάχνω</span>
-            <small>Ένα ένα, ακούς κατευθείαν το drop</small>
+            <span className="vmt-door-title"><Shuffle size={18} /> {t.browseTitle}</span>
+            <small>{t.browseSub}</small>
           </button>
         </div>
 
@@ -806,13 +821,13 @@ export default function VmtStore() {
             <div className="vmt-feed-body">
               <h2>{feedBeat.title}</h2>
               <p className="vmt-specs">{feedBeat.bpm} BPM · {feedBeat.key}</p>
-              <div className="vmt-tags">{(feedBeat.mood || []).map((t) => <span key={t}>#{t}</span>)}</div>
+              <div className="vmt-tags">{(feedBeat.mood || []).map((m) => <span key={m}>#{t.mood(m)}</span>)}</div>
               <Waveform peaks={feedBeat.peaks} progress={current?.title === feedBeat.title ? progress : 0} onSeek={(f) => seek(feedBeat, f)} big />
-              <p className="vmt-hint">Πάτα play και ακούς κατευθείαν το drop.</p>
+              <p className="vmt-hint">{t.dropHint}</p>
               <div className="vmt-actions">
-                <button className="vmt-buy" onClick={() => openLicenses(feedBeat)}>Αυτό θέλω</button>
-                <button className="vmt-ghost" onClick={nextInFeed}>Επόμενο <SkipForward size={16} /></button>
-                <button className="vmt-ghost" onClick={() => { stop(); setRecBeat(feedBeat); }}><Mic size={16} /> Ράψε</button>
+                <button className="vmt-buy" onClick={() => openLicenses(feedBeat)}>{t.wantThis}</button>
+                <button className="vmt-ghost" onClick={nextInFeed}>{t.next} <SkipForward size={16} /></button>
+                <button className="vmt-ghost" onClick={() => { stop(); setRecBeat(feedBeat); }}><Mic size={16} /> {t.rec.short}</button>
               </div>
             </div>
           </div>
@@ -823,34 +838,34 @@ export default function VmtStore() {
             <div className="vmt-list-tools">
               <input
                 type="search"
-                placeholder="Ψάξε: όνομα, BPM, κλειδί, διάθεση"
+                placeholder={t.search}
                 value={query}
                 onChange={(e) => { setQuery(e.target.value); setLimit(8); }}
               />
               <div className="vmt-ftoggles">
                 {genres.length > 1 && (
                   <button className={`${openF === 'genre' ? 'open' : ''} ${genre !== 'όλα' ? 'set' : ''}`} onClick={() => setOpenF(openF === 'genre' ? null : 'genre')}>
-                    Είδος: <b>{genre}</b> <ChevronDown size={14} />
+                    {t.genre}: <b>{t.mood(genre)}</b> <ChevronDown size={14} />
                   </button>
                 )}
                 <button className={`${openF === 'mood' ? 'open' : ''} ${mood !== 'όλα' ? 'set' : ''}`} onClick={() => setOpenF(openF === 'mood' ? null : 'mood')}>
-                  Διάθεση: <b>{mood}</b> <ChevronDown size={14} />
+                  {t.moodLabel}: <b>{t.mood(mood)}</b> <ChevronDown size={14} />
                 </button>
               </div>
               {genres.length > 1 && (
                 <div className={`vmt-moods vmt-genres vmt-fold ${openF === 'genre' ? 'open' : ''}`}>
-                  <span>Είδος</span>
+                  <span>{t.genre}</span>
                   {['όλα', ...genres].map((g) => (
                     <button key={g} className={g === genre ? 'on' : ''} onClick={() => { setGenre(g); setLimit(8); setOpenF(null); }}>
-                      {g}{g !== 'όλα' && <small> {genreCount[g]}</small>}
+                      {t.mood(g)}{g !== 'όλα' && <small> {genreCount[g]}</small>}
                     </button>
                   ))}
                 </div>
               )}
               <div className={`vmt-moods vmt-fold ${openF === 'mood' ? 'open' : ''}`}>
-                <span>Διάθεση</span>
+                <span>{t.moodLabel}</span>
                 {moods.map((m) => (
-                  <button key={m} className={m === mood ? 'on' : ''} onClick={() => { setMood(m); setLimit(8); setOpenF(null); }}>{m}</button>
+                  <button key={m} className={m === mood ? 'on' : ''} onClick={() => { setMood(m); setLimit(8); setOpenF(null); }}>{t.mood(m)}</button>
                 ))}
               </div>
             </div>
@@ -865,9 +880,9 @@ export default function VmtStore() {
                     </button>
                     <img src={b.cover} alt="" loading="lazy" className={`vmt-tone ${isOn(b) ? 'spin' : ''}`} />
                     <div className="vmt-row-main">
-                      {isArchive(b) && <em className="vmt-archive">ΑΠΟ ΤΟ ΑΡΧΕΙΟ</em>}
-                      <strong><Link to={`/beats/${slugOf(b.title)}`} className="vmt-title-link" title="Η σελίδα του beat">{b.title}</Link></strong>
-                      <span>{(b.mood || []).join(' · ')}</span>
+                      {isArchive(b) && <em className="vmt-archive">{t.fromArchive}</em>}
+                      <strong><Link to={`${base}/${slugOf(b.title)}`} className="vmt-title-link" title={t.beatPage}>{b.title}</Link></strong>
+                      <span>{(b.mood || []).map(t.mood).join(' · ')}</span>
                     </div>
                     <MiniWave peaks={b.peaks} progress={current?.title === b.title ? progress : 0} />
                     <span className="vmt-lcd">{b.bpm}<small>BPM</small></span>
@@ -876,7 +891,7 @@ export default function VmtStore() {
                       <span className="vmt-row-sold">SOLD{b.soldTo ? ` · ${b.soldTo}` : ''}</span>
                     ) : (
                       <>
-                        <button className="vmt-row-mic" onClick={() => { stop(); setRecBeat(b); }} aria-label="Ράψε πάνω του"><Mic size={18} /></button>
+                        <button className="vmt-row-mic" onClick={() => { stop(); setRecBeat(b); }} aria-label={t.rec.title}><Mic size={18} /></button>
                         <ShareButton beat={b} small />
                         <button className="vmt-ghost vmt-price-btn" onClick={(e) => { e.stopPropagation(); openLicenses(b); }}>{fromPrice(b)}</button>
                       </>
@@ -885,9 +900,9 @@ export default function VmtStore() {
                 );
               })}
             </ul>
-            {listed.length === 0 && <p className="vmt-hint">Αυτό δεν το έχω μαγειρέψει ακόμα. Δοκίμασε κάτι άλλο ή γράψε μου να σου το φτιάξω.</p>}
+            {listed.length === 0 && <p className="vmt-hint">{t.empty}</p>}
             {listed.length > limit && (
-              <button className="vmt-ghost vmt-more" onClick={() => setLimit(limit + 8)}>Δες κι άλλα ({listed.length - limit})</button>
+              <button className="vmt-ghost vmt-more" onClick={() => setLimit(limit + 8)}>{t.more(listed.length - limit)}</button>
             )}
           </div>
         )}
@@ -898,31 +913,31 @@ export default function VmtStore() {
 
       {/* 3. Άδειες: στο desktop ανοιχτές, στο κινητό με κουμπί */}
       <section className={`vmt-licenses ${showLic ? 'open' : ''}`}>
-        <Bar>MIXER · ΑΔΕΙΕΣ</Bar>
-        <p className="vmt-kicker">ΟΙ ΑΔΕΙΕΣ, ΚΑΘΑΡΑ</p>
+        <Bar>{t.licBar}</Bar>
+        <p className="vmt-kicker">{t.licKicker}</p>
         <button className="vmt-ghost vmt-lic-toggle" onClick={() => setShowLic(!showLic)}>
-          {showLic ? 'Κλείσε τις άδειες' : 'Δες όλες τις άδειες'}
+          {showLic ? t.licClose : t.licOpen}
         </button>
         <div className="vmt-lic">
           {LICENSES.map((l) => (
             <div key={l.key} className={`vmt-lic-card ${l.featured ? 'feat' : ''}`}>
-              {l.featured && <span className="vmt-ribbon">Η ΠΡΟΤΑΣΗ ΤΟΥ ΠΑΡΑΓΩΓΟΥ</span>}
+              {l.featured && <span className="vmt-ribbon">{t.ribbon}</span>}
               <h3>{l.name}</h3>
-              {l.note && <p className="vmt-lic-note">{l.note}</p>}
-              <p className="vmt-price">{l.price}</p>
-              <ul>{l.features.map((f) => <li key={f}><Check size={14} /> {f}</li>)}</ul>
+              {l.note && <p className="vmt-lic-note">{t.licNote(money(priceFor(null, 'wav') - priceFor(null, 'mp3')))}</p>}
+              <p className="vmt-price">{money(priceFor(null, l.key))}</p>
+              <ul>{t.lic[l.key].map((f) => <li key={f}><Check size={14} /> {f}</li>)}</ul>
             </div>
           ))}
         </div>
         <div className="vmt-custom">
           <Bar>CUSTOM</Bar>
           <div>
-            <h2>Θες κάτι μόνο δικό σου;</h2>
-            <p>Αποκλειστικότητα σε έτοιμο beat ή custom beat φτιαγμένο για σένα. Γράψε μου και τα λέμε.</p>
+            <h2>{t.customTitle}</h2>
+            <p>{t.customText}</p>
           </div>
           <div className="vmt-custom-btns">
-            <a href={mailto('Exclusive beat')} className="vmt-ghost"><Mail size={16} /> Επικοινωνία για αποκλειστικότητα</a>
-            <a href={mailto('Custom beat')} className="vmt-ghost"><Mail size={16} /> Custom beat από 100€</a>
+            <a href={mailto('Exclusive beat')} className="vmt-ghost"><Mail size={16} /> {t.exclusive}</a>
+            <a href={mailto('Custom beat')} className="vmt-ghost"><Mail size={16} /> {t.customBtn}</a>
           </div>
         </div>
       </section>
@@ -934,12 +949,12 @@ export default function VmtStore() {
       <footer className="vmt-foot">
         <span>vybezmadethis · The Robe Producer</span>
         <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
-        <a href="/beats/oroi">Όροι, άδειες και απόρρητο</a>
+        <a href="/beats/oroi" hrefLang="el">{t.terms}</a>
         <a href="/" className="vmt-foot-bv">part of Black Vybez</a>
       </footer>
 
       {priced.lines.length > 0 && (
-        <button className={`vmt-cart-fab ${current ? 'up' : ''}`} onClick={() => setCartOpen(true)} aria-label="Καλάθι">
+        <button className={`vmt-cart-fab ${current ? 'up' : ''}`} onClick={() => setCartOpen(true)} aria-label={t.cart}>
           <ShoppingCart size={20} /> <span>{priced.lines.length}</span>
         </button>
       )}
@@ -949,10 +964,10 @@ export default function VmtStore() {
       {cartOpen && (
         <div className="vmt-modal" onClick={() => setCartOpen(false)}>
           <div className="vmt-sheet narrow" onClick={(e) => e.stopPropagation()}>
-            <button className="vmt-close" onClick={() => setCartOpen(false)} aria-label="Κλείσιμο"><X /></button>
-            <p className="vmt-kicker">ΤΟ ΚΑΛΑΘΙ ΣΟΥ</p>
+            <button className="vmt-close" onClick={() => setCartOpen(false)} aria-label={t.close}><X /></button>
+            <p className="vmt-kicker">{t.yourCart}</p>
             {priced.lines.length === 0 ? (
-              <p className="vmt-trust">Άδεια η κατσαρόλα ακόμα. Διάλεξε ένα beat και βάλ' το στο καλάθι.</p>
+              <p className="vmt-trust">{t.cartEmpty}</p>
             ) : (
               <>
                 <ul className="vmt-cart-list">
@@ -962,29 +977,29 @@ export default function VmtStore() {
                         <strong>{l.title}</strong>
                         <span>{l.license.toUpperCase()}</span>
                       </div>
-                      <span className={l.free ? 'vmt-free' : ''}>{l.free ? 'ΔΩΡΟ' : euro(l.price)}</span>
-                      <button onClick={() => removeFromCart(l.slug)} aria-label="Αφαίρεση"><Trash2 size={16} /></button>
+                      <span className={l.free ? 'vmt-free' : ''}>{l.free ? t.free : money(l.price)}</span>
+                      <button onClick={() => removeFromCart(l.slug)} aria-label={t.remove}><Trash2 size={16} /></button>
                     </li>
                   ))}
                 </ul>
                 {PROMOS.bundle.active && priced.lines.length % 3 === 2 && (
-                  <p className="vmt-promo">Βάλε 1 beat ακόμα και το φθηνότερο είναι δώρο.</p>
+                  <p className="vmt-promo">{t.bundleHint}</p>
                 )}
                 <div className="vmt-cart-sum">
-                  {priced.bundleSaving > 0 && <p><span>{PROMOS.bundle.label}</span><span>−{euro(priced.bundleSaving)}</span></p>}
-                  {priced.discount > 0 && <p><span>{priced.reason.includes("%") ? priced.reason : `${priced.reason} ${priced.percent}%`}</span><span>−{euro(priced.discount)}</span></p>}
-                  <p className="total"><span>Σύνολο <small>με ΦΠΑ</small></span><span>{priced.total < priced.subtotal && <s className="vmt-was">{euro(priced.subtotal)}</s>}{euro(priced.total)}</span></p>
-                  {(priced.bundleSaving + priced.discount) > 0 && <p className="vmt-save">Κερδίζεις {euro(priced.bundleSaving + priced.discount)}</p>}
+                  {priced.bundleSaving > 0 && <p><span>{t.bundleLabel}</span><span>−{money(priced.bundleSaving)}</span></p>}
+                  {priced.discount > 0 && <p><span>{t.reason(priced)}</span><span>−{money(priced.discount)}</span></p>}
+                  <p className="total"><span>{t.total} <small>{t.vat}</small></span><span>{priced.total < priced.subtotal && <s className="vmt-was">{money(priced.subtotal)}</s>}{money(priced.total)}</span></p>
+                  {(priced.bundleSaving + priced.discount) > 0 && <p className="vmt-save">{t.save(money(priced.bundleSaving + priced.discount))}</p>}
                 </div>
                 <label className={`vmt-consent ${needAgree ? 'need' : ''}`} ref={consentRef}>
                   <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setPayError(''); setNeedAgree(false); }} />
-                  <span>Θέλω τα αρχεία αμέσως και ξέρω ότι μετά τη λήψη δεν γίνεται υπαναχώρηση. Δέχομαι τους <a href="/beats/oroi" target="_blank" rel="noopener">όρους και τις άδειες</a>.</span>
+                  <span>{t.consent}<a href="/beats/oroi" target="_blank" rel="noopener" hrefLang="el">{t.consentLink}</a>.</span>
                 </label>
                 {payError && <p className="vmt-error">{payError}</p>}
                 <button className="vmt-buy" disabled={paying} onClick={() => { openedAt.current = 0; checkout(cart, true); }}>
-                  {paying ? 'Ανοίγει η πληρωμή…' : `Πληρωμή ${euro(priced.total)}`}
+                  {paying ? t.opening : t.pay(money(priced.total))}
                 </button>
-                <p className="vmt-fine vmt-secure"><Lock size={13} /> Ασφαλής πληρωμή μέσω Polar. Τα αρχεία έρχονται αμέσως στο email σου.</p>
+                <p className="vmt-fine vmt-secure"><Lock size={13} /> {t.secureCart}</p>
               </>
             )}
           </div>
@@ -994,29 +1009,29 @@ export default function VmtStore() {
       {current && (
         <div className="vmt-player">
           <div className="vmt-pp-group">
-            <button className="vmt-skip" onClick={() => step2(-1)} aria-label="Προηγούμενο"><SkipBack size={18} /></button>
+            <button className="vmt-skip" onClick={() => step2(-1)} aria-label={t.prev}><SkipBack size={18} /></button>
             <button className="vmt-pp" onClick={() => play(current)} aria-label="Play">
               {playing ? <Pause size={20} /> : <Play size={20} />}
             </button>
-            <button className="vmt-skip" onClick={() => step2(1)} aria-label="Επόμενο"><SkipForward size={18} /></button>
+            <button className="vmt-skip" onClick={() => step2(1)} aria-label={t.next}><SkipForward size={18} /></button>
           </div>
           <div className="vmt-player-info">
             <strong>{current.title}</strong>
             <span>{current.bpm} BPM · {current.key}</span>
           </div>
           <Waveform peaks={current.peaks} progress={progress} onSeek={(f) => seek(current, f)} />
-          <button className="vmt-buy small" onClick={() => openLicenses(current)}>Αγορά</button>
+          <button className="vmt-buy small" onClick={() => openLicenses(current)}>{t.buy}</button>
         </div>
       )}
 
       {recBeat && (
         <div className="vmt-modal" onClick={() => setRecBeat(null)}>
           <div className="vmt-sheet narrow" onClick={(e) => e.stopPropagation()}>
-            <button className="vmt-close" onClick={() => setRecBeat(null)} aria-label="Κλείσιμο"><X /></button>
+            <button className="vmt-close" onClick={() => setRecBeat(null)} aria-label={t.close}><X /></button>
             <p className="vmt-kicker">{recBeat.title}</p>
             <RecordOver key={recBeat.title} beat={recBeat} />
             <button className="vmt-buy" style={{ marginTop: 18 }} onClick={() => { openLicenses(recBeat); setRecBeat(null); }}>
-              Κάθεται; Πάρ' το από {fromPrice(recBeat)}
+              {t.rec.buy(fromPrice(recBeat))}
             </button>
           </div>
         </div>
@@ -1025,13 +1040,13 @@ export default function VmtStore() {
       {thanks && (
         <div className="vmt-modal" onClick={() => setThanks(null)}>
           <div className="vmt-sheet narrow" onClick={(e) => e.stopPropagation()}>
-            <button className="vmt-close" onClick={() => setThanks(null)} aria-label="Κλείσιμο"><X /></button>
-            <p className="vmt-kicker">ΕΤΟΙΜΟ</p>
-            <h2>{thanks.length > 1 ? 'Είναι δικά σου' : `Το ${thanks[0]} είναι δικό σου`}</h2>
-            <p className="vmt-trust">Σου στείλαμε email με τα links λήψης. Αν έχεις account εδώ με το ίδιο email, τα αρχεία είναι πάντα και στο «Τα Beats μου».</p>
+            <button className="vmt-close" onClick={() => setThanks(null)} aria-label={t.close}><X /></button>
+            <p className="vmt-kicker">{t.done}</p>
+            <h2>{thanks.length > 1 ? t.yoursMany : t.yoursOne(thanks[0])}</h2>
+            <p className="vmt-trust">{t.thanksText}</p>
             <div className="vmt-actions">
-              <a className="vmt-buy" href="/account">Πήγαινε στα beats μου</a>
-              <button className="vmt-ghost" onClick={() => setThanks(null)}>Πίσω στα beats</button>
+              <a className="vmt-buy" href="/account">{t.goMine}</a>
+              <button className="vmt-ghost" onClick={() => setThanks(null)}>{t.backBeats}</button>
             </div>
           </div>
         </div>
@@ -1040,10 +1055,10 @@ export default function VmtStore() {
       {licenseBeat && (
         <div className="vmt-modal" onClick={() => setLicenseBeat(null)}>
           <div className="vmt-sheet" onClick={(e) => e.stopPropagation()}>
-            <button className="vmt-close" onClick={() => setLicenseBeat(null)} aria-label="Κλείσιμο"><X /></button>
-            <p className="vmt-kicker">ΔΙΑΛΕΞΕ ΠΩΣ ΤΟ ΘΕΣ</p>
+            <button className="vmt-close" onClick={() => setLicenseBeat(null)} aria-label={t.close}><X /></button>
+            <p className="vmt-kicker">{t.pick}</p>
             <h2>{licenseBeat.title}</h2>
-            <p className="vmt-trust">Πληρώνεις, κατεβάζεις αμέσως. Χωρίς tag. Το ανεβάζεις σε Spotify, YouTube και παντού, κρατάς τα έσοδα και γράφεις «prod. vybezmadethis».</p>
+            <p className="vmt-trust">{t.trust}</p>
             {licenseBeat.video ? (
               <video className="vmt-video" src={licenseBeat.video} controls playsInline preload="metadata" />
             ) : (
@@ -1057,7 +1072,7 @@ export default function VmtStore() {
             )}
             <label className={`vmt-consent ${needAgree ? 'need' : ''}`} ref={consentRef}>
               <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setPayError(''); setNeedAgree(false); }} />
-              <span>Θέλω τα αρχεία αμέσως και ξέρω ότι μετά τη λήψη δεν γίνεται υπαναχώρηση. Δέχομαι τους <a href="/beats/oroi" target="_blank" rel="noopener">όρους και τις άδειες</a>.</span>
+              <span>{t.consent}<a href="/beats/oroi" target="_blank" rel="noopener" hrefLang="el">{t.consentLink}</a>.</span>
             </label>
             {payError && <p className="vmt-error">{payError}</p>}
             <div className="vmt-lic">
@@ -1066,31 +1081,31 @@ export default function VmtStore() {
                 const slug = slugOf(licenseBeat.title);
                 return (
                   <div key={l.key} className={`vmt-lic-card ${l.featured ? 'feat' : ''}`}>
-                    {l.featured && <span className="vmt-ribbon">Η ΠΡΟΤΑΣΗ ΤΟΥ ΠΑΡΑΓΩΓΟΥ</span>}
+                    {l.featured && <span className="vmt-ribbon">{t.ribbon}</span>}
                     <h3>{l.name}</h3>
-              {l.note && <p className="vmt-lic-note">{isArchive(licenseBeat) ? `Μόνο ${euro(priceFor(licenseBeat, 'wav') - priceFor(licenseBeat, 'mp3'))} παραπάνω, και είναι δικό σου για πάντα` : l.note}</p>}
-                    <p className="vmt-price">{euro(priceFor(licenseBeat, l.key))}</p>
-                    <ul>{l.features.map((f) => <li key={f}><Check size={14} /> {f}</li>)}</ul>
+              {l.note && <p className="vmt-lic-note">{t.licNote(money(priceFor(licenseBeat, 'wav') - priceFor(licenseBeat, 'mp3')))}</p>}
+                    <p className="vmt-price">{money(priceFor(licenseBeat, l.key))}</p>
+                    <ul>{t.lic[l.key].map((f) => <li key={f}><Check size={14} /> {f}</li>)}</ul>
                     {can ? (
                       <div className="vmt-lic-btns">
                         <button className={l.featured ? 'vmt-buy' : 'vmt-ghost vmt-ghost-strong'} disabled={paying} onClick={() => checkout([{ slug, license: l.key }], false)}>
-                          Πάρ' το
+                          {t.getIt}
                         </button>
                         <button type="button" className="vmt-addcart" onClick={() => { addToCart(licenseBeat, l.key); setLicenseBeat(null); setCartOpen(true); }}>
-                          {inCart(slug, l.key) ? <><Check size={13} /> Είναι στο καλάθι</> : <><ShoppingCart size={13} /> ή βάλ' το στο καλάθι</>}
+                          {inCart(slug, l.key) ? <><Check size={13} /> {t.inCart}</> : <><ShoppingCart size={13} /> {t.addCart}</>}
                         </button>
                       </div>
                     ) : (
-                      <span className="vmt-soon">Σύντομα</span>
+                      <span className="vmt-soon">{t.soon}</span>
                     )}
                   </div>
                 );
               })}
             </div>
-            {PROMOS.bundle.active && <p className="vmt-fine vmt-promo">{PROMOS.bundle.label}: βάλε 3 beats στο καλάθι και το φθηνότερο είναι δώρο.</p>}
-            <p className="vmt-fine vmt-secure"><Lock size={13} /> Τιμές με ΦΠΑ. Ασφαλής πληρωμή μέσω Polar (στα αγγλικά, πατάς «Pay now»). Τα αρχεία έρχονται αμέσως στο email σου.</p>
+            {PROMOS.bundle.active && <p className="vmt-fine vmt-promo">{t.bundleLabel}: {t.bundleFine}</p>}
+            <p className="vmt-fine vmt-secure"><Lock size={13} /> {t.secureLic}</p>
             <p className="vmt-fine">
-              Θες το {licenseBeat.title} μόνο για σένα; <a href={mailto(`Αποκλειστικότητα: ${licenseBeat.title}`)}>Επικοινωνία για αποκλειστικότητα</a>.
+              {t.onlyYou(licenseBeat.title)}<a href={mailto(t.exclusiveSubject(licenseBeat.title))}>{t.exclusive}</a>.
             </p>
           </div>
         </div>

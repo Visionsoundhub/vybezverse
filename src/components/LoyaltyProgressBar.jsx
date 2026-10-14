@@ -5,8 +5,10 @@ import { Star, Award, Zap, Info, X } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { LOYALTY_TIERS, tierForPurchases, discountLabel } from '../data/loyaltyTiers';
 import useBeatPurchases from '../utils/useBeatPurchases';
+import { VMT_TEXT } from '../data/vmtI18n';
 
-const LoyaltyProgressBar = () => {
+const LoyaltyProgressBar = ({ lang = 'el' }) => {
+  const t = VMT_TEXT[lang].loyalty;
   const { currentUser } = useAuth();
   const { loading, beatCount: purchasesCount, vipCode } = useBeatPurchases();
   const [showInfo, setShowInfo] = useState(false);
@@ -45,16 +47,16 @@ const LoyaltyProgressBar = () => {
                 <Info size={16} />
               </button>
             </div>
-            <p>VIP Έκπτωση: {discountLabel(currentTier)}{vipCode ? `, κωδικός ${vipCode}` : ''}</p>
+            <p>{t.discount}: {discountLabel(currentTier)}{vipCode ? `, ${t.code} ${vipCode}` : ''}</p>
           </div>
         </div>
         {nextTier ? (
           <div className="loyalty-status">
-            Αγόρασε <strong>{remaining}</strong> beats ακόμα για το <strong>{nextTier.name}</strong> ({discountLabel(nextTier)})
+            {t.buyMore(remaining, nextTier.name, discountLabel(nextTier))}
           </div>
         ) : (
           <div className="loyalty-status gold-status">
-            Έχεις φτάσει στο μέγιστο Level! ({discountLabel(currentTier)} OFF)
+            {t.max(discountLabel(currentTier))}
           </div>
         )}
       </div>
@@ -75,8 +77,8 @@ const LoyaltyProgressBar = () => {
         <div className="loyalty-info-modal-overlay" onClick={() => setShowInfo(false)}>
           <div className="loyalty-info-modal glass" onClick={e => e.stopPropagation()}>
             <button className="btn-close-modal" onClick={() => setShowInfo(false)}><X size={20}/></button>
-            <h4>Πώς δουλεύει το VIP Club;</h4>
-            <p>Κάθε φορά που αγοράζεις ένα Beat, ανεβαίνεις Level και ξεκλειδώνεις <strong>μόνιμες εκπτώσεις</strong> για όλες τις μελλοντικές σου αγορές!</p>
+            <h4>{t.how}</h4>
+            <p>{t.howText}</p>
             <ul>
               {LOYALTY_TIERS.map((tier, i) => {
                 const next = LOYALTY_TIERS[i + 1];
@@ -84,12 +86,12 @@ const LoyaltyProgressBar = () => {
                 return (
                   <li key={tier.key}>
                     <strong>{tier.name} ({range} Beats):</strong>{' '}
-                    {tier.percent ? `Ξεκλειδώνεις -${tier.percent}% μόνιμα.` : 'Η αρχή του ταξιδιού σου.'}
+                    {tier.percent ? t.unlock(tier.percent) : t.start}
                   </li>
                 );
               })}
             </ul>
-            <p className="note">* Η έκπτωση VIP εφαρμόζεται πάνω στην αρχική τιμή του Beat (δεν συνδυάζεται με χρονόμετρα προσφορών).</p>
+            <p className="note">{t.note}</p>
           </div>
         </div>
       , document.body)}

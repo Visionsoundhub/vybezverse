@@ -110,6 +110,16 @@ function injectStaticBody(html, bodyHtml) {
   return html.replace('<div id="root"></div>', `<div id="root"><main>\n${bodyHtml}\n</main></div>`);
 }
 
+// hreflang: η ελληνική (/beats/...) και η αγγλική (/en/beats/...) σελίδα δείχνουν η μία την άλλη.
+function hreflang(html, elPath) {
+  return html.replace('</head>', `  <link rel="alternate" hreflang="el" href="${SITE_URL}/${elPath}" />
+  <link rel="alternate" hreflang="en" href="${SITE_URL}/en/${elPath}" />
+  <link rel="alternate" hreflang="x-default" href="${SITE_URL}/${elPath}" />
+</head>`);
+}
+// Πώς φαίνονται οι διαθέσεις του beats.json στα αγγλικά (ίδιο με src/data/vmtI18n.jsx).
+const MOOD_EN = { 'σκοτεινό': 'dark', 'συναισθηματικό': 'emotional', 'επιθετικό': 'aggressive', 'καλοκαιρινό': 'summer', 'για χορό': 'dance' };
+
 // 3. Helper συνάρτηση για να αντικαθιστά τα Meta Tags
 function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, postData, releaseData, podcastData }) {
   let html = htmlTemplate;
@@ -142,7 +152,7 @@ function injectMetaTags(htmlTemplate, { title, description, urlPath, imageUrl, p
 
   // Breadcrumb σε κάθε σελίδα δεύτερου επιπέδου
   const parts = String(urlPath || '').split('/').filter(Boolean);
-  if (parts.length === 2) {
+  if (parts.length === 2 && parts[0] !== 'en') {
     const SECTION = { blog: 'Journal', releases: 'Releases', podcasts: 'Podcast' };
     const bc = breadcrumb([['Αρχική', '/'], [SECTION[parts[0]] || parts[0], `/${parts[0]}`], [title.split(' | ')[0].split(' - ')[0], `/${urlPath}`]]);
     html = html.replace('</head>', `  <script type="application/ld+json">${JSON.stringify(bc)}</script>\n</head>`);
@@ -319,6 +329,7 @@ ${mdToHtml(bioData?.content || '')}`,
         }))
       };
       htmlContent = htmlContent.replace('</head>', `  <script type="application/ld+json">${JSON.stringify(list)}</script>\n</head>`);
+      htmlContent = hreflang(htmlContent, 'beats');
     }
     fs.writeFileSync(filePath, htmlContent);
     console.log(`✅ Δημιουργήθηκε: /${route.path}`);
@@ -349,10 +360,60 @@ ${mdToHtml(bioData?.content || '')}`,
       offers: { '@type': 'AggregateOffer', priceCurrency: 'EUR', lowPrice: b.tier === 'archive' ? '14.99' : '19.99', highPrice: b.tier === 'archive' ? '17.99' : (b.files?.stems ? '49.99' : '24.99'), offerCount: b.files?.stems ? 3 : 2, availability: 'https://schema.org/InStock', url: `${SITE_URL}/beats/${slug}` },
     };
     html = html.replace('</head>', `  <script type="application/ld+json">${JSON.stringify(product)}</script>\n</head>`);
+    html = hreflang(html, `beats/${slug}`);
     const fp = path.join(DIST_DIR, 'beats', `${slug}.html`);
     fs.mkdirSync(path.dirname(fp), { recursive: true });
     fs.writeFileSync(fp, html);
     console.log(`✅ Δημιουργήθηκε: /beats/${slug}`);
+  }
+
+  // Α3. Αγγλικό beat store: /en/beats και /en/beats/<slug>
+  const toEn = (h) => h.replace('<html lang="el">', '<html lang="en">').replace('content="el_GR"', 'content="en_US"');
+  const moodsEn = (b) => [...(b.tags || []), ...(b.mood || []).map((m) => MOOD_EN[m] || m)];
+  {
+    let html = toEn(injectStaticBody(injectMetaTags(baseHtml, {
+      title: 'Rap and trap beats | vybezmadethis',
+      description: 'Beats by producer vybezmadethis. Listen, record your voice over them and get them from €19.99 with instant download. MP3, WAV and stems.',
+      urlPath: 'en/beats'
+    }), `<h1>VMT Beats | vybezmadethis</h1>
+<p>Beats by producer vybezmadethis, The Robe Producer. Licenses: MP3 €19.99, WAV €24.99, Stems €49.99, instant untagged download.</p>
+<ul>${beatsFile.beatslist.map((b) => { const t = moodsEn(b); return `<li><a href="/en/beats/${beatSlug(b.title)}">${esc(b.title)}</a>${b.bpm ? `, ${esc(b.bpm)} BPM` : ''}${b.key ? `, ${esc(b.key)}` : ''}${t.length ? `, ${t.map(esc).join(', ')} beat` : ''}</li>`; }).join('\n')}</ul>
+<p><a href="/beats">Ελληνικά</a> · <a href="/beats/oroi">Terms and licenses (in Greek)</a></p>`));
+    html = hreflang(html, 'beats');
+    const fp = path.join(DIST_DIR, 'en', 'beats.html');
+    fs.mkdirSync(path.dirname(fp), { recursive: true });
+    fs.writeFileSync(fp, html);
+    console.log('✅ Δημιουργήθηκε: /en/beats');
+  }
+  for (const b of beatsFile.beatslist.filter((x) => x.status !== 'sold')) {
+    const slug = beatSlug(b.title);
+    const t = moodsEn(b);
+    const style = b.category || (b.tags || [])[0] || 'beat';
+    const archive = b.tier === 'archive';
+    const title = `${b.title}, ${style} type beat ${b.bpm} BPM | vybezmadethis`;
+    const description = `${b.title}: ${t.join(', ')} beat at ${b.bpm} BPM in ${b.key}, by producer vybezmadethis. Listen, record over it and get it from €${archive ? '14.99' : '19.99'} with instant download.`;
+    let html = toEn(injectStaticBody(injectMetaTags(baseHtml, { title, description, urlPath: `en/beats/${slug}`, imageUrl: b.cover }),
+      `<h1>${esc(b.title)}</h1>
+<p>${esc(t.join(', '))} beat, ${esc(b.bpm)} BPM, ${esc(b.key)}. Produced by vybezmadethis.</p>
+<p>Licenses: ${archive ? 'MP3 €14.99, WAV €17.99' : `MP3 €19.99, WAV €24.99${b.files?.stems ? ', Stems €49.99' : ''}`}. Instant untagged download.</p>
+<p><a href="/en/beats">All beats</a> · <a href="/beats/${slug}">Ελληνικά</a> · <a href="/beats/oroi">Terms and licenses (in Greek)</a></p>`));
+    const product = {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: `${b.title} (beat)`,
+      image: abs(b.cover),
+      description,
+      keywords: [...t, 'beat', 'type beat', 'instrumental', `${b.bpm} bpm`].join(', '),
+      category: style,
+      brand: { '@type': 'Brand', name: 'vybezmadethis' },
+      offers: { '@type': 'AggregateOffer', priceCurrency: 'EUR', lowPrice: archive ? '14.99' : '19.99', highPrice: archive ? '17.99' : (b.files?.stems ? '49.99' : '24.99'), offerCount: b.files?.stems ? 3 : 2, availability: 'https://schema.org/InStock', url: `${SITE_URL}/en/beats/${slug}` },
+    };
+    html = html.replace('</head>', `  <script type="application/ld+json">${JSON.stringify(product)}</script>\n</head>`);
+    html = hreflang(html, `beats/${slug}`);
+    const fp = path.join(DIST_DIR, 'en', 'beats', `${slug}.html`);
+    fs.mkdirSync(path.dirname(fp), { recursive: true });
+    fs.writeFileSync(fp, html);
+    console.log(`✅ Δημιουργήθηκε: /en/beats/${slug}`);
   }
 
   // Β. Δυναμικές Σελίδες (Blog Posts)
@@ -469,6 +530,11 @@ function generateSitemap() {
   const beatsForMap = JSON.parse(fs.readFileSync(path.resolve(__dirname, 'src/data/beats.json'), 'utf-8'));
   for (const b of beatsForMap.beatslist.filter((x) => x.status !== 'sold')) {
     urls.push({ loc: `${SITE_URL}/beats/${b.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`, priority: '0.8' });
+  }
+  // Αγγλικό beat store
+  urls.push({ loc: `${SITE_URL}/en/beats`, priority: '0.8' });
+  for (const b of beatsForMap.beatslist.filter((x) => x.status !== 'sold')) {
+    urls.push({ loc: `${SITE_URL}/en/beats/${b.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`, priority: '0.7' });
   }
 
   if (fs.existsSync(BLOG_JSON_PATH)) {

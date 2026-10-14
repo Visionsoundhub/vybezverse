@@ -53,7 +53,7 @@ function AppContent() {
   const location = useLocation();
   const isLinksPage = location.pathname === '/links';
   // Το VMT store έχει δικό του header/footer (άλλο brand).
-  const isVmt = /^\/beats(\/|$)/.test(location.pathname) || location.pathname.startsWith('/beats-new');
+  const isVmt = /^(\/en)?\/beats(\/|$)/.test(location.pathname) || location.pathname.startsWith('/beats-new');
   const [idle, setIdle] = useState(false);
   useEffect(() => {
     const go = () => setIdle(true);
@@ -72,6 +72,7 @@ function AppContent() {
             <Route path="/" element={<HomeV2 />} />
             <Route path="/beats/oroi" element={<VmtLegal />} />
             <Route path="/beats/:slug?" element={<VmtStore />} />
+            <Route path="/en/beats/:slug?" element={<VmtStore />} />
             <Route path="/beats-new" element={<Navigate to="/beats" replace />} />
             <Route path="/beats-new/oroi" element={<Navigate to="/beats/oroi" replace />} />
             <Route path="/store" element={<Store />} />
