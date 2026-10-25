@@ -1,6 +1,23 @@
 {
   "releases": [
     {
+      "slug": "jazz-bar-ton-teraton-2",
+      "title": "Jazz Bar των Τεράτων 2",
+      "tag": "Single",
+      "type": "Single",
+      "date": "2026-10-26",
+      "cover": "/assets/uploads/jazzbar-2-cover.webp",
+      "spotify": "https://open.spotify.com/artist/6I1CYhPF8JMoaCh2zIeGe3",
+      "youtube": "https://www.youtube.com/watch?v=6S5F-lf5RVM",
+      "buy": "https://buy.polar.sh/polar_cl_dqRmsGld9StVb9RnPbzuhbx7puKe855V5helA01cMkh",
+      "price": "1.99€",
+      "localAudio": true,
+      "audioSrc": "https://pub-6c8086510372422287fb8c7038fac54a.r2.dev/jazzbar-2-preview.mp3",
+      "description": "Η πόρτα του Jazz Bar ανοίγει ξανά. Νέοι θαμώνες, ίδια τέρατα. Από τον Black Vybez και τον VybezMadeThis.",
+      "lyrics": "",
+      "hubId": "BLACK_VYBEZ:jazzbar2"
+    },
+    {
       "slug": "ase-me-na-apotyxo",
       "title": "Άσε με να αποτύχω",
       "tag": "Single",
