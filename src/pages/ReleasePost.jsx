@@ -72,12 +72,16 @@ function ReleasePost() {
                       <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => playTrack({ title: item.title, cover: item.cover, audioSrc: item.audioSrc })}>
                         <Play size={16} style={{ marginRight: 8 }} /> Άκουσέ το
                       </button>
-                      <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
-                        <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><Play size={16} style={{ marginRight: 8 }} /> Spotify</button>
-                      </a>
-                      <a href={item.apple || APPLE} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
-                        <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><Music size={16} style={{ marginRight: 8 }} /> Apple Music</button>
-                      </a>
+                      {!item.noStreaming && (
+                        <>
+                          <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                            <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><Play size={16} style={{ marginRight: 8 }} /> Spotify</button>
+                          </a>
+                          <a href={item.apple || APPLE} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                            <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><Music size={16} style={{ marginRight: 8 }} /> Apple Music</button>
+                          </a>
+                        </>
+                      )}
                       <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
                         <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><ExternalLink size={16} style={{ marginRight: 8 }} /> YouTube</button>
                       </a>
