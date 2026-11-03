@@ -94,7 +94,7 @@ function HomeV2() {
               {single?.youtube && <a className="h2-btn" href={single.youtube} target="_blank" rel="noreferrer">YouTube</a>}
               {single?.buy && <a className="h2-btn" href={single.buy} target="_blank" rel="noreferrer">Αγόρασε</a>}
             </div>
-            <div className="h2-who">Black Vybez · rapper και producer · Λάρισα</div>
+            <div className="h2-who">Black Vybez · rapper και producer · Αθήνα</div>
           </div>
           <div className="h2-sleeve-wrap">
             <button className={'h2-sleeve' + (isOn(single) ? ' spin' : '')} onClick={playSingle} aria-label="Άκου">

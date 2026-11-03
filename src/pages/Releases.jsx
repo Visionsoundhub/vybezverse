@@ -84,7 +84,7 @@ function Releases() {
                         <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>YouTube</button></a>
                       </div>
                       {item.downloadSrc && (
-                        <a href={item.downloadSrc} download={`${item.title}.mp3`}><button className="btn-outline" style={{ width: '100%', padding: '9px' }}><Download size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Δωρεάν MP3</button></a>
+                        <a href={item.freeLink || item.downloadSrc} {...(item.freeLink ? { target: '_blank', rel: 'noreferrer' } : { download: `${item.title}.mp3` })}><button className="btn-outline" style={{ width: '100%', padding: '9px' }}><Download size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Δωρεάν MP3</button></a>
                       )}
                       {item.acapella && (
                         <a href={item.acapella} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px' }}><Download size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Δωρεάν Acapella</button></a>

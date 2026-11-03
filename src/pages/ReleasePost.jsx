@@ -86,7 +86,7 @@ function ReleasePost() {
                         <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><ExternalLink size={16} style={{ marginRight: 8 }} /> YouTube</button>
                       </a>
                       {item.downloadSrc && (
-                        <a href={item.downloadSrc} download={`${item.title}.mp3`} style={{ textDecoration: 'none' }}>
+                        <a href={item.freeLink || item.downloadSrc} {...(item.freeLink ? { target: '_blank', rel: 'noreferrer' } : { download: `${item.title}.mp3` })} style={{ textDecoration: 'none' }}>
                           <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}>
                             <Download size={16} style={{ marginRight: 8 }} /> Δωρεάν λήψη MP3
                           </button>
