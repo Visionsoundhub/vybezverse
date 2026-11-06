@@ -4,7 +4,7 @@ import './VmtStore.css';
 
 // Όροι, άδειες, υπαναχώρηση και απόρρητο του VMT beat store, σε μία σελίδα.
 // Αλλάζεις κείμενα μόνο εδώ. Η ημερομηνία ενημέρωσης αλλάζει κάθε φορά που αλλάζει κάτι ουσιαστικό.
-const UPDATED = '3 Οκτωβρίου 2026';
+const UPDATED = '6 Νοεμβρίου 2026';
 const EMAIL = 'support@blackvybez.gr';
 
 export default function VmtLegal() {
@@ -33,6 +33,7 @@ export default function VmtLegal() {
           <a href="#terms">Όροι πώλησης</a>
           <a href="#licenses">Οι άδειες</a>
           <a href="#withdrawal">Υπαναχώρηση</a>
+          <a href="#free">Δωρεάν έκδοση</a>
           <a href="#privacy">Απόρρητο</a>
         </nav>
 
@@ -96,6 +97,12 @@ export default function VmtLegal() {
           <p>Αυτό δεν αλλάζει ότι, αν το αρχείο είναι χαλασμένο, λείπει ή δεν είναι αυτό που περιγράφεται, δικαιούσαι σωστό αρχείο ή επιστροφή χρημάτων. Γράψε στο <a href={`mailto:${EMAIL}`}>{EMAIL}</a>.</p>
         </section>
 
+        <section id="free">
+          <h2>Δωρεάν tagged έκδοση</h2>
+          <p>Η δωρεάν έκδοση έχει το φωνητικό tag και δίνεται μόνο για μη κερδοσκοπική χρήση: demo, freestyle, πρόβα, YouTube χωρίς monetization και δωρεάν ανέβασμα στο SoundCloud. Στα credits γράφεις «prod. vybezmadethis».</p>
+          <p>Δεν επιτρέπεται να την κυκλοφορήσεις σε Spotify, Apple Music ή άλλη πλατφόρμα streaming, ούτε να βγάλεις έσοδα από αυτήν με οποιονδήποτε τρόπο. Αν γίνει, έχουμε το δικαίωμα να ζητήσουμε να κατέβει το κομμάτι και να κινηθούμε νομικά. Για κυκλοφορία παίρνεις άδεια MP3, WAV ή Stems.</p>
+        </section>
+
         <section id="privacy">
           <h2>Απόρρητο</h2>
           <h3>Τι κρατάμε</h3>
@@ -103,6 +110,7 @@ export default function VmtLegal() {
             <li><strong>Account:</strong> email, όνομα και τις αγορές σου, για να βλέπεις τα beats σου και να μετράει η έκπτωση VIP.</li>
             <li><strong>Αγορές:</strong> email, beat, άδεια, ποσό και χώρα. Τα στοιχεία της κάρτας τα βλέπει μόνο η Polar.</li>
             <li><strong>Newsletter:</strong> μόνο το email σου, αν γραφτείς. Φεύγεις με ένα κλικ από κάθε email.</li>
+            <li><strong>Δωρεάν MP3:</strong> email, ποιο beat ζήτησες και από πού ήρθες (π.χ. YouTube). Σου στέλνουμε το link και, επειδή το δέχτηκες, νέα beats και προσφορές. Φεύγεις με ένα κλικ από κάθε email.</li>
             <li><strong>Καλάθι:</strong> μένει μόνο στο δικό σου κινητό ή υπολογιστή, μέχρι να πληρώσεις.</li>
             <li><strong>«Ράψε πάνω του»:</strong> η φωνή που γράφεις μένει μόνο στον browser σου. Δεν ανεβαίνει πουθενά και σβήνει όταν κλείσεις τη σελίδα.</li>
           </ul>

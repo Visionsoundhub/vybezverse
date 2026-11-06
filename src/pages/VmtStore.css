@@ -621,3 +621,12 @@ html:has(.vmt) { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 .vmt-first + .vmt-login, .vmt-first + .vmt-vip { margin-top: 0; }
 .vmt-was { color: var(--vmt-muted); font-weight: 400; font-size: 14px; margin-right: 8px; }
 @media (max-width: 720px) { .vmt-first { margin: -16px auto 20px; } .vmt-first a { width: 100%; } }
+
+/* Δωρεάν tagged MP3 μέσα στο παράθυρο του beat */
+.vmt-free { margin: 18px 0 10px; padding: 16px; border: 1px dashed var(--vmt-line); border-radius: 4px; }
+.vmt-free h3 { margin: 0 0 4px; font-size: 1rem; }
+.vmt-free form { display: flex; flex-direction: column; gap: 10px; margin-top: 10px; }
+.vmt-free input[type="email"] { background: var(--vmt-bg); border: 1px solid var(--vmt-line); color: var(--vmt-text); border-radius: 4px; padding: 12px 14px; font: inherit; font-size: 16px; }
+.vmt-free .vmt-consent { margin: 0; }
+.vmt-free .vmt-ghost { display: inline-flex; align-items: center; gap: 6px; margin-top: 6px; }
+.vmt-free-ok { color: var(--vmt-accent); margin: 8px 0 0; }

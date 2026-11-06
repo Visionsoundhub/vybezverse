@@ -308,6 +308,54 @@ function RecordOver({ beat, onStart }) {
   );
 }
 
+// Δωρεάν tagged MP3: email + συγκατάθεση, το link έρχεται στο email (functions/api/vmt-free.js).
+function FreeDownload({ beat }) {
+  const { lang, t: { freeDl: t } } = useVmt();
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [agree, setAgree] = useState(false);
+  const [state, setState] = useState('');
+  const [msg, setMsg] = useState('');
+  const submit = async (e) => {
+    e.preventDefault();
+    if (!agree) { setMsg(t.needConsent); return; }
+    setState('sending'); setMsg('');
+    const from = new URLSearchParams(window.location.search).get('from') || 'site';
+    try {
+      const r = await fetch('/api/vmt-free', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, consent: true, slug: slugOf(beat.title), from, lang }),
+      });
+      const d = await r.json().catch(() => ({}));
+      if (r.ok && d.ok) { setState('done'); setMsg(t.ok); } else { setState(''); setMsg(d.error || t.fail); }
+    } catch {
+      setState(''); setMsg(t.fail);
+    }
+  };
+  if (beat.status === 'sold') return null;
+  return (
+    <div className="vmt-free">
+      <h3>{t.title}</h3>
+      <p className="vmt-fine">{t.text}</p>
+      {state === 'done' ? <p className="vmt-free-ok"><Check size={14} /> {msg}</p> : !open ? (
+        <button type="button" className="vmt-ghost" onClick={() => setOpen(true)}><Download size={14} /> {t.open}</button>
+      ) : (
+        <form onSubmit={submit}>
+          <input type="email" placeholder={t.placeholder} value={email} onChange={(e) => setEmail(e.target.value)} required />
+          <label className="vmt-consent">
+            <input type="checkbox" checked={agree} onChange={(e) => { setAgree(e.target.checked); setMsg(''); }} />
+            <span>{t.consent}<a href="/beats/oroi#privacy" target="_blank" rel="noopener" hrefLang="el">{t.privacy}</a>.</span>
+          </label>
+          <p className="vmt-fine">{t.terms}</p>
+          {msg && <p className="vmt-error">{msg}</p>}
+          <button className="vmt-buy" type="submit" disabled={state === 'sending'}>{state === 'sending' ? t.sending : t.send}</button>
+        </form>
+      )}
+    </div>
+  );
+}
+
 function Newsletter() {
   const { lang, t: { news: t } } = useVmt();
   const [email, setEmail] = useState('');
@@ -754,6 +802,7 @@ export default function VmtStore() {
             ))}
           </div>
         )}
+        {linked && <FreeDownload key={linked.title} beat={linked} />}
       </header>
 
       {linked && (
@@ -1102,6 +1151,7 @@ export default function VmtStore() {
                 );
               })}
             </div>
+            <FreeDownload key={licenseBeat.title} beat={licenseBeat} />
             {PROMOS.bundle.active && <p className="vmt-fine vmt-promo">{t.bundleLabel}: {t.bundleFine}</p>}
             <p className="vmt-fine vmt-secure"><Lock size={13} /> {t.secureLic}</p>
             <p className="vmt-fine">
