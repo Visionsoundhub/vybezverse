@@ -999,6 +999,7 @@ export default function VmtStore() {
         <span>vybezmadethis · The Robe Producer</span>
         <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
         <a href="/beats/oroi" hrefLang="el">{t.terms}</a>
+        <a href="/privacy">Privacy</a>
         <a href="/" className="vmt-foot-bv">part of Black Vybez</a>
       </footer>
 
