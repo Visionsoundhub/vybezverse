@@ -15,6 +15,7 @@ const MOOD_EN = {
   'bouncy': 'bouncy',
   'καλοκαιρινό': 'summer',
   'για χορό': 'dance',
+  'μελωδικό': 'melodic',
 };
 const COUNTRY_EL = { GR: 'Ελλάδα', CY: 'Κύπρο', DE: 'Γερμανία', GB: 'Αγγλία', US: 'Αμερική', FR: 'Γαλλία', IT: 'Ιταλία', NL: 'Ολλανδία' };
 const COUNTRY_EN = { GR: 'Greece', CY: 'Cyprus', DE: 'Germany', GB: 'the UK', US: 'the US', FR: 'France', IT: 'Italy', NL: 'the Netherlands' };
