@@ -44,7 +44,7 @@ function Favorites() {
             const sold = b.status === 'sold';
             return (
               <li key={slug}>
-                <button className={`account-fav-play ${playing === slug ? 'on' : ''}`} onClick={() => play(b)} aria-label={playing === slug ? 'Pause' : 'Play'}>
+                <button className={`account-fav-play ${playing === slug ? 'on' : ''}`} onClick={() => play(b)} aria-label={playing === slug ? 'Pause' : 'Play'} data-track={`${playing === slug ? 'pause' : 'play'}:${slug}`}>
                   {playing === slug ? <Pause size={16} /> : <Play size={16} />}
                 </button>
                 <img src={b.cover} alt="" loading="lazy" />

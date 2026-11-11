@@ -68,6 +68,8 @@ function MiniWave({ peaks = [], progress = 0 }) {
   );
 }
 const pad = (n) => String(n).padStart(2, '0');
+// Label για τον μετρητή studio-stats: πλέι ανά beat (το pause μετράει χωριστά).
+const trackPlay = (b, on) => `${on ? 'pause' : 'play'}:${slugOf(b?.title || '')}`;
 // Το είδος του beat: category, αλλιώς το πρώτο tag.
 const genreOf = (b) => String(b?.category || (b?.tags || [])[0] || '').toLowerCase();
 
@@ -812,10 +814,10 @@ export default function VmtStore() {
         {hero && (
           <div className="vmt-week">
             <Bar>CHANNEL RACK · {hero.title}</Bar>
-            <div className={`vmt-week-cover ${isOn(hero) ? 'spin' : ''}`} onClick={() => play(hero)}>
+            <div className={`vmt-week-cover ${isOn(hero) ? 'spin' : ''}`} onClick={() => play(hero)} data-track={trackPlay(hero, isOn(hero))}>
               <img src={hero.cover} alt={hero.title} className="vmt-tone" />
               <img src="/assets/vmt/vmt-logo-white.png" alt="" className="vmt-stamp" />
-              <button className="vmt-play show" aria-label="Play">{isOn(hero) ? <Pause size={30} /> : <Play size={30} />}</button>
+              <button className="vmt-play show" aria-label="Play" data-track={trackPlay(hero, isOn(hero))}>{isOn(hero) ? <Pause size={30} /> : <Play size={30} />}</button>
             </div>
             <div className="vmt-week-body">
               <p className="vmt-kicker">{linked ? t.beatGenre(genreOf(linked)).trim().toUpperCase() : t.beatOfWeek}</p>
@@ -907,10 +909,10 @@ export default function VmtStore() {
 
         {door === 'feed' && feedBeat && (
           <div className="vmt-feed">
-            <div className={`vmt-feed-cover ${isOn(feedBeat) ? 'spin' : ''}`} onClick={() => play(feedBeat, current?.title !== feedBeat.title)}>
+            <div className={`vmt-feed-cover ${isOn(feedBeat) ? 'spin' : ''}`} onClick={() => play(feedBeat, current?.title !== feedBeat.title)} data-track={trackPlay(feedBeat, isOn(feedBeat))}>
               <img src={feedBeat.cover} alt={feedBeat.title} className="vmt-tone" />
               <img src="/assets/vmt/vmt-logo-white.png" alt="" className="vmt-stamp" />
-              <button className="vmt-play show" aria-label="Play">{isOn(feedBeat) ? <Pause size={30} /> : <Play size={30} />}</button>
+              <button className="vmt-play show" aria-label="Play" data-track={trackPlay(feedBeat, isOn(feedBeat))}>{isOn(feedBeat) ? <Pause size={30} /> : <Play size={30} />}</button>
               <span className="vmt-feed-count">{feedIdx + 1} / {forSale.length}</span>
             </div>
             <div className="vmt-feed-body">
@@ -970,7 +972,7 @@ export default function VmtStore() {
                 return (
                   <li key={b.title} className={`${current?.title === b.title ? 'cur' : ''} ${sold ? 'sold' : ''}`}>
                     <span className="vmt-row-n">{pad(idx + 1)}</span>
-                    <button className={`vmt-row-play ${isOn(b) ? 'on' : ''}`} onClick={() => play(b)} aria-label="Play">
+                    <button className={`vmt-row-play ${isOn(b) ? 'on' : ''}`} onClick={() => play(b)} aria-label="Play" data-track={trackPlay(b, isOn(b))}>
                       {isOn(b) ? <Pause size={18} /> : <Play size={18} />}
                     </button>
                     <img src={b.cover} alt="" loading="lazy" className={`vmt-tone ${isOn(b) ? 'spin' : ''}`} />
@@ -1107,7 +1109,7 @@ export default function VmtStore() {
         <div className="vmt-player">
           <div className="vmt-pp-group">
             <button className="vmt-skip" onClick={() => step2(-1)} aria-label={t.prev}><SkipBack size={18} /></button>
-            <button className="vmt-pp" onClick={() => play(current)} aria-label="Play">
+            <button className="vmt-pp" onClick={() => play(current)} aria-label="Play" data-track={trackPlay(current, playing)}>
               {playing ? <Pause size={20} /> : <Play size={20} />}
             </button>
             <button className="vmt-skip" onClick={() => step2(1)} aria-label={t.next}><SkipForward size={18} /></button>
@@ -1160,7 +1162,7 @@ export default function VmtStore() {
               <video className="vmt-video" src={licenseBeat.video} controls playsInline preload="metadata" />
             ) : (
               <div className="vmt-mini-player">
-                <button className={`vmt-row-play ${isOn(licenseBeat) ? 'on' : ''}`} onClick={() => play(licenseBeat)} aria-label="Play">
+                <button className={`vmt-row-play ${isOn(licenseBeat) ? 'on' : ''}`} onClick={() => play(licenseBeat)} aria-label="Play" data-track={trackPlay(licenseBeat, isOn(licenseBeat))}>
                   {isOn(licenseBeat) ? <Pause size={18} /> : <Play size={18} />}
                 </button>
                 <Waveform peaks={licenseBeat.peaks} progress={current?.title === licenseBeat.title ? progress : 0} onSeek={(f) => seek(licenseBeat, f)} />

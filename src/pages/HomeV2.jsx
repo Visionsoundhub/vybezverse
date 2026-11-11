@@ -3,6 +3,7 @@ import { Play, Pause, ArrowUpRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import beatsDataRaw from '../data/beats.json';
 import releasesData from '../data/releases.json';
+import { slugOf } from '../data/vmtPricing';
 import StatsStrip from '../components/StatsStrip';
 import { AudioContext } from '../context/AudioContext';
 import './HomeV2.css';
@@ -154,9 +155,9 @@ function HomeV2() {
           </div>
           <div className="h2-beats">
             {beats.map((b) => (
-              <div key={b.title} className={'h2-beat' + (isOn(b) ? ' on' : '')} onClick={() => playTrack(b)}>
+              <div key={b.title} className={'h2-beat' + (isOn(b) ? ' on' : '')} onClick={() => playTrack(b)} data-track={`${isOn(b) ? 'pause' : 'play'}:${slugOf(b.title)}`}>
                 <img src={b.cover} alt="" loading="lazy" width="56" height="56" />
-                <button className="h2-play" aria-label="Play">{isOn(b) ? <Pause size={16} /> : <Play size={16} />}</button>
+                <button className="h2-play" aria-label="Play" data-track={`${isOn(b) ? 'pause' : 'play'}:${slugOf(b.title)}`}>{isOn(b) ? <Pause size={16} /> : <Play size={16} />}</button>
                 <div className="h2-beat-t">
                   <b>{b.title}</b>
                   <span>{b.bpm} BPM · {b.key} · {(b.tags || []).join(' · ')}</span>
