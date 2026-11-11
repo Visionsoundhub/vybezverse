@@ -126,3 +126,14 @@
   .dropdown-menu { position: static; margin-top: 5px; padding-top: 0; animation: none; }
   .dropdown-menu-inner { box-shadow: none; border: none; background: rgba(236,227,208,.03); }
 }
+
+/* Κινητό: μεγαλύτερα links στο μενού, εύκολα στο δάχτυλο */
+@media (max-width: 1024px) {
+  .nav-links { gap: 2px; padding: 12px 20px 18px; max-height: calc(100dvh - 70px); overflow-y: auto; }
+  .nav-links .nav-link { font-size: .95rem; min-height: 44px; display: flex; align-items: center; justify-content: center; }
+  .mobile-toggle { min-width: 44px; min-height: 44px; }
+  .dropdown-menu-inner a { min-height: 40px; display: flex; align-items: center; justify-content: center; }
+}
+@media (max-width: 1024px) {
+  .nav-links .nav-more-btn { width: 100%; justify-content: center; gap: 6px; }
+}

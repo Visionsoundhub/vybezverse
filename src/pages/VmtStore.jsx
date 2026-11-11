@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame, ShoppingCart, Trash2, Lock, ArrowLeft, LogOut, Download, Share2, ChevronDown, Heart } from 'lucide-react';
+import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame, ShoppingCart, Trash2, Lock, ArrowLeft, LogOut, Download, Share2, ChevronDown, Heart, User } from 'lucide-react';
 import beatsData from '../data/beats.json';
 import { useAuth } from '../context/AuthContext';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
@@ -674,6 +674,16 @@ export default function VmtStore() {
     Object.assign(b, { position: 'fixed', top: `-${y}px`, width: '100%', overflow: 'hidden' });
     return () => { Object.assign(b, prev); window.scrollTo(0, y); };
   }, [modalOpen]);
+  // Esc κλείνει το παράθυρο που είναι ανοιχτό.
+  useEffect(() => {
+    if (!modalOpen) return undefined;
+    const onKey = (e) => {
+      if (e.key !== 'Escape') return;
+      setLicenseBeat(null); setCartOpen(false); setRecBeat(null); setThanks(null); setMineOpen(false);
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [modalOpen]);
   const openLicenses = (b) => { openedAt.current = Date.now(); setLicenseBeat(b); };
 
   // Πληρωμή: ο server υπολογίζει το σύνολο (2+1, VIP, Black Friday) και ανοίγει το Polar πάνω από τη σελίδα.
@@ -771,6 +781,9 @@ export default function VmtStore() {
           {currentUser
             ? <button className="vmt-top-link" onClick={() => setMineOpen(true)}>{t.myBeatsLink}</button>
             : <a href={`/account?next=${base}`} className="vmt-top-link">{t.login}</a>}
+          {currentUser && (
+            <a href="/account" className="vmt-top-cart vmt-top-account" aria-label={t.account} title={t.account}><User size={18} /></a>
+          )}
           <button className="vmt-top-cart" onClick={() => setCartOpen(true)} aria-label={t.cart}>
             <ShoppingCart size={18} />{priced.lines.length > 0 && <span>{priced.lines.length}</span>}
           </button>

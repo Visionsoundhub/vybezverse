@@ -649,3 +649,17 @@ html:has(.vmt) { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 @keyframes vmtHeartBurst { 0% { opacity: 1; transform: rotate(var(--a)) translateY(0) scale(1); } 100% { opacity: 0; transform: rotate(var(--a)) translateY(-18px) scale(.4); } }
 @media (prefers-reduced-motion: reduce) { .vmt-heart.on .vmt-heart-ic svg, .vmt-heart-burst i { animation: none; } }
 @media (max-width: 720px) { .vmt-list .vmt-heart { height: 38px; min-width: 38px; padding: 0 9px; } }
+
+/* κουμπί λογαριασμού στην κεφαλίδα: χωράει και στα στενά κινητά */
+@media (max-width: 420px) {
+  .vmt-top-right { gap: 7px; }
+  .vmt-top-brand { gap: 6px; font-size: 13px; }
+  .vmt-top-cart { width: 36px; height: 36px; }
+}
+/* μεγαλύτερη περιοχή πατήματος στα μικρά links της κεφαλίδας (EN, Σύνδεση, Τα beats μου) */
+@media (max-width: 720px) {
+  .vmt-top-link, .vmt-top-back { min-height: 40px; display: inline-flex; align-items: center; padding: 0 4px; }
+  .vmt-back { min-height: 40px; display: inline-flex; align-items: center; }
+}
+/* iPhone: κάτω από 16px το Safari κάνει zoom στο πεδίο αναζήτησης */
+@media (max-width: 720px) { .vmt-list-tools input { font-size: 16px; } }
