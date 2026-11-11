@@ -61,6 +61,8 @@ const el = {
     hint: 'Ράψε πάνω του: γράψε 20″ με τη φωνή σου και άκου αν κάθεται, πριν το πάρεις.',
     buy: (p) => `Κάθεται; Πάρ' το από ${p}`,
   },
+  like: 'Μου αρέσει',
+  unlike: 'Δεν μου αρέσει πια',
   freeDl: {
     title: 'Δωρεάν tagged έκδοση',
     text: 'Πάρε το MP3 με το φωνητικό tag για demo, freestyle και YouTube χωρίς monetization. Σου έρχεται στο email.',
@@ -222,6 +224,8 @@ const en = {
     hint: 'Try it on: record 20″ of your voice and hear if it fits, before you buy.',
     buy: (p) => `It fits? Get it from ${p}`,
   },
+  like: 'Like',
+  unlike: 'Unlike',
   freeDl: {
     title: 'Free tagged version',
     text: 'Get the MP3 with the voice tag for demos, freestyles and YouTube without monetization. It goes to your email.',

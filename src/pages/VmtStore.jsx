@@ -1,11 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
-import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame, ShoppingCart, Trash2, Lock, ArrowLeft, LogOut, Download, Share2, ChevronDown } from 'lucide-react';
+import { Play, Pause, X, Check, Mail, Mic, Shuffle, List as ListIcon, SkipForward, SkipBack, Flame, ShoppingCart, Trash2, Lock, ArrowLeft, LogOut, Download, Share2, ChevronDown, Heart } from 'lucide-react';
 import beatsData from '../data/beats.json';
 import { useAuth } from '../context/AuthContext';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
 import useBeatPurchases from '../utils/useBeatPurchases';
 import { priceCart, licensesFor, slugOf, PROMOS, afterOffers, priceFor, isArchive, firstOrderActive } from '../data/vmtPricing';
+import useVmtLikes from '../utils/useVmtLikes';
 import { VMT_TEXT, langFromPath, beatsBase, otherLangPath } from '../data/vmtI18n';
 
 // Γλώσσα από το URL: /en/beats = αγγλικά, /beats = ελληνικά.
@@ -356,6 +357,31 @@ function FreeDownload({ beat }) {
   );
 }
 
+// Καρδιά «μου αρέσει» με μετρητή. Το animation παίζει μόνο όταν γίνεται καρδιά (όχι στο ξε-κάρδιασμα).
+function HeartButton({ beat, likes, big = false }) {
+  const { t } = useVmt();
+  const slug = slugOf(beat.title);
+  const on = likes.isLiked(slug);
+  const n = likes.counts[slug] || 0;
+  const [pop, setPop] = useState(0);
+  return (
+    <button
+      type="button"
+      className={`vmt-heart ${on ? 'on' : ''} ${big ? 'big' : ''}`}
+      aria-pressed={on}
+      aria-label={on ? t.unlike : t.like}
+      title={on ? t.unlike : t.like}
+      onClick={(e) => { e.stopPropagation(); if (!on) setPop((p) => p + 1); likes.toggle(slug); }}
+    >
+      <span className="vmt-heart-ic" key={pop}>
+        <Heart size={big ? 18 : 17} fill={on ? 'currentColor' : 'none'} />
+        {pop > 0 && on && <span className="vmt-heart-burst" aria-hidden="true">{[0, 1, 2, 3, 4, 5].map((i) => <i key={i} />)}</span>}
+      </span>
+      {n > 0 && <span className="vmt-heart-n">{n}</span>}
+    </button>
+  );
+}
+
 function Newsletter() {
   const { lang, t: { news: t } } = useVmt();
   const [email, setEmail] = useState('');
@@ -465,6 +491,7 @@ function SalesToast() {
 }
 
 export default function VmtStore() {
+  const likes = useVmtLikes();
   const { lang, t, base, pathname } = useVmt();
   const money = t.money;
   // «από 19,99€» ή «από 14,99€» για beat από το αρχείο
@@ -783,10 +810,11 @@ export default function VmtStore() {
                 <button className="vmt-buy" onClick={() => openLicenses(hero)}>{t.buyFrom(fromPrice(hero))}</button>
                 <button className="vmt-ghost" onClick={() => { stop(); setRecBeat(hero); }}><Mic size={16} /> {t.rec.title}</button>
                 <ShareButton beat={hero} />
+                {hero.status !== 'sold' && <HeartButton beat={hero} likes={likes} big />}
               </div>
               <p className="vmt-hint vmt-rec-hint">{t.rec.hint}</p>
               {linked && (linked.tags || []).length > 0 && (
-                <div className="vmt-chips">{[...(linked.tags || []), ...(linked.mood || []).map(t.mood)].map((x) => <span key={x}>#{x}</span>)}</div>
+                <div className="vmt-chips">{[...new Set([...(linked.tags || []), ...(linked.mood || []).map(t.mood)])].map((x) => <span key={x}>#{x}</span>)}</div>
               )}
             </div>
           </div>
@@ -940,6 +968,7 @@ export default function VmtStore() {
                       <span className="vmt-row-sold">SOLD{b.soldTo ? ` · ${b.soldTo}` : ''}</span>
                     ) : (
                       <>
+                        <HeartButton beat={b} likes={likes} />
                         <button className="vmt-row-mic" onClick={() => { stop(); setRecBeat(b); }} aria-label={t.rec.title}><Mic size={18} /></button>
                         <ShareButton beat={b} small />
                         <button className="vmt-ghost vmt-price-btn" onClick={(e) => { e.stopPropagation(); openLicenses(b); }}>{fromPrice(b)}</button>

@@ -99,7 +99,7 @@ function HomeV2() {
           <div className="h2-sleeve-wrap">
             <button className={'h2-sleeve' + (isOn(single) ? ' spin' : '')} onClick={playSingle} aria-label="Άκου">
               <span className="h2-disc" />
-              <img src={single?.cover} alt={single?.title} width="600" height="600" fetchpriority="high" />
+              <img src={single?.cover} alt={single?.title} width="600" height="600" fetchPriority="high" />
             </button>
           </div>
         </div>

@@ -1,14 +1,75 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { updateProfile, updatePassword } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Ticket, Music, AlertCircle, ShoppingBag } from 'lucide-react';
+import { LogOut, Ticket, Music, AlertCircle, ShoppingBag, Heart, Play, Pause } from 'lucide-react';
 import { doc, getDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import LoyaltyProgressBar from '../components/LoyaltyProgressBar';
 import { tierForPurchases, discountLabel } from '../data/loyaltyTiers';
 import useBeatPurchases from '../utils/useBeatPurchases';
+import useVmtLikes from '../utils/useVmtLikes';
+import beatsData from '../data/beats.json';
+import { slugOf } from '../data/vmtPricing';
 import './Account.css';
+
+// Αγαπημένα beats (καρδιές από το store): ακρόαση εδώ, αγορά στη σελίδα του beat.
+function Favorites() {
+  const likes = useVmtLikes();
+  const audio = useRef(null);
+  const [playing, setPlaying] = useState('');
+  useEffect(() => () => audio.current?.pause(), []);
+  const bySlug = Object.fromEntries(beatsData.beatslist.map((b) => [slugOf(b.title), b]));
+  const list = likes.mine.map((s) => bySlug[s]).filter(Boolean);
+  const play = (b) => {
+    const slug = slugOf(b.title);
+    if (playing === slug) { audio.current?.pause(); setPlaying(''); return; }
+    audio.current?.pause();
+    const a = new Audio(b.audioSrc);
+    a.onended = () => setPlaying('');
+    a.play().catch(() => setPlaying(''));
+    audio.current = a;
+    setPlaying(slug);
+  };
+  return (
+    <div className="account-card account-favs">
+      <div className="account-card-header">
+        <Heart size={20} color="var(--accent)" />
+        <h2>Αγαπημένα</h2>
+      </div>
+      {!likes.ready ? null : list.length > 0 ? (
+        <ul className="account-fav-list">
+          {list.map((b) => {
+            const slug = slugOf(b.title);
+            const sold = b.status === 'sold';
+            return (
+              <li key={slug}>
+                <button className={`account-fav-play ${playing === slug ? 'on' : ''}`} onClick={() => play(b)} aria-label={playing === slug ? 'Pause' : 'Play'}>
+                  {playing === slug ? <Pause size={16} /> : <Play size={16} />}
+                </button>
+                <img src={b.cover} alt="" loading="lazy" />
+                <div className="account-fav-main">
+                  <a href={`/beats/${slug}`}>{b.title}</a>
+                  <span>{b.bpm} BPM · {b.key}</span>
+                </div>
+                <button className="account-fav-heart" onClick={() => likes.toggle(slug)} aria-label="Βγάλ' το από τα αγαπημένα" title="Βγάλ' το από τα αγαπημένα">
+                  <Heart size={16} fill="currentColor" />
+                </button>
+                {sold ? <span className="account-fav-sold">SOLD</span> : <a className="btn-primary account-fav-buy" href={`/beats/${slug}`}>Αγορά</a>}
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <div className="account-empty-state">
+          <Heart size={36} opacity={0.5} />
+          <p>Πάτα την καρδιά σε όποιο beat σου αρέσει και θα το βρίσκεις εδώ.</p>
+          <a href="/beats" className="btn-outline" style={{ marginTop: 16, display: 'inline-block' }}>Δες τα beats</a>
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Account() {
   const { currentUser, logout, login, signup, loginWithGoogle, authLoading } = useAuth();
@@ -257,6 +318,8 @@ function Account() {
             </div>
           )}
         </div>
+
+        <Favorites />
 
         <div className="account-card">
           <div className="account-card-header">
