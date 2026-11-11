@@ -18,7 +18,7 @@ async function counts(env, token) {
   let page = '';
   do {
     const r = await fetch(`${api(env)}/vmt_likes?pageSize=300${page ? `&pageToken=${page}` : ''}`, { headers: auth(token) });
-    if (!r.ok) break;
+    if (!r.ok) { console.error('vmt-likes counts failed:', r.status, await r.text()); break; }
     const d = await r.json();
     for (const doc of d.documents || []) {
       const n = Number(doc.fields?.count?.integerValue || 0);
@@ -47,8 +47,12 @@ export async function onRequestGet({ request, env }) {
 }
 
 export async function onRequestPost({ request, env }) {
+  try { return await post(request, env); } catch (e) { console.error('vmt-likes crash:', e?.stack || e); return json({ error: 'crash', detail: String(e?.message || e) }, 500); }
+}
+
+async function post(request, env) {
   const user = await userFromRequest(request, env);
-  if (!user) return json({ error: 'login' }, 401);
+  if (!user) { console.error('vmt-likes: no valid token'); return json({ error: 'login' }, 401); }
   let body;
   try { body = await request.json(); } catch { return json({ error: 'bad json' }, 400); }
   const slug = String(body.slug || '');
@@ -81,7 +85,7 @@ export async function onRequestPost({ request, env }) {
     const text = await r.text();
     if (!/FAILED_PRECONDITION|ALREADY_EXISTS|NOT_FOUND/.test(text)) {
       console.error('vmt-likes commit failed:', r.status, text);
-      return json({ error: 'save failed' }, 502);
+      return json({ error: 'save failed', status: r.status, detail: text.slice(0, 300) }, 502);
     }
   }
   const c = await fetch(`${api(env)}/vmt_likes/${slug}`, { headers: auth(token) });

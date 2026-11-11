@@ -44,9 +44,10 @@ export default function useVmtLikes() {
     try {
       const r = await fetch('/api/vmt-likes', { method: 'POST', headers: await headers(), body: JSON.stringify({ slug, like }) });
       const d = await r.json().catch(() => ({}));
-      if (!r.ok) throw new Error(d.error || 'save failed');
+      if (!r.ok) { console.warn('like failed', r.status, d); throw new Error(d.error || 'save failed'); }
       if (typeof d.count === 'number') setCounts((c) => ({ ...c, [slug]: d.count }));
-    } catch {
+    } catch (e) {
+      console.warn('like not saved:', e?.message || e);
       setMine((m) => (like ? m.filter((s) => s !== slug) : [slug, ...m]));
       setCounts((c) => ({ ...c, [slug]: Math.max(0, (c[slug] || 0) + (like ? -1 : 1)) }));
     } finally {
