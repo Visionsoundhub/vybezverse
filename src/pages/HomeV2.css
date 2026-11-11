@@ -107,3 +107,8 @@
 .h2-rv { opacity: 0; transform: translateY(22px); transition: opacity .6s cubic-bezier(.22,1,.36,1), transform .6s cubic-bezier(.22,1,.36,1); }
 .h2-rv.on { opacity: 1; transform: none; }
 @media (prefers-reduced-motion: reduce) { .h2-rv { opacity: 1; transform: none; transition: none; } }
+
+/* συγκατάθεση newsletter */
+.h2-news-consent { flex-basis: 100%; display: flex; gap: 10px; align-items: flex-start; font-size: .85rem; color: var(--text-dim); line-height: 1.45; cursor: pointer; }
+.h2-news-consent input { width: 20px; height: 20px; flex: none; margin: 1px 0 0; accent-color: var(--a); }
+.h2-news-consent a { color: var(--a); }

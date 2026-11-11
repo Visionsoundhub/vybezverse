@@ -19,7 +19,8 @@ import './VmtStore.css';
 
 // VMT beat store: αγορές μέσω Polar (embedded checkout, ο πελάτης δεν φεύγει από το site).
 const CONTACT_EMAIL = 'support@blackvybez.gr';
-const POLAR_EMBED = 'https://cdn.jsdelivr.net/npm/@polar-sh/checkout@0.4/dist/embed.global.js';
+// Αντίγραφο του @polar-sh/checkout 0.4.3 μέσα στο site (όχι CDN τρίτου: GDPR και ασφάλεια).
+const POLAR_EMBED = '/vendor/polar-checkout-embed-0.4.3.js';
 
 // Κείμενα (features, note) ανά γλώσσα στο vmtI18n.
 const LICENSES = [
@@ -411,6 +412,10 @@ function Newsletter() {
         <form onSubmit={submit}>
           <input type="email" placeholder={t.placeholder} value={email} onChange={(e) => setEmail(e.target.value)} required />
           <button className="vmt-buy" type="submit">{t.button}</button>
+          <label className="vmt-consent vmt-news-consent">
+            <input type="checkbox" required />
+            <span>{t.consent}<a href="/privacy" target="_blank" rel="noopener">{t.privacy}</a>.</span>
+          </label>
         </form>
       )}
     </section>

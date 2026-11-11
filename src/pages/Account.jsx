@@ -214,6 +214,10 @@ function Account() {
             </button>
           </form>
 
+          <p className="account-legal">
+            Με τη σύνδεση ή την εγγραφή δέχεσαι τους <a href="/beats/oroi">όρους</a> και την <a href="/privacy">πολιτική απορρήτου</a>.
+          </p>
+
           <p className="account-toggle">
             {isLogin ? 'Δεν έχεις λογαριασμό; ' : 'Έχεις ήδη λογαριασμό; '}
             <span onClick={() => setIsLogin(!isLogin)}>{isLogin ? 'Sign Up' : 'Login'}</span>

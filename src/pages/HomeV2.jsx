@@ -52,6 +52,10 @@ function Newsletter() {
             <label htmlFor="h2-mail" className="h2-sr">Το email σου</label>
             <input id="h2-mail" type="email" required placeholder="το email σου" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" />
             <button className="h2-btn pri" type="submit" disabled={state === 'busy'}>{state === 'busy' ? 'Στέλνεται…' : 'Γράψου'}</button>
+            <label className="h2-news-consent">
+              <input type="checkbox" required />
+              <span>Θέλω να μου στέλνετε email για νέα κομμάτια και beats. Φεύγω με ένα κλικ όποτε θέλω. <a href="/privacy">Απόρρητο</a></span>
+            </label>
             {state === 'err' && <p className="h2-news-err" role="alert">{msg}</p>}
           </form>
         )}

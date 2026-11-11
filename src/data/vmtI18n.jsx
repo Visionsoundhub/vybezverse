@@ -86,6 +86,8 @@ const el = {
     text: 'Κάθε εβδομάδα κάτι βγαίνει από την κουζίνα. Γράψου και σου το στέλνω ζεστό, πριν ανέβει παντού.',
     placeholder: 'το email σου',
     button: 'Στείλε μου τα νέα',
+    consent: 'Θέλω να μου στέλνετε email για νέα beats και προσφορές. Φεύγω με ένα κλικ όποτε θέλω. ',
+    privacy: 'Απόρρητο',
   },
   ago: (m) => {
     if (m < 60) return `πριν ${Math.max(1, m)}′`;
@@ -250,6 +252,8 @@ const en = {
     text: "Something fresh comes out of the kitchen every week. Sign up and I'll send it to you hot, before it drops anywhere else.",
     placeholder: 'your email',
     button: 'Send me the new stuff',
+    consent: 'I want emails about new beats and offers. I can leave with one click anytime. ',
+    privacy: 'Privacy',
   },
   ago: (m) => {
     if (m < 60) return `${Math.max(1, m)} min ago`;

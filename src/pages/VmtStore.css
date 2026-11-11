@@ -663,3 +663,5 @@ html:has(.vmt) { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
 }
 /* iPhone: κάτω από 16px το Safari κάνει zoom στο πεδίο αναζήτησης */
 @media (max-width: 720px) { .vmt-list-tools input { font-size: 16px; } }
+
+.vmt-news-consent { flex-basis: 100%; margin: 4px 0 0; }

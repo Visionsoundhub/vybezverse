@@ -56,7 +56,7 @@ const staticRoutes = [
   {
     path: 'bio',
     title: 'Βιογραφία | Black Vybez (Θοδωρής Παρασχάκης)',
-    description: 'Η ιστορία πίσω από τον Black Vybez: Μουσικός παραγωγός από τη Λάρισα και την Αθήνα, beats, podcasts και η φωνή του για τη νευροδιαφορετικότητα (ΔΕΠΥ).'
+    description: 'Η ιστορία πίσω από τον Black Vybez: Μουσικός παραγωγός που ζει στην Αθήνα, beats, podcasts και η φωνή του για τη νευροδιαφορετικότητα (ΔΕΠΥ).'
   },
   {
     path: 'store',
@@ -279,7 +279,7 @@ ${mdToHtml(bioData?.content || '')}`,
   };
 
   const homeBody = `<h1>Black Vybez, Vybezmadethis</h1>
-<p>Ο Black Vybez (Θοδωρής Παρασχάκης) είναι Έλληνας rapper, μουσικός παραγωγός και τραγουδοποιός από τη Λάρισα. Δημιουργεί beats, κυκλοφορεί μουσική και μιλάει για τη νευροδιαφορετικότητα (ΔΕΠΥ) μέσα από το podcast «Μπαμπάς των 2 &amp; Rapper». Μουσική για κάθε διαφορετικό μυαλό.</p>
+<p>Ο Black Vybez (Θοδωρής Παρασχάκης) είναι Έλληνας rapper, μουσικός παραγωγός και τραγουδοποιός που ζει στην Αθήνα. Δημιουργεί beats, κυκλοφορεί μουσική και μιλάει για τη νευροδιαφορετικότητα (ΔΕΠΥ) μέσα από το podcast «Μπαμπάς των 2 &amp; Rapper». Μουσική για κάθε διαφορετικό μυαλό.</p>
 <ul>
 <li><a href="/releases">Releases</a></li>
 <li><a href="/beats">Beats store</a></li>
@@ -291,7 +291,7 @@ ${mdToHtml(bioData?.content || '')}`,
   // Ομάδα: canonical/og:url + static body στην ίδια την αρχική σελίδα
   const homeHtml = injectStaticBody(injectMetaTags(baseHtml, {
     title: 'Black Vybez | Beats, Releases & Vybezverse',
-    description: 'Black Vybez (Vybezmadethis), producer από τη Λάρισα. Άκου beats, releases, podcasts και γίνε μέλος του Vybezverse. Μουσική για κάθε διαφορετικό μυαλό.',
+    description: 'Black Vybez (Vybezmadethis), producer που ζει στην Αθήνα. Άκου beats, releases, podcasts και γίνε μέλος του Vybezverse. Μουσική για κάθε διαφορετικό μυαλό.',
     urlPath: ''
   }), homeBody);
   fs.writeFileSync(INDEX_HTML_PATH, homeHtml);

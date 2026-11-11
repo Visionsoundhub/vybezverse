@@ -3,22 +3,9 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { Mic } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import podcastsData from '../data/podcasts.json';
+import SpotifyEpisode from '../components/SpotifyEpisode';
 
-function EpisodeFrame({ id, title, height }) {
-  return (
-    <div style={{ borderRadius: 'var(--radius)', overflow: 'hidden', border: '1px solid var(--border-strong)', boxShadow: 'var(--shadow-print)' }}>
-      <iframe
-        title={title || 'Επεισόδιο'}
-        src={`https://open.spotify.com/embed/episode/${id}?theme=0`}
-        width="100%"
-        height={height}
-        style={{ display: 'block', border: 0 }}
-        loading="lazy"
-        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-      />
-    </div>
-  );
-}
+const EpisodeFrame = SpotifyEpisode;
 
 function Podcasts() {
   const reduce = useReducedMotion();

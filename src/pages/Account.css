@@ -281,3 +281,6 @@
 
 /* iPhone: κάτω από 16px το Safari κάνει zoom όταν πατάς το πεδίο */
 .account-form input { font-size: 16px; }
+
+.account-legal { font-size: .8rem; color: var(--text-dim); text-align: center; margin: 14px 0 0; line-height: 1.5; }
+.account-legal a { color: var(--accent); }

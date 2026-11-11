@@ -11,3 +11,19 @@
   ! Permissions-Policy
   Permissions-Policy: camera=(), microphone=(self), geolocation=()
 
+
+/beats/*
+  ! Permissions-Policy
+  Permissions-Policy: camera=(), microphone=(self), geolocation=()
+
+/en/beats
+  ! Permissions-Policy
+  Permissions-Policy: camera=(), microphone=(self), geolocation=()
+
+/en/beats/*
+  ! Permissions-Policy
+  Permissions-Policy: camera=(), microphone=(self), geolocation=()
+
+# Τα js/css του build έχουν hash στο όνομα: δεν αλλάζουν ποτέ, άρα cache για πάντα.
+/assets/:file
+  Cache-Control: public, max-age=31536000, immutable
