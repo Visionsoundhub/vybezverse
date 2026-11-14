@@ -66,7 +66,14 @@ function Releases() {
                 <h3 style={{ fontFamily: 'var(--font-display)', fontSize: '1.35rem', fontWeight: 700, margin: 0 }}>{item.title}</h3>
                 <p style={{ fontFamily: 'var(--font-mono)', fontSize: '.78rem', color: 'var(--accent)', marginTop: 4 }}>{item.tag}{item.tracks ? ` · ${item.tracks} tracks` : ''}</p>
               </div>
-              {item.comingSoon ? (
+              {item.comingSoon && item.presave ? (
+                <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '.68rem', letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--accent)' }}>
+                    Βγαίνει {new Date(item.date).toLocaleDateString('el-GR', { day: 'numeric', month: 'long' })}
+                  </div>
+                  <a href={item.presave} target="_blank" rel="noreferrer" data-track={`presave:${item.slug}`}><button className="btn-primary" style={{ width: '100%', padding: '10px', justifyContent: 'center' }}>Pre-save</button></a>
+                </div>
+              ) : item.comingSoon ? (
                 <div style={{ marginTop: 'auto', fontFamily: 'var(--font-mono)', fontSize: '.72rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--text-dim)', border: '1px dashed var(--border-strong)', borderRadius: 'var(--radius-sm)', padding: '12px', textAlign: 'center' }}>
                   Coming soon
                 </div>
@@ -78,11 +85,18 @@ function Releases() {
                       <button className="btn-outline" style={{ width: '100%', padding: '9px' }} onClick={() => playTrack({ title: item.title, cover: item.cover, audioSrc: item.audioSrc })}>
                         <Play size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Άκουσέ το
                       </button>
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
-                        <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>Spotify</button></a>
-                        <a href={item.apple || APPLE} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>Apple</button></a>
-                        <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>YouTube</button></a>
-                      </div>
+                      {item.noStreaming ? (
+                        <div style={{ display: 'grid', gridTemplateColumns: item.presave ? '1fr 1fr' : '1fr', gap: 6 }}>
+                          {item.presave && <a href={item.presave} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>Pre-save</button></a>}
+                          <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>YouTube</button></a>
+                        </div>
+                      ) : (
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 6 }}>
+                          <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>Spotify</button></a>
+                          <a href={item.apple || APPLE} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>Apple</button></a>
+                          <a href={item.youtube || YOUTUBE} target="_blank" rel="noreferrer"><button className="btn-outline" style={{ width: '100%', padding: '9px', fontSize: '.72rem' }}>YouTube</button></a>
+                        </div>
+                      )}
                       {item.downloadSrc && (
                         <a href={item.freeLink || item.downloadSrc} {...(item.freeLink ? { target: '_blank', rel: 'noreferrer' } : { download: `${item.title}.mp3` })}><button className="btn-outline" style={{ width: '100%', padding: '9px' }}><Download size={15} style={{ marginRight: 6, verticalAlign: -2 }} />Δωρεάν MP3</button></a>
                       )}

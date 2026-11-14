@@ -1,6 +1,19 @@
 {
   "releases": [
     {
+      "slug": "ole-ole-ole-remix",
+      "title": "Ole Ole Ole (Remix)",
+      "artists": "DieM, E Void, Black Vybez",
+      "tag": "Single",
+      "type": "Single",
+      "date": "2026-11-20",
+      "comingSoon": true,
+      "cover": "/assets/uploads/ole-ole-ole-remix-cover.webp",
+      "presave": "https://bfan.link/ole-ole-ole",
+      "youtube": "https://www.youtube.com/watch?v=msqxHkDJscU",
+      "description": "Το Ole Ole Ole ξαναγυρίζει σε remix από τους DieM, E Void και Black Vybez. Βγαίνει Παρασκευή 20 Νοεμβρίου σε όλες τις πλατφόρμες. Κάνε pre-save για να το έχεις πρώτος."
+    },
+    {
       "slug": "jazz-bar-ton-teraton-2",
       "title": "Jazz Bar των Τεράτων 2",
       "tag": "Single",

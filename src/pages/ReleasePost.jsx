@@ -45,7 +45,8 @@ function ReleasePost() {
               {item.date && <span>· {new Date(item.date).getFullYear()}</span>}
             </div>
 
-            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem,6vw,3.2rem)', lineHeight: 0.95, letterSpacing: '-.02em', margin: '0 0 20px' }}>{item.title}</h1>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: 'clamp(2rem,6vw,3.2rem)', lineHeight: 0.95, letterSpacing: '-.02em', margin: item.artists ? '0 0 8px' : '0 0 20px' }}>{item.title}</h1>
+            {item.artists && <p style={{ fontFamily: 'var(--font-mono)', fontSize: '.85rem', color: 'var(--text-dim)', margin: '0 0 20px' }}>{item.artists}</p>}
 
             <p style={{ color: 'var(--text)', fontSize: '1.1rem', lineHeight: 1.6, marginBottom: 0 }}>{item.description}</p>
 
@@ -61,7 +62,21 @@ function ReleasePost() {
 
           {/* Links */}
           <div style={{ marginTop: 30, display: 'flex', flexDirection: 'column', gap: 12 }}>
-            {item.comingSoon ? (
+            {item.comingSoon && item.presave ? (
+              <>
+                <div style={{ fontFamily: 'var(--font-mono)', fontSize: '.8rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--accent)', textAlign: 'center' }}>
+                  Βγαίνει {new Date(item.date).toLocaleDateString('el-GR', { weekday: 'long', day: 'numeric', month: 'long' })}
+                </div>
+                <a href={item.presave} target="_blank" rel="noreferrer" data-track={`presave:${item.slug}`} style={{ textDecoration: 'none' }}>
+                  <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }}><Music size={16} style={{ marginRight: 8 }} /> Pre-save</button>
+                </a>
+                {item.youtube && (
+                  <a href={item.youtube} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                    <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><ExternalLink size={16} style={{ marginRight: 8 }} /> YouTube</button>
+                  </a>
+                )}
+              </>
+            ) : item.comingSoon ? (
                  <div style={{ fontFamily: 'var(--font-mono)', fontSize: '.8rem', letterSpacing: '.14em', textTransform: 'uppercase', color: 'var(--text-dim)', border: '1px dashed var(--border-strong)', borderRadius: 'var(--radius-sm)', padding: '16px', textAlign: 'center' }}>
                    Coming soon
                  </div>
@@ -72,6 +87,11 @@ function ReleasePost() {
                       <button className="btn-primary" style={{ width: '100%', justifyContent: 'center' }} onClick={() => playTrack({ title: item.title, cover: item.cover, audioSrc: item.audioSrc })}>
                         <Play size={16} style={{ marginRight: 8 }} /> Άκουσέ το
                       </button>
+                      {item.noStreaming && item.presave && (
+                        <a href={item.presave} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
+                          <button className="btn-outline" style={{ width: '100%', justifyContent: 'center' }}><Music size={16} style={{ marginRight: 8 }} /> Pre-save</button>
+                        </a>
+                      )}
                       {!item.noStreaming && (
                         <>
                           <a href={item.spotify || SPOTIFY} target="_blank" rel="noreferrer" style={{ textDecoration: 'none' }}>
